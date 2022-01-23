@@ -3,6 +3,8 @@ import Vuex from 'vuex'
 
 Vue.use(Vuex)
 
+import playroom from './modules/playroom.js'
+
 export default new Vuex.Store({
   state: {
   },
@@ -11,5 +13,6 @@ export default new Vuex.Store({
   actions: {
   },
   modules: {
+    playroom: playroom
   }
 })
