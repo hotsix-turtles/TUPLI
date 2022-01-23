@@ -79,7 +79,19 @@
 
 <script>
 export default {
-
+  name: 'PlayroomDetail',
+  metaInfo: {
+    title: 'RoomName',
+    titleTemplate: '%s | Tupli',
+    htmlAttrs: {
+      lang: 'ko-KR'
+    },
+    meta: [
+      { charset: 'utf-8' },
+      //{ name: 'description', content: ''},
+      { name: 'viewport', content: 'width=device-width, initial-scale=1' }
+    ]
+  }
 }
 </script>
 
