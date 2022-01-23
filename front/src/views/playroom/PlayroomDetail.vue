@@ -13,12 +13,8 @@
     </div>
     <div class="playroomInfo">
       <div class="playroomTitleWrapper">
-        <p v-bind:class="{ playroomPublicBadge: roomPublic, playroomPrivateBadge: !roomPublic }">
-          {{ roomPublicLabel }}
-        </p>
-        <p class="playroomTitle">
-          {{ roomTitle }}
-        </p>
+        <p v-bind:class="{ playroomPublicBadge: roomPublic, playroomPrivateBadge: !roomPublic }">{{ roomPublicLabel }}</p>
+        <p class="playroomTitle">{{ roomTitle }}</p>
       </div>
       <div class="playroomAuthorWrapper">
         <div class="authorProfilePic">
