@@ -7,7 +7,7 @@
         @paused="onVideoPaused" @buffering="onVideoBuffering" @cued="onVideoCued" />
     </div>
     <div class="playerNav">
-      <v-bottom-navigation :value="value" grow class="elevation-1">
+      <v-bottom-navigation :value="value" grow class="elevation-2">
         <v-btn class="playroomLike">
           <span>좋아요</span>
           <v-icon>mdi-thumb-up</v-icon>
@@ -29,7 +29,7 @@
         </v-btn>
       </v-bottom-navigation>
     </div>
-    <div class="playroomInfo mx-3">
+    <div class="playroomInfo">
       <div class="playroomTitleWrapper">
         <p v-bind:class="{ playroomPublicBadge: roomPublic, playroomPrivateBadge: !roomPublic }">{{ roomPublicLabel }}</p>
         <p class="playroomTitle">{{ roomTitle }}</p>
@@ -59,11 +59,9 @@
     <div class="playlistWrapper mx-3 mb-5">
       <p>현재 재생중인 <b>플레이리스트</b></p>
       <div class="playlistThumbnailWrapper">
-        <v-card outlined>
+        <v-card outlined style="overflow-x:auto">
           <v-list-item>
-            <v-list-item-avatar size="80" color="grey">
-              <v-badge color="#EAEAEA" inline class="mx-auto"></v-badge>
-            </v-list-item-avatar>
+            <PlaylistThumbnailItem :thumb-url="playlistItem.thumbnail_url" v-for="playlistItem in playlistItems" v-bind:key="playlistItem.id"/>
           </v-list-item>
         </v-card>
       </div>
@@ -118,12 +116,14 @@
 import { mapGetters, mapState } from 'vuex';
 import Vue from 'vue'
 import VueYoutube from 'vue-youtube'
+import PlaylistThumbnailItem from './PlaylistThumbnailItem.vue'
 
 Vue.use(VueYoutube)
 
 export default {
   name: 'PlayroomDetail',
   components: {
+    PlaylistThumbnailItem
   },
   data() {
     return {
@@ -132,7 +132,12 @@ export default {
       playerVars: {
         autoplay: 1,
         mute: 1
-      }
+      },
+      playlistItems: [
+        { id: 1, thumbnail_url: 'http://www.naver.com' },
+        { id: 2, thumbnail_url: 'http://www.naver.com' },
+        { id: 3, thumbnail_url: 'http://www.naver.com' },
+      ]
     }
   },
   metaInfo () {
@@ -215,19 +220,21 @@ export default {
 </script>
 
 <style lang="scss">
-@import '~@/assets/scss/common';
+@import '~@/scss/common';
 
 iframe {
   width: 100%;
   max-width: 650px; /* Also helpful. Optional. */
 }
 
+.playroomInfo {
+  padding: 10px;
+}
+
 .playroomTitleWrapper {
   display: flex;
   flex-direction: row;
-  padding: 10px;
-  width: 100%;
-  height: 100%;
+  height: 20px;
 }
 
 .playroomPublicBadge {
@@ -239,7 +246,7 @@ iframe {
   border-radius: 10px;
   font-size: 12px;
   font-weight: bold;
-  margin-right: 10px;
+  margin-right: 5px;
 }
 
 .playroomPrivateBadge {
@@ -252,7 +259,7 @@ iframe {
   border-radius: 10px;
   font-size: 12px;
   font-weight: bold;
-  margin-right: 10px;
+  margin-right: 5px;
 }
 
 .playroomTitle {
