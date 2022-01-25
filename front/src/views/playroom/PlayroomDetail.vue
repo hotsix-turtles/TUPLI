@@ -1,24 +1,44 @@
 <template>
   <div class="playroom">
     <div class="playerWrapper">
-      <div class="player">
-
-      </div>
+      <youtube :video-id="videoId" :player-vars="playerVars" 
+        width="100%" height="200" ref="youtube" 
+        @ready="onVideoReady" @ended="onVideoEnded" @playing="onVideoPlaying" 
+        @paused="onVideoPaused" @buffering="onVideoBuffering" @cued="onVideoCued" />
     </div>
     <div class="playerNav">
-      <div class="playroomLike"></div>
-      <div class="playroomChat"></div>
-      <div class="playroomShare"></div>
-      <div class="playroomReport"></div>
+      <v-bottom-navigation :value="value" grow class="elevation-1">
+        <v-btn class="playroomLike">
+          <span>좋아요</span>
+          <v-icon>mdi-thumb-up</v-icon>
+        </v-btn>
+
+        <v-btn class="playroomChat">
+          <span>채팅</span>
+          <v-icon>mdi-message</v-icon>
+        </v-btn>
+
+        <v-btn class="playroomShare">
+          <span>공유</span>
+          <v-icon>mdi-share</v-icon>
+        </v-btn>
+
+        <v-btn class="playroomReport">
+          <span>신고</span>
+          <v-icon>mdi-alert</v-icon>
+        </v-btn>
+      </v-bottom-navigation>
     </div>
-    <div class="playroomInfo">
+    <div class="playroomInfo mx-3">
       <div class="playroomTitleWrapper">
         <p v-bind:class="{ playroomPublicBadge: roomPublic, playroomPrivateBadge: !roomPublic }">{{ roomPublicLabel }}</p>
         <p class="playroomTitle">{{ roomTitle }}</p>
       </div>
       <div class="playroomAuthorWrapper">
         <div class="authorProfilePic">
-          <img v-bind:src="roomAuthorProfilePic" />
+          <v-avatar>
+            <img v-bind:src="roomAuthorProfilePic" alt="John">
+          </v-avatar>
         </div>
         <span class="authorName">{{ roomAuthorName }}</span>
         <div class="authorFollowerWrapper">
@@ -36,35 +56,59 @@
         <p v-for="roomTag in roomTags" v-bind:key="roomTag" class="playroomTagItem">{{ roomTag }}</p>
       </div>
     </div>
-    <div class="playlistWrapper">
+    <div class="playlistWrapper mx-3 mb-5">
+      <p>현재 재생중인 <b>플레이리스트</b></p>
       <div class="playlistThumbnailWrapper">
-        <div class="thumbnailItems">
-
+        <v-card outlined>
+          <v-list-item>
+            <v-list-item-avatar size="80" color="grey">
+              <v-badge color="#EAEAEA" inline class="mx-auto"></v-badge>
+            </v-list-item-avatar>
+          </v-list-item>
+        </v-card>
+      </div>
+    </div>
+    <div class="playlistVideoWrapper">
+      <div class="playlistVideoNav mx-3">
+        <div style="color:grey; font-size: 11px;">
+          <v-icon class="mdi-18px">mdi-check</v-icon>
+          <span class="ml-1">전체 선택</span>
+        </div>
+        <div>
+          <v-icon>mdi-play-circle</v-icon>
         </div>
       </div>
-      <div class="playlistVideoWrapper">
-        <div class="playlistVideoNav">
+      <div class="playlistVideoItems">
+      </div>
+      <div class="playlistNavWrapper">
+        <v-card class="mx-auto overflow-hidden" height="300">
+          <v-bottom-navigation absolute background-color="#5B5C9D" hide-on-scroll
+            scroll-target="#scroll-threshold-example" scroll-threshold="500">
+            <v-badge
+              :content="1"
+              color="#EAEAEA"
+              offset-x=20
+              offset-y=20
+              overlap 
+              class="videoCounter"
+            >
+            </v-badge>
+            <v-btn>
+              <span style="color: white;">영상보기</span>
+              <v-icon color="white">mdi-play</v-icon>
+            </v-btn>
 
-        </div>
-        <div class="playlistVideoItems">
-          
-        </div>
-        <div class="playlistNavWrapper">
-          <div class="videoCounter">
+            <v-btn>
+              <span style="color: white;">내 플레이리스트</span>
+              <v-icon color="white">mdi-disc</v-icon>
+            </v-btn>
 
-          </div>
-          <div class="navBtnsWrapper">
-            <div class="playVideo">
-
-            </div>
-            <div class="showMyPlaylist">
-
-            </div>
-            <div class="saveVideo">
-
-            </div>
-          </div>
-        </div>
+            <v-btn>
+              <span style="color: white;">저장하기</span>
+              <v-icon color="white">mdi-bookmark</v-icon>
+            </v-btn>
+          </v-bottom-navigation>
+        </v-card>
       </div>
     </div>
   </div>
@@ -72,12 +116,23 @@
 
 <script>
 import { mapGetters, mapState } from 'vuex';
+import Vue from 'vue'
+import VueYoutube from 'vue-youtube'
+
+Vue.use(VueYoutube)
 
 export default {
   name: 'PlayroomDetail',
+  components: {
+  },
   data() {
     return {
-      showReducedContent: false
+      showReducedContent: false,
+      videoId: 'lG0Ys-2d4MA',
+      playerVars: {
+        autoplay: 1,
+        mute: 1
+      }
     }
   },
   metaInfo () {
@@ -94,6 +149,39 @@ export default {
       ]
     }
   },
+  methods: {
+    playVideo() {
+      this.player.playVideo()
+    },
+    playing() {
+      //const playTime = this.roomCurrentPlayTime.split(':')
+      //this.player.seekTo(parseInt(playTime[0]) * 60 + parseInt(playTime[1]));
+      const playTime = this.roomCurrentPlayTime.split(':').map(v => parseInt(v))
+      this.player.seekTo(playTime[0] * 60 + playTime[1]);
+    },
+    syncSeek() {
+      const playTime = this.roomCurrentPlayTime.split(':').map(v => parseInt(v))
+      this.player.seekTo(playTime[0] * 60 + playTime[1]);
+    },
+    onVideoReady() {
+      console.log('ready')
+    },
+    onVideoEnded() {
+      console.log('ended')
+    },
+    onVideoPlaying() {
+      console.log('playing')
+    },
+    onVideoPaused() {
+      console.log('paused')
+    },
+    onVideoBuffering() {
+      console.log('buffering')
+    },
+    onVideoCued() {
+      console.log('cued')
+    }
+  },
   computed: {
     ...mapState('playroom', [
       'roomTitle',
@@ -108,13 +196,17 @@ export default {
       'roomPlaylists',
       'roomCurrentPlaylist',
       'roomVideos',
-      'roomCurrentVideo'
+      'roomCurrentVideo',
+      'roomCurrentPlayTime'
     ]),
     ...mapGetters('playroom', [
       'roomPlayTime',
       'roomPublicLabel',
       'roomReducedContent'
     ]),
+    player() {
+      return this.$refs.youtube.player
+    },
     roomContentReduced: () => {
       return this.roomContent == this.roomReducedContent
     }
@@ -124,6 +216,11 @@ export default {
 
 <style lang="scss">
 @import '~@/assets/scss/common';
+
+iframe {
+  width: 100%;
+  max-width: 650px; /* Also helpful. Optional. */
+}
 
 .playroomTitleWrapper {
   display: flex;
@@ -136,7 +233,7 @@ export default {
 .playroomPublicBadge {
   width: 50px;
   height: 20px;
-  background: rgb(82, 72, 221);
+  background: #5B5C9D;
   text-align: center;
   color: white;
   border-radius: 10px;
@@ -149,7 +246,7 @@ export default {
   display: inline-block;
   width: 50px;
   height: 20px;
-  background: rgb(163, 160, 209);
+  background: #a3a0d1;
   text-align: center;
   color: white;
   border-radius: 10px;
@@ -159,8 +256,9 @@ export default {
 }
 
 .playroomTitle {
-  font-size: 14px;
+  font-size: 12px;
   font-weight: bold;
+  word-spacing: -0.1em;
 }
 
 .playroomAuthorWrapper {
@@ -234,8 +332,15 @@ export default {
 .playroomTagItem {
   padding: 3px 10px;
   margin-left: 5px;
-  background: rgb(82, 72, 221);
+  background: #5B5C9D;
   color: white;
   border-radius: 10px;
+  font-size: 8px;
+}
+
+.playlistVideoNav {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
 }
 </style>
