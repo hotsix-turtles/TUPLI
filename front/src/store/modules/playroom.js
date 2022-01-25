@@ -14,6 +14,7 @@ const playroom = {
       roomCurrentPlaylist: '0005',
       roomVideos: [ '0010', '0011', '0013' ],
       roomCurrentVideo: '0013',
+      roomCurrentPlayTime: '01:30'
     },
     mutations: {},
     actions: {},
