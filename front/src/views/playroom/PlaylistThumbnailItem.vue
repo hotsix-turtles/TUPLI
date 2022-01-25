@@ -1,9 +1,7 @@
 <template>
-    <div>
-        <v-list-item-avatar size="80" color="grey" src="">
-            <v-badge color="#EAEAEA" inline class="mx-auto"></v-badge>
-        </v-list-item-avatar>
-    </div>
+    <v-avatar size="80" color="grey" class="ml-2 my-2">
+        <v-img :src=src contain></v-img>
+    </v-avatar>
 </template>
 
 <script>
