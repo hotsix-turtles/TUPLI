@@ -12,7 +12,7 @@ module.exports = {
       },
       scss: {
         additionalData: `
-          @import "@/assets/scss/variables.scss";
+          //@import "@/scss/variables.scss";
         `
       }
     }
