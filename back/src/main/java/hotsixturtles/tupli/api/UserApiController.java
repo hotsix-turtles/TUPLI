@@ -19,6 +19,7 @@ import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
@@ -105,6 +106,12 @@ public class UserApiController {
         LocalDateTime modifiedAt;
     }
 
+    @DeleteMapping("/account/withdraw")
+    public ResponseEntity<?> signout(@RequestBody Map<String, String> userInfo){
+        userService.deleteUser(Long.parseLong(userInfo.get("userId")));
+        SecurityContextHolder.clearContext();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+    }
 
     /**
      * 로그인 JWT 발급
