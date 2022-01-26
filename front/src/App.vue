@@ -1,5 +1,5 @@
 <template>
-  <v-app id="app">
+  <v-app>
     <router-view />
     <router-link to="/home">
       Home
@@ -12,7 +12,7 @@
 </template>
 
 <script>
-import NavbarBottom from './components/NavbarBottom.vue';
+import NavbarBottom from './components/common/NavbarBottom.vue';
 
 export default {
   name: 'App',

@@ -69,7 +69,7 @@
 </template>
 
 <script>
-import Back from '../../components/Back.vue'
+import Back from '../../components/common/Back.vue'
 export default {
   name: 'PlaylistForm',
   components: {

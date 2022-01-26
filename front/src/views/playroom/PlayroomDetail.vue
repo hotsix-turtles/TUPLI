@@ -303,7 +303,6 @@ export default {
 </script>
 
 <style lang="scss">
-@import '~@/scss/common';
 
 iframe {
   width: 100%;

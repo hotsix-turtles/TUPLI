@@ -15,6 +15,7 @@
 export default {
   name: 'PlaylistThumbnailItem',
   props: {
+    // eslint-disable-next-line vue/require-default-prop
     src: String,
     selected: Boolean
   },
