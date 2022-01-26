@@ -95,6 +95,10 @@ public class User implements UserDetails {
 
     private String authKey;
 
+    // 연결
+    @OneToMany(mappedBy = "user")
+    private List<Board> boards = new ArrayList<>();
+
     /**
      * Security 회원 가입
      */
