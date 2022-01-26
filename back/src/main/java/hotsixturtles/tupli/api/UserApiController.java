@@ -5,6 +5,7 @@ import hotsixturtles.tupli.entity.User;
 import hotsixturtles.tupli.entity.auth.ProviderType;
 import hotsixturtles.tupli.entity.auth.RoleType;
 import hotsixturtles.tupli.repository.UserRepository;
+import hotsixturtles.tupli.service.FileService;
 import hotsixturtles.tupli.service.UserService;
 import hotsixturtles.tupli.service.token.JwtTokenProvider;
 import io.swagger.annotations.Api;
@@ -24,8 +25,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.Size;
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Map;
 
@@ -38,6 +42,7 @@ public class UserApiController {
     private final UserRepository userRepository;
 
     private final UserService userService;
+    private final FileService fileService;
     private final PasswordEncoder passwordEncoder;
 
     private final MessageSource messageSource;  // 국제화 이용시
@@ -143,5 +148,49 @@ public class UserApiController {
             this.token = accessToken;
         }
     }
+
+    /**
+     * 프로필 편집
+     * @param file : 프로필 이미지 파일, ProfileImage
+     * @param userInfo : {email, nickcname, introduction}
+     * @param request
+     * @return
+     * @throws IOException
+     * 반환 코드 : 200, 404
+     */
+    @PutMapping("/profile")
+    public ResponseEntity<?> updateProfile(@RequestPart(value = "image", required = false) MultipartFile file,
+                                           @RequestBody Map<String, String> userInfo,
+                                           HttpServletRequest request) throws IOException {
+
+
+        // jwt 유효 확인 + 정보 빼기
+        String token = request.getHeader("AUTH");//.replaceFirst("Bearer ", "");
+        if(!jwtTokenProvider.validateToken(token)) {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(new ErrorResponse(messageSource.getMessage("error.valid.jwt", null, LocaleContextHolder.getLocale())));
+        }
+        Long userSeq = jwtTokenProvider.getUserSeq(token);
+
+        // 이미지 업로드 예시
+        String image = "";
+        try {
+        if (file != null) {
+            image = fileService.imageUploadGCS(file, userSeq);
+            System.out.println("이미지 업로드 완료!");
+        }
+        } catch (Exception e) {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(new ErrorResponse(messageSource.getMessage("error.wrong", null, LocaleContextHolder.getLocale())));  // 임시코드
+        }
+        System.out.println("이미지 업로드 MMM = " + image);
+
+        userService.updateProfile(userInfo);
+
+        return ResponseEntity.status(HttpStatus.OK).body(null);
+    }
+
 
 }
