@@ -1,6 +1,11 @@
 /* eslint-disable vue/require-default-prop */
 <template>
   <div>
+    <div
+      v-if="isClickedMakeBtn"
+      class="dark-background"
+      @click="toggle"
+    />
     <div class="d-flex-column">
       <div
         v-if="isClickedMakeBtn"
