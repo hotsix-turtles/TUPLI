@@ -79,6 +79,7 @@ public class UserService {
     public void updateProfile( Map<String, String> userInfo){
         User user = userRepository.findByEmail(userInfo.get("email"));
         user.setNickname(userInfo.get("nickname"));
+        user.setIntroduction(userInfo.get("introduction"));
         user.setModifiedAt(LocalDateTime.now());
         try {
             userRepository.save(user);
