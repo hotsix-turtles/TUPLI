@@ -1,6 +1,12 @@
 <template>
   <v-app id="app">
     <router-view />
+    <router-link to="/home">
+      Home
+    </router-link>
+    <router-link to="/login">
+      Login
+    </router-link>
     <navbar-bottom class="mt-auto" />
   </v-app>
 </template>
