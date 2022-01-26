@@ -1,11 +1,14 @@
 import Vue from 'vue'
+import VueMeta from 'vue-meta'
 import VueRouter from 'vue-router'
 import PlaylistForm from '@/views/playlist/PlaylistForm'
 import PlaylistFormVideo from '@/views/playlist/PlaylistFormVideo'
 import Category from '@/views/Category'
 import Search from '@/views/Search'
+import PlayroomDetail from '../views/playroom/PlayroomDetail.vue'
 
 Vue.use(VueRouter)
+Vue.use(VueMeta)
 
 const routes = [
   {
@@ -27,6 +30,11 @@ const routes = [
     path: '/search',
     name: 'Search',
     component: Search
+  },
+  {
+    path: '/playroom',
+    name: 'PlayroomDetail',
+    component: PlayroomDetail
   },
 ]
 
