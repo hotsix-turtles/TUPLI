@@ -1,8 +1,12 @@
 <template>
   <v-app>
-    <v-main>
+      <router-link to="/home">
+        Home
+      </router-link>
+      <router-link to="/login">
+        Login
+      </router-link>
       <router-view />
-    </v-main>
   </v-app>
 </template>
 
@@ -14,5 +18,12 @@ export default {
   data: () => ({
     //
   }),
+  meta: [
+    { charset: 'utf-8' },
+    //{ name: 'description', content: ''},
+    { name: 'viewport', content: 'width=device-width, initial-scale=1' }
+  ]
+
+
 };
 </script>
