@@ -1,29 +1,21 @@
 <template>
   <v-app>
-      <router-link to="/home">
-        Home
-      </router-link>
-      <router-link to="/login">
-        Login
-      </router-link>
-      <router-view />
+    <router-view />
+    <router-link to="/home">
+      Home
+    </router-link>
+    <router-link to="/login">
+      Login
+    </router-link>
+    <navbar-bottom class="mt-auto" />
   </v-app>
 </template>
 
 <script>
+import NavbarBottom from './components/common/NavbarBottom.vue';
 
 export default {
   name: 'App',
-
-  data: () => ({
-    //
-  }),
-  meta: [
-    { charset: 'utf-8' },
-    //{ name: 'description', content: ''},
-    { name: 'viewport', content: 'width=device-width, initial-scale=1' }
-  ]
-
-
+  components: { NavbarBottom },
 };
 </script>
