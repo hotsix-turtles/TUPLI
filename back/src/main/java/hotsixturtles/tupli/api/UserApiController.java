@@ -6,10 +6,13 @@ import hotsixturtles.tupli.entity.auth.ProviderType;
 import hotsixturtles.tupli.entity.auth.RoleType;
 import hotsixturtles.tupli.repository.UserRepository;
 import hotsixturtles.tupli.service.UserService;
+import hotsixturtles.tupli.service.token.JwtTokenProvider;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import lombok.AccessLevel;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
@@ -23,6 +26,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
+import java.util.Map;
 
 @Slf4j
 @RestController
@@ -37,6 +41,7 @@ public class UserApiController {
 
     private final MessageSource messageSource;  // 국제화 이용시
 
+    private final JwtTokenProvider jwtTokenProvider;
     /**
      * 회원 가입
      * @param request
@@ -98,6 +103,38 @@ public class UserApiController {
         RoleType roleType;
         LocalDateTime createdAt;
         LocalDateTime modifiedAt;
+    }
+
+
+    /**
+     * 로그인 JWT 발급
+     * @param userInfo {email, password}
+     * @return
+     */
+    @PostMapping("/account/login")
+    public ResponseEntity<?> login(@RequestBody Map<String, String> userInfo) {
+        User user = userRepository.findByEmail(userInfo.get("email"));
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new ErrorResponse(messageSource.getMessage("error.none.user", null, LocaleContextHolder.getLocale())));
+        }
+
+        if (!passwordEncoder.matches(userInfo.get("password"), user.getPassword())) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new ErrorResponse(messageSource.getMessage("error.wrong.password", null, LocaleContextHolder.getLocale())));
+        }
+        String token = jwtTokenProvider.createToken(user.getUsername(), user.getUserSeq());
+
+        return ResponseEntity.ok(new LoginUserResponse(token));
+    }
+
+    @Data
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    public class LoginUserResponse {
+        private String token;
+        public LoginUserResponse(String accessToken) {
+            this.token = accessToken;
+        }
     }
 
 }
