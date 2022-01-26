@@ -36,7 +36,7 @@ import java.util.Map;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@Api(tags = "회원 가입 API")
+@Api(tags = "회원 관리 API")
 public class UserApiController {
 
     private final UserRepository userRepository;
@@ -45,7 +45,7 @@ public class UserApiController {
     private final FileService fileService;
     private final PasswordEncoder passwordEncoder;
 
-    private final MessageSource messageSource;  // 국제화 이용시
+    private final MessageSource messageSource;
 
     private final JwtTokenProvider jwtTokenProvider;
     /**
@@ -150,9 +150,10 @@ public class UserApiController {
     }
 
     /**
-     * 프로필 편집
-     * @param file : 프로필 이미지 파일, ProfileImage
-     * @param userInfo : {email, nickcname, introduction}
+     * 프로필 내용 변경
+     * @param file
+     * @param email
+     * @param nickname
      * @param request
      * @return
      * @throws IOException
@@ -160,16 +161,16 @@ public class UserApiController {
      */
     @PutMapping("/profile")
     public ResponseEntity<?> updateProfile(@RequestPart(value = "image", required = false) MultipartFile file,
-                                           @RequestBody Map<String, String> userInfo,
+                                           @RequestPart(value = "email", required = false) String email,
+                                            @RequestPart(value = "nickname", required = false) String nickname,
                                            HttpServletRequest request) throws IOException {
-
-
         // jwt 유효 확인 + 정보 빼기
-        String token = request.getHeader("AUTH");//.replaceFirst("Bearer ", "");
+        String token = request.getHeader("Authorization");
         if(!jwtTokenProvider.validateToken(token)) {
             return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
-                    .body(new ErrorResponse(messageSource.getMessage("error.valid.jwt", null, LocaleContextHolder.getLocale())));
+                    .body(new ErrorResponse(messageSource
+                            .getMessage("error.valid.jwt", null, LocaleContextHolder.getLocale())));
         }
         Long userSeq = jwtTokenProvider.getUserSeq(token);
 
@@ -178,16 +179,15 @@ public class UserApiController {
         try {
         if (file != null) {
             image = fileService.imageUploadGCS(file, userSeq);
-            System.out.println("이미지 업로드 완료!");
         }
         } catch (Exception e) {
             return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
-                    .body(new ErrorResponse(messageSource.getMessage("error.wrong", null, LocaleContextHolder.getLocale())));  // 임시코드
+                    .body(new ErrorResponse(messageSource
+                            .getMessage("error.wrong", null, LocaleContextHolder.getLocale())));
         }
-        System.out.println("이미지 업로드 MMM = " + image);
 
-        userService.updateProfile(userInfo);
+        userService.updateProfile(userSeq, email, nickname, image);
 
         return ResponseEntity.status(HttpStatus.OK).body(null);
     }

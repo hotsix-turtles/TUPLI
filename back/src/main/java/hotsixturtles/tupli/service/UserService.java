@@ -76,11 +76,21 @@ public class UserService {
 
     // 나중에 parameter 더 넘어오면 변경값들도 바꾼다
     @Transactional
-    public void updateProfile( Map<String, String> userInfo){
-        User user = userRepository.findByEmail(userInfo.get("email"));
-        user.setNickname(userInfo.get("nickname"));
-        user.setIntroduction(userInfo.get("introduction"));
+    public void updateProfile(Long userSeq, String email, String nickname, String image){
+        User user = userRepository.findByUserSeq(userSeq);
+        if (email != null) {
+            user.setEmail(email);
+        }
+        if (nickname != null) {
+            user.setNickname(nickname);
+        }
         user.setModifiedAt(LocalDateTime.now());
+
+        System.out.println("image = " + image);
+        if (image != "") {
+            user.setProfileImageUrl(image);
+        }
+
         try {
             userRepository.save(user);
         }
