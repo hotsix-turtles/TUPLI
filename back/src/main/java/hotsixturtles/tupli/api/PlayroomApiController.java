@@ -1,17 +1,17 @@
 package hotsixturtles.tupli.api;
 
 import hotsixturtles.tupli.dto.PlayroomDto;
+import hotsixturtles.tupli.dto.response.ErrorResponse;
 import hotsixturtles.tupli.entity.Playroom;
 import hotsixturtles.tupli.service.PlayroomService;
 import hotsixturtles.tupli.service.token.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -59,4 +59,28 @@ public class PlayroomApiController {
         return ResponseEntity.status(HttpStatus.OK).body(new PlayroomDto(playroom));
     }
 
+    /**
+     * 플레이룸 추가
+     * @param token
+     * @param playroomDto : {roomTitle, roomContent, roomPublic,roominviteIds,
+     *                        roomPlaylists, roomTags, roomVideos, startTime, roomEndTime}
+     * @return
+     * 반환 코드 : 201, 403, 404
+     */
+    @PostMapping("/playroom")
+    public ResponseEntity<?> addPlayroom(@RequestHeader(value = "AUTH") String token,
+                                         @RequestBody PlayroomDto playroomDto){
+
+        if (!jwtTokenProvider.validateToken(token)) {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(new ErrorResponse(messageSource.getMessage("error.valid.jwt", null, LocaleContextHolder.getLocale())));
+        }
+
+        Long userSeq = jwtTokenProvider.getUserSeq(token);
+
+        PlayroomDto playroomResult = playroomService.addPlayroom(playroomDto, userSeq); // userSeq
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(playroomResult);
+    }
 }
