@@ -3,9 +3,8 @@ import VueMeta from 'vue-meta'
 import VueRouter from 'vue-router'
 import PlaylistForm from '@/views/playlist/PlaylistForm'
 import PlaylistFormVideo from '@/views/playlist/PlaylistFormVideo'
-import Category from '@/views/Category'
-import Search from '@/views/Search'
-import Home from '../views/Home.vue'
+import Category from '@/views/common/Category'
+import Search from '@/views/common/Search'
 import Login from '../views/accounts/Login.vue'
 import PlayroomDetail from '../views/playroom/PlayroomDetail.vue'
 
@@ -32,11 +31,6 @@ const routes = [
     path: '/search',
     name: 'Search',
     component: Search
-  },
-  {
-    path: '/home',
-    name: 'Home',
-    component: Home
   },
   // {
   //   path: '/about',
