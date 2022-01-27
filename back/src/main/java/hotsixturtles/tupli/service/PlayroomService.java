@@ -8,6 +8,7 @@ import hotsixturtles.tupli.repository.PlayroomRepository;
 import hotsixturtles.tupli.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -43,5 +44,40 @@ public class PlayroomService {
 
         return new PlayroomDto(playroom);
 
+    }
+
+    @Transactional
+    public PlayroomDto updatePlayroom(Long playroomId, PlayroomDto playroomDto, Long userSeq){
+
+        Playroom playroom = playroomRepository.findById(playroomId).orElse(null);
+
+        if(playroom == null || playroom.getUser().getUserSeq() != userSeq){
+            return null;
+        }
+
+        if(playroomDto.getRoomTitle() != null){
+            playroom.setRoomTitle(playroomDto.getRoomTitle());
+        }
+        if(playroomDto.getRoomContent() != null){
+            playroom.setRoomContent(playroomDto.getRoomContent());
+        }
+
+
+        playroomRepository.save(playroom);
+
+        return new PlayroomDto(playroom);
+    }
+
+    @Transactional
+    public Playroom deletePlayroom(Long playroomId, Long userSeq){
+
+        Playroom playroom = playroomRepository.findById(playroomId).orElse(null);
+
+        if(playroom == null || playroom.getUser().getUserSeq() != userSeq){
+            return null;
+        }
+
+        playroomRepository.deleteById(playroomId);
+        return playroom;
     }
 }
