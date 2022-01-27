@@ -1,6 +1,13 @@
+buildscript {
+	ext {
+		queryDslVersion = "5.0.0"
+	}
+}
+
 plugins {
 	id 'org.springframework.boot' version '2.6.3'
 	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+	id "com.ewerk.gradle.plugins.querydsl" version "1.0.10"
 	id 'java'
 }
 
@@ -59,6 +66,9 @@ dependencies {
 	implementation group: 'com.google.cloud', name: 'spring-cloud-gcp-starter', version: '3.0.0'
 	implementation group: 'com.google.cloud', name: 'spring-cloud-gcp-storage', version: '3.0.0'
 
+	//queryDSL
+	implementation "com.querydsl:querydsl-jpa:${queryDslVersion}"
+	implementation "com.querydsl:querydsl-apt:${queryDslVersion}"
 }
 
 configurations {
@@ -68,6 +78,29 @@ configurations {
 
 test {
 	useJUnitPlatform()
+}
+
+//queryDSL
+def querydslDir = "$buildDir/generated/querydsl"
+querydsl {
+	jpa = true
+	querydslSourcesDir = querydslDir
+}
+sourceSets {
+	main.java.srcDir querydslDir
+}
+// 버전이나 IDE 환경에 따라 바뀌기 쉬우니 문제 발생시 구글 참조
+configurations {
+	querydsl.extendsFrom compileClasspath
+}
+compileQuerydsl {
+	options.annotationProcessorPath = configurations.querydsl
+}
+
+// querydsl cannot find symbol 문제 해결
+compileQuerydsl.doFirst {
+	if(file(querydslDir).exists() )
+		delete(file(querydslDir))
 }
 
 
