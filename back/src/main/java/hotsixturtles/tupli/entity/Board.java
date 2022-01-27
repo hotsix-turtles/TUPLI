@@ -1,5 +1,6 @@
 package hotsixturtles.tupli.entity;
 
+import hotsixturtles.tupli.entity.likes.BoardLikes;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -48,10 +49,8 @@ public class Board {
     @OneToMany(mappedBy = "board", cascade = {CascadeType.REMOVE})
     private List<Comment> comments = new ArrayList<>();
 
-
-
-
-
+    @OneToMany(mappedBy = "board")
+    private List<BoardLikes> boardLikes = new ArrayList<>();
 
 
 }

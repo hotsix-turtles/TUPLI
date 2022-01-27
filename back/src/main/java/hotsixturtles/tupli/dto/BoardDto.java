@@ -34,5 +34,8 @@ public class BoardDto {
         // 연결
         this.user = new SimpleUserDto(board.getUser());
 
+        // 변수
+        this.likes_count = board.getBoardLikes().size();
+
     }
 }
