@@ -1,7 +1,10 @@
 package hotsixturtles.tupli.api;
 
+import hotsixturtles.tupli.dto.BoardDto;
+import hotsixturtles.tupli.dto.params.BoardSearchCondition;
 import hotsixturtles.tupli.dto.params.UserSearchCondition;
 import hotsixturtles.tupli.dto.simple.SimpleUserDto;
+import hotsixturtles.tupli.entity.Board;
 import hotsixturtles.tupli.entity.User;
 import hotsixturtles.tupli.service.SearchService;
 import lombok.RequiredArgsConstructor;
@@ -46,4 +49,21 @@ public class SearchApiController {
         return ResponseEntity.ok().body(result);
     }
 
+    /**
+     * 게시글 검색
+     * @param keyword
+     * @param pageable : 예시 => {sort=email,desc ...} size, page 값 따로 넘길 수 있음
+     * @return
+     * 반환 코드 : 200, 404
+     */
+    @GetMapping("/board/search")
+    public ResponseEntity<?> searchBoard(@RequestParam String keyword,
+                                        @PageableDefault(size = 20, sort ="title",  direction = Sort.Direction.ASC) Pageable pageable ){
+        BoardSearchCondition boardSearchCondition = new BoardSearchCondition();
+        boardSearchCondition.setKeyword(keyword);
+        List<Board> boardList = searchService.searchBoard(boardSearchCondition, pageable);
+        List<BoardDto> result = boardList.stream().map(b -> new BoardDto(b)).collect(Collectors.toList());
+
+        return ResponseEntity.ok().body(result);
+    }
 }
