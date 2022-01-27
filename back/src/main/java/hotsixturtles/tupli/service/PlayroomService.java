@@ -1,6 +1,9 @@
 package hotsixturtles.tupli.service;
 
+import hotsixturtles.tupli.dto.PlayroomDto;
+import hotsixturtles.tupli.dto.simple.SimpleUserDto;
 import hotsixturtles.tupli.entity.Playroom;
+import hotsixturtles.tupli.entity.User;
 import hotsixturtles.tupli.repository.PlayroomRepository;
 import hotsixturtles.tupli.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -28,4 +31,17 @@ public class PlayroomService {
         return playroomRepository.findById(playroomId).orElse(null);
     }
 
+    public PlayroomDto addPlayroom(PlayroomDto playroomDto, Long userSeq){
+
+        User owner = userRepository.findByUserSeq(userSeq);
+
+        playroomDto.setUser(new SimpleUserDto(owner));
+
+        Playroom playroom = new Playroom(playroomDto, owner);
+
+        playroomRepository.save(playroom);
+
+        return new PlayroomDto(playroom);
+
+    }
 }
