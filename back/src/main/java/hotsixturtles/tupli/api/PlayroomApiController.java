@@ -83,4 +83,62 @@ public class PlayroomApiController {
 
         return ResponseEntity.status(HttpStatus.CREATED).body(playroomResult);
     }
+
+    /**
+     *
+     * @param token
+     * @param playroomId
+     * @param playroomDto  : {roomTitle, roomContent} // 다른 값도 추가 가능
+     * @return
+     * 반환 코드 : 200, 401, 403, 404
+     */
+    @PutMapping("/playroom/{playroomId}")
+    public ResponseEntity<?> updatePlayroom(@RequestHeader(value = "AUTH") String token,
+                                            @PathVariable("playroomId") Long playroomId,
+                                            @RequestBody PlayroomDto playroomDto){
+
+        if (!jwtTokenProvider.validateToken(token)) {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(new ErrorResponse(messageSource.getMessage("error.valid.jwt", null, LocaleContextHolder.getLocale())));
+        }
+
+        Long userSeq = jwtTokenProvider.getUserSeq(token);
+
+        PlayroomDto result = playroomService.updatePlayroom(playroomId, playroomDto, userSeq);
+
+        if(result == null){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        }
+
+        return ResponseEntity.status(HttpStatus.OK).body(result);
+    }
+
+    /**
+     *
+     * @param token
+     * @param playroomId
+     * @return
+     * 반환코드 : 200, 401, 403, 404
+     */
+    @DeleteMapping("/playroom/{playroomId}")
+    public ResponseEntity<?> deletePlayroom(@RequestHeader(value = "AUTH") String token,
+                                            @PathVariable("playroomId") Long playroomId){
+
+        if (!jwtTokenProvider.validateToken(token)) {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(new ErrorResponse(messageSource.getMessage("error.valid.jwt", null, LocaleContextHolder.getLocale())));
+        }
+
+        Long userSeq = jwtTokenProvider.getUserSeq(token);
+
+        Playroom result = playroomService.deletePlayroom(playroomId, userSeq);
+
+        if(result == null){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        }
+
+        return ResponseEntity.status(HttpStatus.OK).body(null);
+    }
 }
