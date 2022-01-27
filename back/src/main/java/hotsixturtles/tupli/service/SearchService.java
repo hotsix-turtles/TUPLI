@@ -1,5 +1,10 @@
 package hotsixturtles.tupli.service;
 
+import hotsixturtles.tupli.dto.params.BoardSearchCondition;
+import hotsixturtles.tupli.dto.params.UserSearchCondition;
+import hotsixturtles.tupli.entity.Board;
+import hotsixturtles.tupli.entity.User;
+import hotsixturtles.tupli.repository.BoardRepositoryImpl;
 import hotsixturtles.tupli.dto.params.PlayroomSearchCondition;
 import hotsixturtles.tupli.dto.params.UserSearchCondition;
 import hotsixturtles.tupli.entity.Playroom;
@@ -20,10 +25,15 @@ public class SearchService {
 
     private final PlayroomRepositoryImpl searchPlayroomRepository;
 
+    private final BoardRepositoryImpl boardRepository;
+
     public List<User> searchUser(UserSearchCondition userSearchCondition, Pageable pageable){
         return searchUserRepository.searchByPageSimpleUser(userSearchCondition, pageable);
     }
     public List<Playroom> searchPlayroom(PlayroomSearchCondition playroomSearchCondition, Pageable pageable){
         return searchPlayroomRepository.searchByPageSimplePlayroom(playroomSearchCondition, pageable);
+    }
+    public List<Board> searchBoard(BoardSearchCondition boardSearchCondition, Pageable pageable){
+        return boardRepository.searchByPageSimpleBoard(boardSearchCondition, pageable);
     }
 }

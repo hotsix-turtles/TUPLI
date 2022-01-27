@@ -1,5 +1,10 @@
 package hotsixturtles.tupli.api;
 
+import hotsixturtles.tupli.dto.BoardDto;
+import hotsixturtles.tupli.dto.params.BoardSearchCondition;
+import hotsixturtles.tupli.dto.params.UserSearchCondition;
+import hotsixturtles.tupli.dto.simple.SimpleUserDto;
+import hotsixturtles.tupli.entity.Board;
 import hotsixturtles.tupli.dto.PlayroomDto;
 import hotsixturtles.tupli.dto.params.PlayroomSearchCondition;
 import hotsixturtles.tupli.dto.params.UserSearchCondition;
@@ -50,12 +55,31 @@ public class SearchApiController {
     }
 
     /**
-     * 플레이룸 검색
+     * 게시글 검색
      * @param keyword 제목 // 검색에 필요한 기준 추가가능 (parameter 추가)
-     * @param pageable : 예시 => {sort=email,desc ...} size, page 값 따로 넘길 수 있음
+     * @param pageable : 예시 => {sort=title,desc ...} size, page 값 따로 넘길 수 있음
      * @return
      * 반환 코드 : 200, 404
      */
+    @GetMapping("/board/search")
+    public ResponseEntity<?> searchBoard(@RequestParam String keyword,
+                                        @PageableDefault(size = 20, sort ="title",  direction = Sort.Direction.ASC) Pageable pageable ){
+        BoardSearchCondition boardSearchCondition = new BoardSearchCondition();
+        boardSearchCondition.setKeyword(keyword);
+        List<Board> boardList = searchService.searchBoard(boardSearchCondition, pageable);
+        List<BoardDto> result = boardList.stream().map(b -> new BoardDto(b)).collect(Collectors.toList());
+
+        return ResponseEntity.ok().body(result);
+    }
+    
+    /**
+     * 플레이룸 검색
+     * @param keyword 제목 // 검색에 필요한 기준 추가가능 (parameter 추가)
+     * @param pageable : 예시 => {sort=roomTitle,desc ...} size, page 값 따로 넘길 수 있음
+     * @return
+     * 반환 코드 : 200, 404
+     */
+
     @GetMapping("/playroom/search")
     public ResponseEntity<?> searchPlayroom(@RequestParam String keyword,
                                         @PageableDefault(size = 20, sort ="roomTitle",  direction = Sort.Direction.ASC) Pageable pageable ){
@@ -66,5 +90,4 @@ public class SearchApiController {
 
         return ResponseEntity.ok().body(result);
     }
-
 }
