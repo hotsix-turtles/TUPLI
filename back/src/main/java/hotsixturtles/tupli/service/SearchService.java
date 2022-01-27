@@ -5,6 +5,11 @@ import hotsixturtles.tupli.dto.params.UserSearchCondition;
 import hotsixturtles.tupli.entity.Board;
 import hotsixturtles.tupli.entity.User;
 import hotsixturtles.tupli.repository.BoardRepositoryImpl;
+import hotsixturtles.tupli.dto.params.PlayroomSearchCondition;
+import hotsixturtles.tupli.dto.params.UserSearchCondition;
+import hotsixturtles.tupli.entity.Playroom;
+import hotsixturtles.tupli.entity.User;
+import hotsixturtles.tupli.repository.PlayroomRepositoryImpl;
 import hotsixturtles.tupli.repository.UserRepositoryImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -16,12 +21,17 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SearchService {
 
-    private final UserRepositoryImpl searchRepository;
+    private final UserRepositoryImpl searchUserRepository;
+
+    private final PlayroomRepositoryImpl searchPlayroomRepository;
 
     private final BoardRepositoryImpl boardRepository;
 
     public List<User> searchUser(UserSearchCondition userSearchCondition, Pageable pageable){
-        return searchRepository.searchByPageSimpleUser(userSearchCondition, pageable);
+        return searchUserRepository.searchByPageSimpleUser(userSearchCondition, pageable);
+    }
+    public List<Playroom> searchPlayroom(PlayroomSearchCondition playroomSearchCondition, Pageable pageable){
+        return searchPlayroomRepository.searchByPageSimplePlayroom(playroomSearchCondition, pageable);
     }
     public List<Board> searchBoard(BoardSearchCondition boardSearchCondition, Pageable pageable){
         return boardRepository.searchByPageSimpleBoard(boardSearchCondition, pageable);
