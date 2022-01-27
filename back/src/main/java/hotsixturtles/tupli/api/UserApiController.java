@@ -56,8 +56,8 @@ public class UserApiController {
      * 반환 코드 : 201/ 404
      */
     @PostMapping("/account/signup")
-    @ApiOperation(value = "회원가입", notes = "회원가입 진행. 성공여부에 따라 'id' 또는 'error.same.id' 값을 반환한다.")
-    public ResponseEntity signup(@ApiParam(value = "회원정보") @Validated @RequestBody CreateUserRequest request,
+    @ApiOperation(value = "회원가입", notes = "실패 시 404'이미 있는 아이디입니다' 반환, 성공 시 201 반환")
+    public ResponseEntity signup(@ApiParam(value = "email, username, nickname, password를 받습니다.") @Validated @RequestBody CreateUserRequest request,
                                  BindingResult bindingResult) {
 
         if (bindingResult.hasErrors()) {
@@ -111,8 +111,14 @@ public class UserApiController {
         LocalDateTime modifiedAt;
     }
 
+    /**
+     *
+     * @param userInfo
+     * @return
+     */
     @DeleteMapping("/account/withdraw")
-    public ResponseEntity<?> signout(@RequestBody Map<String, String> userInfo){
+    @ApiOperation(value = "회원탈퇴", notes = "실행 후 204 반환")
+    public ResponseEntity<?> signout(@ApiParam(value = "userInfo를 받습니다.")@RequestBody Map<String, String> userInfo){
         userService.deleteUser(Long.parseLong(userInfo.get("userId")));
         SecurityContextHolder.clearContext();
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
@@ -124,7 +130,8 @@ public class UserApiController {
      * @return
      */
     @PostMapping("/account/login")
-    public ResponseEntity<?> login(@RequestBody Map<String, String> userInfo) {
+    @ApiOperation(value = "로그인", notes = "실패 시 404'존재하지 않은 유저입니다' 또는 404'잘못된 비밀번호입니다' 반환, 성공 시 token 반환")
+    public ResponseEntity<?> login(@ApiParam(value = "email, password를 받습니다.") @RequestBody Map<String, String> userInfo) {
         User user = userRepository.findByEmail(userInfo.get("email"));
         if (user == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
@@ -160,6 +167,7 @@ public class UserApiController {
      * 반환 코드 : 200, 404
      */
     @PutMapping("/profile")
+    @ApiOperation(value = "프로필 내용 변경", notes = "회원정보가 안맞을 시 404'유효하지 않은 토큰입니다' 반환, 프로필 사진 업로드에 문제가 있을 경우 404'잘못된 값입니다' 반환, 성공 시 200 반환")
     public ResponseEntity<?> updateProfile(@RequestPart(value = "image", required = false) MultipartFile file,
                                            @RequestPart(value = "email", required = false) String email,
                                             @RequestPart(value = "nickname", required = false) String nickname,
