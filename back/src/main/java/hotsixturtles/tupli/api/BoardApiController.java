@@ -73,7 +73,7 @@ public class BoardApiController {
      */
 
     @PostMapping("/board")
-    public ResponseEntity<?> addBoard(@RequestHeader(value = "AUTH") String token,
+    public ResponseEntity<?> addBoard(@RequestHeader(value = "Authorization") String token,
                                       @RequestBody Board board){
 
         if (!jwtTokenProvider.validateToken(token)) {
@@ -98,7 +98,7 @@ public class BoardApiController {
      * 반환 코드 : 200, 404
      */
     @PutMapping("/board/{boardId}")
-    public ResponseEntity<?> updateBoard(@RequestHeader(value = "AUTH") String token,
+    public ResponseEntity<?> updateBoard(@RequestHeader(value = "Authorization") String token,
                                          @PathVariable("boardId") Long boardId,
                                          @RequestBody Board board){
 
@@ -121,7 +121,7 @@ public class BoardApiController {
      * 반환 코드 : 200, 403, 404
      */
     @DeleteMapping("/board/{boardId}")
-    public ResponseEntity<?> deleteBoard(@RequestHeader(value = "AUTH") String token, @PathVariable("boardId") Long boardId){
+    public ResponseEntity<?> deleteBoard(@RequestHeader(value = "Authorization") String token, @PathVariable("boardId") Long boardId){
 
         if (!jwtTokenProvider.validateToken(token)) {
             return ResponseEntity

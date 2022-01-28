@@ -57,7 +57,7 @@ public class CommentApiController {
      *반환 코드 : 201, 403, 404
      */
     @PostMapping("/comment/{boardId}")
-    public ResponseEntity<?> addComment(@RequestHeader(value = "AUTH") String token,
+    public ResponseEntity<?> addComment(@RequestHeader(value = "Authorization") String token,
                                       @PathVariable("boardId") Long boardId,
                                       @RequestBody Comment comment){
         if (!jwtTokenProvider.validateToken(token)) {
@@ -82,7 +82,7 @@ public class CommentApiController {
      * 반환 코드 : 200, 401, 403, 404
      */
     @PutMapping("/comment/{boardId}")
-    public ResponseEntity<?> updateComment(@RequestHeader(value = "AUTH") String token,
+    public ResponseEntity<?> updateComment(@RequestHeader(value = "Authorization") String token,
                                          @PathVariable("boardId") Long boardId,
                                          @RequestBody Comment comment){
 
@@ -111,7 +111,7 @@ public class CommentApiController {
      * 반환 코드 : 200, 401, 403, 404
      */
     @DeleteMapping("/comment/{boardId}")
-    public ResponseEntity<?> deleteComment(@RequestHeader(value = "AUTH") String token,
+    public ResponseEntity<?> deleteComment(@RequestHeader(value = "Authorization") String token,
                                          @PathVariable("boardId") Long boardId,
                                          @RequestBody Comment comment){
 

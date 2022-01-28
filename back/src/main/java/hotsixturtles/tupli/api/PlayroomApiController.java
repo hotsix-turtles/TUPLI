@@ -68,7 +68,7 @@ public class PlayroomApiController {
      * 반환 코드 : 201, 403, 404
      */
     @PostMapping("/playroom")
-    public ResponseEntity<?> addPlayroom(@RequestHeader(value = "AUTH") String token,
+    public ResponseEntity<?> addPlayroom(@RequestHeader(value = "Authorization") String token,
                                          @RequestBody PlayroomDto playroomDto){
 
         if (!jwtTokenProvider.validateToken(token)) {
@@ -93,7 +93,7 @@ public class PlayroomApiController {
      * 반환 코드 : 200, 401, 403, 404
      */
     @PutMapping("/playroom/{playroomId}")
-    public ResponseEntity<?> updatePlayroom(@RequestHeader(value = "AUTH") String token,
+    public ResponseEntity<?> updatePlayroom(@RequestHeader(value = "Authorization") String token,
                                             @PathVariable("playroomId") Long playroomId,
                                             @RequestBody PlayroomDto playroomDto){
 
@@ -122,7 +122,7 @@ public class PlayroomApiController {
      * 반환코드 : 200, 401, 403, 404
      */
     @DeleteMapping("/playroom/{playroomId}")
-    public ResponseEntity<?> deletePlayroom(@RequestHeader(value = "AUTH") String token,
+    public ResponseEntity<?> deletePlayroom(@RequestHeader(value = "Authorization") String token,
                                             @PathVariable("playroomId") Long playroomId){
 
         if (!jwtTokenProvider.validateToken(token)) {
