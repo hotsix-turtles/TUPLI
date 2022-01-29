@@ -70,7 +70,8 @@
             <v-icon>mdi-thumb-up</v-icon>
           </v-btn>
 
-          <v-btn class="playroomChat">
+          <v-btn class="playroomChat"
+            @click="dialog = true">
             <span>채팅</span>
             <v-icon>mdi-message</v-icon>
           </v-btn>
@@ -186,6 +187,31 @@
           />
         </div>
       </div>
+
+      <v-dialog
+        v-model="dialog"
+        fullscreen
+        hide-overlay
+        transition="dialog-bottom-transition"
+        scrollable
+      >
+        <v-card tile>
+          <v-card-title>
+            <v-toolbar-title>채팅</v-toolbar-title>
+            <v-btn
+              icon
+              class="ml-auto"
+              @click="dialog = false"
+            >
+              <v-icon>mdi-close</v-icon>
+            </v-btn>
+          </v-card-title>
+          <v-card-text>
+            <ChatItem v-for="chat in chats" :key="chat.id" :id="chat.id" :name="chat.author.name" :profile="chat.author.thumbnail" :content="chat.content" :timestamp="chat.timestamp"></ChatItem>
+          </v-card-text>
+          <div style="flex: 1 1 auto;"></div>
+        </v-card>
+      </v-dialog>
     </v-sheet>
   </v-card>
 </template>
@@ -197,6 +223,7 @@ import VueYoutube from 'vue-youtube'
 import PlaylistThumbnailItem from './PlaylistThumbnailItem.vue'
 import TagItem from './TagItem.vue'
 import PlaylistVideoItem from './PlaylistVideoItem.vue'
+import ChatItem from './ChatItem.vue'
 
 Vue.use(VueYoutube)
 
@@ -205,6 +232,7 @@ export default {
   components: {
     PlaylistThumbnailItem,
     PlaylistVideoItem,
+    ChatItem,
     TagItem
   },
   data() {
@@ -215,7 +243,16 @@ export default {
         autoplay: 1,
         mute: 1
       },
-      clickedItem: 0
+      clickedItem: 0,
+      dialog: false,
+      chats: [
+        { id: 1, author: { name: '김형준', thumbnail: 'https://picsum.photos/80/80' }, content: '와 맛있겠다 ㅋㅋㅋ', timestamp: 1643448193 },
+        { id: 2, author: { name: '김형준', thumbnail: 'https://picsum.photos/80/80' }, content: '와 맛있겠다 ㅋㅋㅋ', timestamp: 1643448193 },
+        { id: 3, author: { name: '김형준', thumbnail: 'https://picsum.photos/80/80' }, content: '와 맛있겠다 ㅋㅋㅋ', timestamp: 1643448193 },
+        { id: 4, author: { name: '김형준', thumbnail: 'https://picsum.photos/80/80' }, content: '와 맛있겠다 ㅋㅋㅋ', timestamp: 1643448193 },
+        { id: 5, author: { name: '김형준', thumbnail: 'https://picsum.photos/80/80' }, content: '와 맛있겠다 ㅋㅋㅋ', timestamp: 1643448193 },
+        { id: 6, author: { name: '김형준', thumbnail: 'https://picsum.photos/80/80' }, content: '와 맛있겠다 ㅋㅋㅋ', timestamp: 1643448193 },
+      ]
     }
   },
   metaInfo () {
