@@ -12,16 +12,24 @@
         md="4"
         class="d-flex align-center"
       >
-        <v-avatar circle
-          @click.stop="dialog2 = !dialog2">
+        <v-avatar
+          circle
+          @click.stop="dialog2 = !dialog2"
+        >
           <img
             :src="profile"
             class="pa-1"
           >
         </v-avatar>
-        <p class="font-3 ml-1 font-weight-bold">{{ name }}</p>
-        <p class="font-3 ml-1">{{ content }}</p>
-        <p class="font-3 ml-auto mr-1">{{ timeLabel }}</p>
+        <p class="font-3 ml-1 font-weight-bold">
+          {{ name }}
+        </p>
+        <p class="font-3 ml-1">
+          {{ content }}
+        </p>
+        <p class="font-3 ml-auto mr-1">
+          {{ timeLabel }}
+        </p>
       </v-col>
     </v-row>
   </v-card>
@@ -37,11 +45,6 @@ export default {
     content: { type: String, default: ''},
     timestamp: { type: Number, default: 0},
   },
-  created() {
-    this.$watch('dialog2', (newVal, oldVal) => {
-      this.$emit(newVal ? 'onMenuOpened' : 'onMenuClosed');
-    })
-  },
   data () {
     return {
       dialog2: false
@@ -53,6 +56,11 @@ export default {
       const dt = new Date();
       return `${dt.getHours() < 12 ? "오전" : "오후"} ${dt.getHours() % 12}:${dt.getMinutes()}`;
     }
+  },
+  created() {
+    this.$watch('dialog2', (newVal, oldVal) => {
+      this.$emit(newVal ? 'onMenuOpened' : 'onMenuClosed');
+    })
   },
   methods: {
     blockMessage () {

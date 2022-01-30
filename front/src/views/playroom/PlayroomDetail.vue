@@ -70,8 +70,10 @@
             <v-icon>mdi-thumb-up</v-icon>
           </v-btn>
 
-          <v-btn class="playroomChat"
-            @click="dialog = true">
+          <v-btn
+            class="playroomChat"
+            @click="dialog = true"
+          >
             <span>채팅</span>
             <v-icon>mdi-message</v-icon>
           </v-btn>
@@ -207,9 +209,17 @@
             </v-btn>
           </v-card-title>
           <v-card-text>
-            <ChatItem v-for="chat in chats" :key="chat.id" :id="chat.id" :name="chat.author.name" :profile="chat.author.thumbnail" :content="chat.content" :timestamp="chat.timestamp"></ChatItem>
+            <ChatItem
+              v-for="chat in chats"
+              :id="chat.id"
+              :key="chat.id"
+              :name="chat.author.name"
+              :profile="chat.author.thumbnail"
+              :content="chat.content"
+              :timestamp="chat.timestamp"
+            />
           </v-card-text>
-          <div style="flex: 1 1 auto;"></div>
+          <div style="flex: 1 1 auto;" />
         </v-card>
       </v-dialog>
     </v-sheet>
