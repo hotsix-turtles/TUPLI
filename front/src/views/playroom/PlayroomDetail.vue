@@ -209,16 +209,65 @@
             </v-btn>
           </v-card-title>
           <v-card-text>
-            <ChatItem
-              v-for="chat in chats"
-              :id="chat.id"
-              :key="chat.id"
-              :name="chat.author.name"
-              :profile="chat.author.thumbnail"
-              :content="chat.content"
-              :timestamp="chat.timestamp"
-            />
+            <v-container>
+              <ChatItem
+                v-for="chat in roomChats"
+                :id="chat.id"
+                :key="chat.id"
+                :name="chat.author.name"
+                :profile="chat.author.thumbnail"
+                :content="chat.content"
+                :timestamp="chat.timestamp"
+                :blockedUser="chat.blockedUser"
+                :blockedMessage="chat.blockedMessage"
+              />
+            </v-container>
           </v-card-text>
+          <v-spacer></v-spacer>
+          <v-card-actions>
+            <v-text-field
+              label="메시지를 입력하세요"
+              v-model='message'
+              solo
+              dense
+              @click:append-outer="sendMessage"
+              :disabled='!canChat'
+              :error='errorOnSend'
+            >
+              <template v-slot:append>
+                <v-menu
+                  v-model="showEmoji"
+                  rounded='lg'
+                  top
+                  left
+                  offset-x
+                  offset-y
+                >
+                  <template v-slot:activator="{ on, attrs }">
+                    <v-icon v-bind="attrs" v-on="on" v-if="showEmoji" @click="showEmoji = !showEmoji">mdi-emoticon</v-icon>
+                    <v-icon v-bind="attrs" v-on="on" v-else @click="showEmoji = !showEmoji">mdi-emoticon-outline</v-icon>
+                  </template>
+                  <v-card>
+                    <v-list>
+                      <v-list-item>
+                        이모지
+                      </v-list-item>
+                    </v-list>
+                  </v-card>
+                </v-menu>
+              </template>
+              <template v-slot:append-outer>
+                <!-- <v-fade-transition leave-absolute> -->
+                  <v-progress-circular
+                    v-if="sending"
+                    size="24"
+                    indeterminate
+                  ></v-progress-circular>
+                <v-icon v-else @click="sendMessage">mdi-send</v-icon>
+                <!-- </v-fade-transition> -->
+              </template>
+            </v-text-field>
+          </v-card-actions>
           <div style="flex: 1 1 auto;" />
         </v-card>
       </v-dialog>
@@ -227,7 +276,7 @@
 </template>
 
 <script>
-import { mapGetters, mapState } from 'vuex';
+import { mapActions, mapGetters, mapState } from 'vuex';
 import Vue from 'vue'
 import VueYoutube from 'vue-youtube'
 import PlaylistThumbnailItem from './PlaylistThumbnailItem.vue'
@@ -255,14 +304,11 @@ export default {
       },
       clickedItem: 0,
       dialog: false,
-      chats: [
-        { id: 1, author: { name: '김형준', thumbnail: 'https://picsum.photos/80/80' }, content: '와 맛있겠다 ㅋㅋㅋ', timestamp: 1643448193 },
-        { id: 2, author: { name: '김형준', thumbnail: 'https://picsum.photos/80/80' }, content: '와 맛있겠다 ㅋㅋㅋ', timestamp: 1643448193 },
-        { id: 3, author: { name: '김형준', thumbnail: 'https://picsum.photos/80/80' }, content: '와 맛있겠다 ㅋㅋㅋ', timestamp: 1643448193 },
-        { id: 4, author: { name: '김형준', thumbnail: 'https://picsum.photos/80/80' }, content: '와 맛있겠다 ㅋㅋㅋ', timestamp: 1643448193 },
-        { id: 5, author: { name: '김형준', thumbnail: 'https://picsum.photos/80/80' }, content: '와 맛있겠다 ㅋㅋㅋ', timestamp: 1643448193 },
-        { id: 6, author: { name: '김형준', thumbnail: 'https://picsum.photos/80/80' }, content: '와 맛있겠다 ㅋㅋㅋ', timestamp: 1643448193 },
-      ]
+      showEmoji: false,
+      sending: false,
+      message: '',
+      canChat: true,
+      errorOnSend: false
     }
   },
   metaInfo () {
@@ -294,7 +340,9 @@ export default {
       'roomCurrentPlaylist',
       'roomVideos',
       'roomCurrentVideo',
-      'roomCurrentPlayTime'
+      'roomCurrentPlayTime',
+      'roomChats',
+      'roomSendingMessage'
     ]),
     ...mapGetters('playroom', [
       'roomPlayTime',
@@ -345,6 +393,43 @@ export default {
     onVideoCued() {
       console.log('cued')
     },
+    sendMessage() {
+      this.disableChatbox()
+      this.pendingToSendMessage()
+      this.$store.dispatch('playroom/sendMessage', this.message)
+        .then(() => {
+          this.clearMessage()
+        })
+        .catch((err) => {
+          this.notifySendError()
+        })
+        .finally(() => {
+          this.completeToSendMessage()
+          this.enableChatbox()
+        })
+    },
+    clearMessage() {
+      this.message = ''
+    },
+    pendingToSendMessage() {
+      this.sending = true
+    },
+    completeToSendMessage() {
+      this.sending = false
+    },
+    enableChatbox() {
+      this.canChat = true
+    },
+    disableChatbox() {
+      this.canChat = false
+    },
+    notifySendError() {
+      this.errorOnSend = true;
+      setTimeout(this.clearSendError, 1000);
+    },
+    clearSendError() {
+      this.errorOnSend = false;
+    }
   },
 }
 </script>

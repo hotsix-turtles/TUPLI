@@ -1,53 +1,121 @@
 <template>
-  <v-card
-    height="60px"
-    class="d-flex pa-1"
-    elevation="0"
-    tile
-    @click.stop="dialog2 = !dialog2"
-  >
-    <v-row>
-      <v-col
-        cols="12"
-        md="4"
-        class="d-flex align-center"
+  <v-row>
+    <v-col
+      height="60px"
+      @click.stop="selectChatItem(id)"
+      cols="12"
+      md="4"
+      class="d-flex align-center pa-1"
+      style="width: 100%"
+    >
+      <v-avatar
+        circle
+        @click.stop="selectChatAvatar(id)"
       >
-        <v-avatar
-          circle
-          @click.stop="dialog2 = !dialog2"
+        <img
+          :src="profile"
+          class="pa-1"
         >
-          <img
-            :src="profile"
-            class="pa-1"
+      </v-avatar>
+      <p class="font-3 ml-1 font-weight-bold">
+        {{ name }}
+      </p>
+      <p class="font-3 ml-1" v-if="!blocked">
+        {{ content }}
+      </p>
+      <p class="font-3 ml-1 blocked" v-else>
+        [차단됨]
+      </p>
+      <p class="font-3 ml-auto mr-1">
+        {{ timeLabel }}
+      </p>
+    </v-col>
+    <v-dialog
+      v-model="selected"
+      hide-overlay
+      max-width="500px"
+      @click:outside="deselectChatItem"
+    >
+      <v-card v-if="roomSelectedChatItem.type == 'CHAT_ITEM'">
+        <v-card-title>
+          <span>Message Actions</span>
+        </v-card-title>
+        <v-card-actions>
+          <v-btn
+            block
+            text
+            @click="blockMessage(id)"
+            v-if="!blockedMessage"
           >
-        </v-avatar>
-        <p class="font-3 ml-1 font-weight-bold">
-          {{ name }}
-        </p>
-        <p class="font-3 ml-1">
-          {{ content }}
-        </p>
-        <p class="font-3 ml-auto mr-1">
-          {{ timeLabel }}
-        </p>
-      </v-col>
-    </v-row>
-  </v-card>
+            메시지 차단
+          </v-btn>
+          <v-btn
+            block
+            text
+            @click="unblockMessage(id)"
+            v-else
+          >
+            메시지 차단 해제
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+      <v-card v-else-if="roomSelectedChatItem.type == 'CHAT_AVATAR'">
+        <v-card-title>
+          <span>User Actions</span>
+        </v-card-title>
+        <v-card-actions class="d-flex flex-column">
+          <v-btn
+            block
+            text
+            @click="followUser(id)"
+          >
+            팔로우
+          </v-btn>
+          <v-btn
+            block
+            text
+            @click="showUserProfile(id)"
+          >
+            유저 프로필
+          </v-btn>
+          <v-btn
+            block
+            text
+            @click="blockUser(id)"
+            v-if="!blockedUser"
+          >
+            유저 차단
+          </v-btn>
+          <v-btn
+            block
+            text
+            @click="unblockUser(id)"
+            v-else
+          >
+            유저 차단 해제
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+  </v-row>
 </template>
 
 <script>
+import { mapActions, mapMutations, mapState } from 'vuex';
+
 export default {
   name: "ChatItem",
   props: {
-    id: { type: Number, default: -1},
-    name: { type: String, default: ''},
-    profile: { type: String, default: ''},
-    content: { type: String, default: ''},
-    timestamp: { type: Number, default: 0},
+    id: { type: Number, default: -1 },
+    name: { type: String, default: '' },
+    profile: { type: String, default: '' },
+    content: { type: String, default: '' },
+    timestamp: { type: Number, default: 0 },
+    blockedUser: { type: Boolean, default: false },
+    blockedMessage: { type: Boolean, default: false }
   },
   data () {
     return {
-      dialog2: false
     }
   },
   computed: {
@@ -55,25 +123,24 @@ export default {
       //const dt = new Date(this.timestamp);
       const dt = new Date();
       return `${dt.getHours() < 12 ? "오전" : "오후"} ${dt.getHours() % 12}:${dt.getMinutes()}`;
-    }
-  },
-  created() {
-    this.$watch('dialog2', (newVal, oldVal) => {
-      this.$emit(newVal ? 'onMenuOpened' : 'onMenuClosed');
-    })
+    },
+    blocked () {
+      return this.blockedUser || this.blockedMessage;
+    },
+    selected () {
+      return this.roomSelectedChatItem.id == this.id
+    },
+    ...mapState('playroom', ['roomSelectedChatItem'])
   },
   methods: {
-    blockMessage () {
-      this.$emit('blockMessaage', this.id);
-      this.closeMenu();
-    },
-    closeMenu () {
-      this.dialog2 = false;
-    }
+    ...mapMutations('playroom', ['selectChatItem', 'selectChatAvatar', 'deselectChatItem']),
+    ...mapActions('playroom', [ 'followUser', 'showUserProfile', 'blockUser', 'blockMessage', 'unblockUser', 'unblockMessage' ])
   }
 }
 </script>
 
 <style>
-
+.blocked {
+  color: #bbb
+}
 </style>
