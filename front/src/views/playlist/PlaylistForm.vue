@@ -3,9 +3,9 @@
     <!-- 뒤로가기/완료 -->
     <div class="d-flex justify-space-between">
       <back :page-name="pageName" />
-      <p class="clickable">
+      <span class="clickable">
         완료
-      </p>
+      </span>
     </div>
 
     <!-- 플레이리스트 생성 폼 -->
@@ -16,6 +16,7 @@
           <v-col
             cols="12"
             md="4"
+            class="py-0"
           >
             <v-text-field
               v-model="title"
@@ -30,6 +31,7 @@
           <v-col
             cols="12"
             md="4"
+            class="py-0"
           >
             <v-text-field
               v-model="content"
@@ -42,6 +44,7 @@
           <v-col
             cols="12"
             md="4"
+            class="py-0"
           >
             <v-text-field
               v-model="content"
@@ -53,16 +56,35 @@
           <!-- 공개 여부 -->
           <v-col class="d-flex justify-space-between">
             <div class="d-flex">
-              <p>공개 설정</p>
-              <p class="font-4">
+              <span>공개 설정</span>
+              <span class="font-4">
                 {{ isPublicMsg }}
-              </p>
+              </span>
             </div>
             <v-switch
               v-model="formData.isPublic"
             />
           </v-col>
         </v-row>
+        <v-btn
+          color="accent"
+          elevation="2"
+          rounded
+          @click="$router.push({ name: 'PlaylistFormVideo'} )"
+        >
+          <v-icon>mdi-plus</v-icon>
+          <span>영상 추가</span>
+        </v-btn>
+        <!-- 플레이리스트에 담긴 영상 리스트 -->
+        <div class="d-flex justify-space-between">
+          <div>
+            <v-icon>mdi-check</v-icon>
+            <span class="clickable">전체 선택</span>
+          </div>
+          <div>
+            <span>0개 영상 선택</span>
+          </div>
+        </div>
       </v-container>
     </v-form>
   </div>
@@ -73,7 +95,7 @@ import Back from '../../components/common/Back.vue'
 export default {
   name: 'PlaylistForm',
   components: {
-    Back
+    Back,
   },
   data: function() {
     return {

@@ -3,16 +3,17 @@ import VueMeta from 'vue-meta'
 import VueRouter from 'vue-router'
 import PlaylistForm from '@/views/playlist/PlaylistForm'
 import PlaylistFormVideo from '@/views/playlist/PlaylistFormVideo'
-import Category from '@/views/Category'
-import Search from '@/views/Search'
-import Home from '../views/Home.vue'
+import Category from '@/views/common/Category'
+import Search from '@/views/common/Search'
 import Login from '../views/accounts/Login.vue'
 import PlayroomDetail from '../views/playroom/PlayroomDetail.vue'
+import VideoSearch from '../views/video/VideoSearch.vue'
 
 Vue.use(VueRouter)
 Vue.use(VueMeta)
 
 const routes = [
+  // 플레이리스트
   {
     path: '/playlist/create',
     name: 'PlaylistForm',
@@ -23,20 +24,23 @@ const routes = [
     name: 'PlaylistFormVideo',
     component: PlaylistFormVideo
   },
+  // 둘러보기
   {
     path: '/category',
     name: 'Category',
     component: Category
   },
+  // 검색
   {
     path: '/search',
     name: 'Search',
     component: Search
   },
+  // 동영상
   {
-    path: '/home',
-    name: 'Home',
-    component: Home
+    path: '/video/search',
+    name: 'VideoSearch',
+    component: VideoSearch
   },
   // {
   //   path: '/about',

@@ -14,16 +14,16 @@
         <div class="mt-4 pt-4">
           <v-form ref="form">
             <v-text-field
-              class="pt-0"
               v-model="email"
+              class="pt-0"
               :rules="emailRules"
               label="이메일을 입력해주세요"
               required
             />
 
             <v-text-field
-              class="pt-0"
               v-model="password"
+              class="pt-0"
               type="password"
               :rules="[passwordRules.min]"
               label="비밀번호를 입력해주세요"
@@ -89,11 +89,21 @@
       <!-- 그 외 -->
       <v-container>
         <div class="row justify-center mb-4 mt-1">
-          <p class="mx-1">회원가입</p>
-          <p class="mx-1">|</p>
-          <p class="mx-1">이메일 찾기</p>
-          <p class="mx-1">|</p>
-          <p class="mx-1">비밀번호 찾기</p>
+          <p class="mx-1">
+            회원가입
+          </p>
+          <p class="mx-1">
+            |
+          </p>
+          <p class="mx-1">
+            이메일 찾기
+          </p>
+          <p class="mx-1">
+            |
+          </p>
+          <p class="mx-1">
+            비밀번호 찾기
+          </p>
         </div>
       </v-container>
     </div>
@@ -133,6 +143,18 @@ export default {
     }
   }),
 
+  watch: {
+    //로딩 애니메이션
+    loader () {
+      const l = this.loader
+      this[l] = !this[l]
+
+      setTimeout(() => (this[l] = false), 3000)
+
+      this.loader = null
+    },
+  },
+
   methods: {
     // 로그인
     login: function () {
@@ -160,18 +182,6 @@ export default {
     },
     resetValidation () {
       this.$refs.form.resetValidation()
-    },
-  },
-
-  watch: {
-    //로딩 애니메이션
-    loader () {
-      const l = this.loader
-      this[l] = !this[l]
-
-      setTimeout(() => (this[l] = false), 3000)
-
-      this.loader = null
     },
   },
 

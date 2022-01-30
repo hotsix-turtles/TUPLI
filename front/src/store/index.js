@@ -4,6 +4,8 @@ import Vuex from 'vuex'
 Vue.use(Vuex)
 
 import playroom from './modules/playroom.js'
+import video from './modules/video.js'
+import playlist from './modules/playlist.js'
 
 export default new Vuex.Store({
   state: {
@@ -13,6 +15,8 @@ export default new Vuex.Store({
   actions: {
   },
   modules: {
-    playroom: playroom
+    playroom: playroom,
+    video: video,
+    playlist: playlist,
   }
 })
