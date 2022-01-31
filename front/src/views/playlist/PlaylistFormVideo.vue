@@ -20,10 +20,20 @@
         {{ item }}
       </v-tab>
     </v-tabs>
+
+    <!-- 탭에 따른 결과물 -->
+    <video-list-item-small
+      :liked-videos="likedVideos"
+    />
+    <video-list-item-small
+      :saved-videos="savedVideos"
+    />
   </div>
 </template>
 
 <script>
+import { mapState } from 'vuex'
+
 import Cancel from '../../components/common/Cancel.vue'
 import SearchBar from '../../components/common/SearchBar.vue'
 export default {
@@ -37,7 +47,17 @@ export default {
         '좋아한 영상', '저장한 영상',
       ],
     }
-  }
+  },
+  computed: {
+    ...mapState('video', {
+      likedVideos: state => state.likedVideos,
+      savedVideos: state => state.savedVideos,
+    })
+  },
+  created: {
+    // setLikedVideos()
+    // setSavedVideos()
+  },
 }
 </script>
 

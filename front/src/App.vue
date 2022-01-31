@@ -9,7 +9,7 @@
     <router-link to="/login">
       Login
     </router-link> -->
-    <navbar-bottom class="mt-auto" />
+    <navbar-bottom class="mt-auto fixed" />
   </v-app>
 </template>
 

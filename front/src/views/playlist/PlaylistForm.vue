@@ -85,12 +85,17 @@
             <span>0개 영상 선택</span>
           </div>
         </div>
+        <video-list-item-small
+          :added-videos="addedVideos"
+        />
       </v-container>
     </v-form>
   </div>
 </template>
 
 <script>
+import { mapState } from 'vuex'
+
 import Back from '../../components/common/Back.vue'
 export default {
   name: 'PlaylistForm',
@@ -118,6 +123,9 @@ export default {
     isPublicMsg () {
       return this.formData.isPublic ? "내 플레이리스트를 공개합니다." : "내 플레이리스트를 비공개합니다."
     },
+    ...mapState('video', {
+      selectedVideos: state => state.selectedVideos,
+    }),
   }
 }
 </script>

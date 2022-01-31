@@ -17,7 +17,20 @@ export default {
   props: {
     // eslint-disable-next-line vue/require-default-prop
     searchedVideos: { type: Array }
-  }
+  },
+  data: function () {
+    return {
+      selectedVideos: []
+    }
+  },
+  methods: {
+    addVideo: function (video) {
+      if (!this.selectedVideos.includes(video)) {
+        this.selectedVideos.push(video)
+      }
+      console.log('selectedVideos', this.selectedVideos)
+    },
+  },
 }
 </script>
 

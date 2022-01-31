@@ -4,15 +4,15 @@
     {{ video.snippet }} -->
     <v-list-item two-line>
       <img
-        :src="video.snippet.thumbnails.default.url"
+        :src="thumbnail"
         style="width: 40%; height: auto"
         class=""
       >
       <v-list-item-content class="ml-2">
-        <v-list-item-title @click="addVideo(video.id.videoId)">
-          {{ video.snippet.title }}
+        <v-list-item-title @click="addVideo(id)">
+          {{ title }}
         </v-list-item-title>
-        <v-list-item-subtitle>{{ video.snippet.publishTime }}</v-list-item-subtitle>
+        <v-list-item-subtitle>{{ date }}</v-list-item-subtitle>
       </v-list-item-content>
     </v-list-item>
   </div>
@@ -23,9 +23,13 @@ export default {
   name: 'VideoItem',
   props: {
     // eslint-disable-next-line vue/require-default-prop
-    video: { type: Object }
+    id: { type: Number, default: 1 },
+    title: { type: String, default: '' },
+    thumbnail: { type: String, default: '' },
+    date: { type: String, default: '' },
+    // runtime: { type: String, default: '' },
   },
-  mehtods: {
+  methods: {
     addVideo: function(videoId) {
       this.$emit('add-video', videoId)
     },
