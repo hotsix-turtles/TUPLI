@@ -12,6 +12,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 @RequiredArgsConstructor
 public class TestApiController {
 
+    @GetMapping("/")
+    public ResponseEntity home() {
+        return ResponseEntity.ok().body("ok");
+    }
+
     @PostMapping("/echo")
     public ResponseEntity postTest(@RequestBody String test) {
 

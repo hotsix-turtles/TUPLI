@@ -2,6 +2,7 @@ package hotsixturtles.tupli.api;
 
 import hotsixturtles.tupli.dto.BoardDto;
 import hotsixturtles.tupli.dto.PlaylistDto;
+import hotsixturtles.tupli.dto.param.SimpleCondition;
 import hotsixturtles.tupli.dto.response.ErrorResponse;
 import hotsixturtles.tupli.entity.Board;
 import hotsixturtles.tupli.entity.Playlist;
@@ -17,9 +18,16 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import javax.annotation.Nullable;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RestController
@@ -142,7 +150,12 @@ public class PlaylistApiController {
     }
 
 
-
+    /**
+     * 플레이리스트 단일 좋아요
+     * @param token
+     * @param id
+     * @return
+     */
     @PostMapping("/playlist/{id}/like")
     public ResponseEntity<?> addPlaylistLike(@RequestHeader(value = "Authorization") String token,
                                              @PathVariable("id") Long id) {
@@ -160,6 +173,12 @@ public class PlaylistApiController {
     }
 
 
+    /**
+     * 플레이리스트 단일 좋아요 취소
+     * @param token
+     * @param id
+     * @return
+     */
     @DeleteMapping("/playlist/{id}/like")
     public ResponseEntity<?> deletePlaylistLike(@RequestHeader(value = "Authorization") String token,
                                                 @PathVariable("id") Long id) {
@@ -176,6 +195,20 @@ public class PlaylistApiController {
         return ResponseEntity.status(HttpStatus.OK).body(null);
     }
 
+    /**
+     * 플레이리스트 단순 검색
+     * @param condition Simplcondition : [type: {관련순(default), 최신순(), keyword}]
+     * @return
+     */
+    @GetMapping("/playlist/search")
+    public ResponseEntity searchPlaylistSimple(SimpleCondition condition) {
+
+        List<Playlist> playlists = playlistService.searchPlaylistSimple(condition);
+
+        List<PlaylistDto> response = playlists.stream().map(x -> new PlaylistDto(x)).collect(Collectors.toList());
+
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
 
 
 }
