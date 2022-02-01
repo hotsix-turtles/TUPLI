@@ -2,10 +2,12 @@ package hotsixturtles.tupli.dto.simple;
 
 import hotsixturtles.tupli.entity.Playlist;
 import hotsixturtles.tupli.entity.meta.PlaylistInfo;
+import lombok.Data;
 
 import java.time.OffsetDateTime;
 import java.util.stream.Collectors;
 
+@Data
 public class SimplePlaylistDto {
 
     private Long id;

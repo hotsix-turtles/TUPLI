@@ -4,14 +4,14 @@ import hotsixturtles.tupli.dto.simple.SimpleUserDto;
 import hotsixturtles.tupli.entity.Playlist;
 import hotsixturtles.tupli.entity.likes.PlaylistLikes;
 import hotsixturtles.tupli.entity.meta.PlaylistInfo;
-
+import lombok.Data;
 
 
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
-
+@Data
 public class PlaylistDto {
 
     private Long id;
