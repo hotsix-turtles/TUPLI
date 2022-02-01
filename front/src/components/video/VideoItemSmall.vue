@@ -9,8 +9,11 @@
         class=""
       >
       <v-list-item-content class="ml-2">
-        <v-list-item-title @click="addVideo(id)">
-          {{ title }}
+        <v-list-item-title @click="addVideo(videoId)">
+          <p>{{ title }}</p>
+          <p>{{ channelTitle }}</p>
+          <p>{{ categoryId }}</p>
+          <p>{{ duration }}</p>
         </v-list-item-title>
         <v-list-item-subtitle>{{ date }}</v-list-item-subtitle>
       </v-list-item-content>
@@ -23,11 +26,13 @@ export default {
   name: 'VideoItem',
   props: {
     // eslint-disable-next-line vue/require-default-prop
-    id: { type: Number, default: 1 },
+    videoId: { type: String, default: '' },
     title: { type: String, default: '' },
     thumbnail: { type: String, default: '' },
     date: { type: String, default: '' },
-    // runtime: { type: String, default: '' },
+    duration: { type: String, default: '' },
+    channelTitle: { type: String, default: '' },
+    categoryId: { type: Number, default: 0 },
   },
   methods: {
     addVideo: function(videoId) {

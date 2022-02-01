@@ -9,18 +9,18 @@
       :searched-videos="searchedVideos"
     />
     <!-- 무한스크롤 -->
-    <!-- <infinite-loading
+    <infinite-loading
       spinner="waveDots"
       @infinite="searchVideosByScroll"
     >
       <div slot="no-results" />
-    </infinite-loading> -->
+    </infinite-loading>
   </div>
 </template>
 
 <script>
 import { mapActions, mapState } from 'vuex'
-// import InfiniteLoading from "vue-infinite-loading"
+import InfiniteLoading from "vue-infinite-loading"
 
 import BackOnly from '@/components/common/BackOnly.vue'
 import SearchBar from '@/components/common/SearchBar.vue'
@@ -32,20 +32,24 @@ export default {
     SearchBar,
     BackOnly,
     VideoListItemSmall,
-    // InfiniteLoading,
+    InfiniteLoading,
+  },
+  computed: {
+    ...mapState('video', {
+      searchedVideos: state => state.searchedVideos,
+      nextPageToken: state => state.nextPageToken,
+    })
+  },
+  created: function () {
+    this.resetVideoSearchState()
   },
   methods: {
     ...mapActions('video', [
       'searchVideos',
       'searchVideosByScroll',
+      'resetVideoSearchState',
     ]),
   },
-  // eslint-disable-next-line vue/order-in-components
-  computed: {
-    ...mapState('video', {
-      searchedVideos: state => state.searchedVideos
-    })
-  }
 }
 </script>
 

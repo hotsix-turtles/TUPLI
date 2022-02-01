@@ -22,7 +22,7 @@
               v-model="title"
               :rules="titleRules"
               :counter="30"
-              label="플레이리스트 제목을 입력해주세요."
+              label="플레이리스트 제목"
               required
             />
           </v-col>
@@ -36,7 +36,7 @@
             <v-text-field
               v-model="content"
               :counter="80"
-              label="플레이리스트 소개글을 입력해주세요."
+              label="플레이리스트 소개글"
             />
           </v-col>
 
@@ -46,15 +46,28 @@
             md="4"
             class="py-0"
           >
+            <tag-input
+              @tag-input="updateTags"
+            />
+          </v-col>
+          <!-- <v-col
+            cols="12"
+            md="4"
+            class="py-0"
+          >
             <v-text-field
               v-model="content"
               :counter="80"
               label="플레이리스트 태그를 입력해주세요."
             />
-          </v-col>
+          </v-col> -->
 
           <!-- 공개 여부 -->
-          <v-col class="d-flex justify-space-between">
+          <v-col
+            class="d-flex justify-space-between py-0"
+            cols="12"
+            md="4"
+          >
             <div class="d-flex">
               <span>공개 설정</span>
               <span class="font-4">
@@ -82,7 +95,7 @@
             <span class="clickable">전체 선택</span>
           </div>
           <div>
-            <span>0개 영상 선택</span>
+            <span>{{ addedVideos.length }}개 영상 선택</span>
           </div>
         </div>
         <video-list-item-small
@@ -97,10 +110,14 @@
 import { mapState } from 'vuex'
 
 import Back from '../../components/common/Back.vue'
+import TagInput from '../../components/common/TagInput.vue'
+import VideoListItemSmall from '../../components/video/VideoListItemSmall.vue'
 export default {
   name: 'PlaylistForm',
   components: {
     Back,
+    VideoListItemSmall,
+    TagInput,
   },
   data: function() {
     return {
@@ -124,9 +141,15 @@ export default {
       return this.formData.isPublic ? "내 플레이리스트를 공개합니다." : "내 플레이리스트를 비공개합니다."
     },
     ...mapState('video', {
-      selectedVideos: state => state.selectedVideos,
+      addedVideos: state => state.addedVideos,
     }),
-  }
+  },
+  methods: {
+    updateTags: function (tags) {
+      this.formData.tags = tags
+      console.log(this.formData)
+    }
+  },
 }
 </script>
 

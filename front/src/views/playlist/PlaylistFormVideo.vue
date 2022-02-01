@@ -36,9 +36,10 @@ import { mapState } from 'vuex'
 
 import Cancel from '../../components/common/Cancel.vue'
 import SearchBar from '../../components/common/SearchBar.vue'
+import VideoListItemSmall from '../../components/video/VideoListItemSmall.vue'
 export default {
   name: 'PlaylistFormVideo',
-  components: { Cancel, SearchBar },
+  components: { Cancel, SearchBar, VideoListItemSmall },
   data: function() {
     return {
       pageName: "영상 추가하기",
