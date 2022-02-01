@@ -80,7 +80,7 @@ public class BoardService {
         if(existBoardLikes == null) {
             BoardLikes boardLikes = new BoardLikes();
             boardLikes.setBoard(boardRepository.findById(boardId).orElse(null));
-            boardLikes.setUser(userRepository.findById(userSeq).orElse(null));
+            boardLikes.setUser(userRepository.findByUserSeq(userSeq));
             boardLikesRepository.save(boardLikes);
         } else {
             // 익셉션 발생

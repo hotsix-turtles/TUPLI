@@ -1,7 +1,7 @@
 package hotsixturtles.tupli.api;
 
 
-import hotsixturtles.tupli.entity.UserInfo;
+import hotsixturtles.tupli.entity.meta.UserInfo;
 import hotsixturtles.tupli.repository.UserInfoRepository;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
