@@ -49,7 +49,7 @@ public class YoutubeVideoService {
         YoutubeVideoSaves existVideo = youtubeVideoSavesRepository.findExist(userSeq, youtubeVideo.getId());
         if(existVideo == null) {
             YoutubeVideoSaves youtubeVideoSaves = new YoutubeVideoSaves();
-            youtubeVideoSaves.setUser(userRepository.findById(userSeq).orElse(null));
+            youtubeVideoSaves.setUser(userRepository.findByUserSeq(userSeq));
             youtubeVideoSaves.setYoutubeVideo(youtubeVideo);
             youtubeVideoSavesRepository.save(youtubeVideoSaves);
         } else {
