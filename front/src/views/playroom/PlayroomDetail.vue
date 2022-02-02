@@ -303,6 +303,7 @@ import TagItem from './TagItem.vue'
 import PlaylistVideoItem from './PlaylistVideoItem.vue'
 import ChatItem from './ChatItem.vue'
 import axiosConnector from '../../utils/axios-connector';
+import wsConnector from '../../utils/ws-connector';
 
 Vue.use(VueYoutube)
 
@@ -367,6 +368,7 @@ export default {
       'roomCurrentPlayTime',
       'roomChats',
       'roomSendingMessage',
+      'chatroomId'
     ]),
     ...mapGetters('playroom', [
       'roomPlayTime',
@@ -406,6 +408,26 @@ export default {
       // axiosConnector.get(`/playroom/${this.$route.params.id}`).then(response => {
       //   this.$store.dispatch('setRoomInfo', response)
       // });
+    },
+    // 시작하기
+    initChatRoom() {
+      //this.token = localStorage.getItem('jwt')
+      wsConnector.connect({ },
+        () => {
+          wsConnector.subscribe(
+            `/chat/room/${this.chatroomId}`,
+            (message) => {
+              var recv = JSON.parse(message.body);
+              console.log('recv', recv)
+              //_this.recvMessage(recv);
+            },
+            //{ Authorization: this.token }
+          )
+        },
+        () => {
+          alert("서버 연결에 실패 하였습니다. 다시 접속해 주십시요.");
+        }
+      )
     },
     playVideo() {
       this.player.playVideo()

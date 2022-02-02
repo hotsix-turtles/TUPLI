@@ -20,6 +20,15 @@ const playroom = {
     roomCurrentPlayTime: '',
     roomSelectedChatItem: { id: -1, type: null },
     roomChats: [],
+    // roomChats: [
+    //   { id: 1, author: { id: 1, name: '김형준', thumbnail: 'https://picsum.photos/80/80' }, content: '와 맛있겠다 ㅋㅋㅋ', timestamp: 1643448193, blockedUser: false, blockedMessage: false },
+    //   { id: 2, author: { id: 1, name: '김형준', thumbnail: 'https://picsum.photos/80/80' }, content: '와 맛있겠다 ㅋㅋㅋ', timestamp: 1643448193, blockedUser: false, blockedMessage: false },
+    //   { id: 3, author: { id: 1, name: '김형준', thumbnail: 'https://picsum.photos/80/80' }, content: '와 맛있겠다 ㅋㅋㅋ', timestamp: 1643448193, blockedUser: false, blockedMessage: false },
+    //   { id: 4, author: { id: 1, name: '김형준', thumbnail: 'https://picsum.photos/80/80' }, content: '와 맛있겠다 ㅋㅋㅋ', timestamp: 1643448193, blockedUser: false, blockedMessage: false },
+    //   { id: 5, author: { id: 1, name: '김형준', thumbnail: 'https://picsum.photos/80/80' }, content: '와 맛있겠다 ㅋㅋㅋ', timestamp: 1643448193, blockedUser: false, blockedMessage: false },
+    //   { id: 6, author: { id: 1, name: '김형준', thumbnail: 'https://picsum.photos/80/80' }, content: '와 맛있겠다 ㅋㅋㅋ', timestamp: 1643448193, blockedUser: false, blockedMessage: false },
+    // ]
+    chatroomId: ''
   },
   mutations: {
     setRoomId: ( state, value ) => state.roomId = value,
@@ -36,6 +45,7 @@ const playroom = {
     setRoomTags: ( state, value ) => state.roomTags = value,
     setRoomPlaylists: ( state, value ) => state.roomPlaylists = value,
     setRoomVideos: ( state, value ) => state.roomVideos = value,
+    setChatroomId: ( state, value ) => state.chatroomId = value,
     blockChatById: ( state, id ) => state.roomChats.map((v) => { if (v.id == id) v.blockedMessage = true; }),
     unblockChatById: ( state, id ) => state.roomChats.map((v) => { if (v.id == id) v.blockedMessage = false; }),
     blockChatByUid: ( state, id ) => {
@@ -77,6 +87,7 @@ const playroom = {
       commit('setRoomTags', data.roomTags);
       commit('setRoomPlaylists', data.roomPlaylists);
       commit('setRoomVideos', data.roomVideos);
+      commit('setChatroomId', data.chatroomId);
     }),
     followUser: ({commit}, id) => {
       console.log('유저 팔로우 처리')
