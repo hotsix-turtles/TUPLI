@@ -295,7 +295,7 @@
 </template>
 
 <script>
-import { mapActions, mapGetters, mapState } from 'vuex';
+import { mapActions, mapGetters, mapMutations, mapState } from 'vuex';
 import Vue from 'vue'
 import VueYoutube from 'vue-youtube'
 import PlaylistThumbnailItem from './PlaylistThumbnailItem.vue'
@@ -346,9 +346,6 @@ export default {
       ]
     }
   },
-  created() {
-    this.getRoomInfo()
-  },
   computed: {
     ...mapState('playroom', [
       'roomId',
@@ -384,6 +381,9 @@ export default {
       return this.roomContent == this.roomReducedContent
     }
   },
+  created() {
+    this.getRoomInfo()
+  },
   methods: {
     getRoomInfo() {
       axiosConnector.post('/echo', {
@@ -411,22 +411,12 @@ export default {
     },
     // 시작하기
     initChatRoom() {
-      //this.token = localStorage.getItem('jwt')
-      wsConnector.connect({ },
-        () => {
-          wsConnector.subscribe(
-            `/chat/room/${this.chatroomId}`,
-            (message) => {
-              var recv = JSON.parse(message.body);
-              console.log('recv', recv)
-              //_this.recvMessage(recv);
-            },
-            //{ Authorization: this.token }
-          )
-        },
-        () => {
-          alert("서버 연결에 실패 하였습니다. 다시 접속해 주십시요.");
-        }
+      //const token = localStorage.getItem('jwt')
+      const token = undefined
+      wsConnector.connect(
+        token ? { Authorization: this.token } : { },
+        () => wsConnector.subscribe(`/sub/chat/room/${this.chatroomId}`, this.recvMessage, token ? { Authorization: token } : undefined),
+        () => alert("서버 연결에 실패 하였습니다. 다시 접속해 주십시요.")
       )
     },
     playVideo() {
@@ -464,9 +454,13 @@ export default {
       console.log('cued')
     },
     sendMessage() {
+      const type = 'TALK'
+      const message = this.message
+      const token = localStorage.getItem('jwt')
+
       this.disableChatbox()
       this.pendingToSendMessage()
-      this.$store.dispatch('playroom/sendMessage', this.message)
+      this.$store.dispatch('playroom/sendMessage', { type, message, token })
         .then(() => {
           this.clearMessage()
         })
@@ -499,7 +493,8 @@ export default {
     },
     clearSendError() {
       this.errorOnSend = false;
-    }
+    },
+    ...mapMutations('playroom', ['recvMessage'])
   },
 }
 </script>

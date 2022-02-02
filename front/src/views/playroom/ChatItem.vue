@@ -12,10 +12,24 @@
         circle
         @click.stop="selectChatAvatar(id)"
       >
-        <img
+        <v-img
           :src="profile"
+          :lazy-src="profile"
           class="pa-1"
         >
+          <template v-slot:placeholder>
+            <v-row
+              class="fill-height ma-0"
+              align="center"
+              justify="center"
+            >
+              <v-progress-circular
+                indeterminate
+                color="grey lighten-5"
+              ></v-progress-circular>
+            </v-row>
+          </template>
+        </v-img>
       </v-avatar>
       <p class="font-3 ml-1 font-weight-bold">
         {{ name }}
@@ -112,7 +126,7 @@ import { mapActions, mapMutations, mapState } from 'vuex';
 export default {
   name: "ChatItem",
   props: {
-    id: { type: Number, default: -1 },
+    id: { type: String, default: '' },
     name: { type: String, default: '' },
     profile: { type: String, default: '' },
     content: { type: String, default: '' },

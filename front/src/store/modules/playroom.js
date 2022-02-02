@@ -1,4 +1,6 @@
 import Vue from 'vue'
+import axiosConnector from '../../utils/axios-connector'
+import wsConnector from '../../utils/ws-connector'
 
 const playroom = {
   namespaced: true,
@@ -18,7 +20,7 @@ const playroom = {
     roomVideos: [],
     roomCurrentVideo: '',
     roomCurrentPlayTime: '',
-    roomSelectedChatItem: { id: -1, type: null },
+    roomSelectedChatItem: { id: '', type: null },
     roomChats: [],
     // roomChats: [
     //   { id: 1, author: { id: 1, name: '김형준', thumbnail: 'https://picsum.photos/80/80' }, content: '와 맛있겠다 ㅋㅋㅋ', timestamp: 1643448193, blockedUser: false, blockedMessage: false },
@@ -28,7 +30,9 @@ const playroom = {
     //   { id: 5, author: { id: 1, name: '김형준', thumbnail: 'https://picsum.photos/80/80' }, content: '와 맛있겠다 ㅋㅋㅋ', timestamp: 1643448193, blockedUser: false, blockedMessage: false },
     //   { id: 6, author: { id: 1, name: '김형준', thumbnail: 'https://picsum.photos/80/80' }, content: '와 맛있겠다 ㅋㅋㅋ', timestamp: 1643448193, blockedUser: false, blockedMessage: false },
     // ]
-    chatroomId: ''
+    chatroomId: '',
+    chatBlockedId: [],
+    chatBlockedUid: []
   },
   mutations: {
     setRoomId: ( state, value ) => state.roomId = value,
@@ -46,34 +50,59 @@ const playroom = {
     setRoomPlaylists: ( state, value ) => state.roomPlaylists = value,
     setRoomVideos: ( state, value ) => state.roomVideos = value,
     setChatroomId: ( state, value ) => state.chatroomId = value,
-    blockChatById: ( state, id ) => state.roomChats.map((v) => { if (v.id == id) v.blockedMessage = true; }),
-    unblockChatById: ( state, id ) => state.roomChats.map((v) => { if (v.id == id) v.blockedMessage = false; }),
+    blockChatById: ( state, id ) => {
+      state.roomChats.map((v) => { if (v.id == id) v.blockedMessage = true; })
+      state.chatBlockedId.push(id)
+    },
+    unblockChatById: ( state, id ) => {
+      state.roomChats.map((v) => { if (v.id == id) v.blockedMessage = false; })
+      const idx = state.chatBlockedId.indexOf(id)
+      if (idx > -1) state.chatBlockedId.splice(idx, 1)
+    },
     blockChatByUid: ( state, id ) => {
-      const authorId = roomChats.filter((v) => v.id == id)[0].author.id
+      const authorId = state.roomChats.filter((v) => v.id == id)[0].author.id
       state.roomChats.map((v) => { if (v.author.id == authorId) v.blockedUser = true; })
+      state.chatBlockedUid.push(authorId)
     },
     unblockChatByUid: ( state, id ) => {
-      const authorId = roomChats.filter((v) => v.id == id)[0].author.id
+      const authorId = state.roomChats.filter((v) => v.id == id)[0].author.id
       state.roomChats.map((v) => { if (v.author.id == authorId) v.blockedUser = false; })
+      const idx = state.chatBlockedUid.indexOf(authorId)
+      if (idx > -1) state.chatBlockedUid.splice(idx, 1)
     },
     selectChatItem: ( {roomSelectedChatItem}, id ) => {
-      if (roomSelectedChatItem.id != -1) return;
+      if (roomSelectedChatItem.id != '') return;
       Vue.set(roomSelectedChatItem, 'id', id);
       Vue.set(roomSelectedChatItem, 'type', 'CHAT_ITEM');
       return roomSelectedChatItem;
     },
     selectChatAvatar: ( {roomSelectedChatItem}, id ) => {
-      if (roomSelectedChatItem.id != -1) return;
+      if (roomSelectedChatItem.id != '') return;
       Vue.set(roomSelectedChatItem, 'id', id);
       Vue.set(roomSelectedChatItem, 'type', 'CHAT_AVATAR');
       return roomSelectedChatItem;
     },
     deselectChatItem: ( {roomSelectedChatItem} ) => {
-      if (roomSelectedChatItem.id == -1) return;
-      Vue.set(roomSelectedChatItem, 'id', -1);
+      if (roomSelectedChatItem.id == '') return;
+      Vue.set(roomSelectedChatItem, 'id', '');
       Vue.set(roomSelectedChatItem, 'type', null);
       return roomSelectedChatItem;
     },
+    recvMessage: async ( {roomChats, chatBlockedUid, chatBlockedId}, payload ) => {
+      const id = payload.headers['message-id']
+      const body = JSON.parse(payload.body);
+      const profile = await axiosConnector.post('/echo', {
+        nickname: '시스템',
+        profilePictureUrl: 'https://picsum.photos/80/80'
+      })
+      //const profile = await axiosConnector.get(`/profile/${body.id}`)
+      const author = { id: body.id, name: profile.data.nickname, thumbnail: profile.data.profilePictureUrl };
+      const content = body.message;
+      const timestamp = new Date().getTime();
+      const blockedUser = ( chatBlockedUid.find((v) => v == author.id) != undefined );
+      const blockedMessage = ( chatBlockedId.find((v) => v == id) != undefined );
+      roomChats.push({ id, author, content, timestamp, blockedUser, blockedMessage });
+    }
   },
   actions: {
     setRoomInfo: (({commit}, {data}) => {
@@ -129,11 +158,14 @@ const playroom = {
       // 1. 플레이룸 신고 axios 처리 후 결과값(성공여부) 리턴
       console.log('불량 플레이룸 신고 처리')
     },
-    sendMessage: ({commit}, payload) => {
-      if (!payload) return;
-      return new Promise((res, rej) => {
-        setTimeout(() => res(), 1000);
-      })
+    sendMessage: (state, payload) => {
+      if (!this.roomId) return;
+      if (!payload || !payload.type || !payload.message || !payload.token) return;
+      return wsConnector.send(
+        "/pub/chat/message",
+        JSON.stringify({ type: payload.type, roomId: state.roomId, message: payload.message }),
+        { Authorization: payload.token }
+      );
     }
   },
   getters: {
