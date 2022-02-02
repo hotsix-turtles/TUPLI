@@ -302,6 +302,7 @@ import PlaylistThumbnailItem from './PlaylistThumbnailItem.vue'
 import TagItem from './TagItem.vue'
 import PlaylistVideoItem from './PlaylistVideoItem.vue'
 import ChatItem from './ChatItem.vue'
+import axiosConnector from '../../utils/axios-connector';
 
 Vue.use(VueYoutube)
 
@@ -344,8 +345,12 @@ export default {
       ]
     }
   },
+  created() {
+    this.getRoomInfo()
+  },
   computed: {
     ...mapState('playroom', [
+      'roomId',
       'roomTitle',
       'roomPublic',
       'roomAuthorProfilePic',
@@ -361,7 +366,7 @@ export default {
       'roomCurrentVideo',
       'roomCurrentPlayTime',
       'roomChats',
-      'roomSendingMessage'
+      'roomSendingMessage',
     ]),
     ...mapGetters('playroom', [
       'roomPlayTime',
@@ -378,6 +383,30 @@ export default {
     }
   },
   methods: {
+    getRoomInfo() {
+      axiosConnector.post('/echo', {
+        roomId: 0,
+        roomTitle: '3일만에 다이어트 포기 선언하게 만든 영상들',
+        roomPublic: false,
+        roomAuthorProfilePic: 'https://picsum.photos/100/100',
+        roomAuthorName: '춘식이',
+        roomAuthorFollowerCount: 456,
+        roomStartTime: new Date(2022, 1, 23, 18, 30),
+        roomEndTime: new Date(2022, 1, 23, 20, 30),
+        roomContent: '같이 치맥하면서 먹방 보실분들?\r\n같이 치맥하면서 먹방 보시분들?\r\n같이 치맥하면서 먹방 보시분들?\r\n',
+        roomTags: ['먹방', '쯔양', '고기먹방', '고기먹방1', '고기먹방2', '고기먹방3', '고기먹방4', ],
+        roomPlaylists: [ 1, 2, 3, 4, 5 ],
+        roomVideos: [ 1, 2, 3, 4, 5, 6, 7, 8, 9 ],
+        chatroomId: '731f3b99-8257-4eae-86b2-ed38ea36ccff'
+      }).then(response => {
+        this.$store.dispatch('playroom/setRoomInfo', response).then(
+          () => this.initChatRoom()
+        )
+      });
+      // axiosConnector.get(`/playroom/${this.$route.params.id}`).then(response => {
+      //   this.$store.dispatch('setRoomInfo', response)
+      // });
+    },
     playVideo() {
       this.player.playVideo()
     },
