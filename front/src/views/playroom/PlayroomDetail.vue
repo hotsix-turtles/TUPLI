@@ -42,7 +42,8 @@
 
     <v-sheet
       id="scroll-threshold-example"
-      class="overflow-y-auto pb-16"
+      class="overflow-y-auto"
+      :class="{ 'pb-16': clickedItem > 0 }"
       max-height="100%"
     >
       <div class="playerWrapper">
