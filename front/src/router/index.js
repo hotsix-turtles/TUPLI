@@ -6,6 +6,7 @@ import PlaylistFormVideo from '@/views/playlist/PlaylistFormVideo'
 import Category from '@/views/common/Category'
 import Search from '@/views/common/Search'
 import Login from '../views/accounts/Login.vue'
+import PlayroomForm from '../views/playroom/PlayroomForm.vue'
 import PlayroomDetail from '../views/playroom/PlayroomDetail.vue'
 import VideoSearch from '../views/video/VideoSearch.vue'
 
@@ -57,6 +58,11 @@ const routes = [
   },
   {
     path: '/playroom',
+    name: 'PlayroomForm',
+    component: PlayroomForm
+  },
+  {
+    path: '/playroom/:id',
     name: 'PlayroomDetail',
     component: PlayroomDetail
   },

@@ -70,7 +70,10 @@
             <v-icon>mdi-thumb-up</v-icon>
           </v-btn>
 
-          <v-btn class="playroomChat">
+          <v-btn
+            class="playroomChat"
+            @click="dialog = true"
+          >
             <span>채팅</span>
             <v-icon>mdi-message</v-icon>
           </v-btn>
@@ -186,17 +189,121 @@
           />
         </div>
       </div>
+
+      <v-dialog
+        v-model="dialog"
+        fullscreen
+        hide-overlay
+        transition="dialog-bottom-transition"
+        scrollable
+      >
+        <v-card tile>
+          <v-card-title>
+            <v-toolbar-title>채팅</v-toolbar-title>
+            <v-btn
+              icon
+              class="ml-auto"
+              @click="dialog = false"
+            >
+              <v-icon>mdi-close</v-icon>
+            </v-btn>
+          </v-card-title>
+          <v-card-text>
+            <v-container>
+              <ChatItem
+                v-for="chat in roomChats"
+                :id="chat.id"
+                :key="chat.id"
+                :name="chat.author.name"
+                :profile="chat.author.thumbnail"
+                :content="chat.content"
+                :timestamp="chat.timestamp"
+                :blocked-user="chat.blockedUser"
+                :blocked-message="chat.blockedMessage"
+              />
+            </v-container>
+          </v-card-text>
+          <v-spacer />
+          <v-card-actions>
+            <v-text-field
+              v-model="message"
+              label="메시지를 입력하세요"
+              solo
+              dense
+              :disabled="!canChat"
+              :error="errorOnSend"
+              @click:append-outer="sendMessage"
+            >
+              <template v-slot:append>
+                <v-menu
+                  v-model="showEmoji"
+                  rounded="lg"
+                  top
+                  left
+                  offset-x
+                  offset-y
+                >
+                  <template v-slot:activator="{ on, attrs }">
+                    <v-icon
+                      v-if="showEmoji"
+                      v-bind="attrs"
+                      v-on="on"
+                      @click="showEmoji = !showEmoji"
+                    >
+                      mdi-emoticon
+                    </v-icon>
+                    <v-icon
+                      v-else
+                      v-bind="attrs"
+                      v-on="on"
+                      @click="showEmoji = !showEmoji"
+                    >
+                      mdi-emoticon-outline
+                    </v-icon>
+                  </template>
+                  <v-card>
+                    <v-list>
+                      <v-list-item>
+                        이모지
+                      </v-list-item>
+                    </v-list>
+                  </v-card>
+                </v-menu>
+              </template>
+              <template v-slot:append-outer>
+                <!-- <v-fade-transition leave-absolute> -->
+                <v-progress-circular
+                  v-if="sending"
+                  size="24"
+                  indeterminate
+                />
+                <v-icon
+                  v-else
+                  @click="sendMessage"
+                >
+                  mdi-send
+                </v-icon>
+                <!-- </v-fade-transition> -->
+              </template>
+            </v-text-field>
+          </v-card-actions>
+          <div style="flex: 1 1 auto;" />
+        </v-card>
+      </v-dialog>
     </v-sheet>
   </v-card>
 </template>
 
 <script>
-import { mapGetters, mapState } from 'vuex';
+import { mapActions, mapGetters, mapState } from 'vuex';
 import Vue from 'vue'
 import VueYoutube from 'vue-youtube'
 import PlaylistThumbnailItem from './PlaylistThumbnailItem.vue'
 import TagItem from './TagItem.vue'
 import PlaylistVideoItem from './PlaylistVideoItem.vue'
+import ChatItem from './ChatItem.vue'
+import axiosConnector from '../../utils/axios-connector';
+import wsConnector from '../../utils/ws-connector';
 
 Vue.use(VueYoutube)
 
@@ -205,6 +312,7 @@ export default {
   components: {
     PlaylistThumbnailItem,
     PlaylistVideoItem,
+    ChatItem,
     TagItem
   },
   data() {
@@ -215,7 +323,13 @@ export default {
         autoplay: 1,
         mute: 1
       },
-      clickedItem: 0
+      clickedItem: 0,
+      dialog: false,
+      showEmoji: false,
+      sending: false,
+      message: '',
+      canChat: true,
+      errorOnSend: false
     }
   },
   metaInfo () {
@@ -232,8 +346,12 @@ export default {
       ]
     }
   },
+  created() {
+    this.getRoomInfo()
+  },
   computed: {
     ...mapState('playroom', [
+      'roomId',
       'roomTitle',
       'roomPublic',
       'roomAuthorProfilePic',
@@ -247,7 +365,10 @@ export default {
       'roomCurrentPlaylist',
       'roomVideos',
       'roomCurrentVideo',
-      'roomCurrentPlayTime'
+      'roomCurrentPlayTime',
+      'roomChats',
+      'roomSendingMessage',
+      'chatroomId'
     ]),
     ...mapGetters('playroom', [
       'roomPlayTime',
@@ -264,6 +385,50 @@ export default {
     }
   },
   methods: {
+    getRoomInfo() {
+      axiosConnector.post('/echo', {
+        roomId: 0,
+        roomTitle: '3일만에 다이어트 포기 선언하게 만든 영상들',
+        roomPublic: false,
+        roomAuthorProfilePic: 'https://picsum.photos/100/100',
+        roomAuthorName: '춘식이',
+        roomAuthorFollowerCount: 456,
+        roomStartTime: new Date(2022, 1, 23, 18, 30),
+        roomEndTime: new Date(2022, 1, 23, 20, 30),
+        roomContent: '같이 치맥하면서 먹방 보실분들?\r\n같이 치맥하면서 먹방 보시분들?\r\n같이 치맥하면서 먹방 보시분들?\r\n',
+        roomTags: ['먹방', '쯔양', '고기먹방', '고기먹방1', '고기먹방2', '고기먹방3', '고기먹방4', ],
+        roomPlaylists: [ 1, 2, 3, 4, 5 ],
+        roomVideos: [ 1, 2, 3, 4, 5, 6, 7, 8, 9 ],
+        chatroomId: '731f3b99-8257-4eae-86b2-ed38ea36ccff'
+      }).then(response => {
+        this.$store.dispatch('playroom/setRoomInfo', response).then(
+          () => this.initChatRoom()
+        )
+      });
+      // axiosConnector.get(`/playroom/${this.$route.params.id}`).then(response => {
+      //   this.$store.dispatch('setRoomInfo', response)
+      // });
+    },
+    // 시작하기
+    initChatRoom() {
+      //this.token = localStorage.getItem('jwt')
+      wsConnector.connect({ },
+        () => {
+          wsConnector.subscribe(
+            `/chat/room/${this.chatroomId}`,
+            (message) => {
+              var recv = JSON.parse(message.body);
+              console.log('recv', recv)
+              //_this.recvMessage(recv);
+            },
+            //{ Authorization: this.token }
+          )
+        },
+        () => {
+          alert("서버 연결에 실패 하였습니다. 다시 접속해 주십시요.");
+        }
+      )
+    },
     playVideo() {
       this.player.playVideo()
     },
@@ -298,6 +463,43 @@ export default {
     onVideoCued() {
       console.log('cued')
     },
+    sendMessage() {
+      this.disableChatbox()
+      this.pendingToSendMessage()
+      this.$store.dispatch('playroom/sendMessage', this.message)
+        .then(() => {
+          this.clearMessage()
+        })
+        .catch((err) => {
+          this.notifySendError()
+        })
+        .finally(() => {
+          this.completeToSendMessage()
+          this.enableChatbox()
+        })
+    },
+    clearMessage() {
+      this.message = ''
+    },
+    pendingToSendMessage() {
+      this.sending = true
+    },
+    completeToSendMessage() {
+      this.sending = false
+    },
+    enableChatbox() {
+      this.canChat = true
+    },
+    disableChatbox() {
+      this.canChat = false
+    },
+    notifySendError() {
+      this.errorOnSend = true;
+      setTimeout(this.clearSendError, 1000);
+    },
+    clearSendError() {
+      this.errorOnSend = false;
+    }
   },
 }
 </script>

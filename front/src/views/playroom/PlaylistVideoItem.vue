@@ -15,7 +15,8 @@
       >
       <v-list-item-content class="ml-2">
         <v-list-item-title>{{ title }}</v-list-item-title>
-        <v-list-item-subtitle>{{ playtime }}</v-list-item-subtitle>
+        <v-list-item-subtitle>{{ author }}</v-list-item-subtitle>
+        <!-- <v-list-item-subtitle>{{ playtime }}</v-list-item-subtitle> -->
       </v-list-item-content>
     </v-list-item>
     <v-card-actions>
@@ -52,9 +53,11 @@ export default {
   props: {
     id: { type: Number, default: -1 },
     title: { type: String, default: '' },
+    author: { type: String, default: '' },
     thumbnail: { type: String, default: '' },
     playtime: { type: String, default: '0:0' },
-    clicked: { type: Boolean, default: false }
+    clicked: { type: Boolean, default: false },
+    readonly: { type: Boolean, default: false }
   },
   data() {
     return {
@@ -69,8 +72,8 @@ export default {
   },
   methods: {
     onItemClick (event) {
+      if (this.readonly) return;
       this.clickState = !this.clickState
-      console.log(this.clickState)
       this.$emit('click', { id: this.id, clickState: this.clickState })
     }
   }
