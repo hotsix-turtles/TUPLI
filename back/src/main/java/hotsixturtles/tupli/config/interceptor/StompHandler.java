@@ -41,13 +41,17 @@ public class StompHandler implements ChannelInterceptor {
     @Override
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
         StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
-        System.out.println("accessor = " + accessor);
         if (StompCommand.CONNECT == accessor.getCommand()) { // websocket 연결요청
             String jwtToken = accessor.getFirstNativeHeader("Authorization");
-            log.info("CONNECT {}", jwtToken);
-            // Header의 jwt token 검증
-            jwtTokenProvider.validateToken(jwtToken);
+            // 회원일 경우, Header의 jwt token 검증
+            if (jwtToken != null) {
+                // 회원 token 받음
+                jwtTokenProvider.validateToken(jwtToken);
+            } else {
+                // 비회원 : id, password 받음
+            }
         } else if (StompCommand.SUBSCRIBE == accessor.getCommand()) { // 채팅룸 구독요청
+//            System.out.println("구독요청");
             // header정보에서 구독 destination정보를 얻고, roomId를 추출한다.
             String roomId = chatService.getRoomId(Optional.ofNullable((String) message.getHeaders().get("simpDestination")).orElse("InvalidRoomId"));
             String sessionId = (String) message.getHeaders().get("simpSessionId");
@@ -55,8 +59,12 @@ public class StompHandler implements ChannelInterceptor {
             chatRoomRepository.plusUserCount(roomId);
             // 클라이언트 입장 메시지를 채팅방에 발송한다.(redis publish)
             // OAuth가 이것저것 principal 건드리고 다녀서 user_id가 출력됨. 미가입자나 익명의 유저 처리 고민 (강민구)
-//            String name = Optional.ofNullable((Principal) message.getHeaders().get("simpUser")).map(Principal::getName).orElse("익명의 유저");
-            String name = jwtTokenProvider.getUser(accessor.getFirstNativeHeader("Authorization")).getEmail();  // 나중에 닉네임으로 변경
+            String jwtToken = accessor.getFirstNativeHeader("Authorization");
+            String name = "익명의 유저";
+            if (jwtToken != null) {
+                // 회원일 경우 이름 변경
+                name = jwtTokenProvider.getUser(jwtToken).getEmail();  // 나중에 닉네임으로 변경
+            }
             // 채팅방에 들어온 클라이언트 정보를 roomId와 맵핑해 놓는다.(나중에 특정 세션이 어떤 채팅방에 들어가 있는지 알기 위함)
             chatRoomRepository.setUserEnterInfo(sessionId, ChatUserInfo.builder().sender(name).roomId(roomId).build());
             chatService.sendChatMessage(ChatMessage.builder().type(ChatMessage.MessageType.ENTER).roomId(roomId).sender(name).build());
