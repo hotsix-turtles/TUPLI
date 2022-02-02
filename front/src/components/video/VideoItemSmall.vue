@@ -4,37 +4,37 @@
     {{ video.snippet }} -->
     <v-list-item two-line>
       <img
-        :src="thumbnail"
+        :src="searchedVideo.thumbnail"
         style="width: 40%; height: auto"
         class=""
+        @click="watchingVideo(searchedVideo)"
       >
       <v-list-item-content class="ml-2">
-        <v-list-item-title @click="addVideo(videoId)">
-          <p>{{ title }}</p>
-          <p>{{ channelTitle }}</p>
-          <p>{{ categoryId }}</p>
-          <p>{{ duration }}</p>
+        <v-list-item-title @click="addVideo(searchedVideo.videoId)">
+          <p>{{ searchedVideo.title }}</p>
+          <p>{{ searchedVideo.channelTitle }}</p>
+          <p>{{ searchedVideo.categoryId }}</p>
+          <p>{{ searchedVideo.duration }}</p>
         </v-list-item-title>
-        <v-list-item-subtitle>{{ date }}</v-list-item-subtitle>
+        <v-list-item-subtitle>{{ searchedVideo.date }}</v-list-item-subtitle>
       </v-list-item-content>
     </v-list-item>
   </div>
 </template>
 
 <script>
+import { mapActions } from 'vuex'
+
 export default {
   name: 'VideoItem',
   props: {
     // eslint-disable-next-line vue/require-default-prop
-    videoId: { type: String, default: '' },
-    title: { type: String, default: '' },
-    thumbnail: { type: String, default: '' },
-    date: { type: String, default: '' },
-    duration: { type: String, default: '' },
-    channelTitle: { type: String, default: '' },
-    categoryId: { type: Number, default: 0 },
+    searchedVideo: { type: Object }
   },
   methods: {
+    ...mapActions('video', [
+      'watchingVideo',
+    ]),
     addVideo: function(videoId) {
       this.$emit('add-video', videoId)
     },

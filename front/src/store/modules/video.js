@@ -1,4 +1,5 @@
 import axios from 'axios'
+import router from '@/router/index.js'
 
 
 const video = {
@@ -7,6 +8,7 @@ const video = {
     addedVideos: [], // 생성용으로 추가한 영상
     searchedVideos: [], // 검색한 영상
     searchedVideoIds: [], // 검색한 영상의 ID
+    rerenderKey: '',
     watchingVideo: '', // 시청하는 영상
     nextPageToken: '', // 다음 페이지(무한 스크롤용)
     query: '', // 검색어
@@ -22,7 +24,6 @@ const video = {
     SEARCH_VIDEOS: function (state, searchedVideos) {
       state.searchedVideos = []
       state.searchedVideoIds = []
-      state.nextPageToken = ''
       for (let searchedVideo of searchedVideos) {
         const data = {
           videoId: searchedVideo.id.videoId,
@@ -31,42 +32,41 @@ const video = {
           thumbnail: searchedVideo.snippet.thumbnails.default.url,
           channelTitle: searchedVideo.snippet.channelTitle,
         }
-        console.log('data', data)
         state.searchedVideos.push(data)
         state.searchedVideoIds.push(searchedVideo.id.videoId)
       }
     },
     SEARCH_VIDEOS_ADD_INFO: function (state, addInfos) {
-      console.log('addInfos', addInfos)
       state.searchedVideos.forEach(searchedVideo => {
         for (let addInfo of addInfos) {
-          console.log('addInfo.snippet.categoryId', addInfo.snippet.categoryId)
           if (searchedVideo.videoId === addInfo.id) {
-            console.log('searchedVideo.videoId', searchedVideo.videoId)
-            console.log('addInfo.id', addInfo.id)
-            searchedVideo.categoryId = addInfo.snippet.categoryId
+            searchedVideo.categoryId = Number(addInfo.snippet.categoryId)
             searchedVideo.duration = addInfo.contentDetails.duration
             break
           }
         }
+        state.rerenderKey = addInfos[0].id
       })
       console.log('state.searchedVideos', state.searchedVideos)
     },
     SEARCH_VIDEOS_BY_SCROLL: function (state, searchedVideos) {
+      state.searchedVideoIds = []
       for (let searchedVideo of searchedVideos) {
         const data = {
           videoId: searchedVideo.id.videoId,
           title: searchedVideo.snippet.title,
           date: searchedVideo.snippet.publishTime,
           thumbnail: searchedVideo.snippet.thumbnails.default.url,
+          channelTitle: searchedVideo.snippet.channelTitle,
         }
         state.searchedVideos.push(data)
+        state.searchedVideoIds.push(searchedVideo.id.videoId)
       }
       console.log('SEARCH_VIDEOS_BY_SCROLL', state.searchedVideos)
     },
     NEXT_PAGE_TOKEN: function (state, nextPageToken) {
       state.nextPageToken = nextPageToken
-      console.log(state.nextPageToken)
+      console.log('state.nextPageToken', state.nextPageToken)
     },
     QUERY: function (state, query) {
       state.query = query
@@ -80,6 +80,7 @@ const video = {
     },
     WATCHING_VIDEO: function (state, watchingVideo) {
       state.watchingVideo = watchingVideo
+      router.push({ name: 'VideoWatch' })
     }
   },
   actions: {
@@ -96,10 +97,11 @@ const video = {
       const searchParams = {
         key: API_KEY,
         part: 'snippet',
+        fields: 'nextPageToken,items(id/videoId,snippet(title,publishTime,thumbnails/default,channelTitle))',
         type: 'video',
         q: query, // 검색어
         eventType: 'completed', // 완료된 영상만 검색
-        maxResults: 3, // 반환할 영상 개수
+        maxResults: 5, // 반환할 영상 개수
       }
       axios({
         method: 'get',
@@ -110,6 +112,9 @@ const video = {
           commit('SEARCH_VIDEOS', res.data.items)
           commit('NEXT_PAGE_TOKEN', res.data.nextPageToken)
           commit('QUERY', query)
+          console.log('113 NEXT_PAGE_TOKEN', res.data.nextPageToken)
+        })
+        .then(() => {
           dispatch('searchVideosAddInfo')
         })
         .catch((err) => {
@@ -146,17 +151,18 @@ const video = {
     searchVideosByScroll: function ({ state, commit }, $state) {
       const SEARCH_API_URL = 'https://www.googleapis.com/youtube/v3/search'
       const API_KEY = process.env.VUE_APP_YOUTUBE_API_KEY
+
+      console.log('searchVideosByScroll 실행됨')
+      console.log('state.nextPageToken', state.nextPageToken)
       if (state.nextPageToken) {
-        console.log('searchVideosByScroll 실행됨')
-        console.log(state.nextPageToken)
         const params = {
           key: API_KEY,
           part: 'snippet',
-          // fields: items(id/videoId,snippet(title,publishTime,thumbnails)),
+          fields: 'nextPageToken,items(id/videoId,snippet(title,publishTime,thumbnails/default,channelTitle))',
           type: 'video',
           q: state.query, // 검색어
           eventType: 'completed', // 완료된 영상만 검색
-          maxResults: 3, // 반환할 영상 개수
+          maxResults: 5, // 반환할 영상 개수
           pageToken: state.nextPageToken,
         }
         axios({
@@ -167,6 +173,9 @@ const video = {
           .then((res) => {
             commit('NEXT_PAGE_TOKEN', res.data.nextPageToken)
             commit('SEARCH_VIDEOS_BY_SCROLL', res.data.items)
+          })
+          .then(() => {
+            dispatch('searchVideosAddInfo')
             $state.loaded()
           })
           .catch((err) => {

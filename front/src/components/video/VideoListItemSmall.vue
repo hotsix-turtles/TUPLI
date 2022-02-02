@@ -3,13 +3,7 @@
     <video-item-small
       v-for="(searchedVideo, idx) in searchedVideos"
       :key="idx"
-      :video-id="searchedVideo.videoId"
-      :title="searchedVideo.title"
-      :thumbnail="searchedVideo.thumbnail"
-      :date="searchedVideo.date"
-      :category-id="searchedVideo.categoryId"
-      :duration="searchedVideo.duration"
-      :channel-title="searchedVideo.channelTitle"
+      :searched-video="searchedVideo"
       @add-video="addVideo"
     />
   </div>

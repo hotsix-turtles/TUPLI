@@ -6,6 +6,7 @@
       @input-change="searchVideos"
     />
     <video-list-item-small
+      :key="rerenderKey"
       :searched-videos="searchedVideos"
     />
     <!-- 무한스크롤 -->
@@ -37,6 +38,7 @@ export default {
   computed: {
     ...mapState('video', {
       searchedVideos: state => state.searchedVideos,
+      rerenderKey: state => state.rerenderKey,
       nextPageToken: state => state.nextPageToken,
     })
   },
