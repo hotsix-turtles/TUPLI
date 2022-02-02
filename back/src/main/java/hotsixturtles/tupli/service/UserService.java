@@ -1,7 +1,9 @@
 package hotsixturtles.tupli.service;
 
 import hotsixturtles.tupli.entity.User;
+import hotsixturtles.tupli.entity.likes.UserDislikes;
 import hotsixturtles.tupli.entity.likes.UserLikes;
+import hotsixturtles.tupli.repository.UserDislikesRepository;
 import hotsixturtles.tupli.repository.UserLikesRepository;
 import hotsixturtles.tupli.repository.UserRepository;
 import hotsixturtles.tupli.service.token.JwtTokenProvider;
@@ -23,6 +25,7 @@ public class UserService {
 
     private final JwtTokenProvider jwtTokenProvider;
     private final UserLikesRepository userLikesRepository;
+    private final UserDislikesRepository userDislikesRepository;
 
     @Transactional
     public Long join(User user) {
@@ -109,6 +112,11 @@ public class UserService {
         }
     }
 
+    // 22.02.02 한길 - follow 했는지 안했는지 정보 반환
+    public UserLikes getFollow(Long userSeq, Long otherUserSeq) {
+        return userLikesRepository.findExist(userSeq, otherUserSeq);
+    }
+
     // 22.02.02 한길 - follow 하기, 이미 follow 되어있으면 아무일도 하지않음.
     @Transactional
     public void follow(Long userSeq, Long otherUserSeq) {
@@ -136,6 +144,43 @@ public class UserService {
             // 이미 언팔로우 되어있음.
         }
     }
+
+    ///////////////////////////
+
+    // 22.02.02 한길 - follow 했는지 안했는지 정보 반환
+    public UserDislikes getDislike(Long userSeq, Long otherUserSeq) {
+        return  userDislikesRepository.findExist(userSeq, otherUserSeq);
+    }
+
+    // 22.02.02 한길 - follow 하기, 이미 follow 되어있으면 아무일도 하지않음.
+    @Transactional
+    public void dislike(Long userSeq, Long otherUserSeq) {
+        UserDislikes existUserDislikes = userDislikesRepository.findExist(userSeq, otherUserSeq);
+        System.out.println("existUserDislikes== " + existUserDislikes);
+        if(existUserDislikes == null) {
+            UserDislikes userDislikes = new UserDislikes();
+            userDislikes.setFromUser(userRepository.findById(userSeq).orElse(null));
+            userDislikes.setToUser(userRepository.findById(otherUserSeq).orElse(null));
+            userDislikesRepository.save(userDislikes);
+        }
+        else {
+            // 이미 팔로우 되어있음.
+        }
+    }
+
+    // 22.02.02 한길 - unfollow 하기, 이미 unfollow 되어있으면 아무일도 하지않음.
+    @Transactional
+    public void undoDislike(Long userSeq, Long otherUserSeq) {
+        UserDislikes existUserDislikes = userDislikesRepository.findExist(userSeq, otherUserSeq);
+        if(existUserDislikes != null) {
+            userDislikesRepository.delete(existUserDislikes);
+        }
+        else {
+            // 이미 언팔로우 되어있음.
+        }
+    }
+
+    ///////////////////////////
 
     // 22.02.02 한길 - 팔로워 리턴하기
     public List<UserLikes> getFollowers(Long otherUserSeq) {
