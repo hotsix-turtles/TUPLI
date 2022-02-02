@@ -91,11 +91,11 @@ const playroom = {
     recvMessage: async ( {roomChats, chatBlockedUid, chatBlockedId}, payload ) => {
       const id = payload.headers['message-id']
       const body = JSON.parse(payload.body);
-      const profile = await axiosConnector.post('/echo', {
-        nickname: '시스템',
-        profilePictureUrl: 'https://picsum.photos/80/80'
-      })
-      //const profile = await axiosConnector.get(`/profile/${body.id}`)
+      // const profile = await axiosConnector.post('/echo', {
+      //   nickname: '시스템',
+      //   profilePictureUrl: 'https://picsum.photos/80/80'
+      // })
+      const profile = await axiosConnector.get(`/profile/${body.id}`)
       const author = { id: body.id, name: profile.data.nickname, thumbnail: profile.data.profilePictureUrl };
       const content = body.message;
       const timestamp = new Date().getTime();
