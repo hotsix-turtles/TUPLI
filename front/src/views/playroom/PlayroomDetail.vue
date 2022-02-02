@@ -218,34 +218,48 @@
                 :profile="chat.author.thumbnail"
                 :content="chat.content"
                 :timestamp="chat.timestamp"
-                :blockedUser="chat.blockedUser"
-                :blockedMessage="chat.blockedMessage"
+                :blocked-user="chat.blockedUser"
+                :blocked-message="chat.blockedMessage"
               />
             </v-container>
           </v-card-text>
-          <v-spacer></v-spacer>
+          <v-spacer />
           <v-card-actions>
             <v-text-field
+              v-model="message"
               label="메시지를 입력하세요"
-              v-model='message'
               solo
               dense
+              :disabled="!canChat"
+              :error="errorOnSend"
               @click:append-outer="sendMessage"
-              :disabled='!canChat'
-              :error='errorOnSend'
             >
               <template v-slot:append>
                 <v-menu
                   v-model="showEmoji"
-                  rounded='lg'
+                  rounded="lg"
                   top
                   left
                   offset-x
                   offset-y
                 >
                   <template v-slot:activator="{ on, attrs }">
-                    <v-icon v-bind="attrs" v-on="on" v-if="showEmoji" @click="showEmoji = !showEmoji">mdi-emoticon</v-icon>
-                    <v-icon v-bind="attrs" v-on="on" v-else @click="showEmoji = !showEmoji">mdi-emoticon-outline</v-icon>
+                    <v-icon
+                      v-if="showEmoji"
+                      v-bind="attrs"
+                      v-on="on"
+                      @click="showEmoji = !showEmoji"
+                    >
+                      mdi-emoticon
+                    </v-icon>
+                    <v-icon
+                      v-else
+                      v-bind="attrs"
+                      v-on="on"
+                      @click="showEmoji = !showEmoji"
+                    >
+                      mdi-emoticon-outline
+                    </v-icon>
                   </template>
                   <v-card>
                     <v-list>
@@ -258,12 +272,17 @@
               </template>
               <template v-slot:append-outer>
                 <!-- <v-fade-transition leave-absolute> -->
-                  <v-progress-circular
-                    v-if="sending"
-                    size="24"
-                    indeterminate
-                  ></v-progress-circular>
-                <v-icon v-else @click="sendMessage">mdi-send</v-icon>
+                <v-progress-circular
+                  v-if="sending"
+                  size="24"
+                  indeterminate
+                />
+                <v-icon
+                  v-else
+                  @click="sendMessage"
+                >
+                  mdi-send
+                </v-icon>
                 <!-- </v-fade-transition> -->
               </template>
             </v-text-field>
