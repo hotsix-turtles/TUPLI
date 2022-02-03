@@ -10,3 +10,14 @@
 // .light-background {
 //   background-color: rgba($color: #eeebeb, $alpha: 1.0);
 // }
+
+.fixed-bottom {
+  display: inline-block;
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+}
+
+.navbar-background {
+  background-color: rgb(243, 242, 242);
+}

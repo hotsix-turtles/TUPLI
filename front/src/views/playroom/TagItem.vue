@@ -14,9 +14,7 @@
 export default {
   name: 'TagItem',
   props: {
-    content: {
-      type: String, default: ''
-    }
+    content: { type: String, default: '' }
   }
 }
 </script>
