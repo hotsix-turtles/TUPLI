@@ -57,7 +57,7 @@ public class PlaylistService {
 
     // 단일 Playlist 추가
     @Transactional
-    public void addPlaylist(Long userSeq, PlaylistRequest playlistRequest) {
+    public Playlist addPlaylist(Long userSeq, PlaylistRequest playlistRequest) {
         // 기본 정보
         Playlist playlist = new Playlist();
         playlist.setTitle(playlistRequest.getTitle());
@@ -83,9 +83,10 @@ public class PlaylistService {
             playlistInfo.put(categoryId, count+1);
         }
         playlist.setPlaylistInfo(playlistInfo);
-        System.out.println("playlistInfo = " + playlistInfo);
 
         playlistRepository.save(playlist);
+
+        return playlist;
     }
 
     // 단일 Playlist id로 검색
@@ -231,13 +232,13 @@ public class PlaylistService {
 
     // 빌더와 다르게 재사용 가능해서 좋아함
     private BooleanExpression titleContains(String keyword) {
-        return hasText(keyword) ? playlist.name.contains(keyword) : null;
+        return hasText(keyword) ? playlist.title.contains(keyword) : null;
     }
     private BooleanExpression usernameContains(String keyword) {
         return hasText(keyword) ? playlist.user.username.contains(keyword) : null;
     }
     private BooleanExpression descriptionContains(String keyword) {
-        return hasText(keyword) ? playlist.description.contains(keyword) : null;
+        return hasText(keyword) ? playlist.content.contains(keyword) : null;
     }
 
 }
