@@ -4,20 +4,24 @@
     height="100vh"
     max-width="640"
   >
+    <!-- 하단 네비게이션 (플레이리스트 조작) -->
     <v-bottom-navigation
       absolute
       background-color="#5B5C9D"
       height="65px"
-      :input-value="clickedItem > 0"
+      :input-value="selectedItem.length > 0"
     >
+      <!-- 선택된 동영상 개수 뱃지 -->
       <v-badge
-        :content="clickedItem"
+        :content="selectedItem.length"
         color="#EAEAEA"
         offset-x="20"
         offset-y="20"
         overlap
         class="videoCounter"
       />
+
+      <!-- 영상보기 버튼 -->
       <v-btn>
         <span style="color: white;">영상보기</span>
         <v-icon color="white">
@@ -25,6 +29,7 @@
         </v-icon>
       </v-btn>
 
+      <!-- 내 플레이리스트 버튼 -->
       <v-btn>
         <span style="color: white;">내 플레이리스트</span>
         <v-icon color="white">
@@ -32,6 +37,7 @@
         </v-icon>
       </v-btn>
 
+      <!-- 저장하기 버튼 -->
       <v-btn>
         <span style="color: white;">저장하기</span>
         <v-icon color="white">
@@ -40,13 +46,16 @@
       </v-btn>
     </v-bottom-navigation>
 
+    <!-- 플레이룸 페이지 -->
     <v-sheet
       id="scroll-threshold-example"
       class="overflow-y-auto"
-      :class="{ 'pb-16': clickedItem > 0 }"
+      :class="{ 'pb-16': selectedItem.length > 0 }"
       max-height="100%"
     >
+      <!-- 유튜브 동영상 플레이어 Wrapper (필요없음) -->
       <div class="playerWrapper">
+        <!-- 유튜브 동영상 플레이어 -->
         <youtube
           ref="youtube"
           :video-id="videoId"
@@ -61,45 +70,61 @@
           @cued="onVideoCued"
         />
       </div>
+      <!-- 유튜브 동영상 플레이어 끝 -->
+
+      <!-- 유튜브 동영상 플레이어 하단 네비게이션 -->
       <div class="playerNav">
         <v-bottom-navigation
           grow
           class="elevation-2"
         >
+          <!-- 플레이룸 좋아요 -->
           <v-btn class="playroomLike">
             <span>좋아요</span>
             <v-icon>mdi-thumb-up</v-icon>
           </v-btn>
 
+          <!-- 플레이룸 댓글 -->
           <v-btn
             class="playroomChat"
-            @click="dialog = true"
+            @click="isChatting = true"
           >
             <span>채팅</span>
             <v-icon>mdi-message</v-icon>
           </v-btn>
 
+          <!-- 플레이룸 공유 -->
           <v-btn class="playroomShare">
             <span>공유</span>
             <v-icon>mdi-share</v-icon>
           </v-btn>
 
+          <!-- 플레이룸 신고 -->
           <v-btn class="playroomReport">
             <span>신고</span>
             <v-icon>mdi-alert</v-icon>
           </v-btn>
         </v-bottom-navigation>
       </div>
+      <!-- 유튜브 동영상 플레이어 하단 네비게이션(플레이룸 SNS 활동 네비게이션) 끝 -->
+
+      <!-- 플레이룸 정보 Wrapper 시작 -->
       <div class="playroomInfo">
+        <!-- 플레이룸 타이틀 Wrapper -->
         <div class="playroomTitleWrapper">
+          <!-- 플레이룸 공개 여부 뱃지 -->
           <p :class="{ playroomPublicBadge: roomPublic, playroomPrivateBadge: !roomPublic }">
             {{ roomPublicLabel }}
           </p>
+          <!-- 플레이룸 타이틀 -->
           <p class="playroomTitle">
             {{ roomTitle }}
           </p>
         </div>
+
+        <!-- 플레이룸 작성자 Wrapper -->
         <div class="playroomAuthorWrapper">
+          <!-- 플레이룸 작성자 프로필 사진 -->
           <div class="authorProfilePic">
             <v-img
               :src="roomAuthorProfilePic"
@@ -108,17 +133,26 @@
               style="width: 100%; height: auto;"
             />
           </div>
+
+          <!-- 플레이룸 작성자 이름 -->
           <span class="authorName">{{ roomAuthorName }}</span>
+
+          <!-- 플레이룸 팔로워 수 -->
           <div class="authorFollowerWrapper">
             <span class="authorFollower">{{ roomAuthorFollowerCount }}</span>
           </div>
         </div>
+
+        <!-- 플레이룸 운영 시간(?) Wrapper -->
         <div class="playroomPlaytimeWrapper">
           <p class="playtime">
             {{ roomPlayTime }}
           </p>
         </div>
+
+        <!-- 플레이룸 설명 Wrapper -->
         <div class="playroomContentWrapper">
+          <!-- 플레이룸 요약 설명 -->
           <p
             v-if="!showReducedContent && roomReducedContent != roomContent"
             class="playroomReducedContent"
@@ -126,6 +160,8 @@
           >
             {{ roomReducedContent }}
           </p>
+
+          <!-- 플레이룸 상세 설명 (더보기) -->
           <p
             v-else
             class="playroomContent"
@@ -133,6 +169,8 @@
             {{ roomContent }}
           </p>
         </div>
+
+        <!-- 플레이룸 태그 Wrapper -->
         <div class="playroomTagWrapper">
           <TagItem
             v-for="roomTag in roomTags"
@@ -141,28 +179,37 @@
           />
         </div>
       </div>
+      <!-- 플레이룸 정보 Wrapper 끝 -->
+
+      <!-- 플레이룸 플레이리스트 목록 Wrapper 시작 -->
       <div class="playlistWrapper mx-3 mb-5">
         <p>현재 재생중인 <b>플레이리스트</b></p>
+        <!-- 플레이리스트 목록 -->
         <v-card
           outlined
           style="display:flex; flex-wrap: nowrap; overflow-x: auto"
           class="playlistThumbnailWrapper"
         >
           <PlaylistThumbnailItem
-            v-for="playlistItem in roomPlaylistItems"
+            v-for="playlistItem in roomPlaylists"
             :id="playlistItem.id"
             :key="playlistItem.id"
-            :src="playlistItem.thumbnail_url"
-            :selected="playlistItem.id == 1"
+            :src="playlistItem.thumbnailUrl"
+            :selected="playlistItem.id == roomCurrentPlaylistOffset"
           />
         </v-card>
       </div>
+      <!-- 플레이룸 플레이리스트 목록 끝 -->
+
+      <!-- 현재 플레이리스트 비디오 목록 Wrapper 시작 -->
       <div class="playlistVideoWrapper">
+        <!-- 현재 플레이리스트 비디오 목록 상단 메뉴 -->
         <div class="playlistVideoNav d-flex justify-space-between align-center mx-3">
           <v-btn
             small
             elevation="0"
             color="white"
+            @click="selectAllVideo"
           >
             <v-icon class="mdi-18px">
               mdi-check
@@ -178,21 +225,29 @@
             <v-icon>mdi-play-circle</v-icon>
           </v-btn>
         </div>
-        <div class="playlistVideoItems d-flex flex-column overflow-y-auto">
+
+        <!-- 현재 플레이리스트 비디오 목록 -->
+        <div
+          v-if="roomPlaylists"
+          class="playlistVideoItems d-flex flex-column overflow-y-auto"
+        >
           <PlaylistVideoItem
-            v-for="playlistVideoItem in roomPlaylistVideoItems"
-            :id="playlistVideoItem.id"
-            :key="playlistVideoItem.id"
-            :title="playlistVideoItem.title"
-            :thumbnail="playlistVideoItem.thumbnail_url"
-            :playtime="playlistVideoItem.playtime"
-            @click="onPlaylistVideoClicked"
+            v-for="video in roomCurrentPlaylistVideos"
+            :id="video.id"
+            :key="video.id"
+            :title="video.title"
+            :thumbnail="video.thumbnailUrl"
+            :playtime="video.playtime"
+            :selected="isSelectedVideo(video.id)"
+            :visible="video.included"
+            @click="onPlaylistVideoSelected"
           />
         </div>
       </div>
 
+      <!-- 플레이룸 채팅창 -->
       <v-dialog
-        v-model="dialog"
+        v-model="isChatting"
         fullscreen
         hide-overlay
         transition="dialog-bottom-transition"
@@ -204,7 +259,7 @@
             <v-btn
               icon
               class="ml-auto"
-              @click="dialog = false"
+              @click="isChatting = false"
             >
               <v-icon>mdi-close</v-icon>
             </v-btn>
@@ -226,67 +281,7 @@
           </v-card-text>
           <v-spacer />
           <v-card-actions>
-            <v-text-field
-              v-model="message"
-              label="메시지를 입력하세요"
-              solo
-              dense
-              :disabled="!canChat"
-              :error="errorOnSend"
-              @click:append-outer="sendMessage"
-            >
-              <template v-slot:append>
-                <v-menu
-                  v-model="showEmoji"
-                  rounded="lg"
-                  top
-                  left
-                  offset-x
-                  offset-y
-                >
-                  <template v-slot:activator="{ on, attrs }">
-                    <v-icon
-                      v-if="showEmoji"
-                      v-bind="attrs"
-                      v-on="on"
-                      @click="showEmoji = !showEmoji"
-                    >
-                      mdi-emoticon
-                    </v-icon>
-                    <v-icon
-                      v-else
-                      v-bind="attrs"
-                      v-on="on"
-                      @click="showEmoji = !showEmoji"
-                    >
-                      mdi-emoticon-outline
-                    </v-icon>
-                  </template>
-                  <v-card>
-                    <v-list>
-                      <v-list-item>
-                        이모지
-                      </v-list-item>
-                    </v-list>
-                  </v-card>
-                </v-menu>
-              </template>
-              <template v-slot:append-outer>
-                <!-- <v-fade-transition leave-absolute> -->
-                <v-progress-circular
-                  v-if="sending"
-                  size="24"
-                  indeterminate
-                />
-                <v-icon
-                  v-else
-                  @click="sendMessage"
-                >
-                  mdi-send
-                </v-icon>
-                <!-- </v-fade-transition> -->
-              </template>
-            </v-text-field>
+            <ChatInput />
           </v-card-actions>
           <div style="flex: 1 1 auto;" />
         </v-card>
@@ -305,6 +300,7 @@ import PlaylistVideoItem from './PlaylistVideoItem.vue'
 import ChatItem from './ChatItem.vue'
 import axiosConnector from '../../utils/axios-connector';
 import wsConnector from '../../utils/ws-connector';
+import ChatInput from './ChatInput.vue'
 
 Vue.use(VueYoutube)
 
@@ -314,23 +310,19 @@ export default {
     PlaylistThumbnailItem,
     PlaylistVideoItem,
     ChatItem,
+    ChatInput,
     TagItem
   },
   data() {
     return {
       showReducedContent: false,
-      videoId: 'lG0Ys-2d4MA',
+      videoId: '',
       playerVars: {
-        autoplay: 1,
         mute: 1
       },
-      clickedItem: 0,
-      dialog: false,
-      showEmoji: false,
-      sending: false,
-      message: '',
-      canChat: true,
-      errorOnSend: false
+      selectedItem: [],
+      isChatting: false,
+      lastPlaytime: 0
     }
   },
   metaInfo () {
@@ -360,143 +352,221 @@ export default {
       'roomContent',
       'roomTags',
       'roomPlaylists',
-      'roomCurrentPlaylist',
-      'roomVideos',
-      'roomCurrentVideo',
-      'roomCurrentPlayTime',
+      'roomCurrentPlaylistOffset',
+      'roomCurrentVideoOffset',
+      'roomCurrentVideoPlaytime',
       'roomChats',
       'roomSendingMessage',
-      'chatroomId'
+      'chatroomId',
+      'chatBlockedId',
+      'chatBlockedUid',
     ]),
     ...mapGetters('playroom', [
       'roomPlayTime',
       'roomPublicLabel',
       'roomReducedContent',
-      'roomPlaylistItems',
-      'roomPlaylistVideoItems'
+      'roomCurrentPlaylistVideos'
     ]),
     player() {
       return this.$refs.youtube.player
     },
-    roomContentReduced: () => {
+    roomContentReduced() {
       return this.roomContent == this.roomReducedContent
     }
   },
   created() {
     this.getRoomInfo()
   },
+  mounted() {
+    this.$watch('roomCurrentPlaylistVideos', (newVal, oldVal) =>
+    {
+      this.updateVideoId()
+    });
+
+    this.$watch('roomCurrentVideoPlaytime', (newVal, oldVal) => {
+      this.seekTo()
+    });
+  },
   methods: {
     getRoomInfo() {
       axiosConnector.post('/echo', {
-        roomId: 0,
-        roomTitle: '3일만에 다이어트 포기 선언하게 만든 영상들',
-        roomPublic: false,
-        roomAuthorProfilePic: 'https://picsum.photos/100/100',
-        roomAuthorName: '춘식이',
-        roomAuthorFollowerCount: 456,
-        roomStartTime: new Date(2022, 1, 23, 18, 30),
-        roomEndTime: new Date(2022, 1, 23, 20, 30),
-        roomContent: '같이 치맥하면서 먹방 보실분들?\r\n같이 치맥하면서 먹방 보시분들?\r\n같이 치맥하면서 먹방 보시분들?\r\n',
-        roomTags: ['먹방', '쯔양', '고기먹방', '고기먹방1', '고기먹방2', '고기먹방3', '고기먹방4', ],
-        roomPlaylists: [ 1, 2, 3, 4, 5 ],
-        roomVideos: [ 1, 2, 3, 4, 5, 6, 7, 8, 9 ],
+        id: 1,
+        title: '3일만에 다이어트 포기 선언하게 만든 영상들',
+        isPublic: false,
+        authorProfilePic: 'https://picsum.photos/100/100',
+        authorName: '춘식이',
+        authorFollowerCount: 456,
+        startTime: new Date(2022, 2, 5, 18, 30),
+        endTime: new Date(2022, 2, 5, 20, 30),
+        content: '같이 치맥하면서 먹방 보실분들?\r\n같이 치맥하면서 먹방 보시분들?\r\n같이 치맥하면서 먹방 보시분들?\r\n',
+        tags: ['먹방', '쯔양', '고기먹방' ],
+        currentPlaylistOffset: 1,
+        playlists: {
+          1: {
+            title: '다이어트 안해',
+            thumbnailUrl: 'https://picsum.photos/90/90',
+            videos: [
+              { id: 1, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/161/90', title: "먹물파스타 먹방", playtime: '01:30', included: true },
+              { id: 2, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/162/90', title: "먹물파스타 먹방", playtime: '01:30', included: true },
+              { id: 3, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/163/90', title: "먹물파스타 먹방", playtime: '01:30', included: true },
+              { id: 4, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/164/90', title: "먹물파스타 먹방", playtime: '01:30', included: true },
+              { id: 5, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/165/90', title: "먹물파스타 먹방", playtime: '01:30', included: true },
+              { id: 6, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/166/90', title: "먹물파스타 먹방", playtime: '01:30', included: true },
+              { id: 7, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/167/90', title: "먹물파스타 먹방", playtime: '01:30', included: true },
+              { id: 8, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/168/90', title: "먹물파스타 먹방", playtime: '01:30', included: true },
+              { id: 9, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/169/90', title: "먹물파스타 먹방", playtime: '01:30', included: true },
+            ]
+          },
+          2: {
+            title: '다이어트 안해 2',
+            thumbnailUrl: 'https://picsum.photos/90/90',
+            videos: [
+              { id: 1, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/161/90', title: "먹물파스타 먹방", playtime: '01:30', included: true },
+              { id: 2, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/162/90', title: "먹물파스타 먹방", playtime: '01:30', included: true },
+              { id: 3, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/163/90', title: "먹물파스타 먹방", playtime: '01:30', included: true },
+              { id: 4, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/164/90', title: "먹물파스타 먹방", playtime: '01:30', included: true },
+              { id: 5, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/165/90', title: "먹물파스타 먹방", playtime: '01:30', included: true },
+              { id: 6, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/166/90', title: "먹물파스타 먹방", playtime: '01:30', included: true },
+              { id: 7, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/167/90', title: "먹물파스타 먹방", playtime: '01:30', included: true },
+              { id: 8, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/168/90', title: "먹물파스타 먹방", playtime: '01:30', included: true },
+              { id: 9, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/169/90', title: "먹물파스타 먹방", playtime: '01:30', included: true },
+            ]
+          },
+          3: {
+            title: '다이어트 안해 3',
+            thumbnailUrl: 'https://picsum.photos/90/90',
+            videos: [
+              { id: 1, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/161/90', title: "먹물파스타 먹방", playtime: '01:30', included: true },
+              { id: 2, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/162/90', title: "먹물파스타 먹방", playtime: '01:30', included: true },
+              { id: 3, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/163/90', title: "먹물파스타 먹방", playtime: '01:30', included: true },
+              { id: 4, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/164/90', title: "먹물파스타 먹방", playtime: '01:30', included: true },
+              { id: 5, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/165/90', title: "먹물파스타 먹방", playtime: '01:30', included: true },
+              { id: 6, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/166/90', title: "먹물파스타 먹방", playtime: '01:30', included: true },
+              { id: 7, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/167/90', title: "먹물파스타 먹방", playtime: '01:30', included: true },
+              { id: 8, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/168/90', title: "먹물파스타 먹방", playtime: '01:30', included: true },
+              { id: 9, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/169/90', title: "먹물파스타 먹방", playtime: '01:30', included: true },
+            ]
+          },
+        },
+        currentVideoOffset: 0,
+        currentVideoPlaytime: 300,
         chatroomId: '731f3b99-8257-4eae-86b2-ed38ea36ccff'
       }).then(response => {
         this.$store.dispatch('playroom/setRoomInfo', response).then(
-          () => this.initChatRoom()
+          () => {
+            this.initChatRoom()
+          }
         )
       });
       // axiosConnector.get(`/playroom/${this.$route.params.id}`).then(response => {
       //   this.$store.dispatch('setRoomInfo', response)
       // });
     },
-    // 시작하기
     initChatRoom() {
-      //const token = localStorage.getItem('jwt')
-      const token = undefined
+      const token = localStorage.getItem('jwt')
       wsConnector.connect(
         token ? { Authorization: this.token } : { },
-        () => wsConnector.subscribe(`/sub/chat/room/${this.chatroomId}`, this.recvMessage, token ? { Authorization: token } : undefined),
+        () => wsConnector.subscribe(`/sub/chat/room/${this.chatroomId}`, this.onReceiveMessage, token ? { Authorization: token } : undefined),
         () => alert("서버 연결에 실패 하였습니다. 다시 접속해 주십시요.")
       )
     },
-    playVideo() {
-      this.player.playVideo()
-    },
-    playing() {
-      //const playTime = this.roomCurrentPlayTime.split(':')
-      //this.player.seekTo(parseInt(playTime[0]) * 60 + parseInt(playTime[1]));
-      const playTime = this.roomCurrentPlayTime.split(':').map(v => parseInt(v))
-      this.player.seekTo(playTime[0] * 60 + playTime[1]);
-    },
-    syncSeek() {
-      const playTime = this.roomCurrentPlayTime.split(':').map(v => parseInt(v))
-      this.player.seekTo(playTime[0] * 60 + playTime[1]);
-    },
-    onPlaylistVideoClicked({ id, clickState }) {
-      this.clickedItem += clickState ? 1 : -1
+    // syncSeek() {
+    //   const playTime = parseFloat(this.roomCurrentVideoPlaytime)
+    //   console.log(playTime)
+    //   this.player.seekTo(playTime);
+    // },
+    onPlaylistVideoSelected({ id, selected }) {
+      if (selected)
+      {
+        const idx = this.selectedItem.findIndex(el => el == id)
+        this.selectedItem.splice(idx, 1)
+      }
+      else
+      {
+        this.selectedItem.push(id)
+      }
     },
     onVideoReady() {
-      console.log('ready')
+
     },
     onVideoEnded() {
       console.log('ended')
+
     },
-    onVideoPlaying() {
-      console.log('playing')
+    async onVideoPlaying() {
+      const currentPlaytime = await this.player.getCurrentTime()
+      console.log('sync event', {
+        state: 'play',
+        timestamp: new Date().getTime(),
+        playlistId: this.roomCurrentPlaylistOffset,
+        videoOffset: this.roomCurrentVideoOffset,
+        videoPlaytime: currentPlaytime
+      })
     },
-    onVideoPaused() {
-      console.log('paused')
+    async onVideoPaused() {
+      const currentPlaytime = await this.player.getCurrentTime()
+      console.log('sync event', {
+        state: 'pause',
+        timestamp: new Date().getTime(),
+        playlistId: this.roomCurrentPlaylistOffset,
+        videoOffset: this.roomCurrentVideoOffset,
+        videoPlaytime: currentPlaytime
+      })
     },
     onVideoBuffering() {
-      console.log('buffering')
+
     },
     onVideoCued() {
-      console.log('cued')
+      this.seekTo()
     },
-    sendMessage() {
-      const type = 'TALK'
-      const message = this.message
-      const token = localStorage.getItem('jwt')
+    async onReceiveMessage(payload) {
+      const id = payload.headers['message-id']
+      const body = JSON.parse(payload.body);
 
-      this.disableChatbox()
-      this.pendingToSendMessage()
-      this.$store.dispatch('playroom/sendMessage', { type, message, token })
-        .then(() => {
-          this.clearMessage()
+      if (body.type == 'SYNC')
+      {
+        this.$store.commit('playroom/seekVideo', parseFloat(body.message));
+      }
+      else// if (body.type == 'TALK')
+      {
+        const profile = await axiosConnector.post('/echo', {
+          nickname: '시스템',
+          profilePictureUrl: 'https://picsum.photos/80/80'
         })
-        .catch((err) => {
-          this.notifySendError()
-        })
-        .finally(() => {
-          this.completeToSendMessage()
-          this.enableChatbox()
-        })
+        //const profile = await axiosConnector.get(`/profile/${body.id}`)
+        const author = { id: body.id, name: profile.data.nickname, thumbnail: profile.data.profilePictureUrl };
+        const content = body.message;
+        const timestamp = new Date().getTime();
+        const blockedUser = ( this.chatBlockedUid.find((v) => v == author.id) != undefined );
+        const blockedMessage = ( this.chatBlockedId.find((v) => v == id) != undefined );
+        this.$store.commit('playroom/receiveMessage', { id, author, content, timestamp, blockedUser, blockedMessage });
+      }
     },
-    clearMessage() {
-      this.message = ''
+    selectAllVideo() {
+      this.selectedItem = (this.selectedItem.length == this.roomCurrentPlaylistVideos.length) ?
+        [] :
+        this.roomCurrentPlaylistVideos.map(v => parseInt(v.id));
     },
-    pendingToSendMessage() {
-      this.sending = true
+    isSelectedVideo(id) {
+      return this.selectedItem.findIndex(el => el == id) > -1
     },
-    completeToSendMessage() {
-      this.sending = false
+    loadNextVideo() {
+      if (this.roomCurrentPlaylistVideos.filter(v => v.included).length < this.roomCurrentVideoOffset + 1)
+      {
+        this.roomCurrentPlaylistOffset
+      }
+      else if (this.roomCurrentPlaylistVideos.filter(v => v.included).length < this.roomCurrentVideoOffset + 1)
+      {
+
+      }
     },
-    enableChatbox() {
-      this.canChat = true
+    updateVideoId() {
+      this.videoId = this.roomCurrentPlaylistVideos.filter(v => v.included).map(v => v.videoId)[this.roomCurrentVideoOffset];
     },
-    disableChatbox() {
-      this.canChat = false
-    },
-    notifySendError() {
-      this.errorOnSend = true;
-      setTimeout(this.clearSendError, 1000);
-    },
-    clearSendError() {
-      this.errorOnSend = false;
-    },
-    ...mapMutations('playroom', ['recvMessage'])
-  },
+    seekTo() {
+      this.player.seekTo(this.roomCurrentVideoPlaytime)
+    }
+  }
 }
 </script>
 
