@@ -11,6 +11,7 @@ import hotsixturtles.tupli.entity.Playlist;
 import hotsixturtles.tupli.entity.likes.BoardLikes;
 import hotsixturtles.tupli.entity.likes.PlaylistLikes;
 import hotsixturtles.tupli.repository.PlaylistRepository;
+import hotsixturtles.tupli.service.FlaskService;
 import hotsixturtles.tupli.service.PlaylistService;
 import hotsixturtles.tupli.service.token.JwtTokenProvider;
 import io.swagger.annotations.Api;
@@ -41,18 +42,19 @@ public class PlaylistApiController {
     private final MessageSource messageSource;
 
     private final PlaylistService playlistService;
+    private final FlaskService flaskService;
 
     /**
      * 플레이 리스트 추가
      * @param token
-     * @param playlist
+     * @param playlistRequest
      * @return 
      * 반환 코드 : 201, 403, 404
      * 고민사항 : ID 또는 PlaylistDto 반환이라도 해줘야 하는지 고민
      */
     @PostMapping("/playlist")
     public ResponseEntity addPlaylist(@RequestHeader(value = "Authorization") String token,
-                                      @RequestBody PlaylistRequest playlist){
+                                      @RequestBody PlaylistRequest playlistRequest){
         // 유저 정보
         if (!jwtTokenProvider.validateToken(token)) {
             return ResponseEntity
@@ -61,30 +63,13 @@ public class PlaylistApiController {
         }
         Long userSeq = jwtTokenProvider.getUserSeq(token);
 
-        playlistService.addPlaylist(userSeq, playlist);
+        Playlist playlist = playlistService.addPlaylist(userSeq, playlistRequest);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(null);
-    }
-
-    @PostMapping("/playlist/test")
-    public ResponseEntity addPlaylistTest(@RequestHeader(value = "Authorization") String token,
-                                            @RequestBody PlaylistRequest playlist){
-        // 유저 정보
-        if (!jwtTokenProvider.validateToken(token)) {
-            return ResponseEntity
-                    .status(HttpStatus.BAD_REQUEST)
-                    .body(new ErrorResponse(messageSource.getMessage("error.valid.jwt", null, LocaleContextHolder.getLocale())));
-        }
-        Long userSeq = jwtTokenProvider.getUserSeq(token);
-
-        System.out.println("MMMM");
-        System.out.println("playlist = " + playlist);
-        System.out.println("playlist = " + playlist.getTitle());
-        System.out.println("playlist = " + playlist.getTags());
-        System.out.println("playlist = " + playlist.getIsPublic());
-        for (SimpleYoutubeVideoDto video : playlist.getVideos()) {
-            System.out.println("video = " + video.getTitle());
-            System.out.println("video = " + video.getCategoryId());
+        // 추천 고도화 (플라스크)
+        try {
+            flaskService.recommendPlaylistFlask(playlist);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
         return ResponseEntity.status(HttpStatus.CREATED).body(null);
