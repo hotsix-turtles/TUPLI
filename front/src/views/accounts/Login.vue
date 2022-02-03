@@ -231,6 +231,6 @@ export default {
 
   .no-background-hover-text {
     text-decoration: none !important;
-    text-decoration-color: black;
+    text-decoration-color: black !important;
   }
 </style>
