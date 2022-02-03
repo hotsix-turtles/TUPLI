@@ -9,6 +9,8 @@ import Login from '../views/accounts/Login.vue'
 import PlayroomForm from '../views/playroom/PlayroomForm.vue'
 import PlayroomDetail from '../views/playroom/PlayroomDetail.vue'
 import VideoSearch from '../views/video/VideoSearch.vue'
+import VideoWatch from '../views/video/VideoWatch.vue'
+import video from '@/store/index.js'
 
 Vue.use(VueRouter)
 Vue.use(VueMeta)
@@ -41,16 +43,20 @@ const routes = [
   {
     path: '/video/search',
     name: 'VideoSearch',
-    component: VideoSearch
+    component: VideoSearch,
+    // beforeEnter: (to, from, next) => {
+    //   if (from.path != '/video/watch') {
+    //     console.log('video.dispatch(resetVideoSearchState)')
+    //     video.dispatch('resetVideoSearchState')
+    //   }
+    //   next()
+    // }
   },
-  // {
-  //   path: '/about',
-  //   name: 'About',
-  //   // route level code-splitting
-  //   // this generates a separate chunk (about.[hash].js) for this route
-  //   // which is lazy-loaded when the route is visited.
-  //   component: () => import(/* webpackChunkName: "about" */ '../views/About.vue')
-  // },
+  {
+    path: '/video/watch',
+    name: 'VideoWatch',
+    component: VideoWatch
+  },
   {
     path: '/login',
     name: 'Login',

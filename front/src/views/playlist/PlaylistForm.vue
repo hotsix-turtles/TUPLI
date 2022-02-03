@@ -3,7 +3,10 @@
     <!-- 뒤로가기/완료 -->
     <div class="d-flex justify-space-between">
       <back :page-name="pageName" />
-      <span class="clickable">
+      <span
+        class="clickable"
+        @click="onClickCompletion"
+      >
         완료
       </span>
     </div>
@@ -19,7 +22,7 @@
             class="py-0"
           >
             <v-text-field
-              v-model="title"
+              v-model="formData.title"
               :rules="titleRules"
               :counter="30"
               label="플레이리스트 제목"
@@ -34,7 +37,7 @@
             class="py-0"
           >
             <v-text-field
-              v-model="content"
+              v-model="formData.content"
               :counter="80"
               label="플레이리스트 소개글"
             />
@@ -47,20 +50,10 @@
             class="py-0"
           >
             <tag-input
+              :proped-tags="formData.tags"
               @tag-input="updateTags"
             />
           </v-col>
-          <!-- <v-col
-            cols="12"
-            md="4"
-            class="py-0"
-          >
-            <v-text-field
-              v-model="content"
-              :counter="80"
-              label="플레이리스트 태그를 입력해주세요."
-            />
-          </v-col> -->
 
           <!-- 공개 여부 -->
           <v-col
@@ -83,7 +76,7 @@
           color="accent"
           elevation="2"
           rounded
-          @click="$router.push({ name: 'PlaylistFormVideo'} )"
+          @click="saveAndGo"
         >
           <v-icon>mdi-plus</v-icon>
           <span>영상 추가</span>
@@ -99,7 +92,7 @@
           </div>
         </div>
         <video-list-item-small
-          :added-videos="addedVideos"
+          :videos="addedVideos"
         />
       </v-container>
     </v-form>
@@ -107,7 +100,7 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
+import { mapActions, mapState } from 'vuex'
 
 import Back from '../../components/common/Back.vue'
 import TagInput from '../../components/common/TagInput.vue'
@@ -124,16 +117,17 @@ export default {
       pageName: "내 플레이리스트 만들기",
       // Create할 때 넘길 데이터
       formData: {
-        valid: false,
         title: '',
         content: '',
         tags: '',
         isPublic: true,
-        titleRules: [
-          v => !!v || '제목은 필수입니다.',
-          v => v.length <= 2 || '제목은 3글자 이상 작성해야 합니다.',
-        ],
-      }
+        videos: [],
+      },
+      valid: false,
+      titleRules: [
+        v => !!v || '제목은 필수입니다.',
+        // v => v.length >= 3 || '제목은 3글자 이상 작성해야 합니다.',
+      ],
     }
   },
   computed: {
@@ -143,11 +137,34 @@ export default {
     ...mapState('video', {
       addedVideos: state => state.addedVideos,
     }),
+    ...mapState('playlist', {
+      savedFormData: state => state.savedFormData,
+    }),
+  },
+  created: function () {
+    if (this.savedFormData) {
+      this.formData = this.savedFormData
+    }
   },
   methods: {
+    ...mapActions('playlist', [
+      'createPlaylist',
+      'saveFormData'
+    ]),
     updateTags: function (tags) {
       this.formData.tags = tags
+    },
+    onClickCompletion: function () {
+      this.formData.videos = this.addedVideos
+      if (this.formData.tags) {
+        this.formData.tags = this.formData.tags.join()
+      }
       console.log(this.formData)
+      this.createPlaylist(this.formData)
+    },
+    saveAndGo: function () {
+      this.saveFormData(this.formData)
+      this.$router.push({ name: 'PlaylistFormVideo'})
     }
   },
 }
