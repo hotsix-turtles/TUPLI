@@ -1,8 +1,10 @@
 package hotsixturtles.tupli.entity;
 
+import hotsixturtles.tupli.dto.simple.SimpleYoutubeVideoDto;
 import hotsixturtles.tupli.entity.auth.ProviderType;
 import hotsixturtles.tupli.entity.auth.RoleType;
 import hotsixturtles.tupli.entity.meta.PlaylistInfo;
+import hotsixturtles.tupli.entity.youtube.YoutubeVideo;
 import hotsixturtles.tupli.repository.PlaylistRepository;
 import hotsixturtles.tupli.repository.UserRepository;
 import org.junit.jupiter.api.Test;
@@ -12,6 +14,7 @@ import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -44,18 +47,19 @@ class PlaylistTest {
             userRepository.save(user);
         }
 
-        for (int i = 0; i < 20; i++) {
-            PlaylistInfo playlistInfo = new PlaylistInfo();
-            playlistInfo.setTag01((int) (1 + Math.random() * 4));
-            playlistInfo.setTag02((int) (1 + Math.random() * 4));
-            playlistInfo.setTag10((int) (1 + Math.random() * 4));
-            playlistInfo.setTag15((int) (1 + Math.random() * 4));
-
+        for (int i = 0; i < 27000; i++) {
             Playlist playlist = new Playlist();
-            playlist.setName("test" + i);
+            playlist.setTitle("test" + i);
             playlist.setUser(user);
-            playlist.setPlaylistInfo(playlistInfo);
 
+            ConcurrentHashMap<Integer, Integer> playlistInfo = new ConcurrentHashMap<Integer, Integer>();
+            for (int j = 0; j < (int) (2 + Math.random() * 4); j++) {
+                // Playlistinfo에 따라 갈림
+                Integer categoryId = (int) (1 + Math.random() * 20);
+                Integer count = playlistInfo.getOrDefault(categoryId, 0);
+                playlistInfo.put(categoryId, count+1);
+            }
+            playlist.setPlaylistInfo(playlistInfo);
             playlistRepository.save(playlist);
         }
     }
