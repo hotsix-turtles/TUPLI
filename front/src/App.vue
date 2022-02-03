@@ -1,12 +1,21 @@
 <template>
   <v-app>
-      <router-link to="/home">
-        Home
-      </router-link>
-      <router-link to="/login">
-        Login
-      </router-link>
-      <router-view />
+    <router-link to="/home">
+      Home
+    </router-link>
+    <router-link to="/login">
+      Login
+    </router-link>
+    <router-link to="/signup">
+      Signup
+    </router-link>
+    <router-link to="/signup2">
+      Signup2
+    </router-link>
+    <router-link to="/signup3">
+      Signup3
+    </router-link>
+    <router-view />
   </v-app>
 </template>
 

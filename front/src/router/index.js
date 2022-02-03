@@ -3,6 +3,9 @@ import VueMeta from 'vue-meta'
 import VueRouter from 'vue-router'
 import Home from '../views/Home.vue'
 import Login from '../views/accounts/Login.vue'
+import Signup from '../views/accounts/Signup1.vue'
+import Signup2 from '../views/accounts/Signup2.vue'
+import Signup3 from '../views/accounts/Signup3.vue'
 import PlayroomDetail from '../views/playroom/PlayroomDetail.vue'
 
 Vue.use(VueRouter)
@@ -26,6 +29,21 @@ const routes = [
     path: '/login',
     name: 'Login',
     component: Login
+  },
+  {
+    path: '/signup',
+    name: 'Signup',
+    component: Signup
+  },
+  {
+    path: '/signup2',
+    name: 'Signup2',
+    component: Signup2
+  },
+  {
+    path: '/signup3',
+    name: 'Signup3',
+    component: Signup3
   },
   {
     path: '/playroom',
