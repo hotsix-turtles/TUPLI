@@ -16,6 +16,7 @@ const playroom = {
     roomEndTime: new Date(),
     roomContent: '',
     roomTags: [],
+    roomPlaylists: [],
     roomCurrentPlaylistOffset: 0,
     roomCurrentVideoOffset: '',
     roomCurrentVideoPlaytime: 0,

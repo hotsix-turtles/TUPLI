@@ -191,11 +191,11 @@
           class="playlistThumbnailWrapper"
         >
           <PlaylistThumbnailItem
-            v-for="playlistItem in roomPlaylists"
-            :id="playlistItem.id"
-            :key="playlistItem.id"
+            v-for="(playlistItem, playlistIdx) in roomPlaylists"
+            :id="playlistIdx"
+            :key="playlistIdx"
             :src="playlistItem.thumbnailUrl"
-            :selected="playlistItem.id == roomCurrentPlaylistOffset"
+            :selected="playlistIdx == roomCurrentPlaylistOffset"
           />
         </v-card>
       </div>
@@ -221,6 +221,7 @@
             elevation="0"
             color="white"
             fab
+            @click="playThisVideo"
           >
             <v-icon>mdi-play-circle</v-icon>
           </v-btn>
@@ -383,10 +384,17 @@ export default {
     {
       this.updateVideoId()
     });
-
+    this.$watch('roomCurrentPlaylistOffset', (newVal, oldVal) => {
+      this.updateVideoId()
+    });
+    this.$watch('roomCurrentVideoOffset', (newVal, oldVal) => {
+      this.updateVideoId()
+    });
     this.$watch('roomCurrentVideoPlaytime', (newVal, oldVal) => {
+      if (Math.abs(newVal - oldVal) < 0.5) return;
       this.seekTo()
     });
+
   },
   methods: {
     getRoomInfo() {
@@ -403,8 +411,8 @@ export default {
         content: '같이 치맥하면서 먹방 보실분들?\r\n같이 치맥하면서 먹방 보시분들?\r\n같이 치맥하면서 먹방 보시분들?\r\n',
         tags: ['먹방', '쯔양', '고기먹방' ],
         currentPlaylistOffset: 1,
-        playlists: {
-          1: {
+        playlists: [
+          {
             title: '다이어트 안해',
             thumbnailUrl: 'https://picsum.photos/90/90',
             videos: [
@@ -419,37 +427,37 @@ export default {
               { id: 9, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/169/90', title: "먹물파스타 먹방", playtime: '01:30', included: true },
             ]
           },
-          2: {
+          {
             title: '다이어트 안해 2',
             thumbnailUrl: 'https://picsum.photos/90/90',
             videos: [
-              { id: 1, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/161/90', title: "먹물파스타 먹방", playtime: '01:30', included: true },
-              { id: 2, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/162/90', title: "먹물파스타 먹방", playtime: '01:30', included: true },
-              { id: 3, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/163/90', title: "먹물파스타 먹방", playtime: '01:30', included: true },
-              { id: 4, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/164/90', title: "먹물파스타 먹방", playtime: '01:30', included: true },
-              { id: 5, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/165/90', title: "먹물파스타 먹방", playtime: '01:30', included: true },
-              { id: 6, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/166/90', title: "먹물파스타 먹방", playtime: '01:30', included: true },
-              { id: 7, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/167/90', title: "먹물파스타 먹방", playtime: '01:30', included: true },
-              { id: 8, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/168/90', title: "먹물파스타 먹방", playtime: '01:30', included: true },
-              { id: 9, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/169/90', title: "먹물파스타 먹방", playtime: '01:30', included: true },
+              { id: 1, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/161/90', title: "해물파스타 먹방", playtime: '01:30', included: true },
+              { id: 2, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/162/90', title: "해물파스타 먹방", playtime: '01:30', included: true },
+              { id: 3, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/163/90', title: "해물파스타 먹방", playtime: '01:30', included: true },
+              { id: 4, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/164/90', title: "해물파스타 먹방", playtime: '01:30', included: true },
+              { id: 5, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/165/90', title: "해물파스타 먹방", playtime: '01:30', included: true },
+              { id: 6, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/166/90', title: "해물파스타 먹방", playtime: '01:30', included: true },
+              { id: 7, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/167/90', title: "해물파스타 먹방", playtime: '01:30', included: true },
+              { id: 8, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/168/90', title: "해물파스타 먹방", playtime: '01:30', included: true },
+              { id: 9, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/169/90', title: "해물파스타 먹방", playtime: '01:30', included: true },
             ]
           },
-          3: {
+          {
             title: '다이어트 안해 3',
             thumbnailUrl: 'https://picsum.photos/90/90',
             videos: [
-              { id: 1, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/161/90', title: "먹물파스타 먹방", playtime: '01:30', included: true },
-              { id: 2, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/162/90', title: "먹물파스타 먹방", playtime: '01:30', included: true },
-              { id: 3, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/163/90', title: "먹물파스타 먹방", playtime: '01:30', included: true },
-              { id: 4, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/164/90', title: "먹물파스타 먹방", playtime: '01:30', included: true },
-              { id: 5, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/165/90', title: "먹물파스타 먹방", playtime: '01:30', included: true },
-              { id: 6, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/166/90', title: "먹물파스타 먹방", playtime: '01:30', included: true },
-              { id: 7, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/167/90', title: "먹물파스타 먹방", playtime: '01:30', included: true },
-              { id: 8, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/168/90', title: "먹물파스타 먹방", playtime: '01:30', included: true },
-              { id: 9, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/169/90', title: "먹물파스타 먹방", playtime: '01:30', included: true },
+              { id: 1, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/161/90', title: "보물파스타 먹방", playtime: '01:30', included: true },
+              { id: 2, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/162/90', title: "보물파스타 먹방", playtime: '01:30', included: true },
+              { id: 3, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/163/90', title: "보물파스타 먹방", playtime: '01:30', included: true },
+              { id: 4, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/164/90', title: "보물파스타 먹방", playtime: '01:30', included: true },
+              { id: 5, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/165/90', title: "보물파스타 먹방", playtime: '01:30', included: true },
+              { id: 6, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/166/90', title: "보물파스타 먹방", playtime: '01:30', included: true },
+              { id: 7, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/167/90', title: "보물파스타 먹방", playtime: '01:30', included: true },
+              { id: 8, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/168/90', title: "보물파스타 먹방", playtime: '01:30', included: true },
+              { id: 9, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/169/90', title: "보물파스타 먹방", playtime: '01:30', included: true },
             ]
           },
-        },
+        ],
         currentVideoOffset: 0,
         currentVideoPlaytime: 300,
         chatroomId: '731f3b99-8257-4eae-86b2-ed38ea36ccff'
@@ -493,7 +501,7 @@ export default {
     },
     onVideoEnded() {
       console.log('ended')
-
+      this.loadNextVideo()
     },
     async onVideoPlaying() {
       const currentPlaytime = await this.player.getCurrentTime()
@@ -504,6 +512,7 @@ export default {
         videoOffset: this.roomCurrentVideoOffset,
         videoPlaytime: currentPlaytime
       })
+      this.setRoomCurrentVideoPlaytime(currentPlaytime)
     },
     async onVideoPaused() {
       const currentPlaytime = await this.player.getCurrentTime()
@@ -514,6 +523,7 @@ export default {
         videoOffset: this.roomCurrentVideoOffset,
         videoPlaytime: currentPlaytime
       })
+      this.setRoomCurrentVideoPlaytime(currentPlaytime)
     },
     onVideoBuffering() {
 
@@ -555,19 +565,38 @@ export default {
     loadNextVideo() {
       if (this.roomCurrentPlaylistVideos.filter(v => v.included).length < this.roomCurrentVideoOffset + 1)
       {
-        this.roomCurrentPlaylistOffset
+        if (Object.keys(this.roomPlaylists).length <= this.roomCurrentPlaylistOffset + 1)
+          this.setRoomCurrentPlaylistOffset(0)
+        else
+          this.setRoomCurrentPlaylistOffset(this.roomCurrentPlaylistOffset + 1)
+        this.setRoomCurrentVideoOffset(0)
+        this.setRoomCurrentVideoPlaytime(0)
       }
-      else if (this.roomCurrentPlaylistVideos.filter(v => v.included).length < this.roomCurrentVideoOffset + 1)
+      else
       {
-
+        this.setRoomCurrentVideoOffset(this.roomCurrentVideoOffset + 1)
+        this.setRoomCurrentVideoPlaytime(0)
       }
     },
     updateVideoId() {
       this.videoId = this.roomCurrentPlaylistVideos.filter(v => v.included).map(v => v.videoId)[this.roomCurrentVideoOffset];
     },
+    playVideo() {
+      this.player.playVideo()
+    },
     seekTo() {
       this.player.seekTo(this.roomCurrentVideoPlaytime)
-    }
+    },
+    playThisVideo() {
+      if (this.selectedItem.length != 1) {
+        alert('바로 재생할 영상을 1개만 선택해주세요')
+        return;
+      }
+      this.setRoomCurrentVideoOffset(this.selectedItem[0])
+      this.setRoomCurrentVideoPlaytime(0)
+      this.selectedItem = []
+      this.seekTo()
+    },
     playroomLike() {
       this.setRoomLiked(!this.roomLiked)
       axiosConnector.post(this.roomLiked ? '/playroom/like' : '/playroom/dislike', JSON.stringify({ id: this.roomId }));
