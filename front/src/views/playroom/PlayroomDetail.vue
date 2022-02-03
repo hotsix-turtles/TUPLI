@@ -42,7 +42,8 @@
 
     <v-sheet
       id="scroll-threshold-example"
-      class="overflow-y-auto pb-16"
+      class="overflow-y-auto"
+      :class="{ 'pb-16': clickedItem > 0 }"
       max-height="100%"
     >
       <div class="playerWrapper">
@@ -218,34 +219,48 @@
                 :profile="chat.author.thumbnail"
                 :content="chat.content"
                 :timestamp="chat.timestamp"
-                :blockedUser="chat.blockedUser"
-                :blockedMessage="chat.blockedMessage"
+                :blocked-user="chat.blockedUser"
+                :blocked-message="chat.blockedMessage"
               />
             </v-container>
           </v-card-text>
-          <v-spacer></v-spacer>
+          <v-spacer />
           <v-card-actions>
             <v-text-field
+              v-model="message"
               label="메시지를 입력하세요"
-              v-model='message'
               solo
               dense
+              :disabled="!canChat"
+              :error="errorOnSend"
               @click:append-outer="sendMessage"
-              :disabled='!canChat'
-              :error='errorOnSend'
             >
               <template v-slot:append>
                 <v-menu
                   v-model="showEmoji"
-                  rounded='lg'
+                  rounded="lg"
                   top
                   left
                   offset-x
                   offset-y
                 >
                   <template v-slot:activator="{ on, attrs }">
-                    <v-icon v-bind="attrs" v-on="on" v-if="showEmoji" @click="showEmoji = !showEmoji">mdi-emoticon</v-icon>
-                    <v-icon v-bind="attrs" v-on="on" v-else @click="showEmoji = !showEmoji">mdi-emoticon-outline</v-icon>
+                    <v-icon
+                      v-if="showEmoji"
+                      v-bind="attrs"
+                      v-on="on"
+                      @click="showEmoji = !showEmoji"
+                    >
+                      mdi-emoticon
+                    </v-icon>
+                    <v-icon
+                      v-else
+                      v-bind="attrs"
+                      v-on="on"
+                      @click="showEmoji = !showEmoji"
+                    >
+                      mdi-emoticon-outline
+                    </v-icon>
                   </template>
                   <v-card>
                     <v-list>
@@ -258,12 +273,17 @@
               </template>
               <template v-slot:append-outer>
                 <!-- <v-fade-transition leave-absolute> -->
-                  <v-progress-circular
-                    v-if="sending"
-                    size="24"
-                    indeterminate
-                  ></v-progress-circular>
-                <v-icon v-else @click="sendMessage">mdi-send</v-icon>
+                <v-progress-circular
+                  v-if="sending"
+                  size="24"
+                  indeterminate
+                />
+                <v-icon
+                  v-else
+                  @click="sendMessage"
+                >
+                  mdi-send
+                </v-icon>
                 <!-- </v-fade-transition> -->
               </template>
             </v-text-field>
@@ -276,13 +296,15 @@
 </template>
 
 <script>
-import { mapActions, mapGetters, mapState } from 'vuex';
+import { mapActions, mapGetters, mapMutations, mapState } from 'vuex';
 import Vue from 'vue'
 import VueYoutube from 'vue-youtube'
 import PlaylistThumbnailItem from './PlaylistThumbnailItem.vue'
 import TagItem from './TagItem.vue'
 import PlaylistVideoItem from './PlaylistVideoItem.vue'
 import ChatItem from './ChatItem.vue'
+import axiosConnector from '../../utils/axios-connector';
+import wsConnector from '../../utils/ws-connector';
 
 Vue.use(VueYoutube)
 
@@ -327,6 +349,7 @@ export default {
   },
   computed: {
     ...mapState('playroom', [
+      'roomId',
       'roomTitle',
       'roomPublic',
       'roomAuthorProfilePic',
@@ -342,7 +365,8 @@ export default {
       'roomCurrentVideo',
       'roomCurrentPlayTime',
       'roomChats',
-      'roomSendingMessage'
+      'roomSendingMessage',
+      'chatroomId'
     ]),
     ...mapGetters('playroom', [
       'roomPlayTime',
@@ -358,7 +382,44 @@ export default {
       return this.roomContent == this.roomReducedContent
     }
   },
+  created() {
+    this.getRoomInfo()
+  },
   methods: {
+    getRoomInfo() {
+      axiosConnector.post('/echo', {
+        roomId: 0,
+        roomTitle: '3일만에 다이어트 포기 선언하게 만든 영상들',
+        roomPublic: false,
+        roomAuthorProfilePic: 'https://picsum.photos/100/100',
+        roomAuthorName: '춘식이',
+        roomAuthorFollowerCount: 456,
+        roomStartTime: new Date(2022, 1, 23, 18, 30),
+        roomEndTime: new Date(2022, 1, 23, 20, 30),
+        roomContent: '같이 치맥하면서 먹방 보실분들?\r\n같이 치맥하면서 먹방 보시분들?\r\n같이 치맥하면서 먹방 보시분들?\r\n',
+        roomTags: ['먹방', '쯔양', '고기먹방', '고기먹방1', '고기먹방2', '고기먹방3', '고기먹방4', ],
+        roomPlaylists: [ 1, 2, 3, 4, 5 ],
+        roomVideos: [ 1, 2, 3, 4, 5, 6, 7, 8, 9 ],
+        chatroomId: '731f3b99-8257-4eae-86b2-ed38ea36ccff'
+      }).then(response => {
+        this.$store.dispatch('playroom/setRoomInfo', response).then(
+          () => this.initChatRoom()
+        )
+      });
+      // axiosConnector.get(`/playroom/${this.$route.params.id}`).then(response => {
+      //   this.$store.dispatch('setRoomInfo', response)
+      // });
+    },
+    // 시작하기
+    initChatRoom() {
+      //const token = localStorage.getItem('jwt')
+      const token = undefined
+      wsConnector.connect(
+        token ? { Authorization: this.token } : { },
+        () => wsConnector.subscribe(`/sub/chat/room/${this.chatroomId}`, this.recvMessage, token ? { Authorization: token } : undefined),
+        () => alert("서버 연결에 실패 하였습니다. 다시 접속해 주십시요.")
+      )
+    },
     playVideo() {
       this.player.playVideo()
     },
@@ -394,9 +455,13 @@ export default {
       console.log('cued')
     },
     sendMessage() {
+      const type = 'TALK'
+      const message = this.message
+      const token = localStorage.getItem('jwt')
+
       this.disableChatbox()
       this.pendingToSendMessage()
-      this.$store.dispatch('playroom/sendMessage', this.message)
+      this.$store.dispatch('playroom/sendMessage', { type, message, token })
         .then(() => {
           this.clearMessage()
         })
@@ -429,7 +494,8 @@ export default {
     },
     clearSendError() {
       this.errorOnSend = false;
-    }
+    },
+    ...mapMutations('playroom', ['recvMessage'])
   },
 }
 </script>

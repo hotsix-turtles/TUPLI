@@ -63,12 +63,12 @@ const routes = [
     component: Login
   },
   {
-    path: '/playroom/create',
+    path: '/playroom',
     name: 'PlayroomForm',
     component: PlayroomForm
   },
   {
-    path: '/playroom',
+    path: '/playroom/:id',
     name: 'PlayroomDetail',
     component: PlayroomDetail
   },
