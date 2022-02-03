@@ -79,9 +79,9 @@
           class="elevation-2"
         >
           <!-- 플레이룸 좋아요 -->
-          <v-btn class="playroomLike">
+          <v-btn class="playroomLike" @click="playroomLike">
             <span>좋아요</span>
-            <v-icon>mdi-thumb-up</v-icon>
+            <v-icon :color="roomLiked ? 'blue' : undefined">mdi-thumb-up</v-icon>
           </v-btn>
 
           <!-- 플레이룸 댓글 -->
@@ -344,6 +344,7 @@ export default {
       'roomId',
       'roomTitle',
       'roomPublic',
+      'roomLiked',
       'roomAuthorProfilePic',
       'roomAuthorName',
       'roomAuthorFollowerCount',
@@ -393,6 +394,7 @@ export default {
         id: 1,
         title: '3일만에 다이어트 포기 선언하게 만든 영상들',
         isPublic: false,
+        isLiked: false,
         authorProfilePic: 'https://picsum.photos/100/100',
         authorName: '춘식이',
         authorFollowerCount: 456,
@@ -566,6 +568,11 @@ export default {
     seekTo() {
       this.player.seekTo(this.roomCurrentVideoPlaytime)
     }
+    playroomLike() {
+      this.setRoomLiked(!this.roomLiked)
+      axiosConnector.post(this.roomLiked ? '/playroom/like' : '/playroom/dislike', JSON.stringify({ id: this.roomId }));
+    },
+    ...mapMutations('playroom', ['setRoomLiked', 'setRoomCurrentPlaylistOffset', 'setRoomCurrentVideoOffset', 'setRoomCurrentVideoPlaytime'])
   }
 }
 </script>
