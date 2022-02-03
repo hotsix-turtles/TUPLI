@@ -3,7 +3,9 @@ package hotsixturtles.tupli.api;
 import hotsixturtles.tupli.dto.BoardDto;
 import hotsixturtles.tupli.dto.PlaylistDto;
 import hotsixturtles.tupli.dto.param.SimpleCondition;
+import hotsixturtles.tupli.dto.request.PlaylistRequest;
 import hotsixturtles.tupli.dto.response.ErrorResponse;
+import hotsixturtles.tupli.dto.simple.SimpleYoutubeVideoDto;
 import hotsixturtles.tupli.entity.Board;
 import hotsixturtles.tupli.entity.Playlist;
 import hotsixturtles.tupli.entity.likes.BoardLikes;
@@ -50,7 +52,7 @@ public class PlaylistApiController {
      */
     @PostMapping("/playlist")
     public ResponseEntity addPlaylist(@RequestHeader(value = "Authorization") String token,
-                                      @RequestBody Playlist playlist){
+                                      @RequestBody PlaylistRequest playlist){
         // 유저 정보
         if (!jwtTokenProvider.validateToken(token)) {
             return ResponseEntity
@@ -59,8 +61,31 @@ public class PlaylistApiController {
         }
         Long userSeq = jwtTokenProvider.getUserSeq(token);
 
-        // 추가 ($$$ try except해서 exception할것인지)
         playlistService.addPlaylist(userSeq, playlist);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(null);
+    }
+
+    @PostMapping("/playlist/test")
+    public ResponseEntity addPlaylistTest(@RequestHeader(value = "Authorization") String token,
+                                            @RequestBody PlaylistRequest playlist){
+        // 유저 정보
+        if (!jwtTokenProvider.validateToken(token)) {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(new ErrorResponse(messageSource.getMessage("error.valid.jwt", null, LocaleContextHolder.getLocale())));
+        }
+        Long userSeq = jwtTokenProvider.getUserSeq(token);
+
+        System.out.println("MMMM");
+        System.out.println("playlist = " + playlist);
+        System.out.println("playlist = " + playlist.getTitle());
+        System.out.println("playlist = " + playlist.getTags());
+        System.out.println("playlist = " + playlist.getIsPublic());
+        for (SimpleYoutubeVideoDto video : playlist.getVideos()) {
+            System.out.println("video = " + video.getTitle());
+            System.out.println("video = " + video.getCategoryId());
+        }
 
         return ResponseEntity.status(HttpStatus.CREATED).body(null);
     }
