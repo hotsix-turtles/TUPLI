@@ -1,5 +1,6 @@
 <template>
-  <div>
+  <div
+    height="100%">
     <!-- 뒤로가기/완료 -->
     <div class="d-flex justify-space-between">
       <back :page-name="pageName" />
@@ -9,7 +10,7 @@
     </div>
 
     <!-- 플레이룸 생성 폼 -->
-    <v-form v-model="valid">
+    <v-form v-model="formData.valid">
       <v-container>
         <!-- 제목 -->
         <v-row>
@@ -18,8 +19,8 @@
             md="4"
           >
             <v-text-field
-              v-model="title"
-              :rules="titleRules"
+              v-model="formData.title"
+              :rules="formData.titleRules"
               :counter="30"
               label="플레이룸 제목을 입력해주세요."
               required
@@ -34,7 +35,7 @@
             md="4"
           >
             <v-text-field
-              v-model="content"
+              v-model="formData.content"
               :counter="80"
               label="플레이룸 소개글을 입력해주세요."
             />
@@ -48,7 +49,7 @@
             md="4"
           >
             <v-text-field
-              v-model="content"
+              v-model="formData.content"
               :counter="80"
               label="플레이룸 태그를 입력해주세요."
             />
