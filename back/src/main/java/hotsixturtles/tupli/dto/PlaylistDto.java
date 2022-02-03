@@ -9,18 +9,23 @@ import lombok.Data;
 
 import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 @Data
 public class PlaylistDto {
 
     private Long id;
-    private String name;
-    private String description;
+    private String title;
+    private String content;
+    private String tags;
+    private Boolean isPublic;
     private String image;
     private OffsetDateTime createdAt;
     private OffsetDateTime updatedAt;
-    private PlaylistInfo playlistInfo;
+
+    // 별도 정보 ??
+    private ConcurrentHashMap<Integer, Integer> playlistInfo;
 
     // 연결
     private SimpleUserDto user;
@@ -29,8 +34,10 @@ public class PlaylistDto {
 
     public PlaylistDto(Playlist playlist) {
         this.id = playlist.getId();
-        this.name = playlist.getName();
-        this.description = playlist.getDescription();
+        this.title = playlist.getTitle();
+        this.content = playlist.getContent();
+        this.tags = playlist.getTags();
+        this.isPublic = playlist.getIsPublic();
         this.image = playlist.getImage();
         this.createdAt = playlist.getCreatedAt();
         this.updatedAt = playlist.getUpdatedAt();

@@ -49,8 +49,8 @@ class YoutubeVideoTest {
 
         for (int i = 0; i < 20; i++) {
             SimpleYoutubeVideoDto youtubeVideoDto = new SimpleYoutubeVideoDto();
-            youtubeVideoDto.setUrl("뭐왜뭐-0"+i);
-            youtubeVideoDto.setCategoryId("23");
+            youtubeVideoDto.setVideoId("뭐왜뭐-0"+i);
+            youtubeVideoDto.setCategoryId((int) (1 + Math.random() * 20));
 
             //영상 추가 or 검색 후 영상 저장 (Transaction상 분리, 합치지 말 것)
             YoutubeVideo youtubeVideo = youtubeVideoService.addVideo(youtubeVideoDto);

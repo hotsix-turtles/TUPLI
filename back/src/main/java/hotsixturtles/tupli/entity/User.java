@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import hotsixturtles.tupli.entity.auth.ProviderType;
 import hotsixturtles.tupli.entity.auth.RoleType;
 import hotsixturtles.tupli.entity.likes.BoardLikes;
+import hotsixturtles.tupli.entity.likes.PlayroomLikes;
+import hotsixturtles.tupli.entity.likes.UserDislikes;
 import hotsixturtles.tupli.entity.likes.UserLikes;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
@@ -107,8 +109,22 @@ public class User implements UserDetails {
     @OneToMany(mappedBy = "toUser")
     private List<UserLikes> to_user = new ArrayList<>();
 
+    @OneToMany(mappedBy = "fromUser")
+    private List<UserDislikes> from_user_dislike = new ArrayList<>();
+
+    @OneToMany(mappedBy = "toUser")
+    private List<UserDislikes> to_user_dislike = new ArrayList<>();
+
     @OneToMany(mappedBy = "user")
     private List<BoardLikes> boardLikes = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user")
+    private List<Playroom> playroom = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user")
+    private List<PlayroomLikes> playroomLikes = new ArrayList<>();
+
+
 
     /**
      * Security 회원 가입

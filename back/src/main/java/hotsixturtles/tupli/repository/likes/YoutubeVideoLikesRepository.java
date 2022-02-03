@@ -16,7 +16,7 @@ public interface YoutubeVideoLikesRepository extends JpaRepository<YoutubeVideoL
     YoutubeVideoLikes findExist(@Param("userSeq") Long userSeq, @Param("youtubeVideoId") Long youtubeVideoId);
 
     // url로 존재하나 확인
-    @Query("select l from YoutubeVideoLikes l where l.youtubeVideo.url = :url and l.user.userSeq = :userSeq")
+    @Query("select l from YoutubeVideoLikes l where l.youtubeVideo.videoId = :url and l.user.userSeq = :userSeq")
     YoutubeVideoLikes findExistByUrl(Long userSeq, String url);
 
     // 해당 유저가 좋아요 영상 전부
@@ -24,7 +24,7 @@ public interface YoutubeVideoLikesRepository extends JpaRepository<YoutubeVideoL
     List<YoutubeVideo> findByUserOrderByIdDesc(@Param("user") User user);
 
     // 해당 영상 좋아요했는지 여부
-    @Query("select count(l.id) > 0 from YoutubeVideoLikes l where l.youtubeVideo.url = :url and l.user.userSeq = :userSeq")
+    @Query("select count(l.id) > 0 from YoutubeVideoLikes l where l.youtubeVideo.videoId = :url and l.user.userSeq = :userSeq")
     boolean isUserLikes (@Param("userSeq") Long userSeq, @Param("url") String url);
 
 }

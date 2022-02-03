@@ -1,9 +1,13 @@
 package hotsixturtles.tupli.api;
 
+import hotsixturtles.tupli.dto.UserDto;
 import hotsixturtles.tupli.dto.response.ErrorResponse;
+import hotsixturtles.tupli.dto.simple.SimpleUserDto;
+import hotsixturtles.tupli.entity.Board;
 import hotsixturtles.tupli.entity.User;
 import hotsixturtles.tupli.entity.auth.ProviderType;
 import hotsixturtles.tupli.entity.auth.RoleType;
+import hotsixturtles.tupli.entity.likes.UserDislikes;
 import hotsixturtles.tupli.entity.likes.UserLikes;
 import hotsixturtles.tupli.repository.UserRepository;
 import hotsixturtles.tupli.service.FileService;
@@ -150,6 +154,50 @@ public class UserApiController {
         return ResponseEntity.ok(new LoginUserResponse(token));
     }
 
+    /**
+     * $$$ 나중에 로그인 쪽으로 포함될 임시 함수
+     * @param token
+     * @return
+     */
+    @GetMapping("/account/userInfo")
+    public ResponseEntity getMyProfile(@RequestHeader(value = "Authorization") String token) {
+        try {
+            User user = jwtTokenProvider.getUser(token);
+            return ResponseEntity.ok().body(new UserDto(user));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+    }
+
+
+    /**
+     * token 유효 확인, 자동 로그아웃 등에 활용
+     * @param token
+     * @return
+     */
+    @GetMapping("/account/tokenvalidate")
+    public ResponseEntity<?> chackTokenValidate(@RequestHeader(value = "Authorization") String token){
+        // 인증 확인후 돌리기
+        if (!jwtTokenProvider.validateToken(token)) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ErrorResponse(messageSource.
+                            getMessage("error.valid.jwt", null, LocaleContextHolder.getLocale())));
+        }
+        return ResponseEntity.ok().body(null);
+    }
+
+    /**
+     * 타인 프로필 정보 간단히 긁어오기 함수
+     * @param userSeq
+     * @return
+     */
+    @GetMapping("/account/profile/{userSeq}")
+    public ResponseEntity getOtherProfile(@PathVariable("userSeq") Long userSeq) {
+        User user = userRepository.findByUserSeq(userSeq);
+        return ResponseEntity.ok().body(new UserDto(user));
+    }
+
+
     @Data
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
     public class LoginUserResponse {
@@ -204,18 +252,19 @@ public class UserApiController {
         return ResponseEntity.status(HttpStatus.OK).body(null);
     }
 
+    
     /**
      * 팔로우 하기
      * 내 로그인 정보와 유저의 아이디 받아옴. 내 회원id가 그 회원id를 좋아한다고 해야함. 반환되는건 없어도 된다.
      */
-    @PostMapping("/follow")
+    @PostMapping("/account/follow/{userSeq}")
     @ApiOperation(value = "팔로우 하기", notes = "회원정보가 안맞을 시 404'유효하지 않은 토큰입니다' 반환, " +
-            "정상 실행 시 200, body에 null 반환")
+            "정상 실행 시 200 반환")
     public ResponseEntity<?> followUser(
-            @ApiParam(value = "Authroization, userName 으로 입력된다.")
-            @RequestBody Map<String, String> info) {
-        String token = info.get("Authroization");
-        String otherUserName = info.get("userName");
+            @ApiParam(value = "Authroization 으로 입력된다.")
+            @RequestHeader(value = "Authorization") String token,
+            @ApiParam(value = "팔로우 할 상대의 userSeq.")
+            @PathVariable("userSeq") Long otherUserSeq) {
         // 내 로그인 정보가 맞으면 진행, 틀리면 로그인정보가 틀립니다 하고 빠꾸
         if (!jwtTokenProvider.validateToken(token)) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
@@ -224,26 +273,27 @@ public class UserApiController {
         }
         // 내 로그인정보로 id 찾아냄.
         Long userSeq = jwtTokenProvider.getUserSeq(token);
-        // 상대 userName 으로 고유 id 찾아냄.
-        Long otherUserSeq = userService.getUserByUserName(otherUserName).getUserSeq();
-        // user_likes 테이블에 기록.
-        userService.follow(userSeq, otherUserSeq);
-        return ResponseEntity.status(HttpStatus.OK).body(null);
+        UserLikes userLikes = userService.getFollow(userSeq, otherUserSeq);
+        // 팔로우 안되어있으면 팔로우 실행
+        if (userLikes == null) {
+            userService.follow(userSeq, otherUserSeq);
+            return ResponseEntity.status(HttpStatus.OK).body("followed");
+        }
+        // 이미 팔로우 되어있음
+        return ResponseEntity.status(HttpStatus.OK).body("already followed");
     }
 
     /**
-     * 해당 유저를 언팔로우 하기
-     * @param info
-     * @return
+     * 언팔로우 하기
      */
-    @DeleteMapping("/follow")
+    @DeleteMapping("/account/follow/{userSeq}")
     @ApiOperation(value = "언팔로우 하기", notes = "회원정보가 안맞을 시 404'유효하지 않은 토큰입니다' 반환, " +
-            "정상 실행 시 200, body에 null 반환")
+            "정상 실행 시 200 반환")
     public ResponseEntity<?> unfollowUser(
-            @ApiParam(value = "Authroization, userName 으로 입력된다.")
-            @RequestBody Map<String, String> info) {
-        String token = info.get("Authroization");
-        String otherUserName = info.get("userName");
+            @ApiParam(value = "Authroization 으로 입력된다.")
+            @RequestHeader(value = "Authorization") String token,
+            @ApiParam(value = "언팔로우 할 상대의 userSeq.")
+            @PathVariable("userSeq") Long otherUserSeq) {
         // 내 로그인 정보가 맞으면 진행, 틀리면 로그인정보가 틀립니다 하고 빠꾸
         if (!jwtTokenProvider.validateToken(token)) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
@@ -251,33 +301,139 @@ public class UserApiController {
                             getMessage("error.valid.jwt", null, LocaleContextHolder.getLocale())));
         }
         Long userSeq = jwtTokenProvider.getUserSeq(token);
-        Long otherUserSeq = userService.getUserByUserName(otherUserName).getUserSeq();
-        userService.unfollow(userSeq, otherUserSeq);
-        return ResponseEntity.status(HttpStatus.OK).body(null);
+        UserLikes userLikes = userService.getFollow(userSeq, otherUserSeq);
+        if (userLikes != null) {
+            userService.unfollow(userSeq, otherUserSeq);
+            return ResponseEntity.status(HttpStatus.OK).body("unfollowed");
+        }
+        // 이미 언팔로우 되어있음
+        return ResponseEntity.status(HttpStatus.OK).body("already followed");
     }
 
     /**
-     * 해당 유저의 팔로워(이 유저를 팔로우 한 사람) 보기
-     * @param info
-     * @return
+     * 팔로우 했는지 여부를 반환하는 함수
      */
-    @GetMapping("/follow")
-    public ResponseEntity<?> getFollowers(
-            @ApiParam(value = "Authroization, userName 으로 입력된다.")
-            @RequestBody Map<String, String> info) {
-        String token = info.get("Authroization");
-        String otherUserName = info.get("userName");
+    @GetMapping("/account/follow/{userSeq}")
+    @ApiOperation(value = "팔로우 했는지 여부 반환", notes = "회원정보가 안맞을 시 404'유효하지 않은 토큰입니다' 반환, " +
+            "정상 실행 시 200 반환")
+    public ResponseEntity<?> getFollowUser(
+            @ApiParam(value = "Authroization 으로 입력된다.")
+            @RequestHeader(value = "Authorization") String token,
+            @ApiParam(value = "팔로우 할 상대의 userSeq.")
+            @PathVariable("userSeq") Long otherUserSeq) {
         if (!jwtTokenProvider.validateToken(token)) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(new ErrorResponse(messageSource.
                             getMessage("error.valid.jwt", null, LocaleContextHolder.getLocale())));
         }
         Long userSeq = jwtTokenProvider.getUserSeq(token);
-        Long otherUserSeq = userService.getUserByUserName(otherUserName).getUserSeq();
+        UserLikes userLikes = userService.getFollow(userSeq, otherUserSeq);
+        if (userLikes == null) {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);  // 안했음
+        }
+        return ResponseEntity.status(HttpStatus.OK).body("ok");  // 했음
+    }
+
+
+    /**
+     * 해당 유저를 싫어요 하기
+     * @return
+     */
+    @PostMapping("/account/dislike/{userSeq}")
+    @ApiOperation(value = "싫어요 하기", notes = "회원정보가 안맞을 시 404'유효하지 않은 토큰입니다' 반환, " +
+            "정상 실행 시 200, body에 null 반환")
+    public ResponseEntity<?> dislikeUser(
+            @ApiParam(value = "Authroization 으로 입력된다.")
+            @RequestHeader(value = "Authorization") String token,
+            @ApiParam(value = "싫어요 할 상대의 userSeq.")
+            @PathVariable("userSeq") Long otherUserSeq) {
+        // 내 로그인 정보가 맞으면 진행, 틀리면 로그인정보가 틀립니다 하고 빠꾸
+        if (!jwtTokenProvider.validateToken(token)) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ErrorResponse(messageSource.
+                            getMessage("error.valid.jwt", null, LocaleContextHolder.getLocale())));
+        }
+        Long userSeq = jwtTokenProvider.getUserSeq(token);
+        UserDislikes userDislikes = userService.getDislike(userSeq, otherUserSeq);
+        // 싫어요 안되어있으면 싫어요 실행
+        if (userDislikes == null) {
+            userService.dislike(userSeq, otherUserSeq);
+            return ResponseEntity.status(HttpStatus.OK).body("checked dislike");
+        }
+        // 이미 싫어요 되어있음
+        return ResponseEntity.status(HttpStatus.OK).body("already checked dislike");
+
+    }
+
+    /**
+     * 해당 유저의 싫어요 체크를 해제하기
+     * @return
+     */
+    @DeleteMapping("/account/dislike/{userSeq}")
+    @ApiOperation(value = "싫어요 해제 하기", notes = "회원정보가 안맞을 시 404'유효하지 않은 토큰입니다' 반환, " +
+            "정상 실행 시 200, body에 null 반환")
+    public ResponseEntity<?> undoDislikeUser(
+            @ApiParam(value = "Authroization 으로 입력된다.")
+            @RequestHeader(value = "Authorization") String token,
+            @ApiParam(value = "싫어요를 해제할 상대의 userSeq.")
+            @PathVariable("userSeq") Long otherUserSeq) {
+        if (!jwtTokenProvider.validateToken(token)) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ErrorResponse(messageSource.
+                            getMessage("error.valid.jwt", null, LocaleContextHolder.getLocale())));
+        }
+        Long userSeq = jwtTokenProvider.getUserSeq(token);
+        UserDislikes userDislikes = userService.getDislike(userSeq, otherUserSeq);
+        if (userDislikes != null) {
+            userService.undoDislike(userSeq, otherUserSeq);
+            return ResponseEntity.status(HttpStatus.OK).body("unchecked dislike");
+        }
+        // 이미 싫어요 해제되어있음.
+        return ResponseEntity.status(HttpStatus.OK).body("already unchecked dislike");
+    }
+
+    /**
+     * 싫어요 했는지 여부를 반환하는 함수
+     */
+    @GetMapping("/account/dislike/{userSeq}")
+    @ApiOperation(value = "싫어요 했는지 여부 반환", notes = "회원정보가 안맞을 시 404'유효하지 않은 토큰입니다' 반환, " +
+            "정상 실행 시 200 반환")
+    public ResponseEntity<?> getDislikeUser(
+            @ApiParam(value = "Authroization 으로 입력된다.")
+            @RequestHeader(value = "Authorization") String token,
+            @ApiParam(value = "싫어요 한 상대의 userSeq.")
+            @PathVariable("userSeq") Long otherUserSeq) {
+        if (!jwtTokenProvider.validateToken(token)) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ErrorResponse(messageSource.
+                            getMessage("error.valid.jwt", null, LocaleContextHolder.getLocale())));
+        }
+        Long userSeq = jwtTokenProvider.getUserSeq(token);
+        UserDislikes userDislikes = userService.getDislike(userSeq, otherUserSeq);
+        if (userDislikes == null) {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);  // 안했음
+        }
+        return ResponseEntity.status(HttpStatus.OK).body("ok");  // 했음
+    }
+
+    /**
+     * 해당 유저의 팔로워(이 유저를 팔로우 한 사람) 보기
+     */
+    @GetMapping("/profile/followers/{userSeq}")
+    public ResponseEntity<?> getFollowers(
+            @ApiParam(value = "auth token")
+            @RequestHeader(value = "Authorization") String token,
+            @ApiParam(value = "path로 userSeq가 입력된다.")
+            @PathVariable("userSeq") Long userSeq) {
+        if (!jwtTokenProvider.validateToken(token)) {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(new ErrorResponse(messageSource.getMessage
+                            ("error.valid.jwt", null, LocaleContextHolder.getLocale())));
+        }
         // user_likes 테이블에 to_user 에 otherUserSeq 이 들어간 리스트 반환하면 될듯
         // 22.02.02 한길 - 미완성... 잘 될지 안될지 모름.
-
-        List<UserLikes> followerList = userService.getFollowers(otherUserSeq);
+        List<UserLikes> followerList = userService.getFollowers(userSeq);
         return ResponseEntity.status(HttpStatus.OK).body(followerList);
     }
 
