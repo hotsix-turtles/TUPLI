@@ -2,6 +2,7 @@ package hotsixturtles.tupli.entity;
 
 import com.vladmihalcea.hibernate.type.json.JsonType;
 import hotsixturtles.tupli.dto.PlayroomDto;
+import hotsixturtles.tupli.entity.likes.PlayroomLikes;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,6 +13,7 @@ import org.hibernate.annotations.TypeDef;
 import javax.persistence.*;
 import javax.validation.constraints.Size;
 import java.time.OffsetDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -63,6 +65,9 @@ public class Playroom {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
+
+    @OneToMany(mappedBy = "playroom")
+    private List<PlayroomLikes> playroomLikes = new ArrayList<>();
 
     private Integer userCount;
 
