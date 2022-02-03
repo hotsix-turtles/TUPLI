@@ -31,8 +31,7 @@ public class YoutubeVideoService {
     @Transactional
     public YoutubeVideo addVideo(SimpleYoutubeVideoDto youtubeVideoDto) {
         // 있을 경우 탐색, 없을 경우 DB에 추가.
-        YoutubeVideo youtubeVideo = youtubeVideoRepository.findByUrl(youtubeVideoDto.getUrl());
-        System.out.println("youtubeVideo = " + youtubeVideo);
+        YoutubeVideo youtubeVideo = youtubeVideoRepository.findByVideoId(youtubeVideoDto.getVideoId());
         if(youtubeVideo == null) {
             youtubeVideo = new YoutubeVideo();
             youtubeVideo.setInit(youtubeVideoDto);  // Custom setter
