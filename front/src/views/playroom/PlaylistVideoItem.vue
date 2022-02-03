@@ -56,25 +56,23 @@ export default {
     author: { type: String, default: '' },
     thumbnail: { type: String, default: '' },
     playtime: { type: String, default: '0:0' },
-    clicked: { type: Boolean, default: false },
+    selected: { type: Boolean, default: false },
     readonly: { type: Boolean, default: false }
   },
   data() {
     return {
-      clickState: this.clicked,
       items: [
         { id: 1, title: 'good' }
       ]
     }
   },
   computed: {
-    color: function () { return this.clickState ? "#dde" : "#eee" }
+    color() { return this.selected ? '#dde' : '#eee' }
   },
   methods: {
-    onItemClick (event) {
+    onItemClick () {
       if (this.readonly) return;
-      this.clickState = !this.clickState
-      this.$emit('click', { id: this.id, clickState: this.clickState })
+      this.$emit('click', { id: this.id, selected: this.selected })
     }
   }
 }
