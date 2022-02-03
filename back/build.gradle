@@ -69,6 +69,9 @@ dependencies {
 	//queryDSL
 	implementation "com.querydsl:querydsl-jpa:${queryDslVersion}"
 	implementation "com.querydsl:querydsl-apt:${queryDslVersion}"
+
+	// firebase 실시간 DB 연동
+	implementation group: 'com.google.firebase', name: 'firebase-admin', version: '8.1.0'
 }
 
 configurations {
