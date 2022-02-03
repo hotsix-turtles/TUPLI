@@ -70,7 +70,10 @@
             <v-icon>mdi-thumb-up</v-icon>
           </v-btn>
 
-          <v-btn class="playroomChat">
+          <v-btn
+            class="playroomChat"
+            @click="dialog = true"
+          >
             <span>채팅</span>
             <v-icon>mdi-message</v-icon>
           </v-btn>
@@ -186,17 +189,100 @@
           />
         </div>
       </div>
+
+      <v-dialog
+        v-model="dialog"
+        fullscreen
+        hide-overlay
+        transition="dialog-bottom-transition"
+        scrollable
+      >
+        <v-card tile>
+          <v-card-title>
+            <v-toolbar-title>채팅</v-toolbar-title>
+            <v-btn
+              icon
+              class="ml-auto"
+              @click="dialog = false"
+            >
+              <v-icon>mdi-close</v-icon>
+            </v-btn>
+          </v-card-title>
+          <v-card-text>
+            <v-container>
+              <ChatItem
+                v-for="chat in roomChats"
+                :id="chat.id"
+                :key="chat.id"
+                :name="chat.author.name"
+                :profile="chat.author.thumbnail"
+                :content="chat.content"
+                :timestamp="chat.timestamp"
+                :blockedUser="chat.blockedUser"
+                :blockedMessage="chat.blockedMessage"
+              />
+            </v-container>
+          </v-card-text>
+          <v-spacer></v-spacer>
+          <v-card-actions>
+            <v-text-field
+              label="메시지를 입력하세요"
+              v-model='message'
+              solo
+              dense
+              @click:append-outer="sendMessage"
+              :disabled='!canChat'
+              :error='errorOnSend'
+            >
+              <template v-slot:append>
+                <v-menu
+                  v-model="showEmoji"
+                  rounded='lg'
+                  top
+                  left
+                  offset-x
+                  offset-y
+                >
+                  <template v-slot:activator="{ on, attrs }">
+                    <v-icon v-bind="attrs" v-on="on" v-if="showEmoji" @click="showEmoji = !showEmoji">mdi-emoticon</v-icon>
+                    <v-icon v-bind="attrs" v-on="on" v-else @click="showEmoji = !showEmoji">mdi-emoticon-outline</v-icon>
+                  </template>
+                  <v-card>
+                    <v-list>
+                      <v-list-item>
+                        이모지
+                      </v-list-item>
+                    </v-list>
+                  </v-card>
+                </v-menu>
+              </template>
+              <template v-slot:append-outer>
+                <!-- <v-fade-transition leave-absolute> -->
+                  <v-progress-circular
+                    v-if="sending"
+                    size="24"
+                    indeterminate
+                  ></v-progress-circular>
+                <v-icon v-else @click="sendMessage">mdi-send</v-icon>
+                <!-- </v-fade-transition> -->
+              </template>
+            </v-text-field>
+          </v-card-actions>
+          <div style="flex: 1 1 auto;" />
+        </v-card>
+      </v-dialog>
     </v-sheet>
   </v-card>
 </template>
 
 <script>
-import { mapGetters, mapState } from 'vuex';
+import { mapActions, mapGetters, mapState } from 'vuex';
 import Vue from 'vue'
 import VueYoutube from 'vue-youtube'
 import PlaylistThumbnailItem from './PlaylistThumbnailItem.vue'
 import TagItem from './TagItem.vue'
 import PlaylistVideoItem from './PlaylistVideoItem.vue'
+import ChatItem from './ChatItem.vue'
 
 Vue.use(VueYoutube)
 
@@ -205,6 +291,7 @@ export default {
   components: {
     PlaylistThumbnailItem,
     PlaylistVideoItem,
+    ChatItem,
     TagItem
   },
   data() {
@@ -215,7 +302,13 @@ export default {
         autoplay: 1,
         mute: 1
       },
-      clickedItem: 0
+      clickedItem: 0,
+      dialog: false,
+      showEmoji: false,
+      sending: false,
+      message: '',
+      canChat: true,
+      errorOnSend: false
     }
   },
   metaInfo () {
@@ -247,7 +340,9 @@ export default {
       'roomCurrentPlaylist',
       'roomVideos',
       'roomCurrentVideo',
-      'roomCurrentPlayTime'
+      'roomCurrentPlayTime',
+      'roomChats',
+      'roomSendingMessage'
     ]),
     ...mapGetters('playroom', [
       'roomPlayTime',
@@ -298,6 +393,43 @@ export default {
     onVideoCued() {
       console.log('cued')
     },
+    sendMessage() {
+      this.disableChatbox()
+      this.pendingToSendMessage()
+      this.$store.dispatch('playroom/sendMessage', this.message)
+        .then(() => {
+          this.clearMessage()
+        })
+        .catch((err) => {
+          this.notifySendError()
+        })
+        .finally(() => {
+          this.completeToSendMessage()
+          this.enableChatbox()
+        })
+    },
+    clearMessage() {
+      this.message = ''
+    },
+    pendingToSendMessage() {
+      this.sending = true
+    },
+    completeToSendMessage() {
+      this.sending = false
+    },
+    enableChatbox() {
+      this.canChat = true
+    },
+    disableChatbox() {
+      this.canChat = false
+    },
+    notifySendError() {
+      this.errorOnSend = true;
+      setTimeout(this.clearSendError, 1000);
+    },
+    clearSendError() {
+      this.errorOnSend = false;
+    }
   },
 }
 </script>

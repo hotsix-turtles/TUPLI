@@ -1,4 +1,4 @@
-package hotsixturtles.tupli.entity;
+package hotsixturtles.tupli.entity.meta;
 
 import com.vladmihalcea.hibernate.type.json.JsonType;
 import lombok.AllArgsConstructor;

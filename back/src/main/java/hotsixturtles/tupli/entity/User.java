@@ -3,6 +3,8 @@ package hotsixturtles.tupli.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import hotsixturtles.tupli.entity.auth.ProviderType;
 import hotsixturtles.tupli.entity.auth.RoleType;
+import hotsixturtles.tupli.entity.likes.BoardLikes;
+import hotsixturtles.tupli.entity.likes.UserLikes;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -91,9 +93,22 @@ public class User implements UserDetails {
     @Size(max = 512)
     private String profileImageUrl;
 
-    private String introduction = "안녕하세요. 잘 부탁드리겠습니다.";
+    private String introduction = "안녕하세요. 잘 부탁드리겠습니다";
 
     private String authKey;
+
+    // 연결
+    @OneToMany(mappedBy = "user")
+    private List<Board> boards = new ArrayList<>();
+
+    @OneToMany(mappedBy = "fromUser")
+    private List<UserLikes> from_user = new ArrayList<>();
+
+    @OneToMany(mappedBy = "toUser")
+    private List<UserLikes> to_user = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user")
+    private List<BoardLikes> boardLikes = new ArrayList<>();
 
     /**
      * Security 회원 가입

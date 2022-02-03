@@ -1,6 +1,8 @@
 package hotsixturtles.tupli.service;
 
 import hotsixturtles.tupli.entity.User;
+import hotsixturtles.tupli.entity.likes.UserLikes;
+import hotsixturtles.tupli.repository.UserLikesRepository;
 import hotsixturtles.tupli.repository.UserRepository;
 import hotsixturtles.tupli.service.token.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
@@ -20,9 +22,10 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
 
     private final JwtTokenProvider jwtTokenProvider;
+    private final UserLikesRepository userLikesRepository;
 
     @Transactional
-    public Long join(User user){
+    public Long join(User user) {
         validateDuplicateUser(user);
         user.setPassword(user.getPassword());
         user.encodePassword(passwordEncoder);
@@ -32,14 +35,14 @@ public class UserService {
     }
 
     @Transactional
-    public void deleteUser(Long userSeq){
+    public void deleteUser(Long userSeq) {
         userRepository.deleteByUserSeq(userSeq);
     }
 
     @Transactional
-    public int updateEmailValidate(String email, String authKey){
+    public int updateEmailValidate(String email, String authKey) {
         User user = userRepository.findByEmail(email);
-        if(user == null || !user.getAuthKey().equals(authKey)){
+        if (user == null || !user.getAuthKey().equals(authKey)) {
             return -1;
         }
         user.setEmailVerifiedYn("Y");
@@ -50,22 +53,30 @@ public class UserService {
 
 
     @Transactional
-    public void updateAuthkey(String email, String authKey){
+    public void updateAuthkey(String email, String authKey) {
         User user = userRepository.findByEmail(email);
         user.setAuthKey(authKey);
         userRepository.save(user);
     }
 
     private void validateDuplicateUser(User user) {
-        List<User> findUsers = userRepository.findByUsername(user.getUsername());
-        if(!findUsers.isEmpty()) {
+        // 22.02.02 한길 수정 - List<User> -> User
+        User findUsers = userRepository.findByUsername(user.getUsername());
+        if (findUsers != null) {
             throw new IllegalStateException("일치하는 아이디가 존재합니다.");
         }
     }
 
     @Transactional
-    public User getUserByEmail(String email){
+    public User getUserByEmail(String email) {
         User user = userRepository.findByEmail(email);
+        return user;
+    }
+
+    // 22.02.02 한길 - userName 으로 user정보 알아오기
+    @Transactional
+    public User getUserByUserName(String userName) {
+        User user = userRepository.findByUsername(userName);
         return user;
     }
 
@@ -76,7 +87,7 @@ public class UserService {
 
     // 나중에 parameter 더 넘어오면 변경값들도 바꾼다
     @Transactional
-    public void updateProfile(Long userSeq, String email, String nickname, String image){
+    public void updateProfile(Long userSeq, String email, String nickname, String image) {
         User user = userRepository.findByUserSeq(userSeq);
         if (email != null) {
             user.setEmail(email);
@@ -93,10 +104,47 @@ public class UserService {
 
         try {
             userRepository.save(user);
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             // 바꾼값이 DB에 이미 있으면 Error!! ( 같으면 안되는 attribute들... )
         }
     }
 
+    // 22.02.02 한길 - follow 하기, 이미 follow 되어있으면 아무일도 하지않음.
+    @Transactional
+    public void follow(Long userSeq, Long otherUserSeq) {
+        UserLikes existUserLikes = userLikesRepository.findExist(userSeq, otherUserSeq);
+        System.out.println("existUserLikes== " + existUserLikes);
+        if(existUserLikes == null) {
+            UserLikes userLikes = new UserLikes();
+            userLikes.setFromUser(userRepository.findById(userSeq).orElse(null));
+            userLikes.setToUser(userRepository.findById(otherUserSeq).orElse(null));
+            userLikesRepository.save(userLikes);
+        }
+        else {
+            // 이미 팔로우 되어있음.
+        }
+    }
+
+    // 22.02.02 한길 - unfollow 하기, 이미 unfollow 되어있으면 아무일도 하지않음.
+    @Transactional
+    public void unfollow(Long userSeq, Long otherUserSeq) {
+        UserLikes existUserLikes = userLikesRepository.findExist(userSeq, otherUserSeq);
+        if(existUserLikes != null) {
+            userLikesRepository.delete(existUserLikes);
+        }
+        else {
+            // 이미 언팔로우 되어있음.
+        }
+    }
+
+    // 22.02.02 한길 - 팔로워 리턴하기
+    public List<UserLikes> getFollowers(Long otherUserSeq) {
+        // to_user_id 가 otherUserSeq 로 이루어져있는 녀석들만 골라서 저장하고 리턴
+        List<UserLikes> userlikes = userLikesRepository.findFollowers(otherUserSeq);
+        return userlikes;
+    }
+
+
+
 }
+
