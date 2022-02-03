@@ -36,6 +36,10 @@ public class Playlist {
 
     private String image;  // 플레이리스트 자체에 이미지 넣을지, 영상 썸네일 중 하나일지?
 
+    @Type(type = "json")
+    @Column(columnDefinition = "json")
+    private List<Long> recommendPlaylists;  // 이 플레이리스트 기준, 추천 플레이리스트
+
     private OffsetDateTime createdAt;
     private OffsetDateTime updatedAt;
 
