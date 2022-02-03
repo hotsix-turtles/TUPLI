@@ -15,6 +15,7 @@ import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Entity
 @Table(name = "playlist")
@@ -28,8 +29,10 @@ public class Playlist {
     @GeneratedValue
     private Long id;
 
-    private String name;
-    private String description;
+    private String title;
+    private String content;
+    private String tags;
+    private Boolean isPublic;
 
     private String image;  // 플레이리스트 자체에 이미지 넣을지, 영상 썸네일 중 하나일지?
 
@@ -49,7 +52,7 @@ public class Playlist {
 
     @Type(type = "json")
     @Column(columnDefinition = "json")
-    private PlaylistInfo playlistInfo;  // 유튜브 Tag + Custom Tag 리스트 등의 메타정보 조합
+    private ConcurrentHashMap<Integer, Integer> playlistInfo;  // 유튜브 Tag + Custom Tag 리스트 등의 메타정보 조합
 
     // 연결
     @ManyToOne(fetch = FetchType.LAZY)

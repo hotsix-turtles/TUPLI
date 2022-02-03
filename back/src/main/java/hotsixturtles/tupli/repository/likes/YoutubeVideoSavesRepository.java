@@ -16,7 +16,7 @@ public interface YoutubeVideoSavesRepository extends JpaRepository<YoutubeVideoS
     YoutubeVideoSaves findExist(@Param("userSeq") Long userSeq, @Param("youtubeVideoId") Long youtubeVideoId);
 
     // url로 존재하나 확인
-    @Query("select s from YoutubeVideoSaves s where s.youtubeVideo.url = :url and s.user.userSeq = :userSeq")
+    @Query("select s from YoutubeVideoSaves s where s.youtubeVideo.videoId = :url and s.user.userSeq = :userSeq")
     YoutubeVideoSaves findExistByUrl(@Param("userSeq") Long userSeq, @Param("url") String url);
 
     // 해당 유저가 저장한 영상 전부
@@ -24,7 +24,7 @@ public interface YoutubeVideoSavesRepository extends JpaRepository<YoutubeVideoS
     List<YoutubeVideo> findByUserOrderByIdDesc(@Param("user") User user);
 
     // 해당 영상 저장했는지 여부
-    @Query("select count(s.id) > 0 from YoutubeVideoSaves s where s.youtubeVideo.url = :url and s.user.userSeq = :userSeq")
+    @Query("select count(s.id) > 0 from YoutubeVideoSaves s where s.youtubeVideo.videoId = :url and s.user.userSeq = :userSeq")
     boolean isUserSaved (@Param("userSeq") Long userSeq, @Param("url") String url);
 
 }

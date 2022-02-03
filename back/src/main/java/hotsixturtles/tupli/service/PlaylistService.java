@@ -12,11 +12,15 @@ import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import hotsixturtles.tupli.dto.PlaylistDto;
 import hotsixturtles.tupli.dto.param.SimpleCondition;
+import hotsixturtles.tupli.dto.request.PlaylistRequest;
+import hotsixturtles.tupli.dto.simple.SimpleYoutubeVideoDto;
 import hotsixturtles.tupli.entity.Playlist;
 import hotsixturtles.tupli.entity.QPlaylist;
 import hotsixturtles.tupli.entity.likes.PlaylistLikes;
+import hotsixturtles.tupli.entity.youtube.YoutubeVideo;
 import hotsixturtles.tupli.repository.PlaylistRepository;
 import hotsixturtles.tupli.repository.UserRepository;
+import hotsixturtles.tupli.repository.YoutubeVideoRepository;
 import hotsixturtles.tupli.repository.likes.PlaylistLikesRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,6 +32,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.EntityManager;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -43,6 +48,7 @@ public class PlaylistService {
     private final UserRepository userRepository;
     private final PlaylistRepository playlistRepository;
     private final PlaylistLikesRepository playlistLikesRepository;
+    private final YoutubeVideoRepository youtubeVideoRepository;
 
     // 심플 querydsl
     private final JPAQueryFactory jpaQueryFactory;
@@ -51,10 +57,33 @@ public class PlaylistService {
 
     // 단일 Playlist 추가
     @Transactional
-    public void addPlaylist(Long userSeq, Playlist playlist) {
+    public void addPlaylist(Long userSeq, PlaylistRequest playlistRequest) {
+        // 기본 정보
+        Playlist playlist = new Playlist();
+        playlist.setTitle(playlistRequest.getTitle());
+        playlist.setContent(playlistRequest.getContent());
+        playlist.setTags(playlistRequest.getTags());
+        playlist.setIsPublic(playlistRequest.getIsPublic());
+        
+        // 연결
         playlist.setUser(userRepository.findByUserSeq(userSeq));
-        // $$$$$ 유튜브 비디오와의 연결은 프론트에서 뭐가 오냐에 따라 조금 갈림.
 
+        // Video 정보
+        ConcurrentHashMap<Integer, Integer> playlistInfo = new ConcurrentHashMap<Integer, Integer>();
+        for (SimpleYoutubeVideoDto videoDto : playlistRequest.getVideos()) {
+            // 기존에 저장, 좋아요 해놓은것과 상관없이 별도로 제작
+            YoutubeVideo video = new YoutubeVideo();
+            video.setInit(videoDto);
+            video.setPlaylist(playlist);  // 연결
+            youtubeVideoRepository.save(video);
+
+            // Playlistinfo에 따라 갈림
+            Integer categoryId = videoDto.getCategoryId();
+            Integer count = playlistInfo.getOrDefault(categoryId, 0);
+            playlistInfo.put(categoryId, count+1);
+        }
+        playlist.setPlaylistInfo(playlistInfo);
+        System.out.println("playlistInfo = " + playlistInfo);
 
         playlistRepository.save(playlist);
     }
@@ -70,8 +99,8 @@ public class PlaylistService {
         Playlist playlistUpdate = playlistRepository.findById(playlistId).orElse(null);
 
         if (playlistUpdate!= null) {
-            playlistUpdate.setName(playlistChange.getName());
-            playlistUpdate.setDescription(playlistChange.getDescription());
+            playlistUpdate.setTitle(playlistChange.getTitle());
+            playlistUpdate.setContent(playlistChange.getContent());
             playlistUpdate.setImage(playlistChange.getImage());
             // $$$$$ 유튜브 비디오와의 연결은 프론트에서 뭐가 오냐에 따라 조금 갈림..
 
