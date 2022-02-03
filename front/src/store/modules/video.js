@@ -6,6 +6,7 @@ const video = {
   namespaced: true,
   state: {
     addedVideos: [], // 생성용으로 추가한 영상
+    selectedVideos: [], // 생성용으로 추가하기 위해 선택한 영상
     searchedVideos: [], // 검색한 영상
     searchedVideoIds: [], // 검색한 영상의 ID
     rerenderKey: '',
@@ -19,9 +20,12 @@ const video = {
     // Video State 초기화
     RESET_VIDEO_SEARCH_STATE: function (state) {
       state.searchedVideos = []
+      state.selectedVideos = []
       state.nextPageToken = ''
+      console.log('RESET_VIDEO_SEARCH_STATE')
     },
     SEARCH_VIDEOS: function (state, searchedVideos) {
+      state.selectedVideos = []
       state.searchedVideos = []
       state.searchedVideoIds = []
       for (let searchedVideo of searchedVideos) {
@@ -37,11 +41,32 @@ const video = {
       }
     },
     SEARCH_VIDEOS_ADD_INFO: function (state, addInfos) {
+
       state.searchedVideos.forEach(searchedVideo => {
+
         for (let addInfo of addInfos) {
           if (searchedVideo.videoId === addInfo.id) {
+            // const addInfoDuration = addInfo.contentDetails.duration
+            // let duration = ''
+            // const type = ['S', 'M', 'H']
+            // let idx1 = addInfoDuration.length - 1
+            // let idx2 = 0
+            // while (addInfoDuration[idx1] !== 'T') {
+            //   if (addInfoDuration[idx1] === type[idx2]) {
+            //     while (!isNaN(addInfoDuration[idx1])) {
+            //       duration = addInfoDuration[idx1] + duration
+            //       idx1++
+            //     }
+            //     duration = ':' + duration
+            //   } else {
+            //     duration = ':00' + duration
+            //   }
+            //   idx2++
+            // }
+            // console.log('duration', duration)
             searchedVideo.categoryId = Number(addInfo.snippet.categoryId)
             searchedVideo.duration = addInfo.contentDetails.duration
+            // searchedVideo.duration = duration
             break
           }
         }
@@ -71,12 +96,22 @@ const video = {
     QUERY: function (state, query) {
       state.query = query
     },
-    ADD_VIDEOS: function (state, addedVideos) {
-      for (let addedVideo of addedVideos) {
-        if (!state.addedVideos.includes(addedVideo)) {
-          state.addedVideos.push(addedVideo)
+    ADD_VIDEOS: function (state) {
+      for (let selectedVideo of state.selectedVideos) {
+        const idx = state.addedVideos.findIndex(i => i.videoId === selectedVideo.videoId)
+        if (idx === -1) {
+          state.addedVideos.push(selectedVideo)
         }
       }
+      state.selectedVideos = []
+      console.log('state.addedVideos', state.addedVideos)
+    },
+    ADD_SELECTED_VIDEO: function (state, video) {
+      state.selectedVideos.push(video)
+    },
+    REMOVE_SELECTED_VIDEO: function (state, video) {
+      const idx = state.selectedVideos.findIndex(i => i.videoId === video.videoId)
+      state.selectedVideos.splice(idx, 1)
     },
     WATCHING_VIDEO: function (state, watchingVideo) {
       state.watchingVideo = watchingVideo
@@ -148,7 +183,7 @@ const video = {
         })
     },
     // 유튜브 검색 (무한스크롤)
-    searchVideosByScroll: function ({ state, commit }, $state) {
+    searchVideosByScroll: function ({ state, commit, dispatch }, $state) {
       const SEARCH_API_URL = 'https://www.googleapis.com/youtube/v3/search'
       const API_KEY = process.env.VUE_APP_YOUTUBE_API_KEY
 
@@ -182,13 +217,19 @@ const video = {
             console.log(err)
             $state.complete()
           })
-      } else {
-        $state.complete()
       }
     },
     // 영상 리스트에 추가
-    addVideo: function ({ commit }, videos) {
-      commit('ADD_VIDEO', video)
+    addVideos: function ({ commit }) {
+      commit('ADD_VIDEOS')
+    },
+    // 선택한 영상 리스트에 추가
+    addSelectedVideo: function ({ commit }, video) {
+      commit('ADD_SELECTED_VIDEO', video)
+    },
+    // 선택한 영상 리스트에서 제거
+    removeSelectedVideo: function ({ commit }, videoId) {
+      commit('REMOVE_SELECTED_VIDEO', videoId)
     },
     // 영상 보기 선택한 영상
     watchingVideo: function ({ commit }, watchingVideo) {

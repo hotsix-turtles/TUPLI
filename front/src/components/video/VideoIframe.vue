@@ -3,8 +3,8 @@
     <iframe
       :src="videoURI"
       frameborder="0"
-      width="500px"
-      height="300px"
+      width="100%"
+      height="220px"
     />
     {{ watchingVideo.title }}
     {{ watchingVideo.channelTitle }}

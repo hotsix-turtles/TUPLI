@@ -10,6 +10,7 @@ import PlayroomForm from '../views/playroom/PlayroomForm.vue'
 import PlayroomDetail from '../views/playroom/PlayroomDetail.vue'
 import VideoSearch from '../views/video/VideoSearch.vue'
 import VideoWatch from '../views/video/VideoWatch.vue'
+import video from '@/store/index.js'
 
 Vue.use(VueRouter)
 Vue.use(VueMeta)
@@ -42,7 +43,14 @@ const routes = [
   {
     path: '/video/search',
     name: 'VideoSearch',
-    component: VideoSearch
+    component: VideoSearch,
+    // beforeEnter: (to, from, next) => {
+    //   if (from.path != '/video/watch') {
+    //     console.log('video.dispatch(resetVideoSearchState)')
+    //     video.dispatch('resetVideoSearchState')
+    //   }
+    //   next()
+    // }
   },
   {
     path: '/video/watch',

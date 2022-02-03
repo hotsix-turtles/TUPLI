@@ -7,8 +7,13 @@
     />
     <video-list-item-small
       :key="rerenderKey"
-      :searched-videos="searchedVideos"
+      :videos="searchedVideos"
+      width="100vw"
     />
+    <!-- 하단 리스트에 추가하기 버튼 -->
+    <add-button-bottom />
+    {{ selectedVideos }}
+    <!-- {{ searchedVideos }} -->
     <!-- 무한스크롤 -->
     <infinite-loading
       spinner="waveDots"
@@ -26,6 +31,7 @@ import InfiniteLoading from "vue-infinite-loading"
 import BackOnly from '@/components/common/BackOnly.vue'
 import SearchBar from '@/components/common/SearchBar.vue'
 import VideoListItemSmall from '../../components/video/VideoListItemSmall.vue'
+import AddButtonBottom from '../../components/common/addButtonBottom.vue'
 
 export default {
   name: 'VideoSearch',
@@ -34,15 +40,30 @@ export default {
     BackOnly,
     VideoListItemSmall,
     InfiniteLoading,
+    AddButtonBottom,
+  },
+  data: function () {
+    return {
+    }
   },
   computed: {
     ...mapState('video', {
       searchedVideos: state => state.searchedVideos,
+      selectedVideos: state => state.selectedVideos,
       rerenderKey: state => state.rerenderKey,
       nextPageToken: state => state.nextPageToken,
     })
   },
   created: function () {
+    // this.$router.beforeEach((to, from, next) => {
+    //   console.log(from.path)
+    //   console.log(from.path != '/video/watch')
+    //   console.log(typeof(from.path),typeof('/video/watch'))
+    //   if (from.path != '/video/watch') {
+    //     this.resetVideoSearchState()
+    //   }
+    //   next()
+    // })
     this.resetVideoSearchState()
   },
   methods: {

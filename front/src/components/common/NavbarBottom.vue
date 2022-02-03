@@ -38,7 +38,44 @@
           </v-btn>
         </div>
       </div>
-      <v-bottom-navigation
+      <div class="d-flex justify-space-around fixed-bottom navbar-background">
+        <div class="clickable d-flex-column justify-center">
+          <v-icon>mdi-home</v-icon>
+          <span>홈</span>
+        </div>
+
+        <div
+          class="clickable d-flex-column justify-center"
+          @click="$router.push({ name: 'Search' })"
+        >
+          <v-icon>mdi-magnify</v-icon>
+          <span>검색</span>
+        </div>
+
+        <div
+          class="clickable d-flex-column justify-center"
+          @click="toggle"
+        >
+          <v-icon>mdi-plus-box</v-icon>
+          <span>만들기</span>
+        </div>
+
+        <div
+          class="clickable d-flex-column justify-center"
+          @click="$router.push({ name: 'Category' })"
+        >
+          <v-icon>mdi-compass</v-icon>
+          <span>둘러보기</span>
+        </div>
+
+        <div
+          class="clickable d-flex-column justify-center"
+        >
+          <v-icon>mdi-account-circle-outline</v-icon>
+          <span>프로필</span>
+        </div>
+      </div>
+      <!-- <v-bottom-navigation
         :value="value"
         color="#5B5C9D"
         style=""
@@ -96,7 +133,7 @@
           <span>프로필</span>
           <v-icon>mdi-account-circle-outline</v-icon>
         </v-btn>
-      </v-bottom-navigation>
+      </v-bottom-navigation> -->
     </div>
   </div>
 </template>
