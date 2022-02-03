@@ -15,11 +15,10 @@ const playroom = {
     roomEndTime: new Date(),
     roomContent: '',
     roomTags: [],
-    roomPlaylists: [],
-    roomCurrentPlaylist: '',
-    roomVideos: [],
-    roomCurrentVideo: '',
-    roomCurrentPlayTime: '',
+    roomPlaylists: {},
+    roomCurrentPlaylistOffset: 0,
+    roomCurrentVideoOffset: '',
+    roomCurrentVideoPlaytime: 0,
     roomSelectedChatItem: { id: '', type: null },
     roomChats: [],
     // roomChats: [
@@ -47,8 +46,10 @@ const playroom = {
     setRoomEndTime: ( state, value ) => state.roomEndTime = new Date(value),
     setRoomContent: ( state, value ) => state.roomContent = value,
     setRoomTags: ( state, value ) => state.roomTags = value,
-    setRoomPlaylists: ( state, value ) => state.roomPlaylists = value,
-    setRoomVideos: ( state, value ) => state.roomVideos = value,
+    setRoomCurrentPlaylistOffset: ( state, value ) => state.roomCurrentPlaylistOffset = value,
+    setRoomPlaylists: ( state, value ) => { state.roomPlaylists = value },
+    setRoomCurrentVideoOffset: ( state, value ) => { state.roomCurrentVideoOffset = value },
+    setRoomCurrentVideoPlaytime: ( state, value ) => { state.roomCurrentVideoPlaytime = value },
     setChatroomId: ( state, value ) => state.chatroomId = value,
     blockChatById: ( state, id ) => {
       state.roomChats.map((v) => { if (v.id == id) v.blockedMessage = true; })
@@ -88,34 +89,27 @@ const playroom = {
       Vue.set(roomSelectedChatItem, 'type', null);
       return roomSelectedChatItem;
     },
-    recvMessage: async ( {roomChats, chatBlockedUid, chatBlockedId}, payload ) => {
-      const id = payload.headers['message-id']
-      const body = JSON.parse(payload.body);
-      // const profile = await axiosConnector.post('/echo', {
-      //   nickname: '시스템',
-      //   profilePictureUrl: 'https://picsum.photos/80/80'
-      // })
-      const profile = await axiosConnector.get(`/profile/${body.id}`)
-      const author = { id: body.id, name: profile.data.nickname, thumbnail: profile.data.profilePictureUrl };
-      const content = body.message;
-      const timestamp = new Date().getTime();
-      const blockedUser = ( chatBlockedUid.find((v) => v == author.id) != undefined );
-      const blockedMessage = ( chatBlockedId.find((v) => v == id) != undefined );
-      roomChats.push({ id, author, content, timestamp, blockedUser, blockedMessage });
+    seekVideo: ( {roomCurrentVideoPlaytime}, time ) => {
+      roomCurrentVideoPlaytime = time;
+    },
+    receiveMessage: ( { roomChats }, payload ) => {
+      roomChats.push(payload);
     }
   },
   actions: {
     setRoomInfo: (({commit}, {data}) => {
-      commit('setRoomId', data.roomId);
-      commit('setRoomTitle', data.roomTitle);
-      commit('setRoomPublic', data.roomPublic);
-      commit('setRoomAuthor', { name: data.roomAuthorName, pic: data.roomAuthorProfilePic, follower: data.roomAuthorFollowerCount});
-      commit('setRoomStartTime', data.roomStartTime);
-      commit('setRoomEndTime', data.roomEndTime);
-      commit('setRoomContent', data.roomContent);
-      commit('setRoomTags', data.roomTags);
-      commit('setRoomPlaylists', data.roomPlaylists);
-      commit('setRoomVideos', data.roomVideos);
+      commit('setRoomId', data.id);
+      commit('setRoomTitle', data.title);
+      commit('setRoomPublic', data.isPublic);
+      commit('setRoomAuthor', { name: data.authorName, pic: data.authorProfilePic, follower: data.authorFollowerCount});
+      commit('setRoomStartTime', data.startTime);
+      commit('setRoomEndTime', data.endTime);
+      commit('setRoomContent', data.content);
+      commit('setRoomTags', data.tags);
+      commit('setRoomCurrentPlaylistOffset', data.currentPlaylistOffset)
+      commit('setRoomPlaylists', data.playlists);
+      commit('setRoomCurrentVideoOffset', data.currentVideoOffset)
+      commit('setRoomCurrentVideoPlaytime', data.currentVideoPlaytime)
       commit('setChatroomId', data.chatroomId);
     }),
     followUser: ({commit}, id) => {
@@ -172,35 +166,7 @@ const playroom = {
     roomPlayTime: ( {roomStartTime, roomEndTime} ) => `${roomStartTime.getHours()}:${roomStartTime.getMinutes()} - ${roomEndTime.getHours()}:${roomEndTime.getMinutes()}`,
     roomPublicLabel: ( {roomPublic} ) => roomPublic ? '공개' : '비공개',
     roomReducedContent: ( {roomContent} ) => roomContent.split(/\r?\n/).slice(0, 2).join('\n'),
-    roomPlaylistItems: ( {roomPlaylists} ) => roomPlaylists.map((v) => {
-      const playlistItems = {
-        1: { id: 1, thumbnail_url: 'https://picsum.photos/100/101' },
-        2: { id: 2, thumbnail_url: 'https://picsum.photos/100/102' },
-        3: { id: 3, thumbnail_url: 'https://picsum.photos/100/103' },
-        4: { id: 4, thumbnail_url: 'https://picsum.photos/100/104' },
-        5: { id: 5, thumbnail_url: 'https://picsum.photos/100/105' },
-        6: { id: 6, thumbnail_url: 'https://picsum.photos/100/106' },
-      }
-      // TODO: axios json으로 대체
-
-      return playlistItems[v]
-    }),
-    roomPlaylistVideoItems: ( {roomVideos} ) => roomVideos.map((v) => {
-      const playlistVideoItems = {
-        1: { id: 1, thumbnail_url: 'https://picsum.photos/161/90', title: "먹물파스타 먹방", playtime: '01:30' },
-        2: { id: 2, thumbnail_url: 'https://picsum.photos/162/90', title: "먹물파스타 먹방", playtime: '01:30' },
-        3: { id: 3, thumbnail_url: 'https://picsum.photos/163/90', title: "먹물파스타 먹방", playtime: '01:30' },
-        4: { id: 4, thumbnail_url: 'https://picsum.photos/164/90', title: "먹물파스타 먹방", playtime: '01:30' },
-        5: { id: 5, thumbnail_url: 'https://picsum.photos/165/90', title: "먹물파스타 먹방", playtime: '01:30' },
-        6: { id: 6, thumbnail_url: 'https://picsum.photos/166/90', title: "먹물파스타 먹방", playtime: '01:30' },
-        7: { id: 7, thumbnail_url: 'https://picsum.photos/167/90', title: "먹물파스타 먹방", playtime: '01:30' },
-        8: { id: 8, thumbnail_url: 'https://picsum.photos/168/90', title: "먹물파스타 먹방", playtime: '01:30' },
-        9: { id: 9, thumbnail_url: 'https://picsum.photos/169/90', title: "먹물파스타 먹방", playtime: '01:30' },
-      }
-      // TODO: axios json으로 대체
-
-      return playlistVideoItems[v]
-    })
+    roomCurrentPlaylistVideos: ( {roomPlaylists, roomCurrentPlaylistOffset} ) => roomPlaylists[roomCurrentPlaylistOffset] ? roomPlaylists[roomCurrentPlaylistOffset].videos : []
   }
 };
 
