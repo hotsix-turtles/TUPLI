@@ -45,15 +45,15 @@ export default new Vuex.Store({
   actions: {
     // 로그인
     login: function ({ commit, dispatch }, credentials) {
-      // axiosConnector.post('/account/login', { email: credentials.email, password: credentials.password })
-      axios({
-        method: 'post',
-        url: 'https://i6a102.p.ssafy.io/api/v1' + '/account/login',
-        data: {
-          email: credentials.email,
-          password: credentials.password,
-        }
-      })
+      axiosConnector.post('/account/login', { email: credentials.email, password: credentials.password })
+      // axios({
+      //   method: 'post',
+      //   url: 'https://i6a102.p.ssafy.io/api/v1' + '/account/login',
+      //   data: {
+      //     email: credentials.email,
+      //     password: credentials.password,
+      //   }
+      // })
         .then((res) => {
           commit('TOKEN', res.data.token)
           this.state.isLogin = true
@@ -73,19 +73,22 @@ export default new Vuex.Store({
     },
     // 회원가입
     signup: function (context, credentials) {
-      console.log(context, credentials)
-      // axiosConnector.post('/account/signup', {
-      //   email: credentials.email,
-      //   password: credentials.password
-      // })
-      axios({
-        method: 'post',
-        url: 'https://i6a102.p.ssafy.io/api/v1' + '/account/signup',
-        data: {
-          email: credentials.email,
-          password: credentials.password,
-        }
+      // console.log(context, credentials)
+      axiosConnector.post('/account/signup', {
+        email: credentials.email,
+        password: credentials.password,
+        username: credentials.username,
+        nickname: credentials.nickname,
       })
+      // axios({
+      //   method: 'post',
+      //   url: 'https://i6a102.p.ssafy.io/api/v1' + '/account/signup',
+      //   data: {
+      //     email: credentials.email,
+      //     password: credentials.password,
+      //     username: credentials.nickname,
+      //   }
+      // })
         .then((res) => {
           console.log(res)
           console.log('signup success')

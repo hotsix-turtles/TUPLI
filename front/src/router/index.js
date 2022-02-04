@@ -23,11 +23,20 @@ import PlayroomDetail from '../views/playroom/PlayroomDetail.vue'
 import VideoSearch from '../views/video/VideoSearch.vue'
 import VideoWatch from '../views/video/VideoWatch.vue'
 import video from '@/store/index.js'
+import AuthHandler from '../views/handler/AuthHandler.vue'
+
 
 Vue.use(VueRouter)
 Vue.use(VueMeta)
 
 const routes = [
+  // 구글 소셜로그인
+  {
+    path: '/oauth/redirect',
+    name: 'AuthHandler',
+    component: AuthHandler
+  },
+
   // 플레이리스트
   {
     path: '/playlist/create',

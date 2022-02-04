@@ -62,6 +62,14 @@
               type=""
               label="닉네임"
             />
+
+            <h3>이름</h3>
+            <v-text-field
+              v-model="credentials.username"
+              class="pt-0"
+              type=""
+              label="이름"
+            />
           </v-form>
 
           <v-btn
@@ -95,6 +103,7 @@ export default {
         password: null,
         passwordCheck: null,
         nickname: null,
+        username: null,
       },
 
       // 유효성 검사

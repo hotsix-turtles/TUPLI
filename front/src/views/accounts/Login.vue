@@ -37,7 +37,7 @@
             block
             elevation="0"
             rounded
-            @click="login"
+            @click="requestLogin"
           >
             로그인
           </v-btn>
@@ -59,6 +59,7 @@
                   fab
                   elevation="0"
                   class="mx-3"
+                  :href="socialLoginUrl('google')"
                   :loading="loading"
                   :disabled="loading"
                   @click="loader = 'loading'"
@@ -118,6 +119,7 @@
 
 <script>
 import { mapActions } from 'vuex'
+import SERVER from '@/api/server.js'
 
 export default {
   name: 'Login',
@@ -163,13 +165,24 @@ export default {
 
   methods: {
     // 로그인
-    login: function () {
+    requestLogin: function () {
       this.login(this.credentials)
       this.valid = true
     },
     ...mapActions([
       'login',
-    ])
+    ]),
+
+    socialLoginUrl: function(socialType){
+      const BACKEND_PORT = SERVER.BACKEND_PORT === null ? '' : `:${SERVER.BACKEND_PORT}`
+      const BACKEND_URL = `${location.protocol}//${location.hostname}${BACKEND_PORT}`
+      const FRONTEND_PORT = SERVER.FRONTEND_PORT === null ? '' : `:${SERVER.FRONTEND_PORT}`
+      const REDIRECT_URI = `${location.protocol}//${location.hostname}${FRONTEND_PORT}/oauth/redirect`
+      console.log(`${BACKEND_URL}/oauth2/authorization/${socialType}?redirect_uri=${REDIRECT_URI}`)
+      const call = "https://i6a102.p.ssafy.io/api/v1/oauth2/authorization/google?redirect_uri=" + `${REDIRECT_URI}`;
+      return call
+      // return `${BACKEND_URL}/oauth2/authorization/${socialType}?redirect_uri=${REDIRECT_URI}`
+    }
 
   },
 
