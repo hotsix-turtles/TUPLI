@@ -74,6 +74,7 @@ export default new Vuex.Store({
     // 회원가입
     signup: function (context, credentials) {
       // console.log(context, credentials)
+      console.log(credentials)
       axiosConnector.post('/account/signup', {
         email: credentials.email,
         password: credentials.password,
