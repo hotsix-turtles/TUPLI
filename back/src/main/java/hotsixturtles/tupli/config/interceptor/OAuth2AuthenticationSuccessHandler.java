@@ -135,8 +135,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
                     System.out.println("으헝헝  " + clientRedirectUri.getHost());
                     System.out.println("으헝헝  " + authorizedURI.getPort());
                     System.out.println("으헝헝  " + clientRedirectUri.getPort());
-                    if(authorizedURI.getHost().equalsIgnoreCase(clientRedirectUri.getHost())
-                            && authorizedURI.getPort() == clientRedirectUri.getPort()) {
+                    if(authorizedURI.getHost().equalsIgnoreCase(clientRedirectUri.getHost())) {
                         return true;
                     }
                     return false;
