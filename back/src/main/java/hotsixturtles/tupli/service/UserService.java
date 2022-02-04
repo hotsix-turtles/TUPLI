@@ -6,7 +6,6 @@ import hotsixturtles.tupli.entity.likes.UserLikes;
 import hotsixturtles.tupli.repository.UserDislikesRepository;
 import hotsixturtles.tupli.repository.UserLikesRepository;
 import hotsixturtles.tupli.repository.UserRepository;
-import hotsixturtles.tupli.service.token.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -23,7 +22,6 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
-    private final JwtTokenProvider jwtTokenProvider;
     private final UserLikesRepository userLikesRepository;
     private final UserDislikesRepository userDislikesRepository;
 

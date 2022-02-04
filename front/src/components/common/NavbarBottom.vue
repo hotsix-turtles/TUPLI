@@ -1,12 +1,14 @@
 /* eslint-disable vue/require-default-prop */
 <template>
   <div>
+    <!-- 만들기 버튼 나오면서 나오는 검정 배경 -->
     <div
       v-if="isClickedMakeBtn"
       class="dark-background"
       @click="toggle"
     />
-    <div class="d-flex-column">
+    <!-- 만들기 버튼 (플레이리스트/플레이룸/게시글) -->
+    <div class="d-flex-column pb-5">
       <div
         v-if="isClickedMakeBtn"
         class="d-flex-column text-center"
@@ -14,126 +16,67 @@
         <div class="my-5">
           <v-btn
             rounded
-            @click="toggle"
+            @click="goPlaylistForm"
           >
-            <router-link
-              :to="{ name: 'PlaylistForm' }"
-              class="text-decoration-none text-primary"
-            >
-              PlaylistForm
-            </router-link>
+            플레이리스트
           </v-btn>
         </div>
         <div class="my-5">
           <v-btn
             rounded
-            @click="toggle"
+            @click="goPlayroomForm"
           >
-            <router-link
-              :to="{ name: 'PlaylistFormVideo' }"
-              class="text-decoration-none text-primary"
-            >
-              PlaylistFormVideo
-            </router-link>
+            플레이룸
           </v-btn>
         </div>
+        <div class="my-5">
+          <v-btn
+            rounded
+          >
+            게시글
+          </v-btn>
+        </div><br><br>
       </div>
-      <div class="d-flex justify-space-around fixed-bottom navbar-background">
-        <div class="clickable d-flex-column justify-center">
+      <!-- 네브바 -->
+      <div
+        class="d-flex justify-space-around fixed-bottom navbar-background py-1"
+      >
+        <div class="clickable d-flex-column text-center">
           <v-icon>mdi-home</v-icon>
-          <span>홈</span>
+          <div>홈</div>
         </div>
 
         <div
-          class="clickable d-flex-column justify-center"
+          class="clickable d-flex-column text-center"
           @click="$router.push({ name: 'Search' })"
         >
           <v-icon>mdi-magnify</v-icon>
-          <span>검색</span>
+          <div>검색</div>
         </div>
 
         <div
-          class="clickable d-flex-column justify-center"
+          class="clickable d-flex-column text-center"
           @click="toggle"
         >
           <v-icon>mdi-plus-box</v-icon>
-          <span>만들기</span>
+          <div>만들기</div>
         </div>
 
         <div
-          class="clickable d-flex-column justify-center"
+          class="clickable d-flex-column text-center"
           @click="$router.push({ name: 'Category' })"
         >
           <v-icon>mdi-compass</v-icon>
-          <span>둘러보기</span>
+          <div>둘러보기</div>
         </div>
 
         <div
-          class="clickable d-flex-column justify-center"
+          class="clickable d-flex-column text-center"
         >
           <v-icon>mdi-account-circle-outline</v-icon>
-          <span>프로필</span>
+          <div>프로필</div>
         </div>
       </div>
-      <!-- <v-bottom-navigation
-        :value="value"
-        color="#5B5C9D"
-        style=""
-        grow
-      >
-        <v-btn>
-          <span>홈</span>
-          <v-icon>mdi-home</v-icon>
-        </v-btn>
-
-        <v-btn>
-          <span>
-            <router-link
-              :to="{ name: 'Search' }"
-              class="text-decoration-none"
-            >
-              검색
-            </router-link>
-          </span>
-          <router-link
-            :to="{ name: 'Search' }"
-            class="text-decoration-none"
-          >
-            <v-icon>
-              mdi-magnify
-            </v-icon>
-          </router-link>
-        </v-btn>
-
-        <v-btn @click="toggle">
-          <span>만들기</span>
-          <v-icon>mdi-plus-box</v-icon>
-        </v-btn>
-
-        <v-btn>
-          <span>
-            <router-link
-              :to="{ name: 'Category' }"
-              class="text-decoration-none"
-            >
-              둘러보기
-            </router-link>
-          </span>
-          <router-link
-            :to="{ name: 'Category' }"
-            class="text-decoration-none"
-          >
-            <v-icon>
-              mdi-compass
-            </v-icon>
-          </router-link>
-        </v-btn>
-
-        <v-btn>
-          <span>프로필</span>
-          <v-icon>mdi-account-circle-outline</v-icon>
-        </v-btn>
-      </v-bottom-navigation> -->
     </div>
   </div>
 </template>
@@ -152,7 +95,19 @@ export default {
   methods: {
     toggle: function() {
       this.isClickedMakeBtn = !this.isClickedMakeBtn
-    }
+    },
+    goPlaylistForm: function() {
+      this.$router.push({ name: 'PlaylistForm' })
+      this.toggle()
+    },
+    goPlayroomForm: function() {
+      this.$router.push({ name: 'PlayroomForm' })
+      this.toggle()
+    },
+    // goBoardForm: function() {
+    //   this.$router.push({ name: 'BoardForm' })
+    //   this.toggle()
+    // },
   }
 }
 </script>

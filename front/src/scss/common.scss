@@ -1,0 +1,51 @@
+// common.scss - 공통으로 적용되는 스타일
+
+.clickable {
+  cursor: pointer;
+}
+
+.font-1 {
+  font-size: $font-size-1;
+}
+
+.font-2 {
+  font-size: $font-size-2;
+}
+
+.font-3 {
+  font-size: $font-size-3;
+}
+
+.font-4 {
+  font-size: $font-size-4;
+}
+
+.color-main {
+    color: $color-main !important;
+}
+
+.color-sub {
+  color: $color-sub !important;
+}
+
+.bg-color-main {
+  background-color: $color-main !important;
+}
+
+.bg-color-sub {
+  background-color: $color-sub !important;
+}
+
+.color-dark-gray {
+  color: $color-dark-gray;
+}
+
+.fixed-bottom {
+  position: fixed;
+  bottom: 0;
+  right: 0;
+}
+
+.line-height-s {
+  line-height: 18px;
+}
