@@ -56,11 +56,7 @@ export default {
     author: { type: String, default: '' },
     thumbnail: { type: String, default: '' },
     playtime: { type: String, default: '0:0' },
-<<<<<<< HEAD
-    clicked: { type: Boolean, default: false },
-=======
     selected: { type: Boolean, default: false },
->>>>>>> 2e271a7bd18cd87da6b2056108ea373197c120d5
     readonly: { type: Boolean, default: false }
   },
   data() {
@@ -74,16 +70,9 @@ export default {
     color() { return this.selected ? '#dde' : '#eee' }
   },
   methods: {
-<<<<<<< HEAD
-    onItemClick (event) {
-      if (this.readonly) return;
-      this.clickState = !this.clickState
-      this.$emit('click', { id: this.id, clickState: this.clickState })
-=======
     onItemClick () {
       if (this.readonly) return;
       this.$emit('click', { id: this.id, selected: this.selected })
->>>>>>> 2e271a7bd18cd87da6b2056108ea373197c120d5
     }
   }
 }

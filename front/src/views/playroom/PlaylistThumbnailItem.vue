@@ -17,15 +17,9 @@ import { mapMutations } from 'vuex'
 export default {
   name: 'PlaylistThumbnailItem',
   props: {
-<<<<<<< HEAD
-    // eslint-disable-next-line vue/require-default-prop
-    src: String,
-    selected: Boolean
-=======
     id: {type: Number, default: 0},
     src: {type: String, default: ''},
     selected: {type: Boolean, default: false},
->>>>>>> 2e271a7bd18cd87da6b2056108ea373197c120d5
   },
   data() {
     return {

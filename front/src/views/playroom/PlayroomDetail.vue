@@ -79,21 +79,21 @@
           class="elevation-2"
         >
           <!-- 플레이룸 좋아요 -->
-          <v-btn class="playroomLike" @click="playroomLike">
+          <v-btn
+            class="playroomLike"
+            @click="playroomLike"
+          >
             <span>좋아요</span>
-            <v-icon :color="roomLiked ? 'blue' : undefined">mdi-thumb-up</v-icon>
+            <v-icon :color="roomLiked ? 'blue' : undefined">
+              mdi-thumb-up
+            </v-icon>
           </v-btn>
 
-<<<<<<< HEAD
-          <v-btn
-            class="playroomChat"
-            @click="dialog = true"
-=======
+
           <!-- 플레이룸 댓글 -->
           <v-btn
             class="playroomChat"
             @click="isChatting = true"
->>>>>>> 2e271a7bd18cd87da6b2056108ea373197c120d5
           >
             <span>채팅</span>
             <v-icon>mdi-message</v-icon>
@@ -252,14 +252,10 @@
         </div>
       </div>
 
-<<<<<<< HEAD
-      <v-dialog
-        v-model="dialog"
-=======
+
       <!-- 플레이룸 채팅창 -->
       <v-dialog
         v-model="isChatting"
->>>>>>> 2e271a7bd18cd87da6b2056108ea373197c120d5
         fullscreen
         hide-overlay
         transition="dialog-bottom-transition"
@@ -271,11 +267,8 @@
             <v-btn
               icon
               class="ml-auto"
-<<<<<<< HEAD
-              @click="dialog = false"
-=======
+
               @click="isChatting = false"
->>>>>>> 2e271a7bd18cd87da6b2056108ea373197c120d5
             >
               <v-icon>mdi-close</v-icon>
             </v-btn>
@@ -290,57 +283,7 @@
                 :profile="chat.author.thumbnail"
                 :content="chat.content"
                 :timestamp="chat.timestamp"
-<<<<<<< HEAD
-                :blockedUser="chat.blockedUser"
-                :blockedMessage="chat.blockedMessage"
-              />
-            </v-container>
-          </v-card-text>
-          <v-spacer></v-spacer>
-          <v-card-actions>
-            <v-text-field
-              label="메시지를 입력하세요"
-              v-model='message'
-              solo
-              dense
-              @click:append-outer="sendMessage"
-              :disabled='!canChat'
-              :error='errorOnSend'
-            >
-              <template v-slot:append>
-                <v-menu
-                  v-model="showEmoji"
-                  rounded='lg'
-                  top
-                  left
-                  offset-x
-                  offset-y
-                >
-                  <template v-slot:activator="{ on, attrs }">
-                    <v-icon v-bind="attrs" v-on="on" v-if="showEmoji" @click="showEmoji = !showEmoji">mdi-emoticon</v-icon>
-                    <v-icon v-bind="attrs" v-on="on" v-else @click="showEmoji = !showEmoji">mdi-emoticon-outline</v-icon>
-                  </template>
-                  <v-card>
-                    <v-list>
-                      <v-list-item>
-                        이모지
-                      </v-list-item>
-                    </v-list>
-                  </v-card>
-                </v-menu>
-              </template>
-              <template v-slot:append-outer>
-                <!-- <v-fade-transition leave-absolute> -->
-                  <v-progress-circular
-                    v-if="sending"
-                    size="24"
-                    indeterminate
-                  ></v-progress-circular>
-                <v-icon v-else @click="sendMessage">mdi-send</v-icon>
-                <!-- </v-fade-transition> -->
-              </template>
-            </v-text-field>
-=======
+
                 :blocked-user="chat.blockedUser"
                 :blocked-message="chat.blockedMessage"
               />
@@ -349,7 +292,6 @@
           <v-spacer />
           <v-card-actions>
             <ChatInput />
->>>>>>> 2e271a7bd18cd87da6b2056108ea373197c120d5
           </v-card-actions>
           <div style="flex: 1 1 auto;" />
         </v-card>
@@ -359,23 +301,16 @@
 </template>
 
 <script>
-<<<<<<< HEAD
-import { mapActions, mapGetters, mapState } from 'vuex';
-=======
 import { mapActions, mapGetters, mapMutations, mapState } from 'vuex';
->>>>>>> 2e271a7bd18cd87da6b2056108ea373197c120d5
 import Vue from 'vue'
 import VueYoutube from 'vue-youtube'
 import PlaylistThumbnailItem from './PlaylistThumbnailItem.vue'
 import TagItem from './TagItem.vue'
 import PlaylistVideoItem from './PlaylistVideoItem.vue'
 import ChatItem from './ChatItem.vue'
-<<<<<<< HEAD
-=======
 import axiosConnector from '../../utils/axios-connector';
 import wsConnector from '../../utils/ws-connector';
 import ChatInput from './ChatInput.vue'
->>>>>>> 2e271a7bd18cd87da6b2056108ea373197c120d5
 
 Vue.use(VueYoutube)
 
@@ -385,10 +320,7 @@ export default {
     PlaylistThumbnailItem,
     PlaylistVideoItem,
     ChatItem,
-<<<<<<< HEAD
-=======
     ChatInput,
->>>>>>> 2e271a7bd18cd87da6b2056108ea373197c120d5
     TagItem
   },
   data() {
@@ -398,19 +330,9 @@ export default {
       playerVars: {
         mute: 1
       },
-<<<<<<< HEAD
-      clickedItem: 0,
-      dialog: false,
-      showEmoji: false,
-      sending: false,
-      message: '',
-      canChat: true,
-      errorOnSend: false
-=======
       selectedItem: [],
       isChatting: false,
       lastPlaytime: 0
->>>>>>> 2e271a7bd18cd87da6b2056108ea373197c120d5
     }
   },
   metaInfo () {
@@ -441,14 +363,6 @@ export default {
       'roomContent',
       'roomTags',
       'roomPlaylists',
-<<<<<<< HEAD
-      'roomCurrentPlaylist',
-      'roomVideos',
-      'roomCurrentVideo',
-      'roomCurrentPlayTime',
-      'roomChats',
-      'roomSendingMessage'
-=======
       'roomCurrentPlaylistOffset',
       'roomCurrentVideoOffset',
       'roomCurrentVideoPlaytime',
@@ -457,7 +371,6 @@ export default {
       'chatroomId',
       'chatBlockedId',
       'chatBlockedUid',
->>>>>>> 2e271a7bd18cd87da6b2056108ea373197c120d5
     ]),
     ...mapGetters('playroom', [
       'roomPlayTime',
@@ -627,46 +540,6 @@ export default {
     onVideoCued() {
       this.seekTo()
     },
-<<<<<<< HEAD
-    sendMessage() {
-      this.disableChatbox()
-      this.pendingToSendMessage()
-      this.$store.dispatch('playroom/sendMessage', this.message)
-        .then(() => {
-          this.clearMessage()
-        })
-        .catch((err) => {
-          this.notifySendError()
-        })
-        .finally(() => {
-          this.completeToSendMessage()
-          this.enableChatbox()
-        })
-    },
-    clearMessage() {
-      this.message = ''
-    },
-    pendingToSendMessage() {
-      this.sending = true
-    },
-    completeToSendMessage() {
-      this.sending = false
-    },
-    enableChatbox() {
-      this.canChat = true
-    },
-    disableChatbox() {
-      this.canChat = false
-    },
-    notifySendError() {
-      this.errorOnSend = true;
-      setTimeout(this.clearSendError, 1000);
-    },
-    clearSendError() {
-      this.errorOnSend = false;
-    }
-  },
-=======
     async onReceiveMessage(payload) {
       const id = payload.headers['message-id']
       const body = JSON.parse(payload.body);
@@ -739,7 +612,6 @@ export default {
     },
     ...mapMutations('playroom', ['setRoomLiked', 'setRoomCurrentPlaylistOffset', 'setRoomCurrentVideoOffset', 'setRoomCurrentVideoPlaytime'])
   }
->>>>>>> 2e271a7bd18cd87da6b2056108ea373197c120d5
 }
 </script>
 
