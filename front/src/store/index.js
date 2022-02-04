@@ -10,6 +10,8 @@ import router from '../router/index.js'
 import video from './modules/video.js'
 import playlist from './modules/playlist.js'
 
+import axiosConnector from '../utils/axios-connector.js'
+
 export default new Vuex.Store({
   // data
   state: {
@@ -20,6 +22,8 @@ export default new Vuex.Store({
   modules: {
     playroom: playroom,
     account: account,
+    video: video,
+    playlist: playlist,
   },
   mutations: {
     // 로그인
@@ -41,10 +45,14 @@ export default new Vuex.Store({
   actions: {
     // 로그인
     login: function ({ commit, dispatch }, credentials) {
+      // axiosConnector.post('/account/login', { email: credentials.email, password: credentials.password })
       axios({
         method: 'post',
         url: 'https://i6a102.p.ssafy.io/api/v1' + '/account/login',
-        data: credentials,
+        data: {
+          email: credentials.email,
+          password: credentials.password,
+        }
       })
         .then((res) => {
           commit('TOKEN', res.data.token)
@@ -65,7 +73,11 @@ export default new Vuex.Store({
     },
     // 회원가입
     signup: function (context, credentials) {
-      //axiosConnector.post('/account/signup', { email: email, password: password })
+      console.log(context, credentials)
+      // axiosConnector.post('/account/signup', {
+      //   email: credentials.email,
+      //   password: credentials.password
+      // })
       axios({
         method: 'post',
         url: 'https://i6a102.p.ssafy.io/api/v1' + '/account/signup',
@@ -100,7 +112,6 @@ export default new Vuex.Store({
     //     })
     // }
   },
-    video: video,
-    playlist: playlist,
-  }
+
+
 })
