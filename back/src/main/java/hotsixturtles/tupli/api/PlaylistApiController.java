@@ -3,12 +3,16 @@ package hotsixturtles.tupli.api;
 import hotsixturtles.tupli.dto.BoardDto;
 import hotsixturtles.tupli.dto.PlaylistDto;
 import hotsixturtles.tupli.dto.param.SimpleCondition;
+import hotsixturtles.tupli.dto.request.PlaylistRequest;
 import hotsixturtles.tupli.dto.response.ErrorResponse;
+import hotsixturtles.tupli.dto.response.IdResponse;
+import hotsixturtles.tupli.dto.simple.SimpleYoutubeVideoDto;
 import hotsixturtles.tupli.entity.Board;
 import hotsixturtles.tupli.entity.Playlist;
 import hotsixturtles.tupli.entity.likes.BoardLikes;
 import hotsixturtles.tupli.entity.likes.PlaylistLikes;
 import hotsixturtles.tupli.repository.PlaylistRepository;
+import hotsixturtles.tupli.service.FlaskService;
 import hotsixturtles.tupli.service.PlaylistService;
 import hotsixturtles.tupli.service.token.JwtTokenProvider;
 import io.swagger.annotations.Api;
@@ -39,18 +43,19 @@ public class PlaylistApiController {
     private final MessageSource messageSource;
 
     private final PlaylistService playlistService;
+    private final FlaskService flaskService;
 
     /**
      * 플레이 리스트 추가
      * @param token
-     * @param playlist
+     * @param playlistRequest
      * @return 
      * 반환 코드 : 201, 403, 404
      * 고민사항 : ID 또는 PlaylistDto 반환이라도 해줘야 하는지 고민
      */
     @PostMapping("/playlist")
     public ResponseEntity addPlaylist(@RequestHeader(value = "Authorization") String token,
-                                      @RequestBody Playlist playlist){
+                                      @RequestBody PlaylistRequest playlistRequest){
         // 유저 정보
         if (!jwtTokenProvider.validateToken(token)) {
             return ResponseEntity
@@ -59,10 +64,16 @@ public class PlaylistApiController {
         }
         Long userSeq = jwtTokenProvider.getUserSeq(token);
 
-        // 추가 ($$$ try except해서 exception할것인지)
-        playlistService.addPlaylist(userSeq, playlist);
+        Playlist playlist = playlistService.addPlaylist(userSeq, playlistRequest);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(null);
+        // 추천 고도화 (플라스크)
+        try {
+            flaskService.recommendPlaylistFlask(playlist);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(new IdResponse(playlist.getId()));
     }
 
     /**
@@ -82,14 +93,14 @@ public class PlaylistApiController {
      * 플레이리스트 단일 UPDATE
      * @param token
      * @param id
-     * @param playlistChange
+     * @param playlistRequest
      * @return
      * 반환 코드 : 200, 404
      */
     @PutMapping("/playlist/{id}")
     public ResponseEntity<?> updatePlaylist(@RequestHeader(value = "Authorization") String token,
                                          @PathVariable("id") Long id,
-                                         @RequestBody Playlist playlistChange){
+                                            @RequestBody PlaylistRequest playlistRequest){
         // 유저 인증
         if (!jwtTokenProvider.validateToken(token)) {
             return ResponseEntity
@@ -97,7 +108,7 @@ public class PlaylistApiController {
                     .body(new ErrorResponse(messageSource.getMessage("error.valid.jwt", null, LocaleContextHolder.getLocale())));
         }
 
-        playlistService.updatePlaylist(id, playlistChange);
+        playlistService.updatePlaylist(id, playlistRequest);
 
         return ResponseEntity.status(HttpStatus.OK).body(null);
     }
