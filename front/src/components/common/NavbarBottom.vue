@@ -38,9 +38,7 @@
           </v-btn>
         </div>
       </div>
-<<<<<<< HEAD
-      <v-bottom-navigation
-=======
+
       <div class="d-flex justify-space-around fixed-bottom navbar-background">
         <div class="clickable d-flex-column justify-center">
           <v-icon>mdi-home</v-icon>
@@ -79,7 +77,6 @@
         </div>
       </div>
       <!-- <v-bottom-navigation
->>>>>>> 2e271a7bd18cd87da6b2056108ea373197c120d5
         :value="value"
         color="#5B5C9D"
         style=""
@@ -137,11 +134,8 @@
           <span>프로필</span>
           <v-icon>mdi-account-circle-outline</v-icon>
         </v-btn>
-<<<<<<< HEAD
-      </v-bottom-navigation>
-=======
+
       </v-bottom-navigation> -->
->>>>>>> 2e271a7bd18cd87da6b2056108ea373197c120d5
     </div>
   </div>
 </template>
@@ -153,10 +147,7 @@ export default {
   },
   data: function() {
     return {
-<<<<<<< HEAD
-=======
       value: 1,
->>>>>>> 2e271a7bd18cd87da6b2056108ea373197c120d5
       isClickedMakeBtn: false
     }
   },
