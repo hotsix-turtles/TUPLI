@@ -7,6 +7,8 @@ Vue.use(Vuex)
 import account from './modules/account.js'
 import playroom from './modules/playroom.js'
 import router from '../router/index.js'
+import video from './modules/video.js'
+import playlist from './modules/playlist.js'
 
 export default new Vuex.Store({
   // data
@@ -98,4 +100,7 @@ export default new Vuex.Store({
     //     })
     // }
   },
+    video: video,
+    playlist: playlist,
+  }
 })

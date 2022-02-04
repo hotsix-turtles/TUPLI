@@ -2,28 +2,48 @@
   <v-row>
     <v-col
       height="60px"
-      @click.stop="selectChatItem(id)"
       cols="12"
       md="4"
       class="d-flex align-center pa-1"
       style="width: 100%"
+      @click.stop="selectChatItem(id)"
     >
       <v-avatar
         circle
         @click.stop="selectChatAvatar(id)"
       >
-        <img
+        <v-img
           :src="profile"
+          :lazy-src="profile"
           class="pa-1"
         >
+          <template v-slot:placeholder>
+            <v-row
+              class="fill-height ma-0"
+              align="center"
+              justify="center"
+            >
+              <v-progress-circular
+                indeterminate
+                color="grey lighten-5"
+              />
+            </v-row>
+          </template>
+        </v-img>
       </v-avatar>
       <p class="font-3 ml-1 font-weight-bold">
         {{ name }}
       </p>
-      <p class="font-3 ml-1" v-if="!blocked">
+      <p
+        v-if="!blocked"
+        class="font-3 ml-1"
+      >
         {{ content }}
       </p>
-      <p class="font-3 ml-1 blocked" v-else>
+      <p
+        v-else
+        class="font-3 ml-1 blocked"
+      >
         [차단됨]
       </p>
       <p class="font-3 ml-auto mr-1">
@@ -42,18 +62,18 @@
         </v-card-title>
         <v-card-actions>
           <v-btn
+            v-if="!blockedMessage"
             block
             text
             @click="blockMessage(id)"
-            v-if="!blockedMessage"
           >
             메시지 차단
           </v-btn>
           <v-btn
+            v-else
             block
             text
             @click="unblockMessage(id)"
-            v-else
           >
             메시지 차단 해제
           </v-btn>
@@ -79,18 +99,18 @@
             유저 프로필
           </v-btn>
           <v-btn
+            v-if="!blockedUser"
             block
             text
             @click="blockUser(id)"
-            v-if="!blockedUser"
           >
             유저 차단
           </v-btn>
           <v-btn
+            v-else
             block
             text
             @click="unblockUser(id)"
-            v-else
           >
             유저 차단 해제
           </v-btn>
@@ -106,7 +126,7 @@ import { mapActions, mapMutations, mapState } from 'vuex';
 export default {
   name: "ChatItem",
   props: {
-    id: { type: Number, default: -1 },
+    id: { type: String, default: '' },
     name: { type: String, default: '' },
     profile: { type: String, default: '' },
     content: { type: String, default: '' },

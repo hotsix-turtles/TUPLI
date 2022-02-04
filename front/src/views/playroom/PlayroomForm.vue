@@ -9,7 +9,7 @@
     </div>
 
     <!-- 플레이룸 생성 폼 -->
-    <v-form v-model="valid">
+    <v-form v-model="isValid">
       <v-container>
         <!-- 제목 -->
         <v-row>
@@ -18,7 +18,7 @@
             md="4"
           >
             <v-text-field
-              v-model="title"
+              v-model="formData.title"
               :rules="titleRules"
               :counter="30"
               label="플레이룸 제목을 입력해주세요."
@@ -34,7 +34,7 @@
             md="4"
           >
             <v-text-field
-              v-model="content"
+              v-model="formData.content"
               :counter="80"
               label="플레이룸 소개글을 입력해주세요."
             />
@@ -47,8 +47,8 @@
             cols="12"
             md="4"
           >
-            <v-text-field
-              v-model="content"
+            <TagInput
+              v-model="formData.tags"
               :counter="80"
               label="플레이룸 태그를 입력해주세요."
             />
@@ -233,7 +233,7 @@
                     :thumbnail="video.thumbnail_url"
                     :author="video.author"
                     :playtime="video.playtime"
-                    :clicked="video.selected"
+                    :selected="video.included"
                     @click="onVideoItemClicked"
                   />
                 </v-expansion-panel-content>
@@ -249,27 +249,29 @@
 <script>
 import Back from '../../components/common/Back.vue'
 import PlaylistVideoItem from '../playroom/PlaylistVideoItem.vue'
+import TagInput from '../../components/common/TagInput.vue'
 
 export default {
   name: 'PlaylistForm',
   components: {
     Back,
+    TagInput,
     PlaylistVideoItem
   },
   data: function() {
     return {
       pageName: "내 플레이룸 만들기",
+      titleRules: [
+        v => !!v || '제목은 필수입니다.',
+        v => v.length <= 2 || '제목은 3글자 이상 작성해야 합니다.',
+      ],
+      isValid: false,
       // Create할 때 넘길 데이터
       formData: {
-        valid: false,
         title: '',
         content: '',
         tags: '',
         isPublic: true,
-        titleRules: [
-          v => !!v || '제목은 필수입니다.',
-          v => v.length <= 2 || '제목은 3글자 이상 작성해야 합니다.',
-        ],
         friends: [
           { id: 1, name: "김형준" },
           { id: 2, name: "김기솔" },
@@ -279,18 +281,18 @@ export default {
           {
             id: 1, name: "3일만에 다이어트 포기함 ㅅㄱ", thumbnailSrc: "https://picsum.photos/80/80",
             videos: [
-              {id: 1, title: '해ㅐㅇ', thumbnail_url: 'https://picsum.photos/120/80', author: '쯔양', playtime: '01:30', selected: false},
-              {id: 2, title: '해ㅐㅇ', thumbnail_url: 'https://picsum.photos/120/80', author: '쯔양', playtime: '01:30', selected: false},
-              {id: 3, title: '해ㅐㅇ', thumbnail_url: 'https://picsum.photos/120/80', author: '쯔양', playtime: '01:30', selected: false},
-              {id: 4, title: '해ㅐㅇ', thumbnail_url: 'https://picsum.photos/120/80', author: '쯔양', playtime: '01:30', selected: false},
+              {id: 1, title: '해ㅐㅇ', thumbnail_url: 'https://picsum.photos/120/80', author: '쯔양', playtime: '01:30', included: false},
+              {id: 2, title: '해ㅐㅇ', thumbnail_url: 'https://picsum.photos/120/80', author: '쯔양', playtime: '01:30', included: false},
+              {id: 3, title: '해ㅐㅇ', thumbnail_url: 'https://picsum.photos/120/80', author: '쯔양', playtime: '01:30', included: false},
+              {id: 4, title: '해ㅐㅇ', thumbnail_url: 'https://picsum.photos/120/80', author: '쯔양', playtime: '01:30', included: false},
             ]
           },
           {
             id: 2, name: "3일만에 다이어트 포기함 ㅅㄱ", thumbnailSrc: "https://picsum.photos/80/80",
             videos: [
-              {id: 5, title: '해ㅐㅇ', thumbnail_url: 'https://picsum.photos/120/80', author: '쯔양', playtime: '01:30', selected: false},
-              {id: 6, title: '해ㅐㅇ', thumbnail_url: 'https://picsum.photos/120/80', author: '쯔양', playtime: '01:30', selected: false},
-              {id: 7, title: '해ㅐㅇ', thumbnail_url: 'https://picsum.photos/120/80', author: '쯔양', playtime: '01:30', selected: false},
+              {id: 5, title: '해ㅐㅇ', thumbnail_url: 'https://picsum.photos/120/80', author: '쯔양', playtime: '01:30', included: false},
+              {id: 6, title: '해ㅐㅇ', thumbnail_url: 'https://picsum.photos/120/80', author: '쯔양', playtime: '01:30', included: false},
+              {id: 7, title: '해ㅐㅇ', thumbnail_url: 'https://picsum.photos/120/80', author: '쯔양', playtime: '01:30', included: false},
             ]
           }
         ]
@@ -308,12 +310,12 @@ export default {
       return this.formData.playlists.length
     },
     numberOfPlaylistVideos () {
-      return this.formData.playlists.reduce((acc, cur) => acc + cur.videos.reduce((acc, cur) => acc + (cur.selected ? 1 : 0), 0), 0)
+      return this.formData.playlists.reduce((acc, cur) => acc + cur.videos.reduce((acc, cur) => acc + (cur.included ? 1 : 0), 0), 0)
     }
   },
   methods: {
-    onVideoItemClicked ( { id, clickState }) {
-      return this.formData.playlists.map((playlist) => playlist.videos.map((v) => v.selected = (v.id == id ? clickState : v.selected)))
+    onVideoItemClicked ( { id, selected }) {
+      return this.formData.playlists.map((playlist) => playlist.videos.map((v) => v.included = (v.id == id ? !selected : v.included)))
     }
   }
 }
