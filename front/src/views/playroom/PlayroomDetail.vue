@@ -22,28 +22,22 @@
       />
 
       <!-- 영상보기 버튼 -->
-      <v-btn>
-        <span style="color: white;">영상보기</span>
-        <v-icon color="white">
-          mdi-play
-        </v-icon>
-      </v-btn>
+      <NavButton
+        color="white"
+        content="영상보기"
+        icon="mdi-play" />
 
       <!-- 내 플레이리스트 버튼 -->
-      <v-btn>
-        <span style="color: white;">내 플레이리스트</span>
-        <v-icon color="white">
-          mdi-disc
-        </v-icon>
-      </v-btn>
+      <NavButton
+        color="white"
+        content="내 플레이리스트"
+        icon="mdi-disc" />
 
       <!-- 저장하기 버튼 -->
-      <v-btn>
-        <span style="color: white;">저장하기</span>
-        <v-icon color="white">
-          mdi-bookmark
-        </v-icon>
-      </v-btn>
+      <NavButton
+        color="white"
+        content="저장하기"
+        icon="mdi-bookmark" />
     </v-bottom-navigation>
 
     <!-- 플레이룸 페이지 -->
@@ -311,6 +305,7 @@ import ChatItem from './ChatItem.vue'
 import axiosConnector from '../../utils/axios-connector';
 import wsConnector from '../../utils/ws-connector';
 import ChatInput from './ChatInput.vue'
+import NavButton from '../../components/common/NavButton.vue'
 
 Vue.use(VueYoutube)
 
@@ -321,6 +316,7 @@ export default {
     PlaylistVideoItem,
     ChatItem,
     ChatInput,
+    NavButton,
     TagItem
   },
   data() {
