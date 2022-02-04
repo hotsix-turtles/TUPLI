@@ -14,7 +14,7 @@
         <div class="mt-4 pt-4">
           <v-form ref="form">
             <v-text-field
-              v-model="email"
+              v-model="credentials.email"
               class="pt-0"
               :rules="emailRules"
               label="이메일을 입력해주세요"
@@ -22,7 +22,7 @@
             />
 
             <v-text-field
-              v-model="password"
+              v-model="credentials.password"
               class="pt-0"
               type="password"
               :rules="[passwordRules.min]"
@@ -91,7 +91,7 @@
       <v-container>
         <div class="row justify-center mb-4 mt-1">
           <router-link
-            to="/signup"
+            to="/signup2"
             class="no-background-hover-text"
           >
             <p class="mx-1">
@@ -172,7 +172,6 @@ export default {
     ])
 
   },
-
 
   metaInfo () {
     return {

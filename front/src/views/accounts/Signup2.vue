@@ -35,21 +35,21 @@
           <v-form ref="form">
             <h3>이메일</h3>
             <v-text-field
-              v-model="email"
+              v-model="credentials.email"
               class="pt-0"
               label="이메일을 입력해주세요"
             />
 
             <h3>비밀번호</h3>
             <v-text-field
-              v-model="password"
+              v-model="credentials.password"
               class="pt-0"
               type="password"
               label="비밀번호"
             />
 
             <v-text-field
-              v-model="passwordCheck"
+              v-model="credentials.passwordCheck"
               class="pt-0"
               type="password"
               label="비밀번호 확인"
@@ -57,7 +57,7 @@
 
             <h3>닉네임</h3>
             <v-text-field
-              v-model="nickname"
+              v-model="credentials.nickname"
               class="pt-0"
               type=""
               label="닉네임"
@@ -65,7 +65,6 @@
           </v-form>
 
           <v-btn
-            to="/signup3"
             class="white--text my-5"
             color="#5B5C9D"
             block
@@ -73,7 +72,7 @@
             rounded
             @click="signupCheck"
           >
-            다음
+            회원가입
           </v-btn>
         </div>
       </v-container>
@@ -90,12 +89,12 @@ export default {
   // 이메일 비밀번호 규칙 설정
   data: function() {
     return {
-    // 로그인 값
+    // 회원 정보
       credentials: {
         email: null,
         password: null,
-        nickname: null,
         passwordCheck: null,
+        nickname: null,
       },
 
       // 유효성 검사
@@ -122,13 +121,13 @@ export default {
   },
 
   methods: {
+    ...mapActions([
+      'signup',
+    ]),
     // 회원가입 유효성 검사
     signupCheck: function () {
       this.signup(this.credentials)
     },
-    ...mapActions([
-      'signup',
-    ]),
 
   },
 

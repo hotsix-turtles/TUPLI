@@ -41,7 +41,7 @@ export default new Vuex.Store({
     login: function ({ commit, dispatch }, credentials) {
       axios({
         method: 'post',
-        url: 'http://api.tupli.kr/v1' + '/account/login',
+        url: 'https://i6a102.p.ssafy.io/api/v1' + '/account/login',
         data: credentials,
       })
         .then((res) => {
@@ -62,34 +62,40 @@ export default new Vuex.Store({
       router.push({ name: 'Login' })
     },
     // 회원가입
-    signup: function (context, credentails) {
+    signup: function (context, credentials) {
+      //axiosConnector.post('/account/signup', { email: email, password: password })
       axios({
         method: 'post',
-        url: 'http://api.tupli.kr/v1' + '/account/signup',
-        data: credentails,
+        url: 'https://i6a102.p.ssafy.io/api/v1' + '/account/signup',
+        data: {
+          email: credentials.email,
+          password: credentials.password,
+        }
       })
-        .then(() => {
-          console.log('signup')
+        .then((res) => {
+          console.log(res)
+          console.log('signup success')
           router.push( { name: 'Login' })
         })
         .catch((err) => {
+          console.log('signup fail')
           console.log(err)
         })
     },
 
     // 프로필
-    getProfile: function ({ commit }) {
-      axios({
-        method: 'get',
-        url: 'http://api.tupli.kr/v1' + '/profile',
-        headers: state.authToken
-      })
-        .then((res) => {
-          commit('PROFILE', res.data.userInfo)
-        })
-        .catch((err) => {
-          console.log(err)
-        })
-    }
+    // getProfile: function ({ commit }) {
+    //   axios({
+    //     method: 'get',
+    //     url: 'i6a102.p.ssafy.io/api/v1' + '/profile',
+    //     headers: state.authToken
+    //   })
+    //     .then((res) => {
+    //       commit('PROFILE', res.data.userInfo)
+    //     })
+    //     .catch((err) => {
+    //       console.log(err)
+    //     })
+    // }
   },
 })
