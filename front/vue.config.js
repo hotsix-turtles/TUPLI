@@ -4,17 +4,9 @@ module.exports = {
   ],
   css: {
     loaderOptions: {
-      sass: {
-        additionalData: `
-          //sass 미사용
-          //@import "@/assets/scss/variables.sass"
-        `
-      },
       scss: {
-        additionalData: `
-          //@import "@/scss/variables.scss";
-        `
-      }
-    }
-  }
+        additionalData: `@import "@/assets/scss/variables.scss";`,
+      },
+    },
+  },
 }

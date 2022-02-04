@@ -170,6 +170,7 @@ export default {
     ...mapActions([
       'login',
     ])
+
   },
 
 
