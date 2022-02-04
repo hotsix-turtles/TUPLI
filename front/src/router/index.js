@@ -6,6 +6,7 @@ import PlaylistFormVideo from '@/views/playlist/PlaylistFormVideo'
 import Category from '@/views/common/Category'
 import Search from '@/views/common/Search'
 import Login from '../views/accounts/Login.vue'
+<<<<<<< .merge_file_1LyCUH
 <<<<<<< .merge_file_CuPzi2
 import Signup from '../views/accounts/Signup1.vue'
 import Signup2 from '../views/accounts/Signup2.vue'
@@ -22,6 +23,9 @@ import Terms from '../views/profile/Terms.vue'
 =======
 import PlayroomForm from '../views/playroom/PlayroomForm.vue'
 >>>>>>> .merge_file_TUz9MB
+=======
+import PlayroomForm from '../views/playroom/PlayroomForm.vue'
+>>>>>>> .merge_file_BeeeIF
 import PlayroomDetail from '../views/playroom/PlayroomDetail.vue'
 
 Vue.use(VueRouter)
@@ -64,6 +68,7 @@ const routes = [
     component: Login
   },
   {
+<<<<<<< .merge_file_1LyCUH
 <<<<<<< .merge_file_CuPzi2
     path: '/signup',
     name: 'Signup',
@@ -132,12 +137,17 @@ const routes = [
   //playroom
   {
 =======
+=======
+>>>>>>> .merge_file_BeeeIF
     path: '/playroom/create',
     name: 'PlayroomForm',
     component: PlayroomForm
   },
   {
+<<<<<<< .merge_file_1LyCUH
 >>>>>>> .merge_file_TUz9MB
+=======
+>>>>>>> .merge_file_BeeeIF
     path: '/playroom',
     name: 'PlayroomDetail',
     component: PlayroomDetail
