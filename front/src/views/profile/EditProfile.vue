@@ -42,7 +42,7 @@
             class="py-3"
             src="../../assets/logo_semi.png"
             alt=""
-            width="40px"
+            width="45px"
             fab
           >
           <p>프로필 사진 변경</p>
