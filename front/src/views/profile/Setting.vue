@@ -7,7 +7,7 @@
         class="align-center mt-5"
       >
         <router-link
-          to="/signup"
+          to="/profile"
           class="no-background-hover-text"
         >
           <v-icon

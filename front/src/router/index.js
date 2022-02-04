@@ -10,6 +10,7 @@ import Signup from '../views/accounts/Signup1.vue'
 import Signup2 from '../views/accounts/Signup2.vue'
 import Signup3 from '../views/accounts/Signup3.vue'
 import ChangePassword from '../views/profile/ChangePassword.vue'
+import EditProfile from '../views/profile/EditProfile.vue'
 import History from '../views/profile/History.vue'
 import Like from '../views/profile/Like.vue'
 import Notice from '../views/profile/Notice.vue'
@@ -104,6 +105,11 @@ const routes = [
     path: '/changepassword',
     name: 'ChangePassword',
     component: ChangePassword
+  },
+  {
+    path: '/editprofile',
+    name: 'EditProfile',
+    component: EditProfile
   },
   {
     path: '/history',
