@@ -178,7 +178,6 @@ export default {
           console.log(err)
         })
     },
-
     validate () {
       this.$refs.form.validate()
     },
