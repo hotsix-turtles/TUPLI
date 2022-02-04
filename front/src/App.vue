@@ -6,27 +6,14 @@
     <router-link to="/login">
       Login
     </router-link>
-    <router-link to="/signup">
+    <router-link to="/signup2">
       Signup
     </router-link>
-    <router-link to="/signup2">
-      Signup2
+    <router-link to="/profile">
+      Profile
     </router-link>
-    <router-link to="/signup3">
-      Signup3
-    </router-link>
-    <router-view />
     <v-main>
       <router-view />
-      <!-- <router-link to="/home">
-        Home
-      </router-link>
-      <router-link to="/login">
-        Login
-      </router-link>
-      <router-link to="/playroom">
-        Playroom
-      </router-link> -->
     </v-main>
     <navbar-bottom class="mt-auto fixed" />
   </v-app>

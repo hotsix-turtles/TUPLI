@@ -1,0 +1,22 @@
+@import "~vuetify/src/styles/styles.sass";
+
+// 폰트
+$font-size-1: 22px;
+$font-size-2: 18px;
+$font-size-3: 14px;
+$font-size-4: 12px;
+
+
+// 컬러
+$color-main: #5B5C9D;
+$color-sub: #F6F7FF;
+$color-light-gray: #F5F5F5;
+$color-dark-gray: #8B8B8B;
+
+
+// Vuetify
+// 뱃지
+$badge-color: ap-get($color-sub, $color-main);
+$badge-dot-height: 12px;
+$badge-dot-width: 12px;
+// $badge-height: 26px;
