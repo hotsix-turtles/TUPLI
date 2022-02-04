@@ -37,6 +37,7 @@
             block
             elevation="0"
             rounded
+            @click="login"
           >
             로그인
           </v-btn>
@@ -116,7 +117,7 @@
 </template>
 
 <script>
-import axios from 'axios'
+import { mapActions } from 'vuex'
 
 export default {
   name: 'Login',
@@ -134,7 +135,7 @@ export default {
     loading: false,
 
     // 유효성 검사
-    valid: true,
+    valid: false,
 
     email: '',
     emailRules: [
@@ -163,31 +164,12 @@ export default {
   methods: {
     // 로그인
     login: function () {
-      axios({
-        method: 'post',
-        url: '',
-        data: this.credentials,
-      })
-        .then(res => {
-          console.log(res)
-          localStorage.setItem('jwt', res.data.token)
-          this.$emit('login')
-          this.$router.push({ name: 'empty_main' })
-        })
-        .catch(err => {
-          console.log(err)
-        })
+      this.login(this.credentials)
+      this.valid = true
     },
-
-    validate () {
-      this.$refs.form.validate()
-    },
-    reset () {
-      this.$refs.form.reset()
-    },
-    resetValidation () {
-      this.$refs.form.resetValidation()
-    },
+    ...mapActions([
+      'login',
+    ])
   },
 
 
