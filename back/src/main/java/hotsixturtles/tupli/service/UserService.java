@@ -22,6 +22,10 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
+<<<<<<< HEAD
+=======
+    private final JwtTokenProvider jwtTokenProvider;
+>>>>>>> 2e271a7bd18cd87da6b2056108ea373197c120d5
     private final UserLikesRepository userLikesRepository;
     private final UserDislikesRepository userDislikesRepository;
 

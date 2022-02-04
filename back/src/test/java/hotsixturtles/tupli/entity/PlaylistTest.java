@@ -3,6 +3,11 @@ package hotsixturtles.tupli.entity;
 import hotsixturtles.tupli.dto.simple.SimpleYoutubeVideoDto;
 import hotsixturtles.tupli.entity.auth.ProviderType;
 import hotsixturtles.tupli.entity.auth.RoleType;
+<<<<<<< HEAD
+=======
+import hotsixturtles.tupli.entity.meta.PlaylistInfo;
+import hotsixturtles.tupli.entity.youtube.YoutubeVideo;
+>>>>>>> 2e271a7bd18cd87da6b2056108ea373197c120d5
 import hotsixturtles.tupli.repository.PlaylistRepository;
 import hotsixturtles.tupli.repository.UserRepository;
 import org.junit.jupiter.api.Test;

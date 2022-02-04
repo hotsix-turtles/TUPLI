@@ -2,28 +2,69 @@
   <v-row>
     <v-col
       height="60px"
+<<<<<<< HEAD
       @click.stop="selectChatItem(id)"
+=======
+>>>>>>> 2e271a7bd18cd87da6b2056108ea373197c120d5
       cols="12"
       md="4"
       class="d-flex align-center pa-1"
       style="width: 100%"
+<<<<<<< HEAD
+=======
+      @click.stop="selectChatItem(id)"
+>>>>>>> 2e271a7bd18cd87da6b2056108ea373197c120d5
     >
       <v-avatar
         circle
         @click.stop="selectChatAvatar(id)"
       >
+<<<<<<< HEAD
         <img
           :src="profile"
           class="pa-1"
         >
+=======
+        <v-img
+          :src="profile"
+          :lazy-src="profile"
+          class="pa-1"
+        >
+          <template v-slot:placeholder>
+            <v-row
+              class="fill-height ma-0"
+              align="center"
+              justify="center"
+            >
+              <v-progress-circular
+                indeterminate
+                color="grey lighten-5"
+              />
+            </v-row>
+          </template>
+        </v-img>
+>>>>>>> 2e271a7bd18cd87da6b2056108ea373197c120d5
       </v-avatar>
       <p class="font-3 ml-1 font-weight-bold">
         {{ name }}
       </p>
+<<<<<<< HEAD
       <p class="font-3 ml-1" v-if="!blocked">
         {{ content }}
       </p>
       <p class="font-3 ml-1 blocked" v-else>
+=======
+      <p
+        v-if="!blocked"
+        class="font-3 ml-1"
+      >
+        {{ content }}
+      </p>
+      <p
+        v-else
+        class="font-3 ml-1 blocked"
+      >
+>>>>>>> 2e271a7bd18cd87da6b2056108ea373197c120d5
         [차단됨]
       </p>
       <p class="font-3 ml-auto mr-1">
@@ -42,18 +83,32 @@
         </v-card-title>
         <v-card-actions>
           <v-btn
+<<<<<<< HEAD
             block
             text
             @click="blockMessage(id)"
             v-if="!blockedMessage"
+=======
+            v-if="!blockedMessage"
+            block
+            text
+            @click="blockMessage(id)"
+>>>>>>> 2e271a7bd18cd87da6b2056108ea373197c120d5
           >
             메시지 차단
           </v-btn>
           <v-btn
+<<<<<<< HEAD
             block
             text
             @click="unblockMessage(id)"
             v-else
+=======
+            v-else
+            block
+            text
+            @click="unblockMessage(id)"
+>>>>>>> 2e271a7bd18cd87da6b2056108ea373197c120d5
           >
             메시지 차단 해제
           </v-btn>
@@ -79,18 +134,32 @@
             유저 프로필
           </v-btn>
           <v-btn
+<<<<<<< HEAD
             block
             text
             @click="blockUser(id)"
             v-if="!blockedUser"
+=======
+            v-if="!blockedUser"
+            block
+            text
+            @click="blockUser(id)"
+>>>>>>> 2e271a7bd18cd87da6b2056108ea373197c120d5
           >
             유저 차단
           </v-btn>
           <v-btn
+<<<<<<< HEAD
             block
             text
             @click="unblockUser(id)"
             v-else
+=======
+            v-else
+            block
+            text
+            @click="unblockUser(id)"
+>>>>>>> 2e271a7bd18cd87da6b2056108ea373197c120d5
           >
             유저 차단 해제
           </v-btn>
@@ -106,7 +175,11 @@ import { mapActions, mapMutations, mapState } from 'vuex';
 export default {
   name: "ChatItem",
   props: {
+<<<<<<< HEAD
     id: { type: Number, default: -1 },
+=======
+    id: { type: String, default: '' },
+>>>>>>> 2e271a7bd18cd87da6b2056108ea373197c120d5
     name: { type: String, default: '' },
     profile: { type: String, default: '' },
     content: { type: String, default: '' },

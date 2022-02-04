@@ -35,52 +35,52 @@
           <v-form ref="form">
             <h3>이메일</h3>
             <v-text-field
-              v-model="email"
+              v-model="credentials.email"
               class="pt-0"
-              :rules="emailRules"
               label="이메일을 입력해주세요"
-              required
             />
 
             <h3>비밀번호</h3>
             <v-text-field
-              v-model="password"
+              v-model="credentials.password"
               class="pt-0"
               type="password"
-              :rules="[passwordRules.min]"
               label="비밀번호"
-              required
             />
 
             <v-text-field
-              v-model="passwordCheck"
+              v-model="credentials.passwordCheck"
               class="pt-0"
               type="password"
-              :rules="[passwordCheckRules.check]"
               label="비밀번호 확인"
-              required
             />
 
             <h3>닉네임</h3>
             <v-text-field
-              v-model="nickname"
+              v-model="credentials.nickname"
               class="pt-0"
               type=""
-              :rules="[nicknameRules.min, nicknameRules.max]"
               label="닉네임"
-              required
+            />
+
+            <h3>이름</h3>
+            <v-text-field
+              v-model="credentials.username"
+              class="pt-0"
+              type=""
+              label="이름"
             />
           </v-form>
 
           <v-btn
-            to="/signup3"
             class="white--text my-5"
             color="#5B5C9D"
             block
             elevation="0"
             rounded
+            @click="signupCheck"
           >
-            다음
+            회원가입
           </v-btn>
         </div>
       </v-container>
@@ -89,81 +89,55 @@
 </template>
 
 <script>
-import axios from 'axios'
+import { mapActions } from 'vuex'
 
 export default {
   name: 'Signup2',
 
   // 이메일 비밀번호 규칙 설정
-  data: () => ({
-    // 로그인 값
-    credentials: {
-      email: null,
-      password: null,
-    },
+  data: function() {
+    return {
+    // 회원 정보
+      credentials: {
+        email: null,
+        password: null,
+        passwordCheck: null,
+        nickname: null,
+        username: null,
+      },
 
-    // 로딩 아이콘
-    loader: null,
-    loading: false,
+      // 유효성 검사
+      valid: true,
 
-    // 유효성 검사
-    valid: true,
+      emailRules: [
+        v => !!v || '이메일을 입력해주세요.',
+        v => /.+@.+\..+/.test(v) || '올바른 형식의 이메일을 입력해주세요.',
+      ],
 
-    email: '',
-    emailRules: [
-      v => !!v || '이메일을 입력해주세요.',
-      v => /.+@.+\..+/.test(v) || '올바른 형식의 이메일을 입력해주세요.',
-    ],
+      passwordRules: {
+        min: v => v.length >= 8 || '올바른 비밀번호를 입력해주세요.',
+      },
 
-    password: '',
-    passwordRules: {
-      min: v => v.length >= 8 || '올바른 비밀번호를 입력해주세요.',
-    },
+      passwordCheckRules: {
+        check: v => v === password || '일치하지 않는 비밀번호입니다.',
+      },
 
-    passwordCheck: '',
-    passwordCheckRules: {
-      check: v => v === password || '일치하지 않는 비밀번호입니다.',
-    },
-
-    nickname: '',
-    nicknameRules: {
-      max: v => v.length <= 6 || '6글자 내의 닉네임을 입력해주세요.',
-      min: v => v.length > 0 || '닉네임을 입력해주세요.'
-    }
-  }),
-
-  watch: {
-
+      nicknameRules: {
+        max: v => v.length <= 6 || '6글자 내의 닉네임을 입력해주세요.',
+        min: v => v.length > 0 || '닉네임을 입력해주세요.'
+      }
+    };
   },
 
   methods: {
-    // 로그인
-    login: function () {
-      axios({
-        method: 'post',
-        url: '',
-        data: this.credentials,
-      })
-        .then(res => {
-          console.log(res)
-          localStorage.setItem('jwt', res.data.token)
-          this.$emit('login')
-          this.$router.push({ name: 'empty_main' })
-        })
-        .catch(err => {
-          console.log(err)
-        })
+    ...mapActions([
+      'signup',
+    ]),
+    // 회원가입 유효성 검사
+    signupCheck: function () {
+      this.signup(this.credentials)
     },
 
-    validate () {
-      this.$refs.form.validate()
-    },
-    reset () {
-      this.$refs.form.reset()
-    },
-    resetValidation () {
-      this.$refs.form.resetValidation()
-    },
   },
 
 

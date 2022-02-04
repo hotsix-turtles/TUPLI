@@ -32,7 +32,10 @@ public class ChatController {
         // 로그인 회원 정보로 대화명 설정
         message.setSender(nickname);
         message.setUserCount(chatRoomRepository.getUserCount(message.getRoomId()));
+<<<<<<< HEAD
         message.setImg(user.getProfileImageUrl());
+=======
+>>>>>>> 2e271a7bd18cd87da6b2056108ea373197c120d5
         // Websocket에 발행된 메시지를 redis로 발행한다(publish). redisTemplate을 통해 바로 ChannelTopic으로 메시지를 발행
         redisTemplate.convertAndSend(channelTopic.getTopic(), message);
         // 발행한 메시지 저장
