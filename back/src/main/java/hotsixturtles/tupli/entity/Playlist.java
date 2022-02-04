@@ -2,7 +2,6 @@ package hotsixturtles.tupli.entity;
 
 import com.vladmihalcea.hibernate.type.json.JsonType;
 import hotsixturtles.tupli.entity.likes.PlaylistLikes;
-import hotsixturtles.tupli.entity.meta.PlaylistInfo;
 import hotsixturtles.tupli.entity.youtube.YoutubeVideo;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,7 +10,6 @@ import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;

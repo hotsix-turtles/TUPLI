@@ -2,8 +2,6 @@ package hotsixturtles.tupli.dto;
 
 import hotsixturtles.tupli.dto.simple.SimpleUserDto;
 import hotsixturtles.tupli.entity.Playlist;
-import hotsixturtles.tupli.entity.likes.PlaylistLikes;
-import hotsixturtles.tupli.entity.meta.PlaylistInfo;
 import lombok.Data;
 
 
