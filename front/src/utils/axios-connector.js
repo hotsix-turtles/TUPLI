@@ -6,10 +6,6 @@ const token = localStorage.getItem('jwt')
 // axios 객체 생성
 export default axios.create({
   baseURL,
-  headers: {
-    Authorization: token,
-  },
-  xhrFields: {
-    withCredentials: true,
-  },
+  headers: token ? { Authorization: token } : { },
+  xhrFields: token ? { withCredentials: true } : { },
 });

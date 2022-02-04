@@ -8,6 +8,7 @@ const playroom = {
     roomId: -1,
     roomTitle: '',
     roomPublic: false,
+    roomLiked: false,
     roomAuthorProfilePic: '',
     roomAuthorName: '',
     roomAuthorFollowerCount: 0,
@@ -15,7 +16,7 @@ const playroom = {
     roomEndTime: new Date(),
     roomContent: '',
     roomTags: [],
-    roomPlaylists: {},
+    roomPlaylists: [],
     roomCurrentPlaylistOffset: 0,
     roomCurrentVideoOffset: '',
     roomCurrentVideoPlaytime: 0,
@@ -37,6 +38,7 @@ const playroom = {
     setRoomId: ( state, value ) => state.roomId = value,
     setRoomTitle: ( state, value ) => state.roomTitle = value,
     setRoomPublic: ( state, value ) => state.roomPublic = value,
+    setRoomLiked: ( state, value ) => state.roomLiked = value,
     setRoomAuthor: ( state, value ) => {
       state.roomAuthorName = value.name;
       state.roomAuthorProfilePic = value.pic;

@@ -14,7 +14,7 @@
         <div class="mt-4 pt-4">
           <v-form ref="form">
             <v-text-field
-              v-model="email"
+              v-model="credentials.email"
               class="pt-0"
               :rules="emailRules"
               label="이메일을 입력해주세요"
@@ -22,7 +22,7 @@
             />
 
             <v-text-field
-              v-model="password"
+              v-model="credentials.password"
               class="pt-0"
               type="password"
               :rules="[passwordRules.min]"
@@ -37,6 +37,7 @@
             block
             elevation="0"
             rounded
+            @click="login"
           >
             로그인
           </v-btn>
@@ -89,9 +90,14 @@
       <!-- 그 외 -->
       <v-container>
         <div class="row justify-center mb-4 mt-1">
-          <p class="mx-1">
-            회원가입
-          </p>
+          <router-link
+            to="/signup2"
+            class="no-background-hover-text"
+          >
+            <p class="mx-1">
+              회원가입
+            </p>
+          </router-link>
           <p class="mx-1">
             |
           </p>
@@ -111,7 +117,7 @@
 </template>
 
 <script>
-import axios from 'axios'
+import { mapActions } from 'vuex'
 
 export default {
   name: 'Login',
@@ -129,7 +135,7 @@ export default {
     loading: false,
 
     // 유효성 검사
-    valid: true,
+    valid: false,
 
     email: '',
     emailRules: [
@@ -158,33 +164,14 @@ export default {
   methods: {
     // 로그인
     login: function () {
-      axios({
-        method: 'post',
-        url: '',
-        data: this.credentials,
-      })
-        .then(res => {
-          console.log(res)
-          localStorage.setItem('jwt', res.data.token)
-          this.$emit('login')
-          this.$router.push({ name: 'empty_main' })
-        })
-        .catch(err => {
-          console.log(err)
-        })
+      this.login(this.credentials)
+      this.valid = true
     },
+    ...mapActions([
+      'login',
+    ])
 
-    validate () {
-      this.$refs.form.validate()
-    },
-    reset () {
-      this.$refs.form.reset()
-    },
-    resetValidation () {
-      this.$refs.form.resetValidation()
-    },
   },
-
 
   metaInfo () {
     return {
@@ -214,6 +201,7 @@ export default {
     animation: loader 1s infinite;
     display: flex;
   }
+
   @keyframes loader {
     from {
       transform: rotate(0);
@@ -221,5 +209,10 @@ export default {
     to {
       transform: rotate(360deg);
     }
+  }
+
+  .no-background-hover-text {
+    text-decoration: none !important;
+    text-decoration-color: black !important;
   }
 </style>
