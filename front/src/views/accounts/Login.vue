@@ -59,6 +59,7 @@
                   fab
                   elevation="0"
                   class="mx-3"
+                  :href="socialLoginUrl('google')"
                   :loading="loading"
                   :disabled="loading"
                   @click="loader = 'loading'"
@@ -118,6 +119,7 @@
 
 <script>
 import { mapActions } from 'vuex'
+import SERVER from '@/api/server.js'
 
 export default {
   name: 'Login',
@@ -169,7 +171,17 @@ export default {
     },
     ...mapActions([
       'login',
-    ])
+    ]),
+
+    socialLoginUrl: function(socialType){
+      const BACKEND_PORT = SERVER.BACKEND_PORT === null ? '' : `:${SERVER.BACKEND_PORT}`
+      // const BACKEND_URL = `${location.protocol}//${location.hostname}${BACKEND_PORT}`
+      const BACKEND_URL = "https://i6a102.p.ssafy.io/api/v1"
+      const FRONTEND_PORT = SERVER.FRONTEND_PORT === null ? '' : `:${SERVER.FRONTEND_PORT}`
+      const REDIRECT_URI = `${location.protocol}//${location.hostname}${FRONTEND_PORT}/oauth/redirect`
+      console.log(`${BACKEND_URL}/oauth2/authorization/${socialType}?redirect_uri=${REDIRECT_URI}`)
+      return `${BACKEND_URL}/oauth2/authorization/${socialType}?redirect_uri=${REDIRECT_URI}`
+    }
 
   },
 
