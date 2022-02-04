@@ -88,6 +88,9 @@ public class JwtTokenProvider {
         return Long.parseLong(String.valueOf(claims.getBody().get("user_id")));
     }
 
+    /**
+     * 구버전들
+     */
 //    // JWT 복호화 해서 유저 얻기
 //    public User getUser(String token) {
 //        Jws<Claims> claims = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token);
@@ -117,6 +120,13 @@ public class JwtTokenProvider {
 //        }
 //    }
 
+    //    // JWT 복호화 해서 유저 얻기
+    public User getUser(String token) {
+        Jws<Claims> claims = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token);
+        String user_seq = String.valueOf(claims.getBody().get("user_seq"));
+        return userRepository.findByUserSeq(Long.parseLong(user_seq));
+    }
+
     public Long getUserSeq(String token) {
         Jws<Claims> claims = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token);
         String user_seq = String.valueOf(claims.getBody().get("user_seq"));
@@ -139,7 +149,7 @@ public class JwtTokenProvider {
     // Request의 Header에서 token 값을 가져옵니다. "X-AUTH-TOKEN" : "TOKEN값'
     // 22.01.09 X-AUTH-TOKEN 에서 AUTH로 1차 변경 -> 이 부분 회의 필요
     public String resolveToken(HttpServletRequest request) {
-        return request.getHeader("AUTH");
+        return request.getHeader("Authorization");
     }
 
     // 토큰의 유효성 + 만료일자 확인

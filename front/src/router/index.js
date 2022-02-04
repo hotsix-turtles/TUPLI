@@ -1,8 +1,12 @@
 import Vue from 'vue'
 import VueMeta from 'vue-meta'
 import VueRouter from 'vue-router'
-import Home from '../views/Home.vue'
+import PlaylistForm from '@/views/playlist/PlaylistForm'
+import PlaylistFormVideo from '@/views/playlist/PlaylistFormVideo'
+import Category from '@/views/common/Category'
+import Search from '@/views/common/Search'
 import Login from '../views/accounts/Login.vue'
+<<<<<<< .merge_file_CuPzi2
 import Signup from '../views/accounts/Signup1.vue'
 import Signup2 from '../views/accounts/Signup2.vue'
 import Signup3 from '../views/accounts/Signup3.vue'
@@ -15,6 +19,9 @@ import Profile from '../views/profile/Profile.vue'
 import Save from '../views/profile/Save.vue'
 import Setting from '../views/profile/Setting.vue'
 import Terms from '../views/profile/Terms.vue'
+=======
+import PlayroomForm from '../views/playroom/PlayroomForm.vue'
+>>>>>>> .merge_file_TUz9MB
 import PlayroomDetail from '../views/playroom/PlayroomDetail.vue'
 
 Vue.use(VueRouter)
@@ -22,9 +29,24 @@ Vue.use(VueMeta)
 
 const routes = [
   {
-    path: '/home',
-    name: 'Home',
-    component: Home
+    path: '/playlist/create',
+    name: 'PlaylistForm',
+    component: PlaylistForm
+  },
+  {
+    path: '/playlist/create/video',
+    name: 'PlaylistFormVideo',
+    component: PlaylistFormVideo
+  },
+  {
+    path: '/category',
+    name: 'Category',
+    component: Category
+  },
+  {
+    path: '/search',
+    name: 'Search',
+    component: Search
   },
   // {
   //   path: '/about',
@@ -42,6 +64,7 @@ const routes = [
     component: Login
   },
   {
+<<<<<<< .merge_file_CuPzi2
     path: '/signup',
     name: 'Signup',
     component: Signup
@@ -108,6 +131,13 @@ const routes = [
 
   //playroom
   {
+=======
+    path: '/playroom/create',
+    name: 'PlayroomForm',
+    component: PlayroomForm
+  },
+  {
+>>>>>>> .merge_file_TUz9MB
     path: '/playroom',
     name: 'PlayroomDetail',
     component: PlayroomDetail
