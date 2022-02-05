@@ -17,7 +17,8 @@ public class FirebaseInitialize {
     @PostConstruct
     public void initialize() throws IOException {
 
-        InputStream resource = new ClassPathResource("serviceAccountKey.json").getInputStream();
+        InputStream resource = getClass().getResourceAsStream("/serviceAccountKey.json");
+//        InputStream resource = new ClassPathResource("serviceAccountKey.json").getInputStream();
 //        FileInputStream serviceAccount =
 //                new FileInputStream("./src/main/resources/serviceAccountKey.json");
 //                new FileInputStream(System.getProperty("user.dir") + "/src/main/resources/serviceAccountKey.json");
