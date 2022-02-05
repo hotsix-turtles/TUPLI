@@ -50,6 +50,18 @@
           프로필 편집하기
         </v-btn>
       </div>
+      <div class="d-flex justify-center">
+        <v-btn
+          class="white--text my-5"
+          color="#5B5C9D"
+          block
+          elevation="0"
+          rounded
+          @click="buyPremium"
+        >
+          임시 결제 버튼/프리미엄회원은 안보임
+        </v-btn>
+      </div>
     </v-container>
 
     <div class="d-flex justify-space-around mt-5">
@@ -77,10 +89,32 @@
 <script>
 import ProfilePlaylist from '../../components/profile/ProfilePlaylist.vue'
 import ProfileTaste from '../../components/profile/ProfileTaste.vue'
+
+import axiosConnector from '../../utils/axios-connector.js'
+
 export default {
   components: { ProfileTaste, ProfilePlaylist },
 
   methods: {
+    buyPremium: function() {
+      axiosConnector.get('/kakaoPay/')
+      // 실제 적용시에는, 이미 프리미엄 유저인지 확인하는 것 필요
+      // axios({
+      //   method: 'GET',
+      //   url: SERVER.URL + SERVER.ROUTES.accounts.kakaoPay,
+      //   headers: {Authorization: this.token},
+      // })
+        .then((res) => {
+          window.location.href = res.data 
+        })
+        .catch (() => {
+          swal.fire ({
+            icon: 'error',
+            title: '결제 실패',
+            text: '서버가 혼잡합니다. 다시 시도해 주세요.'
+          })
+        })
+    },
 
   },
 
