@@ -15,6 +15,7 @@ import Like from '../views/profile/Like.vue'
 import Notice from '../views/profile/Notice.vue'
 import Payment from '../views/profile/Payment.vue'
 import Profile from '../views/profile/Profile.vue'
+import EditProfile from '../views/profile/EditProfile.vue'
 import Save from '../views/profile/Save.vue'
 import Setting from '../views/profile/Setting.vue'
 import Terms from '../views/profile/Terms.vue'
@@ -123,6 +124,11 @@ const routes = [
     path: '/profile',
     name: 'Profile',
     component: Profile
+  },
+  {
+    path: '/editprofile',
+    name: 'EditProfile',
+    component: EditProfile
   },
   {
     path: '/save',
