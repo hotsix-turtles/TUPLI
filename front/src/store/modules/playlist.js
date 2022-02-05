@@ -1,3 +1,4 @@
+import Vue from 'vue'
 import axios from 'axios'
 import router from '@/router/index.js'
 import axiosConnector from '../../utils/axios-connector'
@@ -10,8 +11,9 @@ const playlist = {
     playlistDetail: '',
     selectedPlaylists: [],
     addedPlaylists: [],
+    addedPlaylistVideoIds: [],
     myPlaylists: [ { playlistId: 1, title: '좋아요한 플레이리스트 1', thumbnail: '', videos: [{ videoId: 'a2dxf-fvfla', title: '냠냠', thumbnail: '' }] }, { playlistId: 2, title: '좋아요한 플레이리스트 2', thumbnail: '' }, { playlistId: 3, title: '좋아요한 플레이리스트 3', thumbnail: '' }, ],
-    savedPlaylists: [ { playlistId: 1, title: '저장한 플레이리스트 1', thumbnail: '' }, { playlistId: 2, title: '저장한 플레이리스트 2', thumbnail: '' }, { playlistId: 3, title: '저장한 플레이리스트 3', thumbnail: '' }, ]
+    savedPlaylists: [ { playlistId: 4, title: '저장한 플레이리스트 1', thumbnail: '', videos: [{ videoId: 'a2dxf-fvflb', title: '냠냠', thumbnail: '' }] }, { playlistId: 5, title: '저장한 플레이리스트 2', thumbnail: '' }, { playlistId: 6, title: '저장한 플레이리스트 3', thumbnail: '' }, ]
   },
   mutations: {
     RESET_FORM_DATA: function (state) {
@@ -39,32 +41,74 @@ const playlist = {
       console.log(state.playlistDetail)
     },
     ADD_PLAYLISTS: function (state) {
-      state.selectedPlaylists
-        .filter(selectedPlaylist => state.addedPlaylists.findIndex(addedPlaylist => addedPlaylist.playlistId == selectedPlaylist.playlistId) == -1)
-        .map(v => state.addedPlaylists.push(v))
-
+      state.addedPlaylists = []
+      state.selectedPlaylists.map(selectedPlaylist => {
+        if (selectedPlaylist.videos)
+          selectedPlaylist.videos
+            .filter(video => !state.addedPlaylistVideoIds.find(addedPlaylistVideoId => addedPlaylistVideoId == video.videoId))
+            .map(video => state.addedPlaylistVideoIds.push(video.videoId))
+      });
+      state.selectedPlaylists.map(selectedPlaylist => state.addedPlaylists.push(selectedPlaylist))
       state.selectedPlaylists = []
       console.log('state.addedPlaylists', state.addedPlaylists)
     },
     REVOKE_PLAYLISTS: function (state) {
       state.selectedPlaylists = []
-      state.addedPlaylists.map(v => state.selectedPlaylists.push(v))
+      state.addedPlaylists.map(addedPlaylist => state.selectedPlaylists.push(addedPlaylist))
+      state.addedPlaylists = []
+      state.addedPlaylistVideoIds = []
 
       console.log('state.revokePlaylists', state.selectedPlaylists)
     },
-    ADD_SELECTED_PLAYLIST: function (state, toAddPlaylist) {
+    SELECT_PLAYLIST: function (state, toAddPlaylist) {
       state.selectedPlaylists.push(toAddPlaylist)
-      console.log('add_selected_playlist', state.selectedPlaylists)
+      console.log('select_playlist', state.selectedPlaylists)
     },
-    REMOVE_SELECTED_PLAYLIST: function (state, toRemovePlaylist) {
-      const idx = state.selectedPlaylists.findIndex(selectedPlaylist => selectedPlaylist.playlistId === toRemovePlaylist.playlistId)
+    DESELECT_PLAYLIST: function (state, toRemovePlaylist) {
+      const idx = state.selectedPlaylists.findIndex(selectedPlaylist => selectedPlaylist.playlistId == toRemovePlaylist.playlistId)
       state.selectedPlaylists.splice(idx, 1)
-      console.log('remove_selected_playlist', state.selectedPlaylists)
+      console.log('deselect_playlist', state.selectedPlaylists)
     },
     WATCHING_PLAYLIST: function (state, watchingPlaylist) {
       state.watchingPlaylist = watchingPlaylist
       //router.push({ name: 'VideoPlaylist' })
-    }
+    },
+    SELECT_PLAYLIST_VIDEO: function (state, videoId) {
+      const idx = state.addedPlaylistVideoIds.findIndex(addedPlaylistVideoId => addedPlaylistVideoId == videoId)
+      if (idx != -1) return;
+      state.addedPlaylistVideoIds.push(videoId)
+
+      console.log('select_playlist_video', videoId)
+    },
+    SELECT_ALL_PLAYLIST_VIDEO: function (state) {
+      state.addedPlaylists.map(addedPlaylist => {
+        if (addedPlaylist.videos)
+          addedPlaylist.videos.map(video => {
+            const idx = state.addedPlaylistVideoIds.findIndex(addedPlaylistVideoId => addedPlaylistVideoId == video.videoId)
+            if (idx != -1) return;
+            state.addedPlaylistVideoIds.push(video.videoId)
+          });
+      });
+
+      console.log('select_all_playlist_video')
+    },
+    DESELECT_PLAYLIST_VIDEO: function (state, videoId) {
+      const idx = state.addedPlaylistVideoIds.findIndex(addedPlaylistVideoId => addedPlaylistVideoId == videoId)
+      state.addedPlaylistVideoIds.splice(idx, 1)
+
+      console.log('deselect_playlist_video', videoId)
+    },
+    DESELECT_ALL_PLAYLIST_VIDEO: function (state) {
+      state.addedPlaylists.map(addedPlaylist => {
+        if (addedPlaylist.videos)
+          addedPlaylist.videos.map(video => {
+            const idx = state.addedPlaylistVideoIds.findIndex(addedPlaylistVideoId => addedPlaylistVideoId == video.videoId)
+            state.addedPlaylistVideoIds.splice(idx, 1)
+          });
+      });
+
+      console.log('deselect_all_playlist_video')
+    },
   },
   actions: {
     createPlaylist: function ({ commit }, formData) {
@@ -104,28 +148,42 @@ const playlist = {
     // 플레이리스트 리스트에 추가
     addPlaylists: function ({ commit }) {
       commit('ADD_PLAYLISTS')
-      commit('video/ADD_VIDEOS', null, { root: true })
     },
     // 추가한 플레이리스트들을 선택한 플레이리스트 리스트로 되돌림
     revokePlaylists: function ({ commit }) {
       commit('REVOKE_PLAYLISTS')
     },
     // 선택한 플레이리스트 리스트에 추가
-    addSelectedPlaylist: function ({ commit }, playlist) {
-      commit('ADD_SELECTED_PLAYLIST', playlist)
-      commit('video/ADD_SELECTED_VIDEOS_FROM_PLAYLIST', playlist, { root: true })
+    selectPlaylist: function ({ commit }, playlist) {
+      commit('SELECT_PLAYLIST', playlist)
     },
     // 선택한 플레이리스트 리스트에서 제거
-    removeSelectedPlaylist: function ({ commit }, playlist) {
-      commit('REMOVE_SELECTED_PLAYLIST', playlist.playlistId)
-      commit('video/REMOVE_SELECTED_VIDEOS_FROM_PLAYLIST', playlist, { root: true })
+    deselectPlaylist: function ({ commit }, playlist) {
+      commit('DESELECT_PLAYLIST', playlist)
     },
     // 플레이리스트 보기 선택한 영상
     watchingPlaylist: function ({ commit }, watchingPlaylist) {
       commit('WATCHING_PLAYLIST', watchingPlaylist)
     },
+    selectPlaylistVideo: function ({ commit }, videoId) {
+      commit('SELECT_PLAYLIST_VIDEO', videoId)
+    },
+    deselectPlaylistVideo: function ({ commit }, videoId) {
+      commit('DESELECT_PLAYLIST_VIDEO', videoId)
+    },
+    selectAllPlaylistVideo: function ({ commit }) {
+      commit('SELECT_ALL_PLAYLIST_VIDEO')
+    },
+    deselectAllPlaylistVideo: function ({ commit }) {
+      commit('DESELECT_ALL_PLAYLIST_VIDEO')
+    }
   },
   modules: {
+  },
+  getters: {
+    numberOfAddedPlaylists: state => state.addedPlaylists.length,
+    numberOfAddedPlaylistVideos: state => state.addedPlaylists.reduce((acc, cur) => acc + (cur.videos ? cur.videos.length : 0), 0),
+    numberOfAddedPlaylistSelectedVideos: state => state.addedPlaylistVideoIds.length,
   }
 }
 export default playlist

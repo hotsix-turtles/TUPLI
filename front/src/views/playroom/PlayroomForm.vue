@@ -3,9 +3,13 @@
     <!-- 뒤로가기/완료 -->
     <div class="d-flex justify-space-between">
       <back :page-name="pageName" />
-      <p class="clickable">
+      <v-btn
+        class="clickable"
+        text
+        @click="submit"
+      >
         완료
-      </p>
+      </v-btn>
     </div>
 
     <!-- 플레이룸 생성 폼 -->
@@ -47,10 +51,10 @@
             cols="12"
             md="4"
           >
-            <TagInput
-              v-model="formData.tags"
-              :counter="80"
-              label="플레이룸 태그를 입력해주세요."
+            <tag-input
+              :proped-tags="formData.tags"
+              @tag-input="updateTags"
+            />
             />
           </v-col>
         </v-row>
@@ -186,6 +190,7 @@
               small
               elevation="0"
               color="white"
+              @click="selectAllVideo"
             >
               <v-icon class="mdi-18px">
                 mdi-check
@@ -193,7 +198,7 @@
               <span class="ml-1">전체 선택</span>
             </v-btn>
             <p class="font-4">
-              {{ numberOfPlaylist }}개 플레이리스트 / {{ numberOfPlaylistVideos }}개 영상 선택
+              {{ numberOfAddedPlaylists }}개 플레이리스트 / {{ numberOfAddedPlaylistSelectedVideos }}개 영상 선택
             </p>
           </v-col>
         </v-row>
@@ -207,6 +212,8 @@
           >
             <playlist-list-item-small
               :playlists="addedPlaylists"
+              :playlist-readonly="true"
+              :video-readonly="false"
             />
           </v-col>
         </v-row>
@@ -216,7 +223,7 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
+import { mapGetters, mapState } from 'vuex'
 import Back from '../../components/common/Back.vue'
 import PlaylistListItemSmall from '../../components/playlist/PlaylistListItemSmall.vue'
 import TagInput from '../../components/common/TagInput.vue'
@@ -234,28 +241,20 @@ export default {
       pageName: "내 플레이룸 만들기",
       titleRules: [
         v => !!v || '제목은 필수입니다.',
-        v => v.length <= 2 || '제목은 3글자 이상 작성해야 합니다.',
+        v => v.length > 2 || '제목은 3글자 이상 작성해야 합니다.',
       ],
       isValid: false,
       // Create할 때 넘길 데이터
       formData: {
         title: '',
         content: '',
-        tags: '',
+        tags: [],
         isPublic: true,
-        titleRules: [
-          v => !!v || '제목은 필수입니다.',
-          v => v.length <= 2 || '제목은 3글자 이상 작성해야 합니다.',
-        ],
         friends: [],
         playlists: []
-      }
-    }
-  },
-  created: function () {
-    if (this.savedFormData) {
-      this.formData = this.savedFormData
-      this.formData.playlists
+      },
+      numberOfPlaylist: 0,
+      numberOfPlaylistVideos: 0
     }
   },
   computed: {
@@ -265,23 +264,26 @@ export default {
     numberOfFriend () {
       return this.formData.friends.length
     },
-    numberOfPlaylist () {
-      return this.addedPlaylists.length
-    },
-    numberOfPlaylistVideos () {
-      return this.addedPlaylists.reduce((acc, cur) => acc + cur.videos ? cur.videos.reduce((acc, cur) => acc + (cur.included ? 1 : 0), 0) : 0, 0)
-    },
-    ...mapState('playlist', ['addedPlaylists', 'savedFormData'])
+    ...mapState('playlist', ['addedPlaylists']),
+    ...mapState('playroom', ['savedFormData']),
+    ...mapGetters('playlist', ['numberOfAddedPlaylists', 'numberOfAddedPlaylistSelectedVideos', 'numberOfAddedPlaylistVideos'])
+  },
+  created: function () {
+    if (this.savedFormData) {
+      console.log('restoreData', this.savedFormData)
+      this.formData = this.savedFormData
+    }
   },
   methods: {
+    updateTags: function (tags) {
+      this.formData.tags = tags
+    },
     onVideoItemClicked ( { id, selected }) {
       return this.formData.playlists.map((playlist) => playlist.videos.map((v) => v.included = (v.id == id ? !selected : v.included)))
     },
     submit() {
-      this.formData.videos = this.addedVideos
-      if (this.formData.tags) {
-        this.formData.tags = this.formData.tags.join()
-      }
+      if (this.formData.tags) this.formData.tags = this.formData.tags.join()
+      this.formData.playlists = this.addedPlaylists
       console.log(this.formData)
       this.createPlayroom(this.formData)
     },
@@ -289,8 +291,15 @@ export default {
       this.saveFormData(this.formData)
       this.$router.push({ name: 'PlayroomFormPlaylist'})
     },
-    ...mapActions('playroom', ['saveFormData'])
-  }
+    selectAllVideo () {
+      if (!this.numberOfAddedPlaylistVideos == this.numberOfAddedPlaylistSelectedVideos)
+        this.selectAllPlaylistVideo()
+      else
+        this.deselectAllPlaylistVideo()
+    },
+    ...mapActions('playroom', ['saveFormData', 'createPlayroom']),
+    ...mapActions('playlist', ['selectAllPlaylistVideo', 'deselectAllPlaylistVideo'])
+  },
 }
 </script>
 

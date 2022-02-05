@@ -25,19 +25,22 @@
       <NavButton
         color="white"
         content="영상보기"
-        icon="mdi-play" />
+        icon="mdi-play"
+      />
 
       <!-- 내 플레이리스트 버튼 -->
       <NavButton
         color="white"
         content="내 플레이리스트"
-        icon="mdi-disc" />
+        icon="mdi-disc"
+      />
 
       <!-- 저장하기 버튼 -->
       <NavButton
         color="white"
         content="저장하기"
-        icon="mdi-bookmark" />
+        icon="mdi-bookmark"
+      />
     </v-bottom-navigation>
 
     <!-- 플레이룸 페이지 -->
@@ -73,9 +76,14 @@
           class="elevation-2"
         >
           <!-- 플레이룸 좋아요 -->
-          <v-btn class="playroomLike" @click="playroomLike">
+          <v-btn
+            class="playroomLike"
+            @click="playroomLike"
+          >
             <span>좋아요</span>
-            <v-icon :color="roomLiked ? 'blue' : undefined">mdi-thumb-up</v-icon>
+            <v-icon :color="roomLiked ? 'blue' : undefined">
+              mdi-thumb-up
+            </v-icon>
           </v-btn>
 
           <!-- 플레이룸 댓글 -->

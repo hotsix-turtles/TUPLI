@@ -6,6 +6,8 @@
       v-for="(playlist, idx) in playlists"
       :key="idx"
       :playlist="playlist"
+      :readonly="playlistReadonly"
+      :video-readonly="videoReadonly"
     />
   </v-expansion-panels>
 </template>
@@ -16,16 +18,9 @@ export default {
   name: 'PlaylistListItemSmall',
   components: { PlaylistItemSmall },
   props: {
-    playlists: { type: Array, default() { [] } }
-  },
-  created() {
-    console.log(this.playlists)
-  },
-  data: function () {
-    return {
-    }
-  },
-  methods: {
+    playlists: { type: Array, default() { [] } },
+    playlistReadonly: { type: Boolean, default: false },
+    videoReadonly: { type: Boolean, default: false }
   },
 }
 </script>

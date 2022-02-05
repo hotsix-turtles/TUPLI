@@ -3,18 +3,19 @@
     elevation="0"
   >
     <v-expansion-panel-header
-      :color="selected ? '#dde' : 'white'"
+      :color="color"
       class="pl-0"
     >
       <v-list-item two-line>
         <v-btn
+          v-if="!readonly"
           fab
           small
           text
-          @click.stop="addPlaylist"
-          >
+          @click.stop="clickPlaylist"
+        >
           <v-icon>
-            mdi-plus
+            {{ selected ? 'mdi-check' : 'mdi-plus' }}
           </v-icon>
         </v-btn>
         <img
@@ -34,13 +35,15 @@
       </v-list-item>
     </v-expansion-panel-header>
     <v-expansion-panel-content
-      :color="selected ? '#dde' : 'white'"
+      :color="color"
     >
-      <video-item-small
+      <playlist-video-item-small
         v-for="(video, idx) in playlist.videos"
         :key="idx"
+        :playlist-id="playlist.playlistId"
+        :playlist-selected="selected"
         :video="video"
-        readonly
+        :readonly="videoReadonly"
       />
     </v-expansion-panel-content>
   </v-expansion-panel>
@@ -48,19 +51,19 @@
 
 <script>
 import { mapActions, mapState } from 'vuex'
-import VideoItemSmall from '../video/VideoItemSmall.vue'
+import PlaylistVideoItemSmall from './PlaylistVideoItemSmall.vue'
 
 export default {
   name: 'PlaylistItemSmall',
-  components: { VideoItemSmall },
+  components: { PlaylistVideoItemSmall },
   props: {
     playlist: { type: Object, default() { {} } },
-  },
-  created() {
-    console.log(this.playlist)
+    readonly: { type: Boolean, default: false },
+    videoReadonly: { type: Boolean, default: false }
   },
   data() {
     return {
+      selected: false,
       menuItems: [
         { id: 1, title: '메뉴 1' },
         { id: 2, title: '메뉴 2' },
@@ -69,27 +72,31 @@ export default {
     }
   },
   computed: {
-    selected() {
-      return this.selectedPlaylists.filter(selectedPlaylist => selectedPlaylist.playlistId == this.playlist.playlistId).length > 0
-    },
     color() {
-      return this.selected ? "#dde" : "white"
+      return !this.readonly && this.selected ? "#dde" : "white"
     },
-    ...mapState('playlist', ['selectedPlaylists']),
+    ...mapState('playlist', ['addedPlaylists', 'selectedPlaylists']),
+  },
+  created() {
+    this.selected = Boolean(this.selectedPlaylists && this.selectedPlaylists
+      .find(selectedPlaylist => selectedPlaylist.playlistId == this.playlist.playlistId))
+    console.log(this.readonly, this.selected)
   },
   methods: {
-    addPlaylist() {
-      console.log('addPlaylist', this.playlist)
+    clickPlaylist() {
+      if (this.readonly) return;
       if (this.selected) {
-        this.removeSelectedPlaylist(this.playlist)
+        this.deselectPlaylist(this.playlist)
+        this.selected = false;
       } else {
-        this.addSelectedPlaylist(this.playlist)
+        this.selectPlaylist(this.playlist)
+        this.selected = true;
       }
     },
     ...mapActions('playlist', [
       'watchingVideo',
-      'addSelectedPlaylist',
-      'removeSelectedPlaylist',
+      'selectPlaylist',
+      'deselectPlaylist',
     ])
   }
 }
