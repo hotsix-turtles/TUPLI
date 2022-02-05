@@ -4,9 +4,11 @@ import hotsixturtles.tupli.entity.User;
 import hotsixturtles.tupli.entity.auth.ProviderType;
 import hotsixturtles.tupli.entity.auth.RoleType;
 import hotsixturtles.tupli.entity.auth.UserPrincipal;
+import hotsixturtles.tupli.entity.meta.UserInfo;
 import hotsixturtles.tupli.exception.OAuthProviderMissMatchException;
 import hotsixturtles.tupli.info.OAuth2UserInfo;
 import hotsixturtles.tupli.info.OAuth2UserInfoFactory;
+import hotsixturtles.tupli.repository.UserInfoRepository;
 import hotsixturtles.tupli.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -25,6 +27,8 @@ import java.time.LocalDateTime;
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
     private final UserRepository userRepository;
+
+    private final UserInfoRepository userInfoRepository;
 
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
@@ -54,8 +58,13 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                 );
             }
             updateUser(savedUser, userInfo);
+            UserInfo nowUserInfo =  userInfoRepository.findOneByUserSeq(savedUser.getUserSeq());
+            nowUserInfo.setLoginCount(nowUserInfo.getLoginCount() + 1L);
+            userInfoRepository.save(nowUserInfo);
         } else {
             savedUser = createUser(userInfo, providerType);
+            UserInfo nowUserInfo = new UserInfo(null, savedUser.getUserSeq(), null, 0L, 0L, 0L, 0L);
+            userInfoRepository.save(nowUserInfo);
         }
 
         return UserPrincipal.create(savedUser, user.getAttributes());
