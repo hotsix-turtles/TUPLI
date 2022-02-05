@@ -41,7 +41,9 @@
       <div
         class="d-flex justify-space-around fixed-bottom navbar-background py-1"
       >
-        <div class="clickable d-flex-column text-center">
+        <div
+          class="clickable d-flex-column text-center"
+          @click="$router.push({ name: 'Home' })">
           <v-icon>mdi-home</v-icon>
           <div>홈</div>
         </div>
