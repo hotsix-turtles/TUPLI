@@ -24,9 +24,18 @@ const playroom = {
     roomChats: [],
     chatroomId: '',
     chatBlockedId: [],
-    chatBlockedUid: []
+    chatBlockedUid: [],
+    savedFormData: ''
   },
   mutations: {
+    RESET_FORM_DATA: function (state) {
+      state.savedFormData = ''
+      console.log('RESET_FORM_DATA', state.savedFormData)
+    },
+    SAVE_FORM_DATA: function (state, formData) {
+      state.savedFormData = formData
+      console.log('SAVE_FORM_DATA', state.savedFormData)
+    },
     SET_ROOM_ID: ( state, value ) => state.roomId = value,
     SET_ROOM_TITLE: ( state, value ) => state.roomTitle = value,
     SET_ROOM_PUBLIC: ( state, value ) => state.roomPublic = value,
@@ -154,7 +163,22 @@ const playroom = {
         JSON.stringify({ type: payload.type, roomId: state.roomId, message: payload.message }),
         { Authorization: payload.token }
       );
-    }
+    },
+    saveFormData: function ({ commit }, formData) {
+      console.log('saveFormData', formData)
+      commit('SAVE_FORM_DATA', formData)
+    },
+    createPlayroom: function ({ commit }, formData) {
+      console.log('createPlayroom', formData)
+      axiosConnector.post('/playroom', formData)
+        .then((res) => {
+          console.log(res)
+        })
+        .catch((err) => {
+          console.log(err)
+        })
+      commit('RESET_FORM_DATA')
+    },
   },
   getters: {
     roomPlayTime: ( {roomStartTime, roomEndTime} ) => `${roomStartTime.getHours()}:${roomStartTime.getMinutes()} - ${roomEndTime.getHours()}:${roomEndTime.getMinutes()}`,

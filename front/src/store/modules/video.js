@@ -136,6 +136,30 @@ const video = {
       // }
       state.selectedVideos = []
     },
+    ADD_VIDEOS_FROM_PLAYLIST: function (state, playlist) {
+      for (let selectedVideo of playlist.videos) {
+        const idx = state.addedVideos.findIndex(i => i.videoId === selectedVideo.videoId)
+        if (idx === -1) {
+          state.addedVideos.push(selectedVideo)
+        }
+      }
+      state.selectedVideos = []
+      console.log('state.addedVideos', state.addedVideos)
+    },
+    REMOVE_VIDEOS_FROM_PLAYLIST: function (state) {
+      for (let selectedVideo of playlist.videos) {
+        const idx = state.addedVideos.findIndex(i => i.videoId === selectedVideo.videoId)
+        state.addedVideos.splice(idx, 1)
+      }
+      // let i = 0
+      // while (state.selectedVideos.length > 0) {
+      //   const idx = state.addedVideos.findIndex(x => x.videoId === state.selectedVideos[i].videoId)
+      //   console.log(state.selectedVideos[i].videoId)
+      //   state.addedVideos.splice(idx, 1)
+      //   i++
+      // }
+      state.selectedVideos = []
+    },
     SELECT_ALL_ADDED_VIDEOS: function (state) {
       state.selectedVideos = state.addedVideos.slice()
     },
