@@ -32,4 +32,8 @@
   color: $color-dark-gray;
 }
 
-
+.fixed-bottom {
+  position: fixed;
+  bottom: 0;
+  right: 0;
+}
