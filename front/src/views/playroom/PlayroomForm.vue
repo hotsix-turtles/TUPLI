@@ -55,7 +55,6 @@
               :proped-tags="formData.tags"
               @tag-input="updateTags"
             />
-            />
           </v-col>
         </v-row>
 
