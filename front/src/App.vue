@@ -1,17 +1,5 @@
 <template>
   <v-app>
-    <!-- <router-link to="/home">
-      Home
-    </router-link>
-    <router-link to="/login">
-      Login
-    </router-link>
-    <router-link to="/signup2">
-      Signup
-    </router-link>
-    <router-link to="/signup3">
-      Signup3
-    </router-link> -->
     <v-main>
       <router-view />
     </v-main>
