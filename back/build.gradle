@@ -1,6 +1,13 @@
+buildscript {
+	ext {
+		queryDslVersion = "5.0.0"
+	}
+}
+
 plugins {
 	id 'org.springframework.boot' version '2.6.3'
 	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+	id "com.ewerk.gradle.plugins.querydsl" version "1.0.10"
 	id 'java'
 }
 
@@ -51,13 +58,20 @@ dependencies {
 	implementation group: 'com.vladmihalcea', name: 'hibernate-types-52', version: '2.12.1'
 
 	// Swagger 설정
-	implementation group: 'io.springfox', name: 'springfox-swagger-ui', version: '2.9.2'
-	implementation group: 'io.springfox', name: 'springfox-swagger2', version: '2.9.2'
+	implementation group: 'io.springfox', name: 'springfox-swagger-ui', version: '3.0.0'
+	implementation group: 'io.springfox', name: 'springfox-swagger2', version: '3.0.0'
+	implementation group: 'io.springfox', name: 'springfox-boot-starter', version: '3.0.0'
 
 	//GCP
 	implementation group: 'com.google.cloud', name: 'spring-cloud-gcp-starter', version: '3.0.0'
 	implementation group: 'com.google.cloud', name: 'spring-cloud-gcp-storage', version: '3.0.0'
 
+	//queryDSL
+	implementation "com.querydsl:querydsl-jpa:${queryDslVersion}"
+	implementation "com.querydsl:querydsl-apt:${queryDslVersion}"
+
+	// firebase 실시간 DB 연동
+	implementation group: 'com.google.firebase', name: 'firebase-admin', version: '8.1.0'
 }
 
 configurations {
@@ -67,6 +81,29 @@ configurations {
 
 test {
 	useJUnitPlatform()
+}
+
+//queryDSL
+def querydslDir = "$buildDir/generated/querydsl"
+querydsl {
+	jpa = true
+	querydslSourcesDir = querydslDir
+}
+sourceSets {
+	main.java.srcDir querydslDir
+}
+// 버전이나 IDE 환경에 따라 바뀌기 쉬우니 문제 발생시 구글 참조
+configurations {
+	querydsl.extendsFrom compileClasspath
+}
+compileQuerydsl {
+	options.annotationProcessorPath = configurations.querydsl
+}
+
+// querydsl cannot find symbol 문제 해결
+compileQuerydsl.doFirst {
+	if(file(querydslDir).exists() )
+		delete(file(querydslDir))
 }
 
 
