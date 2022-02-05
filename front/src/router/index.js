@@ -23,6 +23,9 @@ import PlayroomDetail from '../views/playroom/PlayroomDetail.vue'
 import VideoSearch from '../views/video/VideoSearch.vue'
 import VideoWatch from '../views/video/VideoWatch.vue'
 import video from '@/store/index.js'
+import KakaoPaySuccess from '../views/handler/kakaoPay/KakaoPaySuccess.vue'
+import KakaoPayCancel from '../views/handler/kakaoPay/KakaoPayCancel.vue'
+import KakaoPayFail from '../views/handler/kakaoPay/KakaoPayFail.vue'
 
 Vue.use(VueRouter)
 Vue.use(VueMeta)
@@ -150,12 +153,34 @@ const routes = [
     name: 'PlayroomDetail',
     component: PlayroomDetail
   },
+  //handler
+  //카카오
+  {
+    path: '/kakaoPay/success',
+    name: 'KakaoPaySuccess',
+    component: KakaoPaySuccess
+  },
+  {
+    path: '/kakaoPay/cancel',
+    name: 'KakaoPayCancel',
+    component: KakaoPayCancel
+  },
+  {
+    path: '/kakaoPay/fail',
+    name: 'KakaoPayFail',
+    component: KakaoPayFail
+  },
+
+
 ]
 
 const router = new VueRouter({
   mode: 'history',
   base: process.env.BASE_URL,
-  routes
+  routes,
+  scrollBehavior() { 
+    return { x: 0, y: 0 } 
+  },
 })
 
 export default router
