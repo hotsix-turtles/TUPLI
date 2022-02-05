@@ -508,7 +508,7 @@ export default {
         videoOffset: this.roomCurrentVideoOffset,
         videoPlaytime: currentPlaytime
       })
-      this.setRoomCurrentVideoPlaytime(currentPlaytime)
+      this.SET_ROOM_CURRENT_VIDEO_PLAYTIME(currentPlaytime)
     },
     async onVideoPaused() {
       const currentPlaytime = await this.player.getCurrentTime()
@@ -519,7 +519,7 @@ export default {
         videoOffset: this.roomCurrentVideoOffset,
         videoPlaytime: currentPlaytime
       })
-      this.setRoomCurrentVideoPlaytime(currentPlaytime)
+      this.SET_ROOM_CURRENT_VIDEO_PLAYTIME(currentPlaytime)
     },
     onVideoBuffering() {
 
@@ -533,7 +533,7 @@ export default {
 
       if (body.type == 'SYNC')
       {
-        this.$store.commit('playroom/seekVideo', parseFloat(body.message));
+        this.$store.commit('playroom/SEEK_VIDEO', parseFloat(body.message));
       }
       else// if (body.type == 'TALK')
       {
@@ -547,7 +547,7 @@ export default {
         const timestamp = new Date().getTime();
         const blockedUser = ( this.chatBlockedUid.find((v) => v == author.id) != undefined );
         const blockedMessage = ( this.chatBlockedId.find((v) => v == id) != undefined );
-        this.$store.commit('playroom/receiveMessage', { id, author, content, timestamp, blockedUser, blockedMessage });
+        this.$store.commit('playroom/RECEIVE_MESSAGE', { id, author, content, timestamp, blockedUser, blockedMessage });
       }
     },
     selectAllVideo() {
@@ -562,16 +562,16 @@ export default {
       if (this.roomCurrentPlaylistVideos.filter(v => v.included).length < this.roomCurrentVideoOffset + 1)
       {
         if (Object.keys(this.roomPlaylists).length <= this.roomCurrentPlaylistOffset + 1)
-          this.setRoomCurrentPlaylistOffset(0)
+          this.SET_ROOM_CURRENT_PLAYLIST_OFFSET(0)
         else
-          this.setRoomCurrentPlaylistOffset(this.roomCurrentPlaylistOffset + 1)
-        this.setRoomCurrentVideoOffset(0)
-        this.setRoomCurrentVideoPlaytime(0)
+          this.SET_ROOM_CURRENT_PLAYLIST_OFFSET(this.roomCurrentPlaylistOffset + 1)
+        this.SET_ROOM_CURRENT_VIDEO_OFFSET(0)
+        this.SET_ROOM_CURRENT_VIDEO_PLAYTIME(0)
       }
       else
       {
-        this.setRoomCurrentVideoOffset(this.roomCurrentVideoOffset + 1)
-        this.setRoomCurrentVideoPlaytime(0)
+        this.SET_ROOM_CURRENT_VIDEO_OFFSET(this.roomCurrentVideoOffset + 1)
+        this.SET_ROOM_CURRENT_VIDEO_PLAYTIME(0)
       }
     },
     updateVideoId() {
@@ -588,16 +588,16 @@ export default {
         alert('바로 재생할 영상을 1개만 선택해주세요')
         return;
       }
-      this.setRoomCurrentVideoOffset(this.selectedItem[0])
-      this.setRoomCurrentVideoPlaytime(0)
+      this.SET_ROOM_CURRENT_VIDEO_OFFSET(this.selectedItem[0])
+      this.SET_ROOM_CURRENT_VIDEO_PLAYTIME(0)
       this.selectedItem = []
       this.seekTo()
     },
     playroomLike() {
-      this.setRoomLiked(!this.roomLiked)
+      this.SET_ROOOM_LIKED(!this.roomLiked)
       axiosConnector.post(this.roomLiked ? '/playroom/like' : '/playroom/dislike', JSON.stringify({ id: this.roomId }));
     },
-    ...mapMutations('playroom', ['setRoomLiked', 'setRoomCurrentPlaylistOffset', 'setRoomCurrentVideoOffset', 'setRoomCurrentVideoPlaytime'])
+    ...mapMutations('playroom', ['SET_ROOOM_LIKED', 'SET_ROOM_CURRENT_PLAYLIST_OFFSET', 'SET_ROOM_CURRENT_VIDEO_OFFSET', 'SET_ROOM_CURRENT_VIDEO_PLAYTIME'])
   }
 }
 </script>

@@ -22,125 +22,117 @@ const playroom = {
     roomCurrentVideoPlaytime: 0,
     roomSelectedChatItem: { id: '', type: null },
     roomChats: [],
-    // roomChats: [
-    //   { id: 1, author: { id: 1, name: '김형준', thumbnail: 'https://picsum.photos/80/80' }, content: '와 맛있겠다 ㅋㅋㅋ', timestamp: 1643448193, blockedUser: false, blockedMessage: false },
-    //   { id: 2, author: { id: 1, name: '김형준', thumbnail: 'https://picsum.photos/80/80' }, content: '와 맛있겠다 ㅋㅋㅋ', timestamp: 1643448193, blockedUser: false, blockedMessage: false },
-    //   { id: 3, author: { id: 1, name: '김형준', thumbnail: 'https://picsum.photos/80/80' }, content: '와 맛있겠다 ㅋㅋㅋ', timestamp: 1643448193, blockedUser: false, blockedMessage: false },
-    //   { id: 4, author: { id: 1, name: '김형준', thumbnail: 'https://picsum.photos/80/80' }, content: '와 맛있겠다 ㅋㅋㅋ', timestamp: 1643448193, blockedUser: false, blockedMessage: false },
-    //   { id: 5, author: { id: 1, name: '김형준', thumbnail: 'https://picsum.photos/80/80' }, content: '와 맛있겠다 ㅋㅋㅋ', timestamp: 1643448193, blockedUser: false, blockedMessage: false },
-    //   { id: 6, author: { id: 1, name: '김형준', thumbnail: 'https://picsum.photos/80/80' }, content: '와 맛있겠다 ㅋㅋㅋ', timestamp: 1643448193, blockedUser: false, blockedMessage: false },
-    // ]
     chatroomId: '',
     chatBlockedId: [],
     chatBlockedUid: []
   },
   mutations: {
-    setRoomId: ( state, value ) => state.roomId = value,
-    setRoomTitle: ( state, value ) => state.roomTitle = value,
-    setRoomPublic: ( state, value ) => state.roomPublic = value,
-    setRoomLiked: ( state, value ) => state.roomLiked = value,
-    setRoomAuthor: ( state, value ) => {
+    SET_ROOM_ID: ( state, value ) => state.roomId = value,
+    SET_ROOM_TITLE: ( state, value ) => state.roomTitle = value,
+    SET_ROOM_PUBLIC: ( state, value ) => state.roomPublic = value,
+    SET_ROOOM_LIKED: ( state, value ) => state.roomLiked = value,
+    SET_ROOM_AUTHOR: ( state, value ) => {
       state.roomAuthorName = value.name;
       state.roomAuthorProfilePic = value.pic;
       state.roomAuthorFollowerCount = value.follower
     },
-    setRoomStartTime: ( state, value ) => state.roomStartTime = new Date(value),
-    setRoomEndTime: ( state, value ) => state.roomEndTime = new Date(value),
-    setRoomContent: ( state, value ) => state.roomContent = value,
-    setRoomTags: ( state, value ) => state.roomTags = value,
-    setRoomCurrentPlaylistOffset: ( state, value ) => state.roomCurrentPlaylistOffset = value,
-    setRoomPlaylists: ( state, value ) => { state.roomPlaylists = value },
-    setRoomCurrentVideoOffset: ( state, value ) => { state.roomCurrentVideoOffset = value },
-    setRoomCurrentVideoPlaytime: ( state, value ) => { state.roomCurrentVideoPlaytime = value },
-    setChatroomId: ( state, value ) => state.chatroomId = value,
-    blockChatById: ( state, id ) => {
+    SET_ROOM_START_TIME: ( state, value ) => state.roomStartTime = new Date(value),
+    SET_ROOM_END_TIME: ( state, value ) => state.roomEndTime = new Date(value),
+    SET_ROOM_CONTENT: ( state, value ) => state.roomContent = value,
+    SET_ROOM_TAGS: ( state, value ) => state.roomTags = value,
+    SET_ROOM_CURRENT_PLAYLIST_OFFSET: ( state, value ) => state.roomCurrentPlaylistOffset = value,
+    SET_ROOM_PLAYLISTS: ( state, value ) => { state.roomPlaylists = value },
+    SET_ROOM_CURRENT_VIDEO_OFFSET: ( state, value ) => { state.roomCurrentVideoOffset = value },
+    SET_ROOM_CURRENT_VIDEO_PLAYTIME: ( state, value ) => { state.roomCurrentVideoPlaytime = value },
+    SET_ROOM_CHATROOM_ID: ( state, value ) => state.chatroomId = value,
+    BLOCK_CHAT_BY_ID: ( state, id ) => {
       state.roomChats.map((v) => { if (v.id == id) v.blockedMessage = true; })
       state.chatBlockedId.push(id)
     },
-    unblockChatById: ( state, id ) => {
+    UNBLOCK_CHAT_BY_ID: ( state, id ) => {
       state.roomChats.map((v) => { if (v.id == id) v.blockedMessage = false; })
       const idx = state.chatBlockedId.indexOf(id)
       if (idx > -1) state.chatBlockedId.splice(idx, 1)
     },
-    blockChatByUid: ( state, id ) => {
+    BLOCK_CHAT_BY_UID: ( state, id ) => {
       const authorId = state.roomChats.filter((v) => v.id == id)[0].author.id
       state.roomChats.map((v) => { if (v.author.id == authorId) v.blockedUser = true; })
       state.chatBlockedUid.push(authorId)
     },
-    unblockChatByUid: ( state, id ) => {
+    UNBLOCK_CHAT_BY_UID: ( state, id ) => {
       const authorId = state.roomChats.filter((v) => v.id == id)[0].author.id
       state.roomChats.map((v) => { if (v.author.id == authorId) v.blockedUser = false; })
       const idx = state.chatBlockedUid.indexOf(authorId)
       if (idx > -1) state.chatBlockedUid.splice(idx, 1)
     },
-    selectChatItem: ( {roomSelectedChatItem}, id ) => {
+    SELECT_CHAT_ITEM: ( {roomSelectedChatItem}, id ) => {
       if (roomSelectedChatItem.id != '') return;
       Vue.set(roomSelectedChatItem, 'id', id);
       Vue.set(roomSelectedChatItem, 'type', 'CHAT_ITEM');
       return roomSelectedChatItem;
     },
-    selectChatAvatar: ( {roomSelectedChatItem}, id ) => {
+    SELECT_CHAT_AVATAR: ( {roomSelectedChatItem}, id ) => {
       if (roomSelectedChatItem.id != '') return;
       Vue.set(roomSelectedChatItem, 'id', id);
       Vue.set(roomSelectedChatItem, 'type', 'CHAT_AVATAR');
       return roomSelectedChatItem;
     },
-    deselectChatItem: ( {roomSelectedChatItem} ) => {
+    DESELECT_CHAT_ITEM: ( {roomSelectedChatItem} ) => {
       if (roomSelectedChatItem.id == '') return;
       Vue.set(roomSelectedChatItem, 'id', '');
       Vue.set(roomSelectedChatItem, 'type', null);
       return roomSelectedChatItem;
     },
-    seekVideo: ( {roomCurrentVideoPlaytime}, time ) => {
+    SEEK_VIDEO: ( {roomCurrentVideoPlaytime}, time ) => {
       roomCurrentVideoPlaytime = time;
     },
-    receiveMessage: ( { roomChats }, payload ) => {
+    RECEIVE_MESSAGE: ( { roomChats }, payload ) => {
       roomChats.push(payload);
     }
   },
   actions: {
     setRoomInfo: (({commit}, {data}) => {
-      commit('setRoomId', data.id);
-      commit('setRoomTitle', data.title);
-      commit('setRoomPublic', data.isPublic);
-      commit('setRoomAuthor', { name: data.authorName, pic: data.authorProfilePic, follower: data.authorFollowerCount});
-      commit('setRoomStartTime', data.startTime);
-      commit('setRoomEndTime', data.endTime);
-      commit('setRoomContent', data.content);
-      commit('setRoomTags', data.tags);
-      commit('setRoomCurrentPlaylistOffset', data.currentPlaylistOffset)
-      commit('setRoomPlaylists', data.playlists);
-      commit('setRoomCurrentVideoOffset', data.currentVideoOffset)
-      commit('setRoomCurrentVideoPlaytime', data.currentVideoPlaytime)
-      commit('setChatroomId', data.chatroomId);
+      commit('SET_ROOM_ID', data.id);
+      commit('SET_ROOM_TITLE', data.title);
+      commit('SET_ROOM_PUBLIC', data.isPublic);
+      commit('SET_ROOM_AUTHOR', { name: data.authorName, pic: data.authorProfilePic, follower: data.authorFollowerCount});
+      commit('SET_ROOM_START_TIME', data.startTime);
+      commit('SET_ROOM_END_TIME', data.endTime);
+      commit('SET_ROOM_CONTENT', data.content);
+      commit('SET_ROOM_TAGS', data.tags);
+      commit('SET_ROOM_CURRENT_PLAYLIST_OFFSET', data.currentPlaylistOffset)
+      commit('SET_ROOM_PLAYLISTS', data.playlists);
+      commit('SET_ROOM_CURRENT_VIDEO_OFFSET', data.currentVideoOffset)
+      commit('SET_ROOM_CURRENT_VIDEO_PLAYTIME', data.currentVideoPlaytime)
+      commit('SET_ROOM_CHATROOM_ID', data.chatroomId);
     }),
     followUser: ({commit}, id) => {
       console.log('유저 팔로우 처리')
-      commit('deselectChatItem')
+      commit('DESELECT_CHAT_ITEM')
     },
     showUserProfile: ({commit}, id) => {
       console.log('유저 프로필 로드 처리')
-      commit('deselectChatItem')
+      commit('DESELECT_CHAT_ITEM')
     },
     blockUser: ({commit}, id) => {
       console.log('유저 차단 처리')
-      commit('blockChatByUid', id)
-      commit('deselectChatItem')
+      commit('BLOCK_CHAT_BY_UID', id)
+      commit('DESELECT_CHAT_ITEM')
     },
     blockMessage: ({commit}, id) => {
       console.log('메시지 차단 처리')
-      commit('blockChatById', id)
-      commit('deselectChatItem')
+      commit('BLOCK_CHAT_BY_ID', id)
+      commit('DESELECT_CHAT_ITEM')
     },
     unblockUser: ({commit}, id) => {
       console.log('유저 차단 해제 처리')
-      commit('unblockChatByUid', id)
-      commit('deselectChatItem')
+      commit('UNBLOCK_CHAT_BY_UID', id)
+      commit('DESELECT_CHAT_ITEM')
     },
     unblockMessage: ({commit}, id) => {
       console.log('메시지 차단 해제 처리')
-      commit('unblockChatById', id)
-      commit('deselectChatItem')
+      commit('UNBLOCK_CHAT_BY_ID', id)
+      commit('DESELECT_CHAT_ITEM')
     },
     sharePlayroom: (state, id) => {
       // TODO:
