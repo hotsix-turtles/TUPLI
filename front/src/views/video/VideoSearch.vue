@@ -12,15 +12,14 @@
     />
     <!-- 하단 리스트에 추가하기 버튼 -->
     <add-button-bottom />
-    {{ selectedVideos }}
-    <!-- {{ searchedVideos }} -->
     <!-- 무한스크롤 -->
     <infinite-loading
+      v-if="searchedVideos.length > 0"
       spinner="waveDots"
       @infinite="searchVideosByScroll"
     >
       <div slot="no-results" />
-    </infinite-loading>
+    </infinite-loading><br><br>
   </div>
 </template>
 
