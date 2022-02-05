@@ -1,5 +1,7 @@
 <template>
-  <v-btn>
+  <v-btn
+    @click="$emit('click')"
+  >
     <span :style="{ color: color }">{{ content }}</span>
     <v-icon :color="color">
       {{ icon }}

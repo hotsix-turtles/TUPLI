@@ -9,7 +9,7 @@
     <div
       class="d-flex justify-space-between container"
       width="100%"
-      @click="selectVideo"
+      @click="clickVideo"
     >
       <div class="d-flex">
         <div class="video-thumbnail">
@@ -68,43 +68,49 @@
 </template>
 
 <script>
+import Vue from 'vue'
 import { mapActions, mapState } from 'vuex'
 
 export default {
-  name: 'VideoItemSmall',
+  name: 'PlaylistVideoItemSmall',
   props: {
-    // eslint-disable-next-line vue/require-default-prop
-    video: { type: Object },
+    playlistId: { type: Number, default: 0 },
+    playlistSelected: { type: Boolean, default: false },
+    video: { type: Object, default() {} },
+    readonly: { type: Boolean, defautl: false }
   },
   data() {
     return {
     }
   },
   computed: {
-    ...mapState('video', {
-      selectedVideos: state => state.selectedVideos,
-    }),
-    isSelected: function () {
-      return this.selectedVideos.findIndex(x => x.videoId === this.video.videoId)
+    selected() {
+      return this.addedPlaylistVideoIds.find(addedPlaylistVideoId => addedPlaylistVideoId == this.video.videoId)
     },
-    color: function () {
-      return this.isSelected === -1 ? "white" : "#dde"
-    }
+    color() {
+      return this.playlistSelected || this.selected ? "#dde" : "white"
+    },
+    ...mapState('playlist', ['addedPlaylists', 'addedPlaylistVideoIds', 'selectedPlaylists'])
   },
   methods: {
-    ...mapActions('video', [
-      'watchingVideo',
-      'addSelectedVideo',
-      'removeSelectedVideo',
-      'resetVideoSearchState',
-    ]),
-    selectVideo: function() {
-      if (this.isSelected !== -1) {
-        this.removeSelectedVideo(this.video.videoId)
-      } else {
-        this.addSelectedVideo(this.video)
+    clickVideo() {
+      if (this.readonly) return;
+      if (this.selected)
+      {
+        this.deselectPlaylistVideo(this.video.videoId);
+      }
+      else
+      {
+        this.selectPlaylistVideo(this.video.videoId);
       }
     },
+    ...mapActions('playlist', [
+      'selectPlaylistVideo',
+      'deselectPlaylistVideo',
+    ]),
+    ...mapActions('video', [
+      'watchingVideo',
+    ])
   },
 }
 </script>

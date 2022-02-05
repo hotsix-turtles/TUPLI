@@ -21,11 +21,19 @@
 }
 
 .color-main {
-    color: $color-main;
+    color: $color-main !important;
 }
 
 .color-sub {
-  color: $color-sub;
+  color: $color-sub !important;
+}
+
+.bg-color-main {
+  background-color: $color-main !important;
+}
+
+.bg-color-sub {
+  background-color: $color-sub !important;
 }
 
 .color-dark-gray {
@@ -36,4 +44,8 @@
   position: fixed;
   bottom: 0;
   right: 0;
+}
+
+.line-height-s {
+  line-height: 18px;
 }

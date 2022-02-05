@@ -12,3 +12,11 @@ $color-main: #5B5C9D;
 $color-sub: #F6F7FF;
 $color-light-gray: #F5F5F5;
 $color-dark-gray: #8B8B8B;
+
+
+// Vuetify
+// 뱃지
+$badge-color: ap-get($color-sub, $color-main);
+$badge-dot-height: 12px;
+$badge-dot-width: 12px;
+// $badge-height: 26px;

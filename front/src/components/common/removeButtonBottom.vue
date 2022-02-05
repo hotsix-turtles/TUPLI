@@ -14,19 +14,19 @@
       offset-x="120"
       offset-y="10"
       overlap
-      class="videoCounter shadow-s"
+      class="videoCounter"
     />
     <div
       class="d-flex align-center"
-      @click="addVideos"
+      @click="removeVideos"
     >
       <div>
         <v-icon color="white">
-          mdi-plus-box
+          mdi-trash-can-outline
         </v-icon>
       </div>
       <div style="color: white;">
-        추가
+        삭제
       </div>
     </div>
   </v-bottom-navigation>
@@ -36,7 +36,7 @@
 import { mapActions, mapState } from 'vuex'
 
 export default {
-  name: 'AddButtonBottom',
+  name: 'RemoveButtonBottom',
   components: {
   },
   props: {
@@ -48,7 +48,7 @@ export default {
   },
   methods: {
     ...mapActions('video', [
-      'addVideos'
+      'removeVideos'
     ])
   }
 }

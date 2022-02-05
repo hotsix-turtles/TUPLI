@@ -3,9 +3,13 @@
     <!-- 뒤로가기/완료 -->
     <div class="d-flex justify-space-between">
       <back :page-name="pageName" />
-      <p class="clickable">
+      <v-btn
+        class="clickable"
+        text
+        @click="submit"
+      >
         완료
-      </p>
+      </v-btn>
     </div>
 
     <!-- 플레이룸 생성 폼 -->
@@ -47,10 +51,9 @@
             cols="12"
             md="4"
           >
-            <TagInput
-              v-model="formData.tags"
-              :counter="80"
-              label="플레이룸 태그를 입력해주세요."
+            <tag-input
+              :proped-tags="formData.tags"
+              @tag-input="updateTags"
             />
           </v-col>
         </v-row>
@@ -163,7 +166,10 @@
             md="12"
             class="py-0"
           >
-            <v-btn small>
+            <v-btn
+              small
+              @click="saveAndGo"
+            >
               <v-icon color="black">
                 mdi-plus
               </v-icon>
@@ -183,6 +189,7 @@
               small
               elevation="0"
               color="white"
+              @click="selectAllVideo"
             >
               <v-icon class="mdi-18px">
                 mdi-check
@@ -190,7 +197,7 @@
               <span class="ml-1">전체 선택</span>
             </v-btn>
             <p class="font-4">
-              {{ numberOfPlaylist }}개 플레이리스트 / {{ numberOfPlaylistVideos }}개 영상 선택
+              {{ numberOfAddedPlaylists }}개 플레이리스트 / {{ numberOfAddedPlaylistSelectedVideos }}개 영상 선택
             </p>
           </v-col>
         </v-row>
@@ -202,43 +209,11 @@
             md="12"
             class="pt-0"
           >
-            <v-expansion-panels
-              v-for="playlist in formData.playlists"
-              :id="playlist.id"
-              :key="playlist.id"
-              class="mx-auto"
-            >
-              <v-expansion-panel
-                class="py-2"
-                elevation="0"
-              >
-                <v-expansion-panel-header>
-                  <v-avatar
-                    size="80"
-                    class="ml-2 my-2"
-                  >
-                    <v-img
-                      :src="playlist.thumbnailSrc"
-                      contain
-                    />
-                  </v-avatar>
-                  {{ playlist.name }}
-                </v-expansion-panel-header>
-                <v-expansion-panel-content>
-                  <PlaylistVideoItem
-                    v-for="video in playlist.videos"
-                    :id="video.id"
-                    :key="video.id"
-                    :title="video.title"
-                    :thumbnail="video.thumbnail_url"
-                    :author="video.author"
-                    :playtime="video.playtime"
-                    :selected="video.included"
-                    @click="onVideoItemClicked"
-                  />
-                </v-expansion-panel-content>
-              </v-expansion-panel>
-            </v-expansion-panels>
+            <playlist-list-item-small
+              :playlists="addedPlaylists"
+              :playlist-readonly="true"
+              :video-readonly="false"
+            />
           </v-col>
         </v-row>
       </v-container>
@@ -247,60 +222,38 @@
 </template>
 
 <script>
+import { mapGetters, mapState } from 'vuex'
 import Back from '../../components/common/Back.vue'
-import PlaylistVideoItem from '../playroom/PlaylistVideoItem.vue'
+import PlaylistListItemSmall from '../../components/playlist/PlaylistListItemSmall.vue'
 import TagInput from '../../components/common/TagInput.vue'
+import { mapActions } from 'vuex'
 
 export default {
   name: 'PlaylistForm',
   components: {
     Back,
     TagInput,
-    PlaylistVideoItem
+    PlaylistListItemSmall
   },
   data: function() {
     return {
       pageName: "내 플레이룸 만들기",
       titleRules: [
         v => !!v || '제목은 필수입니다.',
-        v => v.length <= 2 || '제목은 3글자 이상 작성해야 합니다.',
+        v => v.length > 2 || '제목은 3글자 이상 작성해야 합니다.',
       ],
       isValid: false,
       // Create할 때 넘길 데이터
       formData: {
         title: '',
         content: '',
-        tags: '',
+        tags: [],
         isPublic: true,
-        titleRules: [
-          v => !!v || '제목은 필수입니다.',
-          v => v.length <= 2 || '제목은 3글자 이상 작성해야 합니다.',
-        ],
-        friends: [
-          { id: 1, name: "김형준" },
-          { id: 2, name: "김기솔" },
-          { id: 3, name: "최하영" },
-        ],
-        playlists: [
-          {
-            id: 1, name: "3일만에 다이어트 포기함 ㅅㄱ", thumbnailSrc: "https://picsum.photos/80/80",
-            videos: [
-              {id: 1, title: '해ㅐㅇ', thumbnail_url: 'https://picsum.photos/120/80', author: '쯔양', playtime: '01:30', included: false},
-              {id: 2, title: '해ㅐㅇ', thumbnail_url: 'https://picsum.photos/120/80', author: '쯔양', playtime: '01:30', included: false},
-              {id: 3, title: '해ㅐㅇ', thumbnail_url: 'https://picsum.photos/120/80', author: '쯔양', playtime: '01:30', included: false},
-              {id: 4, title: '해ㅐㅇ', thumbnail_url: 'https://picsum.photos/120/80', author: '쯔양', playtime: '01:30', included: false},
-            ]
-          },
-          {
-            id: 2, name: "3일만에 다이어트 포기함 ㅅㄱ", thumbnailSrc: "https://picsum.photos/80/80",
-            videos: [
-              {id: 5, title: '해ㅐㅇ', thumbnail_url: 'https://picsum.photos/120/80', author: '쯔양', playtime: '01:30', included: false},
-              {id: 6, title: '해ㅐㅇ', thumbnail_url: 'https://picsum.photos/120/80', author: '쯔양', playtime: '01:30', included: false},
-              {id: 7, title: '해ㅐㅇ', thumbnail_url: 'https://picsum.photos/120/80', author: '쯔양', playtime: '01:30', included: false},
-            ]
-          }
-        ]
-      }
+        friends: [],
+        playlists: []
+      },
+      numberOfPlaylist: 0,
+      numberOfPlaylistVideos: 0
     }
   },
   computed: {
@@ -310,18 +263,42 @@ export default {
     numberOfFriend () {
       return this.formData.friends.length
     },
-    numberOfPlaylist () {
-      return this.formData.playlists.length
-    },
-    numberOfPlaylistVideos () {
-      return this.formData.playlists.reduce((acc, cur) => acc + cur.videos.reduce((acc, cur) => acc + (cur.included ? 1 : 0), 0), 0)
+    ...mapState('playlist', ['addedPlaylists']),
+    ...mapState('playroom', ['savedFormData']),
+    ...mapGetters('playlist', ['numberOfAddedPlaylists', 'numberOfAddedPlaylistSelectedVideos', 'numberOfAddedPlaylistVideos'])
+  },
+  created: function () {
+    if (this.savedFormData) {
+      console.log('restoreData', this.savedFormData)
+      this.formData = this.savedFormData
     }
   },
   methods: {
+    updateTags: function (tags) {
+      this.formData.tags = tags
+    },
     onVideoItemClicked ( { id, selected }) {
       return this.formData.playlists.map((playlist) => playlist.videos.map((v) => v.included = (v.id == id ? !selected : v.included)))
-    }
-  }
+    },
+    submit() {
+      if (this.formData.tags) this.formData.tags = this.formData.tags.join()
+      this.formData.playlists = this.addedPlaylists
+      console.log(this.formData)
+      this.createPlayroom(this.formData)
+    },
+    saveAndGo: function () {
+      this.saveFormData(this.formData)
+      this.$router.push({ name: 'PlayroomFormPlaylist'})
+    },
+    selectAllVideo () {
+      if (!this.numberOfAddedPlaylistVideos == this.numberOfAddedPlaylistSelectedVideos)
+        this.selectAllPlaylistVideo()
+      else
+        this.deselectAllPlaylistVideo()
+    },
+    ...mapActions('playroom', ['saveFormData', 'createPlayroom']),
+    ...mapActions('playlist', ['selectAllPlaylistVideo', 'deselectAllPlaylistVideo'])
+  },
 }
 </script>
 

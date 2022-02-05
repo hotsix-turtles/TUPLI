@@ -3,7 +3,7 @@
     size="80"
     class="ml-2 my-2"
     :class="{ selected: selected, not_selected: !selected }"
-    @click="setRoomCurrentPlaylistOffset(id)"
+    @click="SET_ROOM_CURRENT_PLAYLIST_OFFSET(id)"
   >
     <v-img
       :src="src"
@@ -27,7 +27,7 @@ export default {
     }
   },
   methods: {
-    ...mapMutations('playroom', ['setRoomCurrentPlaylistOffset'])
+    ...mapMutations('playroom', ['SET_ROOM_CURRENT_PLAYLIST_OFFSET'])
   }
 }
 </script>

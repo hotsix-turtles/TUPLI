@@ -25,19 +25,22 @@
       <NavButton
         color="white"
         content="영상보기"
-        icon="mdi-play" />
+        icon="mdi-play"
+      />
 
       <!-- 내 플레이리스트 버튼 -->
       <NavButton
         color="white"
         content="내 플레이리스트"
-        icon="mdi-disc" />
+        icon="mdi-disc"
+      />
 
       <!-- 저장하기 버튼 -->
       <NavButton
         color="white"
         content="저장하기"
-        icon="mdi-bookmark" />
+        icon="mdi-bookmark"
+      />
     </v-bottom-navigation>
 
     <!-- 플레이룸 페이지 -->
@@ -82,7 +85,6 @@
               mdi-thumb-up
             </v-icon>
           </v-btn>
-
 
           <!-- 플레이룸 댓글 -->
           <v-btn
@@ -246,7 +248,6 @@
         </div>
       </div>
 
-
       <!-- 플레이룸 채팅창 -->
       <v-dialog
         v-model="isChatting"
@@ -261,7 +262,6 @@
             <v-btn
               icon
               class="ml-auto"
-
               @click="isChatting = false"
             >
               <v-icon>mdi-close</v-icon>
@@ -277,7 +277,6 @@
                 :profile="chat.author.thumbnail"
                 :content="chat.content"
                 :timestamp="chat.timestamp"
-
                 :blocked-user="chat.blockedUser"
                 :blocked-message="chat.blockedMessage"
               />
@@ -517,7 +516,7 @@ export default {
         videoOffset: this.roomCurrentVideoOffset,
         videoPlaytime: currentPlaytime
       })
-      this.setRoomCurrentVideoPlaytime(currentPlaytime)
+      this.SET_ROOM_CURRENT_VIDEO_PLAYTIME(currentPlaytime)
     },
     async onVideoPaused() {
       const currentPlaytime = await this.player.getCurrentTime()
@@ -528,7 +527,7 @@ export default {
         videoOffset: this.roomCurrentVideoOffset,
         videoPlaytime: currentPlaytime
       })
-      this.setRoomCurrentVideoPlaytime(currentPlaytime)
+      this.SET_ROOM_CURRENT_VIDEO_PLAYTIME(currentPlaytime)
     },
     onVideoBuffering() {
 
@@ -542,7 +541,7 @@ export default {
 
       if (body.type == 'SYNC')
       {
-        this.$store.commit('playroom/seekVideo', parseFloat(body.message));
+        this.$store.commit('playroom/SEEK_VIDEO', parseFloat(body.message));
       }
       else// if (body.type == 'TALK')
       {
@@ -556,7 +555,7 @@ export default {
         const timestamp = new Date().getTime();
         const blockedUser = ( this.chatBlockedUid.find((v) => v == author.id) != undefined );
         const blockedMessage = ( this.chatBlockedId.find((v) => v == id) != undefined );
-        this.$store.commit('playroom/receiveMessage', { id, author, content, timestamp, blockedUser, blockedMessage });
+        this.$store.commit('playroom/RECEIVE_MESSAGE', { id, author, content, timestamp, blockedUser, blockedMessage });
       }
     },
     selectAllVideo() {
@@ -571,16 +570,16 @@ export default {
       if (this.roomCurrentPlaylistVideos.filter(v => v.included).length < this.roomCurrentVideoOffset + 1)
       {
         if (Object.keys(this.roomPlaylists).length <= this.roomCurrentPlaylistOffset + 1)
-          this.setRoomCurrentPlaylistOffset(0)
+          this.SET_ROOM_CURRENT_PLAYLIST_OFFSET(0)
         else
-          this.setRoomCurrentPlaylistOffset(this.roomCurrentPlaylistOffset + 1)
-        this.setRoomCurrentVideoOffset(0)
-        this.setRoomCurrentVideoPlaytime(0)
+          this.SET_ROOM_CURRENT_PLAYLIST_OFFSET(this.roomCurrentPlaylistOffset + 1)
+        this.SET_ROOM_CURRENT_VIDEO_OFFSET(0)
+        this.SET_ROOM_CURRENT_VIDEO_PLAYTIME(0)
       }
       else
       {
-        this.setRoomCurrentVideoOffset(this.roomCurrentVideoOffset + 1)
-        this.setRoomCurrentVideoPlaytime(0)
+        this.SET_ROOM_CURRENT_VIDEO_OFFSET(this.roomCurrentVideoOffset + 1)
+        this.SET_ROOM_CURRENT_VIDEO_PLAYTIME(0)
       }
     },
     updateVideoId() {
@@ -597,16 +596,16 @@ export default {
         alert('바로 재생할 영상을 1개만 선택해주세요')
         return;
       }
-      this.setRoomCurrentVideoOffset(this.selectedItem[0])
-      this.setRoomCurrentVideoPlaytime(0)
+      this.SET_ROOM_CURRENT_VIDEO_OFFSET(this.selectedItem[0])
+      this.SET_ROOM_CURRENT_VIDEO_PLAYTIME(0)
       this.selectedItem = []
       this.seekTo()
     },
     playroomLike() {
-      this.setRoomLiked(!this.roomLiked)
+      this.SET_ROOOM_LIKED(!this.roomLiked)
       axiosConnector.post(this.roomLiked ? '/playroom/like' : '/playroom/dislike', JSON.stringify({ id: this.roomId }));
     },
-    ...mapMutations('playroom', ['setRoomLiked', 'setRoomCurrentPlaylistOffset', 'setRoomCurrentVideoOffset', 'setRoomCurrentVideoPlaytime'])
+    ...mapMutations('playroom', ['SET_ROOOM_LIKED', 'SET_ROOM_CURRENT_PLAYLIST_OFFSET', 'SET_ROOM_CURRENT_VIDEO_OFFSET', 'SET_ROOM_CURRENT_VIDEO_PLAYTIME'])
   }
 }
 </script>

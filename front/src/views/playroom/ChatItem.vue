@@ -6,11 +6,11 @@
       md="4"
       class="d-flex align-center pa-1"
       style="width: 100%"
-      @click.stop="selectChatItem(id)"
+      @click.stop="SELECT_CHAT_ITEM(id)"
     >
       <v-avatar
         circle
-        @click.stop="selectChatAvatar(id)"
+        @click.stop="SELECT_CHAT_AVATAR(id)"
       >
         <v-img
           :src="profile"
@@ -54,7 +54,7 @@
       v-model="selected"
       hide-overlay
       max-width="500px"
-      @click:outside="deselectChatItem"
+      @click:outside="DESELECT_CHAT_ITEM"
     >
       <v-card v-if="roomSelectedChatItem.type == 'CHAT_ITEM'">
         <v-card-title>
@@ -70,7 +70,6 @@
             메시지 차단
           </v-btn>
           <v-btn
-
             v-else
             block
             text
@@ -100,7 +99,6 @@
             유저 프로필
           </v-btn>
           <v-btn
-
             v-if="!blockedUser"
             block
             text
@@ -155,7 +153,7 @@ export default {
     ...mapState('playroom', ['roomSelectedChatItem'])
   },
   methods: {
-    ...mapMutations('playroom', ['selectChatItem', 'selectChatAvatar', 'deselectChatItem']),
+    ...mapMutations('playroom', ['SELECT_CHAT_ITEM', 'SELECT_CHAT_AVATAR', 'DESELECT_CHAT_ITEM']),
     ...mapActions('playroom', [ 'followUser', 'showUserProfile', 'blockUser', 'blockMessage', 'unblockUser', 'unblockMessage' ])
   }
 }

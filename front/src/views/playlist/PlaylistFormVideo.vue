@@ -23,17 +23,15 @@
 
     <!-- 탭에 따른 결과물 -->
     <video-list-item-small
-      :liked-videos="likedVideos"
+      :videos="likedVideos"
     />
     <video-list-item-small
-      :saved-videos="savedVideos"
+      :videos="savedVideos"
     />
-    >>>>>>> 2e271a7bd18cd87da6b2056108ea373197c120d5
   </div>
 </template>
 
 <script>
-
 import { mapState } from 'vuex'
 import Back from '../../components/common/Back.vue'
 import SearchBar from '../../components/common/SearchBar.vue'
@@ -64,6 +62,5 @@ export default {
 </script>
 
 <style>
-
 
 </style>
