@@ -11,6 +11,7 @@
     "axios": "^0.25.0",
     "core-js": "^3.6.5",
     "vue": "^2.6.11",
+    "vue-infinite-loading": "^2.4.5",
     "vue-meta": "^2.4.0",
     "vue-router": "^3.2.0",
     "vue-youtube": "^1.4.0",

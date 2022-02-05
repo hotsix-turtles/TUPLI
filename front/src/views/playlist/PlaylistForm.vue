@@ -3,9 +3,9 @@
     <!-- 뒤로가기/완료 -->
     <div class="d-flex justify-space-between">
       <back :page-name="pageName" />
-      <p class="clickable">
+      <span class="clickable">
         완료
-      </p>
+      </span>
     </div>
 
     <!-- 플레이리스트 생성 폼 -->
@@ -16,12 +16,13 @@
           <v-col
             cols="12"
             md="4"
+            class="py-0"
           >
             <v-text-field
               v-model="title"
               :rules="titleRules"
               :counter="30"
-              label="플레이리스트 제목을 입력해주세요."
+              label="플레이리스트 제목"
               required
             />
           </v-col>
@@ -30,11 +31,12 @@
           <v-col
             cols="12"
             md="4"
+            class="py-0"
           >
             <v-text-field
               v-model="content"
               :counter="80"
-              label="플레이리스트 소개글을 입력해주세요."
+              label="플레이리스트 소개글"
             />
           </v-col>
 
@@ -42,38 +44,80 @@
           <v-col
             cols="12"
             md="4"
+            class="py-0"
+          >
+            <tag-input
+              @tag-input="updateTags"
+            />
+          </v-col>
+          <!-- <v-col
+            cols="12"
+            md="4"
+            class="py-0"
           >
             <v-text-field
               v-model="content"
               :counter="80"
               label="플레이리스트 태그를 입력해주세요."
             />
-          </v-col>
+          </v-col> -->
 
           <!-- 공개 여부 -->
-          <v-col class="d-flex justify-space-between">
+          <v-col
+            class="d-flex justify-space-between py-0"
+            cols="12"
+            md="4"
+          >
             <div class="d-flex">
-              <p>공개 설정</p>
-              <p class="font-4">
+              <span>공개 설정</span>
+              <span class="font-4">
                 {{ isPublicMsg }}
-              </p>
+              </span>
             </div>
             <v-switch
               v-model="formData.isPublic"
             />
           </v-col>
         </v-row>
+        <v-btn
+          color="accent"
+          elevation="2"
+          rounded
+          @click="$router.push({ name: 'PlaylistFormVideo'} )"
+        >
+          <v-icon>mdi-plus</v-icon>
+          <span>영상 추가</span>
+        </v-btn>
+        <!-- 플레이리스트에 담긴 영상 리스트 -->
+        <div class="d-flex justify-space-between">
+          <div>
+            <v-icon>mdi-check</v-icon>
+            <span class="clickable">전체 선택</span>
+          </div>
+          <div>
+            <span>{{ addedVideos.length }}개 영상 선택</span>
+          </div>
+        </div>
+        <video-list-item-small
+          :added-videos="addedVideos"
+        />
       </v-container>
     </v-form>
   </div>
 </template>
 
 <script>
+import { mapState } from 'vuex'
+
 import Back from '../../components/common/Back.vue'
+import TagInput from '../../components/common/TagInput.vue'
+import VideoListItemSmall from '../../components/video/VideoListItemSmall.vue'
 export default {
   name: 'PlaylistForm',
   components: {
-    Back
+    Back,
+    VideoListItemSmall,
+    TagInput,
   },
   data: function() {
     return {
@@ -96,7 +140,16 @@ export default {
     isPublicMsg () {
       return this.formData.isPublic ? "내 플레이리스트를 공개합니다." : "내 플레이리스트를 비공개합니다."
     },
-  }
+    ...mapState('video', {
+      addedVideos: state => state.addedVideos,
+    }),
+  },
+  methods: {
+    updateTags: function (tags) {
+      this.formData.tags = tags
+      console.log(this.formData)
+    }
+  },
 }
 </script>
 
