@@ -37,7 +37,7 @@
             block
             elevation="0"
             rounded
-            @click="login"
+            @click="requestLogin"
           >
             로그인
           </v-btn>
@@ -163,7 +163,7 @@ export default {
 
   methods: {
     // 로그인
-    login: function () {
+    requestLogin: function () {
       this.login(this.credentials)
       this.valid = true
     },

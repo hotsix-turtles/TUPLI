@@ -10,18 +10,25 @@
   >
     <v-badge
       :content="selectedVideos.length"
-      color="#8B8B8B"
+      color="#F6F7FF"
       offset-x="120"
       offset-y="10"
       overlap
-      class="videoCounter"
+      class="videoCounter shadow-s"
     />
-    <v-btn @click="addVideos">
-      <span style="color: white;">추가</span>
-      <v-icon color="white">
-        mdi-plus-box
-      </v-icon>
-    </v-btn>
+    <div
+      class="d-flex align-center"
+      @click="addVideos"
+    >
+      <div>
+        <v-icon color="white">
+          mdi-plus-box
+        </v-icon>
+      </div>
+      <div style="color: white;">
+        추가
+      </div>
+    </div>
   </v-bottom-navigation>
 </template>
 
@@ -33,10 +40,6 @@ export default {
   components: {
   },
   props: {
-    // eslint-disable-next-line vue/require-default-prop
-    cntClickedItems: {
-      type: Number,
-    }
   },
   computed: {
     ...mapState('video', {

@@ -23,10 +23,10 @@
 
     <!-- 탭에 따른 결과물 -->
     <video-list-item-small
-      :liked-videos="likedVideos"
+      :videos="likedVideos"
     />
     <video-list-item-small
-      :saved-videos="savedVideos"
+      :videos="savedVideos"
     />
   </div>
 </template>

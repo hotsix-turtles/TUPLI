@@ -3,6 +3,7 @@ import VueMeta from 'vue-meta'
 import VueRouter from 'vue-router'
 import PlaylistForm from '@/views/playlist/PlaylistForm'
 import PlaylistFormVideo from '@/views/playlist/PlaylistFormVideo'
+import PlaylistDetail from '@/views/playlist/PlaylistDetail'
 import Category from '@/views/common/Category'
 import Search from '@/views/common/Search'
 import Login from '../views/accounts/Login.vue'
@@ -38,6 +39,11 @@ const routes = [
     path: '/playlist/create/video',
     name: 'PlaylistFormVideo',
     component: PlaylistFormVideo
+  },
+  {
+    path: '/playlist/:playlistId', // router.push({ name: 'user', params: { userId: '123' } })
+    name: 'PlaylistDetail',
+    component: PlaylistDetail
   },
   // 둘러보기
   {

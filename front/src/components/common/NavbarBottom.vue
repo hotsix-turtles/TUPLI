@@ -67,7 +67,7 @@
           @click="$router.push({ name: 'Category' })"
         >
           <v-icon>mdi-compass</v-icon>
-          <div>둘러보기</div>
+          <div>탐색</div>
         </div>
 
         <div
