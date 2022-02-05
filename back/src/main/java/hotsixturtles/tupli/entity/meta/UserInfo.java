@@ -37,4 +37,8 @@ public class UserInfo {
 
     private Long boardUpload = 0L;
 
+    private Long loginCount = 0L;
+
+    private Long dailyCheck = 0L;
+
 }
