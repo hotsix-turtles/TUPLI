@@ -9,8 +9,12 @@ import hotsixturtles.tupli.entity.auth.ProviderType;
 import hotsixturtles.tupli.entity.auth.RoleType;
 import hotsixturtles.tupli.entity.likes.UserDislikes;
 import hotsixturtles.tupli.entity.likes.UserLikes;
+import hotsixturtles.tupli.entity.meta.UserInfo;
+import hotsixturtles.tupli.repository.UserInfoRepository;
 import hotsixturtles.tupli.repository.UserRepository;
+import hotsixturtles.tupli.service.BadgeService;
 import hotsixturtles.tupli.service.FileService;
+import hotsixturtles.tupli.service.UserInfoService;
 import hotsixturtles.tupli.service.UserService;
 import hotsixturtles.tupli.service.token.JwtTokenProvider;
 import io.swagger.annotations.Api;
@@ -47,8 +51,11 @@ import java.util.Map;
 public class UserApiController {
 
     private final UserRepository userRepository;
+    private final UserInfoRepository userInfoRepository;
 
     private final UserService userService;
+    private final UserInfoService userInfoService;
+    private final BadgeService badgeService;
     private final FileService fileService;
     private final PasswordEncoder passwordEncoder;
 
@@ -149,6 +156,11 @@ public class UserApiController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(new ErrorResponse(messageSource.getMessage("error.wrong.password", null, LocaleContextHolder.getLocale())));
         }
+
+        UserInfo nowUserinfo = userInfoRepository.findOneByUserSeq(user.getUserSeq());
+        nowUserinfo.setLoginCount(nowUserinfo.getLoginCount() + 1L);
+        userInfoRepository.save(nowUserinfo);
+
         String token = jwtTokenProvider.createToken(user.getUsername(), user.getUserSeq());
 
         return ResponseEntity.ok(new LoginUserResponse(token));
