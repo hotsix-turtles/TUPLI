@@ -1,7 +1,7 @@
 <template>
   <v-app>
     <v-main>
-      <router-view />
+      <router-view :key="$route.path" />
     </v-main>
     <navbar-bottom class="mt-auto fixed" />
   </v-app>
