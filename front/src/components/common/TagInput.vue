@@ -31,7 +31,8 @@ export default {
     return {
       tags: [],
       items: [],
-      search: "" //sync search
+      search: "", //sync search
+      select: []
     }
   },
   watch: {

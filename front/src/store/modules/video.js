@@ -17,13 +17,20 @@ const video = {
     savedVideos: [], // 저장한 영상
   },
   mutations: {
-    // Video State 초기화
+    // Video Search State 초기화
     RESET_VIDEO_SEARCH_STATE: function (state) {
       state.searchedVideos = []
       state.selectedVideos = []
       state.nextPageToken = ''
       console.log('RESET_VIDEO_SEARCH_STATE')
     },
+    // Video Add State 초기화
+    RESET_VIDEO_ADD_STATE: function (state) {
+      state.addedVideos = []
+      state.selectedVideos = []
+      console.log('RESET_VIDEO_ADD_STATE')
+    },
+    // 유튜브 검색 (기본 정보)
     SEARCH_VIDEOS: function (state, searchedVideos) {
       state.selectedVideos = []
       state.searchedVideos = []
@@ -40,39 +47,50 @@ const video = {
         state.searchedVideoIds.push(searchedVideo.id.videoId)
       }
     },
+    // 카테고리ID, 영상길이 정보 추가
     SEARCH_VIDEOS_ADD_INFO: function (state, addInfos) {
 
-      state.searchedVideos.forEach(searchedVideo => {
+      function HMS(input, type){
+        let index = input.indexOf(type);
 
+        if(index < 0 & type != 'H'){
+          return "00"; // 들어오는 값이 없는 경우 index가 -1 , H를 00: 으로 표시하고 싶으면 뒤에 유닛값조건만 지우면 된다.
+        }
+        if(isNaN(input.charAt(index-2))){ //해당 유닛의 인덱스 2번째앞이 숫자인지 확인
+          if (type == 'H') { // H이고 한자리 숫자인경우 한자리 숫자만 반환
+            return input.charAt(index-1);
+          } else{
+            return '0' + input.charAt(index-1);} // 숫자 아닌 경우에는 0을 붙인걸 반환
+        }else{
+          return input.charAt(index-2) + input.charAt(index-1); // 숫자인 경우에는 합쳐서 반환
+        }
+      }
+
+      function DurationChange(input){
+        let H = HMS(input, 'H');
+        let M = HMS(input, 'M');
+        let S = HMS(input, 'S');
+
+        if (H) { //H가 들어있는 경우에는 : 더하기
+          H += ':'
+        } else
+        {
+          if (M=='00') { // H없고 M이 00 인 경우 0으로 변환
+            M='0'
+          }
+        }
+        return H  + M + ':' + S ;
+      }
+      state.searchedVideos.forEach(searchedVideo => {
         for (let addInfo of addInfos) {
           if (searchedVideo.videoId === addInfo.id) {
-            // const addInfoDuration = addInfo.contentDetails.duration
-            // let duration = ''
-            // const type = ['S', 'M', 'H']
-            // let idx1 = addInfoDuration.length - 1
-            // let idx2 = 0
-            // while (addInfoDuration[idx1] !== 'T') {
-            //   if (addInfoDuration[idx1] === type[idx2]) {
-            //     while (!isNaN(addInfoDuration[idx1])) {
-            //       duration = addInfoDuration[idx1] + duration
-            //       idx1++
-            //     }
-            //     duration = ':' + duration
-            //   } else {
-            //     duration = ':00' + duration
-            //   }
-            //   idx2++
-            // }
-            // console.log('duration', duration)
             searchedVideo.categoryId = Number(addInfo.snippet.categoryId)
-            searchedVideo.duration = addInfo.contentDetails.duration
-            // searchedVideo.duration = duration
+            searchedVideo.duration = DurationChange(addInfo.contentDetails.duration)
             break
           }
         }
         state.rerenderKey = addInfos[0].id
       })
-      console.log('state.searchedVideos', state.searchedVideos)
     },
     SEARCH_VIDEOS_BY_SCROLL: function (state, searchedVideos) {
       state.searchedVideoIds = []
@@ -87,11 +105,9 @@ const video = {
         state.searchedVideos.push(data)
         state.searchedVideoIds.push(searchedVideo.id.videoId)
       }
-      console.log('SEARCH_VIDEOS_BY_SCROLL', state.searchedVideos)
     },
     NEXT_PAGE_TOKEN: function (state, nextPageToken) {
       state.nextPageToken = nextPageToken
-      console.log('state.nextPageToken', state.nextPageToken)
     },
     QUERY: function (state, query) {
       state.query = query
@@ -106,11 +122,31 @@ const video = {
       state.selectedVideos = []
       console.log('state.addedVideos', state.addedVideos)
     },
+    REMOVE_VIDEOS: function (state) {
+      for (let selectedVideo of state.selectedVideos) {
+        const idx = state.addedVideos.findIndex(i => i.videoId === selectedVideo.videoId)
+        state.addedVideos.splice(idx, 1)
+      }
+      // let i = 0
+      // while (state.selectedVideos.length > 0) {
+      //   const idx = state.addedVideos.findIndex(x => x.videoId === state.selectedVideos[i].videoId)
+      //   console.log(state.selectedVideos[i].videoId)
+      //   state.addedVideos.splice(idx, 1)
+      //   i++
+      // }
+      state.selectedVideos = []
+    },
+    SELECT_ALL_ADDED_VIDEOS: function (state) {
+      state.selectedVideos = state.addedVideos.slice()
+    },
+    UNSELECT_ALL_ADDED_VIDEOS: function (state) {
+      state.selectedVideos = []
+    },
     ADD_SELECTED_VIDEO: function (state, video) {
       state.selectedVideos.push(video)
     },
-    REMOVE_SELECTED_VIDEO: function (state, video) {
-      const idx = state.selectedVideos.findIndex(i => i.videoId === video.videoId)
+    REMOVE_SELECTED_VIDEO: function (state, videoId) {
+      const idx = state.selectedVideos.findIndex(i => i.videoId === videoId)
       state.selectedVideos.splice(idx, 1)
     },
     WATCHING_VIDEO: function (state, watchingVideo) {
@@ -119,9 +155,13 @@ const video = {
     }
   },
   actions: {
-    // Video 데이터 초기화
+    // Video 검색 데이터 초기화
     resetVideoSearchState: function ({ state, commit }) {
       commit('RESET_VIDEO_SEARCH_STATE')
+    },
+    // Video 생성 데이터 초기화
+    resetVideoAddState: function ({ state, commit }) {
+      commit('RESET_VIDEO_ADD_STATE')
     },
     // 유튜브 API로 영상 리스트 검색
     searchVideos: function ({ commit, dispatch }, query) {
@@ -162,7 +202,6 @@ const video = {
       const API_KEY = process.env.VUE_APP_YOUTUBE_API_KEY
 
       const ids = state.searchedVideoIds.join()
-      console.log(ids)
       const videoParams = {
         key: API_KEY,
         part: 'snippet,contentDetails',
@@ -187,41 +226,55 @@ const video = {
       const SEARCH_API_URL = 'https://www.googleapis.com/youtube/v3/search'
       const API_KEY = process.env.VUE_APP_YOUTUBE_API_KEY
 
-      console.log('searchVideosByScroll 실행됨')
-      console.log('state.nextPageToken', state.nextPageToken)
-      if (state.nextPageToken) {
-        const params = {
-          key: API_KEY,
-          part: 'snippet',
-          fields: 'nextPageToken,items(id/videoId,snippet(title,publishTime,thumbnails/default,channelTitle))',
-          type: 'video',
-          q: state.query, // 검색어
-          eventType: 'completed', // 완료된 영상만 검색
-          maxResults: 5, // 반환할 영상 개수
-          pageToken: state.nextPageToken,
-        }
-        axios({
-          method: 'get',
-          url: SEARCH_API_URL,
-          params,
-        })
-          .then((res) => {
-            commit('NEXT_PAGE_TOKEN', res.data.nextPageToken)
-            commit('SEARCH_VIDEOS_BY_SCROLL', res.data.items)
+      if (state.nextPageToken != '') {
+        setTimeout(() => {
+          const params = {
+            key: API_KEY,
+            part: 'snippet',
+            fields: 'nextPageToken,items(id/videoId,snippet(title,publishTime,thumbnails/default,channelTitle))',
+            type: 'video',
+            q: state.query, // 검색어
+            eventType: 'completed', // 완료된 영상만 검색
+            maxResults: 5, // 반환할 영상 개수
+            pageToken: state.nextPageToken,
+          }
+          // console.log(params)
+          axios({
+            method: 'get',
+            url: SEARCH_API_URL,
+            params,
           })
-          .then(() => {
-            dispatch('searchVideosAddInfo')
-            $state.loaded()
-          })
-          .catch((err) => {
-            console.log(err)
-            $state.complete()
-          })
+            .then((res) => {
+              // console.log(res)
+              commit('NEXT_PAGE_TOKEN', res.data.nextPageToken)
+              commit('SEARCH_VIDEOS_BY_SCROLL', res.data.items)
+              // console.log('248 NEXT_PAGE_TOKEN', res.data.nextPageToken)
+            })
+            .then(() => {
+              dispatch('searchVideosAddInfo')
+              $state.loaded()
+            })
+            .catch((err) => {
+              console.log(err)
+              $state.complete()
+            })
+        }, 800)
       }
     },
-    // 영상 리스트에 추가
+    // 최종 생성할 영상 리스트에 추가
     addVideos: function ({ commit }) {
       commit('ADD_VIDEOS')
+    },
+    // 최종 생성할 영상 리스트에서 제거
+    removeVideos: function ({ commit }) {
+      commit('REMOVE_VIDEOS')
+    },
+    //
+    selectAllAddedVideos: function ({ commit }) {
+      commit('SELECT_ALL_ADDED_VIDEOS')
+    },
+    unselectAllAddedVideos: function ({ commit }) {
+      commit('UNSELECT_ALL_ADDED_VIDEOS')
     },
     // 선택한 영상 리스트에 추가
     addSelectedVideo: function ({ commit }, video) {
