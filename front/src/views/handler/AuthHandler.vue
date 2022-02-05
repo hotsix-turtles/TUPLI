@@ -13,16 +13,16 @@ export default {
   created() {
     const token = this.$route.query.token
     if (token) {
-      this.SET_TOKEN(token)
-      this.getUserInfoToken(token) // 쿼리로 유저 네임이나 정보도 보내줘야되나...
+      this.TOKEN(token)
+      this.getUserInfo() // 쿼리로 유저 네임이나 정보도 보내줘야되나...
     }
-    // this.$router.replace('/')  // 홈으로 보내버리겠다. 2
+    // this.$router.replace('/')  // 홈으로 보내버리겠다.  2
     // router.push('/')  // 홈으로 보내버리겠다. 1
     this.$router.push('/home')
   },
   methods: {
-    ...mapActions(['getUserInfoToken']),
-    ...mapMutations(['SET_TOKEN'])
+    ...mapActions(['getUserInfo']),
+    ...mapMutations(['TOKEN'])
   }
 }
 </script>
@@ -30,3 +30,4 @@ export default {
 <style>
 
 </style>
+

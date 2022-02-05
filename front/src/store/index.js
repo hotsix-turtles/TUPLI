@@ -27,6 +27,7 @@ export default new Vuex.Store({
   mutations: {
     // 로그인
     TOKEN: function (state, token) {
+      state.isLogin = true
       state.authToken = token
       localStorage.setItem('jwt', token)
     },
@@ -34,6 +35,19 @@ export default new Vuex.Store({
     DELETE_TOKEN: function (state) {
       localStorage.removeItem('jwt')
       state.authToken = null
+    },
+    // 유저 정보 갱신
+    GET_USER_INFO(state, res) {
+      state.userId = res.userSeq
+      state.email = res.email
+      state.nickname = res.nickname
+      state.introduction = res.introduction
+      if (res.image) {
+        state.image = 'https://storage.cloud.google.com/tupli_profile' + res.image
+      } else {
+        state.image = null
+      }
+      state.is_vip = res.is_vip
     },
     // 회원정보
     PROFILE: function (state, userInfo) {
@@ -45,20 +59,10 @@ export default new Vuex.Store({
     // 로그인
     login: function ({ commit, dispatch }, credentials) {
       axiosConnector.post('/account/login', { email: credentials.email, password: credentials.password })
-      // axios({
-      //   method: 'post',
-      //   url: 'https://i6a102.p.ssafy.io/api/v1' + '/account/login',
-      //   data: {
-      //     email: credentials.email,
-      //     password: credentials.password,
-      //   }
-      // })
         .then((res) => {
           commit('TOKEN', res.data.token)
-          this.state.isLogin = true
           router.push({ name: 'Profile' })
-          dispatch('getUserId')
-          dispatch('setUserInfo')
+          dispatch('getUserInfo')
         })
         .catch((err) => {
           console.log(err)
@@ -99,6 +103,19 @@ export default new Vuex.Store({
           console.log(err)
         })
     },
+    // 사용자 정보 얻기
+    getUserInfoToken({commit}) {
+      axiosConnector.get('/account/userInfo')
+      // axios({
+      //   method: 'GET',
+      //   url: SERVER.URL + SERVER.ROUTES.accounts.getUserInfo,
+      //   headers: {Authorization: token}
+      // })
+        .then(res => {
+          commit('GET_USER_INFO', res.data)
+        })
+        .catch(err => console.log(err))
+    },
 
     // 프로필
     // getProfile: function ({ commit }) {
@@ -118,3 +135,4 @@ export default new Vuex.Store({
 
 
 })
+
