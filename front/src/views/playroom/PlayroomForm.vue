@@ -272,6 +272,10 @@ export default {
         content: '',
         tags: '',
         isPublic: true,
+        titleRules: [
+          v => !!v || '제목은 필수입니다.',
+          v => v.length <= 2 || '제목은 3글자 이상 작성해야 합니다.',
+        ],
         friends: [
           { id: 1, name: "김형준" },
           { id: 2, name: "김기솔" },

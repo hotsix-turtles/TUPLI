@@ -38,26 +38,6 @@
         <v-icon>mdi-dots-vertical</v-icon>
       </div>
     </div>
-    <!-- <v-list-item two-line>
-        <div class="video-thumbnail">
-          <img
-            :src="video.thumbnail"
-            style="width: 150px; height: 100px"
-            class=""
-            @click="watchingVideo(video)"
-          >
-          <span class="duration">{{ video.duration }}</span>
-        </div>
-        <v-list-item-content
-          class="ml-2"
-          @click="selectVideo"
-        >
-          <v-list-item-title>
-            <p>{{ video.title }}</p>
-          </v-list-item-title>
-          <v-list-item-subtitle>{{ video.channelTitle }}</v-list-item-subtitle>
-        </v-list-item-content>
-      </v-list-item> -->
     <!-- 점3개 눌렀을시 -->
     <!-- <v-card-actions>
         <v-menu bottom>
@@ -98,10 +78,6 @@ export default {
   },
   data() {
     return {
-      clickState: false,
-      items: [
-        { id: 1, title: 'good' }
-      ],
     }
   },
   computed: {
