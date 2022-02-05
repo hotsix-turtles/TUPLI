@@ -19,6 +19,7 @@ import Save from '../views/profile/Save.vue'
 import Setting from '../views/profile/Setting.vue'
 import Terms from '../views/profile/Terms.vue'
 import PlayroomForm from '../views/playroom/PlayroomForm.vue'
+import PlayroomFormPlaylist from '../views/playroom/PlayroomFormPlaylist.vue'
 import PlayroomDetail from '../views/playroom/PlayroomDetail.vue'
 import VideoSearch from '../views/video/VideoSearch.vue'
 import VideoWatch from '../views/video/VideoWatch.vue'
@@ -141,9 +142,14 @@ const routes = [
 
   //playroom
   {
-    path: '/playroom',
+    path: '/playroom/create',
     name: 'PlayroomForm',
     component: PlayroomForm
+  },
+  {
+    path: '/playroom/create/playlist',
+    name: 'PlayroomFormPlaylist',
+    component: PlayroomFormPlaylist
   },
   {
     path: '/playroom/:id',
