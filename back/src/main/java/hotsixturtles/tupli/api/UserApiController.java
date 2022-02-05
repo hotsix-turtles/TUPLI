@@ -189,7 +189,7 @@ public class UserApiController {
     /**
      * 타인 프로필 정보 간단히 긁어오기 함수
      * @param userSeq
-     * @return
+     * @return 
      */
     @GetMapping("/account/profile/{userSeq}")
     public ResponseEntity getOtherProfile(@PathVariable("userSeq") Long userSeq) {
