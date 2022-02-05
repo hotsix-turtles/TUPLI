@@ -9,3 +9,9 @@ vue add router
 vue add vuex
 
 vue add vuetify
+
+
+
+npm install sweetalert2
+
+npm install --save vuex-persistedstate

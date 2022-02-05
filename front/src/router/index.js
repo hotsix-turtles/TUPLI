@@ -16,6 +16,7 @@ import Like from '../views/profile/Like.vue'
 import Notice from '../views/profile/Notice.vue'
 import Payment from '../views/profile/Payment.vue'
 import Profile from '../views/profile/Profile.vue'
+import EditProfile from '../views/profile/EditProfile.vue'
 import Save from '../views/profile/Save.vue'
 import Setting from '../views/profile/Setting.vue'
 import Terms from '../views/profile/Terms.vue'
@@ -25,6 +26,9 @@ import PlayroomDetail from '../views/playroom/PlayroomDetail.vue'
 import VideoSearch from '../views/video/VideoSearch.vue'
 import VideoWatch from '../views/video/VideoWatch.vue'
 import video from '@/store/index.js'
+import KakaoPaySuccess from '../views/handler/kakaoPay/KakaoPaySuccess.vue'
+import KakaoPayCancel from '../views/handler/kakaoPay/KakaoPayCancel.vue'
+import KakaoPayFail from '../views/handler/kakaoPay/KakaoPayFail.vue'
 
 Vue.use(VueRouter)
 Vue.use(VueMeta)
@@ -129,6 +133,11 @@ const routes = [
     component: Profile
   },
   {
+    path: '/editprofile',
+    name: 'EditProfile',
+    component: EditProfile
+  },
+  {
     path: '/save',
     name: 'Save',
     component: Save
@@ -162,12 +171,34 @@ const routes = [
     name: 'PlayroomDetail',
     component: PlayroomDetail
   },
+  //handler
+  //카카오
+  {
+    path: '/kakaoPay/success',
+    name: 'KakaoPaySuccess',
+    component: KakaoPaySuccess
+  },
+  {
+    path: '/kakaoPay/cancel',
+    name: 'KakaoPayCancel',
+    component: KakaoPayCancel
+  },
+  {
+    path: '/kakaoPay/fail',
+    name: 'KakaoPayFail',
+    component: KakaoPayFail
+  },
+
+
 ]
 
 const router = new VueRouter({
   mode: 'history',
   base: process.env.BASE_URL,
-  routes
+  routes,
+  scrollBehavior() { 
+    return { x: 0, y: 0 } 
+  },
 })
 
 export default router
