@@ -76,8 +76,8 @@ public class PlayroomApiController {
                     .status(HttpStatus.BAD_REQUEST)
                     .body(new ErrorResponse(messageSource.getMessage("error.valid.jwt", null, LocaleContextHolder.getLocale())));
         }
-
         Long userSeq = jwtTokenProvider.getUserSeq(token);
+//        Long userSeq = 1L;  // 테스트용
 
         PlayroomDto playroomResult = playroomService.addPlayroom(playroomDto, userSeq); // userSeq
 
