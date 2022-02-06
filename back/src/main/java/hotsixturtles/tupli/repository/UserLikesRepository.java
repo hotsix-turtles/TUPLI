@@ -14,4 +14,7 @@ public interface UserLikesRepository extends JpaRepository<UserLikes, Long> {
 
     @Query("select l from UserLikes l where l.toUser.userSeq = :otherUserSeq")
     List<UserLikes> findFollowers(@Param("otherUserSeq") Long otherUserSeq);
+
+    @Query("select ul from UserLikes ul where ul.fromUser.userSeq = :userSeq")
+    List<UserLikes> findByFromUser(Long userSeq);
 }

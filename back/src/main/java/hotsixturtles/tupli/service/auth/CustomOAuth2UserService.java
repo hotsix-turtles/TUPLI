@@ -1,14 +1,18 @@
 package hotsixturtles.tupli.service.auth;
 
 import hotsixturtles.tupli.entity.User;
+import hotsixturtles.tupli.entity.UserBadge;
 import hotsixturtles.tupli.entity.auth.ProviderType;
 import hotsixturtles.tupli.entity.auth.RoleType;
 import hotsixturtles.tupli.entity.auth.UserPrincipal;
+import hotsixturtles.tupli.entity.meta.UserInfo;
 import hotsixturtles.tupli.exception.OAuthProviderMissMatchException;
 import hotsixturtles.tupli.info.OAuth2UserInfo;
 import hotsixturtles.tupli.info.OAuth2UserInfoFactory;
+import hotsixturtles.tupli.repository.UserInfoRepository;
 import hotsixturtles.tupli.repository.UserRepository;
 
+import hotsixturtles.tupli.service.BadgeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.core.AuthenticationException;
@@ -19,12 +23,17 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
     private final UserRepository userRepository;
+
+    private final UserInfoRepository userInfoRepository;
+
+    private final BadgeService badgeService;
 
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
@@ -54,8 +63,21 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                 );
             }
             updateUser(savedUser, userInfo);
+            UserInfo nowUserInfo =  userInfoRepository.findOneByUserSeq(savedUser.getUserSeq());
+            nowUserInfo.setLoginCount(nowUserInfo.getLoginCount() + 1L);
+            if(nowUserInfo.getDailyLoginYN().equals("N")) {
+                nowUserInfo.setDailyLoginYN("Y");
+                nowUserInfo.setDailyCheck(nowUserInfo.getDailyCheck() + 1L);
+                List<UserBadge> userbadges = badgeService.getBadgeList(savedUser.getUserSeq());
+                List<Long> badges = badgeService.getUserBadgeSeq(userbadges);
+                badgeService.checkDaily(26, savedUser.getUserSeq(), badges);
+            }
+
+            userInfoRepository.save(nowUserInfo);
         } else {
             savedUser = createUser(userInfo, providerType);
+            UserInfo nowUserInfo = new UserInfo(null, savedUser.getUserSeq(), null, 0L, 0L, 1L, 1L, "Y");
+            userInfoRepository.save(nowUserInfo);
         }
 
         return UserPrincipal.create(savedUser, user.getAttributes());

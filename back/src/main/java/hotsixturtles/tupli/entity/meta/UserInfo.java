@@ -9,6 +9,7 @@ import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 
 import javax.persistence.*;
+import javax.validation.constraints.Size;
 import java.util.List;
 
 /**
@@ -36,5 +37,14 @@ public class UserInfo {
     private Long watchTime = 0L;
 
     private Long boardUpload = 0L;
+
+    private Long loginCount = 0L;
+
+    private Long dailyCheck = 0L;
+
+    @Column(name = "DAILY_LOGIN_YN", length = 1)
+//    @NotNull
+    @Size(min = 1, max = 1)
+    private String dailyLoginYN;
 
 }

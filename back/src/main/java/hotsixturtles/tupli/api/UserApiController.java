@@ -5,12 +5,17 @@ import hotsixturtles.tupli.dto.response.ErrorResponse;
 import hotsixturtles.tupli.dto.simple.SimpleUserDto;
 import hotsixturtles.tupli.entity.Board;
 import hotsixturtles.tupli.entity.User;
+import hotsixturtles.tupli.entity.UserBadge;
 import hotsixturtles.tupli.entity.auth.ProviderType;
 import hotsixturtles.tupli.entity.auth.RoleType;
 import hotsixturtles.tupli.entity.likes.UserDislikes;
 import hotsixturtles.tupli.entity.likes.UserLikes;
+import hotsixturtles.tupli.entity.meta.UserInfo;
+import hotsixturtles.tupli.repository.UserInfoRepository;
 import hotsixturtles.tupli.repository.UserRepository;
+import hotsixturtles.tupli.service.BadgeService;
 import hotsixturtles.tupli.service.FileService;
+import hotsixturtles.tupli.service.UserInfoService;
 import hotsixturtles.tupli.service.UserService;
 import hotsixturtles.tupli.service.token.JwtTokenProvider;
 import io.swagger.annotations.Api;
@@ -47,8 +52,11 @@ import java.util.Map;
 public class UserApiController {
 
     private final UserRepository userRepository;
+    private final UserInfoRepository userInfoRepository;
 
     private final UserService userService;
+    private final UserInfoService userInfoService;
+    private final BadgeService badgeService;
     private final FileService fileService;
     private final PasswordEncoder passwordEncoder;
 
@@ -149,6 +157,18 @@ public class UserApiController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(new ErrorResponse(messageSource.getMessage("error.wrong.password", null, LocaleContextHolder.getLocale())));
         }
+
+        UserInfo nowUserInfo = userInfoRepository.findOneByUserSeq(user.getUserSeq());
+        nowUserInfo.setLoginCount(nowUserInfo.getLoginCount() + 1L);
+        if(nowUserInfo.getDailyLoginYN().equals("N")) {
+            nowUserInfo.setDailyLoginYN("Y");
+            nowUserInfo.setDailyCheck(nowUserInfo.getDailyCheck() + 1L);
+            List<UserBadge> userbadges = badgeService.getBadgeList(user.getUserSeq());
+            List<Long> badges = badgeService.getUserBadgeSeq(userbadges);
+            badgeService.checkDaily(26, user.getUserSeq(), badges);
+        }
+        userInfoRepository.save(nowUserInfo);
+
         String token = jwtTokenProvider.createToken(user.getUsername(), user.getUserSeq());
 
         return ResponseEntity.ok(new LoginUserResponse(token));

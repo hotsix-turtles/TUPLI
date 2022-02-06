@@ -3,9 +3,8 @@ package hotsixturtles.tupli.service;
 import hotsixturtles.tupli.entity.User;
 import hotsixturtles.tupli.entity.likes.UserDislikes;
 import hotsixturtles.tupli.entity.likes.UserLikes;
-import hotsixturtles.tupli.repository.UserDislikesRepository;
-import hotsixturtles.tupli.repository.UserLikesRepository;
-import hotsixturtles.tupli.repository.UserRepository;
+import hotsixturtles.tupli.entity.meta.UserInfo;
+import hotsixturtles.tupli.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -22,7 +21,9 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
+    private final UserInfoRepository userInfoRepository;
     private final UserLikesRepository userLikesRepository;
+    private final UserBadgeRepository userBadgeRepository;
     private final UserDislikesRepository userDislikesRepository;
 
     @Transactional
@@ -32,12 +33,17 @@ public class UserService {
         user.encodePassword(passwordEncoder);
 
         userRepository.save(user);
+        UserInfo userInfo = new UserInfo(null, user.getUserSeq(), null, 0L, 0L, 0L, 1L, "Y");
+        userInfoRepository.save(userInfo);
         return user.getUserSeq();
     }
 
     @Transactional
     public void deleteUser(Long userSeq) {
+
         userRepository.deleteByUserSeq(userSeq);
+        userInfoRepository.deleteByUserSeq(userSeq);
+        userBadgeRepository.deleteAllByUserSeq(userSeq);
     }
 
     @Transactional
