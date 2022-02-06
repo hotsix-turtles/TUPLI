@@ -64,6 +64,18 @@
           </v-btn>
         </div>
       </div>
+      <div class="d-flex justify-center">
+        <v-btn
+          class="text-center pt-1"
+          outlined
+          color="#5B5C9D"
+          rounded
+          small
+          @click="logout"
+        >
+          임시로그아웃버튼
+        </v-btn>
+      </div>
     </v-container>
 
     <div class="d-flex justify-space-around mt-5">
@@ -100,6 +112,30 @@ export default {
   methods: {
 
 
+    buyPremium: function() {
+      axiosConnector.get('/kakaoPay/')
+      // 실제 적용시에는, 이미 프리미엄 유저인지 확인하는 것 필요
+      // axios({
+      //   method: 'GET',
+      //   url: SERVER.URL + SERVER.ROUTES.accounts.kakaoPay,
+      //   headers: {Authorization: this.token},
+      // })
+        .then((res) => {
+          window.location.href = res.data
+        })
+        .catch (() => {
+          swal.fire ({
+            icon: 'error',
+            title: '결제 실패',
+            text: '서버가 혼잡합니다. 다시 시도해 주세요.'
+          })
+        })
+    },
+    // 임시 로그아웃 버튼 in profile
+    logout: function() {
+      this.$store.dispatch('logout')
+      this.$router.push({ name: 'Login'})
+    }
   },
 
 
