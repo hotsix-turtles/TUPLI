@@ -24,7 +24,7 @@ public class SimpleUserDto {
     private String nickname;
     //private String password;
     private String email;
-    private String profileImageUrl;
+    private String profileImage;
     private String introduction;
     private String authKey;
     private String is_vip;
@@ -41,10 +41,10 @@ public class SimpleUserDto {
         this.nickname = user.getNickname();
         //this.password = password;
         this.email = user.getEmail();
-        if (user.getProfileImageUrl() == null || user.getProfileImageUrl().equals("")) {
-            this.profileImageUrl = null;
+        if (user.getProfileImage() == null || user.getProfileImage().equals("")) {
+            this.profileImage = null;
         } else {
-            this.profileImageUrl = user.getProfileImageUrl();
+            this.profileImage = user.getProfileImage();
         }
         this.introduction = user.getIntroduction();
         this.authKey = user.getAuthKey();

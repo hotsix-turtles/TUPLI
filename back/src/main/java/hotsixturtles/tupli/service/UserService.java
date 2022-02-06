@@ -96,10 +96,10 @@ public class UserService {
 
     // 나중에 parameter 더 넘어오면 변경값들도 바꾼다
     @Transactional
-    public void updateProfile(Long userSeq, String email, String nickname, String image) {
+    public void updateProfile(Long userSeq, String introduction, String nickname, String image) {
         User user = userRepository.findByUserSeq(userSeq);
-        if (email != null) {
-            user.setEmail(email);
+        if (introduction != null) {
+            user.setIntroduction(introduction);
         }
         if (nickname != null) {
             user.setNickname(nickname);
@@ -108,7 +108,7 @@ public class UserService {
 
         System.out.println("image = " + image);
         if (image != "") {
-            user.setProfileImageUrl(image);
+            user.setProfileImage(image);
         }
 
         try {
