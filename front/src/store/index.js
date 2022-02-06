@@ -17,6 +17,7 @@ export default new Vuex.Store({
   // 새로고침, 외부진입시에도 state 정보 온존
   plugins: [createPersistedState()],
   //plugins: [createPersistedState({storage: window.sessionStorage})], // 창 종료시 state 초기화 하는 타입
+
   // data
   state: {
     authToken: localStorage.getItem('jwt'),

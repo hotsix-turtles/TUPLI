@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import VueMeta from 'vue-meta'
 import VueRouter from 'vue-router'
+import Home from '@/views/common/Home'
 import PlaylistForm from '@/views/playlist/PlaylistForm'
 import PlaylistFormVideo from '@/views/playlist/PlaylistFormVideo'
 import PlaylistDetail from '@/views/playlist/PlaylistDetail'
@@ -31,11 +32,22 @@ import KakaoPaySuccess from '../views/handler/kakaoPay/KakaoPaySuccess.vue'
 import KakaoPayCancel from '../views/handler/kakaoPay/KakaoPayCancel.vue'
 import KakaoPayFail from '../views/handler/kakaoPay/KakaoPayFail.vue'
 
+import KakaoPaySuccess from '../views/handler/kakaoPay/KakaoPaySuccess.vue'
+import KakaoPayCancel from '../views/handler/kakaoPay/KakaoPayCancel.vue'
+import KakaoPayFail from '../views/handler/kakaoPay/KakaoPayFail.vue'
+
 
 Vue.use(VueRouter)
 Vue.use(VueMeta)
 
 const routes = [
+  // 홈
+  {
+    path: '/home',
+    name: 'Home',
+    component: Home
+  },
+
   // 구글 소셜로그인
   {
     path: '/oauth/redirect',
@@ -148,6 +160,11 @@ const routes = [
     component: Profile
   },
   {
+    path: '/editprofile',
+    name: 'EditProfile',
+    component: EditProfile
+  },
+  {
     path: '/save',
     name: 'Save',
     component: Save
@@ -199,6 +216,25 @@ const routes = [
     name: 'PlayroomDetail',
     component: PlayroomDetail
   },
+
+  //handler
+  //카카오
+  {
+    path: '/kakaoPay/success',
+    name: 'KakaoPaySuccess',
+    component: KakaoPaySuccess
+  },
+  {
+    path: '/kakaoPay/cancel',
+    name: 'KakaoPayCancel',
+    component: KakaoPayCancel
+  },
+  {
+    path: '/kakaoPay/fail',
+    name: 'KakaoPayFail',
+    component: KakaoPayFail
+  },
+
 ]
 
 const router = new VueRouter({
