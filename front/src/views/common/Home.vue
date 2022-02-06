@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <v-app>
     <router-link to="/home">
       Home
     </router-link>
@@ -12,7 +12,7 @@
     <router-link to="/profile">
       Profile
     </router-link>
-  </div>
+  </v-app>
 </template>
 
 <script>
