@@ -1,7 +1,7 @@
 <template>
   <v-app>
     <div class="background-login px-5">
-      <h1>회원가입 페이지</h1>
+      <!-- <h1>회원가입 페이지</h1> -->
       <v-container>
         <router-link
           to="/login"
