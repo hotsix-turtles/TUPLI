@@ -3,6 +3,7 @@ import VueMeta from 'vue-meta'
 import VueRouter from 'vue-router'
 import PlaylistForm from '@/views/playlist/PlaylistForm'
 import PlaylistFormVideo from '@/views/playlist/PlaylistFormVideo'
+import PlaylistDetail from '@/views/playlist/PlaylistDetail'
 import Category from '@/views/common/Category'
 import Search from '@/views/common/Search'
 import Login from '../views/accounts/Login.vue'
@@ -20,11 +21,15 @@ import Save from '../views/profile/Save.vue'
 import Setting from '../views/profile/Setting.vue'
 import Terms from '../views/profile/Terms.vue'
 import PlayroomForm from '../views/playroom/PlayroomForm.vue'
+import PlayroomFormPlaylist from '../views/playroom/PlayroomFormPlaylist.vue'
 import PlayroomDetail from '../views/playroom/PlayroomDetail.vue'
 import VideoSearch from '../views/video/VideoSearch.vue'
 import VideoWatch from '../views/video/VideoWatch.vue'
 import video from '@/store/index.js'
 import AuthHandler from '../views/handler/AuthHandler.vue'
+import KakaoPaySuccess from '../views/handler/kakaoPay/KakaoPaySuccess.vue'
+import KakaoPayCancel from '../views/handler/kakaoPay/KakaoPayCancel.vue'
+import KakaoPayFail from '../views/handler/kakaoPay/KakaoPayFail.vue'
 
 
 Vue.use(VueRouter)
@@ -49,6 +54,12 @@ const routes = [
     name: 'PlaylistFormVideo',
     component: PlaylistFormVideo
   },
+  {
+    path: '/playlist/:playlistId', // router.push({ name: 'user', params: { userId: '123' } })
+    name: 'PlaylistDetail',
+    component: PlaylistDetail
+  },
+
   // 둘러보기
   {
     path: '/category',
@@ -152,6 +163,24 @@ const routes = [
     component: Terms
   },
 
+  //handler
+  //카카오
+  {
+    path: '/kakaoPay/success',
+    name: 'KakaoPaySuccess',
+    component: KakaoPaySuccess
+  },
+  {
+    path: '/kakaoPay/cancel',
+    name: 'KakaoPayCancel',
+    component: KakaoPayCancel
+  },
+  {
+    path: '/kakaoPay/fail',
+    name: 'KakaoPayFail',
+    component: KakaoPayFail
+  },
+
 
 
   //playroom
@@ -159,6 +188,11 @@ const routes = [
     path: '/playroom',
     name: 'PlayroomForm',
     component: PlayroomForm
+  },
+  {
+    path: '/playroom/create/playlist',
+    name: 'PlayroomFormPlaylist',
+    component: PlayroomFormPlaylist
   },
   {
     path: '/playroom/:id',
@@ -170,7 +204,11 @@ const routes = [
 const router = new VueRouter({
   mode: 'history',
   base: process.env.BASE_URL,
-  routes
+  routes,
+  scrollBehavior() {
+    return { x: 0, y: 0 }
+  },
+
 })
 
 export default router
