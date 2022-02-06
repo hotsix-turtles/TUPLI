@@ -62,6 +62,18 @@
           임시 결제 버튼/프리미엄회원은 안보임
         </v-btn>
       </div>
+      <div class="d-flex justify-center">
+        <v-btn
+          class="text-center pt-1"
+          outlined
+          color="#5B5C9D"
+          rounded
+          small
+          @click="logout"
+        >
+          임시로그아웃버튼
+        </v-btn>
+      </div>
     </v-container>
 
     <div class="d-flex justify-space-around mt-5">
@@ -115,7 +127,11 @@ export default {
           })
         })
     },
-
+    // 임시 로그아웃 버튼 in profile
+    logout: function() {
+      this.$store.dispatch('logout')
+      this.$router.push({ name: 'Login'}) 
+    }
   },
 
 
