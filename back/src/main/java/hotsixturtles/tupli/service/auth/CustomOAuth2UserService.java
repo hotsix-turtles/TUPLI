@@ -106,8 +106,8 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             user.setUsername(userInfo.getName());
         }
 
-        if (userInfo.getImageUrl() != null && !user.getProfileImageUrl().equals(userInfo.getImageUrl())) {
-            user.setProfileImageUrl(userInfo.getImageUrl());
+        if (userInfo.getImageUrl() != null && !user.getProfileImage().equals(userInfo.getImageUrl())) {
+            user.setProfileImage(userInfo.getImageUrl());
         }
 
         return user;
