@@ -107,7 +107,7 @@ public class UserApiController {
 
     @Data
     static class CreateUserRequest {
-        @Size(min=3, max=128, message = "{error.size.username}")
+//        @Size(min=3, max=128, message = "{error.size.username}")
         private String username;
         @Size(min=3, max=128, message = "{error.size.email}")
 //        @Email(message = "{error.format.email}")
@@ -118,10 +118,10 @@ public class UserApiController {
 //        @Length(min=3, max=128, message = "비밀번호 길이 불일치")
         private String password;
         @Size(max = 64) String userId;
-        @Size(max = 1) String emailVerifiedYn;
-        @Size(max = 512) String profileImageUrl;
-        ProviderType providerType;
-        RoleType roleType;
+//        @Size(max = 1) String emailVerifiedYn;
+//        @Size(max = 512) String profileImageUrl;
+//        ProviderType providerType;
+//        RoleType roleType;
         LocalDateTime createdAt;
         LocalDateTime modifiedAt;
     }

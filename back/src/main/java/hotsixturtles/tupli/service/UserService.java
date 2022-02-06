@@ -5,6 +5,7 @@ import hotsixturtles.tupli.entity.likes.UserDislikes;
 import hotsixturtles.tupli.entity.likes.UserLikes;
 import hotsixturtles.tupli.entity.meta.UserInfo;
 import hotsixturtles.tupli.repository.*;
+import hotsixturtles.tupli.service.token.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -12,7 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
+
 
 @Service
 @Transactional(readOnly = true)  // 기본적으로 트랜잭션 안에서만 데이터 변경하게 설정(그만큼 최적화 되어 읽는게 빨라짐)
@@ -25,6 +26,8 @@ public class UserService {
     private final UserLikesRepository userLikesRepository;
     private final UserBadgeRepository userBadgeRepository;
     private final UserDislikesRepository userDislikesRepository;
+
+    private final JwtTokenProvider jwtTokenProvider;
 
     @Transactional
     public Long join(User user) {
@@ -67,8 +70,7 @@ public class UserService {
     }
 
     private void validateDuplicateUser(User user) {
-        // 22.02.02 한길 수정 - List<User> -> User
-        User findUsers = userRepository.findByUsername(user.getUsername());
+        User findUsers = userRepository.findByEmail(user.getEmail());
         if (findUsers != null) {
             throw new IllegalStateException("일치하는 아이디가 존재합니다.");
         }
@@ -194,6 +196,11 @@ public class UserService {
     }
 
 
-
+    @Transactional
+    public void rankUpPremium(String token) {
+        User user = jwtTokenProvider.getUser(token);
+        user.setIs_vip("Y");
+        userRepository.save(user);
+    }
 }
 
