@@ -5,6 +5,7 @@ import hotsixturtles.tupli.dto.response.ErrorResponse;
 import hotsixturtles.tupli.dto.simple.SimpleUserDto;
 import hotsixturtles.tupli.entity.Board;
 import hotsixturtles.tupli.entity.User;
+import hotsixturtles.tupli.entity.UserBadge;
 import hotsixturtles.tupli.entity.auth.ProviderType;
 import hotsixturtles.tupli.entity.auth.RoleType;
 import hotsixturtles.tupli.entity.likes.UserDislikes;
@@ -157,9 +158,16 @@ public class UserApiController {
                     .body(new ErrorResponse(messageSource.getMessage("error.wrong.password", null, LocaleContextHolder.getLocale())));
         }
 
-        UserInfo nowUserinfo = userInfoRepository.findOneByUserSeq(user.getUserSeq());
-        nowUserinfo.setLoginCount(nowUserinfo.getLoginCount() + 1L);
-        userInfoRepository.save(nowUserinfo);
+        UserInfo nowUserInfo = userInfoRepository.findOneByUserSeq(user.getUserSeq());
+        nowUserInfo.setLoginCount(nowUserInfo.getLoginCount() + 1L);
+        if(nowUserInfo.getDailyLoginYN().equals("N")) {
+            nowUserInfo.setDailyLoginYN("Y");
+            nowUserInfo.setDailyCheck(nowUserInfo.getDailyCheck() + 1L);
+            List<UserBadge> userbadges = badgeService.getBadgeList(user.getUserSeq());
+            List<Long> badges = badgeService.getUserBadgeSeq(userbadges);
+            badgeService.checkDaily(26, user.getUserSeq(), badges);
+        }
+        userInfoRepository.save(nowUserInfo);
 
         String token = jwtTokenProvider.createToken(user.getUsername(), user.getUserSeq());
 
