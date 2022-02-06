@@ -1,6 +1,7 @@
 package hotsixturtles.tupli.dto;
 
 import hotsixturtles.tupli.dto.simple.SimpleUserDto;
+import hotsixturtles.tupli.dto.simple.SimpleYoutubeVideoDto;
 import hotsixturtles.tupli.entity.Playroom;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -8,6 +9,8 @@ import lombok.NoArgsConstructor;
 import javax.validation.constraints.Size;
 import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Data
 @NoArgsConstructor
@@ -15,42 +18,35 @@ public class PlayroomDto {
 
     private Long id;
 
-    @Size(max = 200)
-    private String roomTitle;
+    private String title;
+    private String content;
+    private Boolean isPublic;
+    private String tags;
+    private Map<Long, List<String>> playlists;  // 들어오기만 하고 나가지는 않음
+    private List<Long> inviteIds;  // 들어오기만 하고 나가지는 않음
+    private OffsetDateTime startTime;
+    private OffsetDateTime endTime;
 
-    private String roomContent;
-
-    private Boolean roomPublic;
-
-    // 일단 주석
-//    @Type(type = "json")
-//    @Column(columnDefinition = "json")
-//    private List<Long> inviteIds;
-
-    private List<Long> roomPlaylists;
-
-    private List<String> roomTags;
-
-    private List<Long> roomVideos;
-
-    private OffsetDateTime roomStartTime;
-
-    private OffsetDateTime roomEndTime;
-
+    // 연결
     private SimpleUserDto user;
+    private List<SimpleYoutubeVideoDto> videos;
+
 
     public PlayroomDto(Playroom playroom) {
         this.id = playroom.getId();
-        this.roomTitle = playroom.getRoomTitle();
-        this.roomContent = playroom.getRoomContent();
-        this.roomPublic = playroom.getRoomPublic();
-//        this.inviteIds = playroom.getInviteIds();
-        this.roomPlaylists = playroom.getRoomPlaylists();
-        this.roomTags = playroom.getRoomTags();
-        this.roomVideos = playroom.getRoomVideos();
-        this.roomStartTime = playroom.getRoomStartTime();
-        this.roomEndTime = playroom.getRoomEndTime();
+        this.title = playroom.getTitle();
+        this.content = playroom.getContent();
+        this.isPublic = playroom.getIsPublic();
+        this.tags = playroom.getTags();
+//        this.playlists = playlists;
+//        this.inviteIds = inviteIds;
+        this.startTime = playroom.getStartTime();
+        this.endTime = playroom.getEndTime();
 
+        // 연결
         this.user = new SimpleUserDto(playroom.getUser());
+        this.videos = playroom.getVideos()
+                .stream().map(x -> new SimpleYoutubeVideoDto(x)).collect(Collectors.toList());
     }
+
 }

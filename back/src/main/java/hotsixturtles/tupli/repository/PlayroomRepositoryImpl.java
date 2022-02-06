@@ -30,7 +30,7 @@ public class PlayroomRepositoryImpl implements PlayroomRepositoryCustom{
         JPAQuery<Playroom> query = jpaQueryFactory
                 .selectFrom(playroom)
                 .where(
-                        playroom.roomTitle.contains(playroomSearchCondition.getKeyword())
+                        playroom.title.contains(playroomSearchCondition.getKeyword())
                 )
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize());

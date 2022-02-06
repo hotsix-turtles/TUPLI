@@ -1,9 +1,8 @@
 package hotsixturtles.tupli.entity;
 
 import com.vladmihalcea.hibernate.type.json.JsonType;
-import hotsixturtles.tupli.dto.PlayroomDto;
 import hotsixturtles.tupli.entity.likes.PlayroomLikes;
-import lombok.AccessLevel;
+import hotsixturtles.tupli.entity.youtube.YoutubeVideo;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -11,16 +10,16 @@ import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 
 import javax.persistence.*;
-import javax.validation.constraints.Size;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Entity
 @Table(name = "playroom")
 @Getter
 @Setter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor//(access = AccessLevel.PROTECTED)
 @TypeDef(name = "json", typeClass = JsonType.class)
 public class Playroom {
 
@@ -28,64 +27,44 @@ public class Playroom {
     @GeneratedValue
     private Long id;
 
-    @Size(max = 200)
-    private String roomTitle;
-
-    private String roomContent;
-
-    private Boolean roomPublic;
-
-//    @Type(type = "json")
-//    @Column(columnDefinition = "json")
-//    private List<Long> inviteIds;
+    private String title;
+    private String content;
+    private Boolean isPublic;
+    private String tags;
 
     @Type(type = "json")
     @Column(columnDefinition = "json")
-    private List<Long> roomPlaylists;
+    private List<Long> playlists;  // request에서 번호만 추출해서 저장
 
-    @Type(type = "json")
-    @Column(columnDefinition = "json")
-    private List<String> roomTags;
-
-
-    @Type(type = "json")
-    @Column(columnDefinition = "json")
-    private List<Long> roomVideos;
-
-    @Column(name = "start_time")
-    private OffsetDateTime roomStartTime;
+    private OffsetDateTime startTime;
 
     @PrePersist
     private void beforeSaving() {
-        roomStartTime = OffsetDateTime.now();
+        startTime = OffsetDateTime.now();
     }
-    @Column(name = "end_time")
-    private OffsetDateTime roomEndTime;
 
+    private OffsetDateTime endTime;
+
+    // 유튜브 Tag 등의 메타정보 조합, 뱃지에 사용
+    // 특정방에 있었다는 정보만 있으면 조합 가능하니까 DTO로 보낼 필요 없음
+    @Type(type = "json")
+    @Column(columnDefinition = "json")
+    private ConcurrentHashMap<Integer, Integer> playroomInfo;
+
+
+    // 연결
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
-    private User user;
+    private User user;  // 방제작자, 방장, 싱크조절자.
 
     @OneToMany(mappedBy = "playroom")
     private List<PlayroomLikes> playroomLikes = new ArrayList<>();
 
+    @OneToMany(mappedBy = "playroom", cascade = {CascadeType.REMOVE})
+    private List<YoutubeVideo> videos = new ArrayList<>();
+
+    // 기타 : DTO 외 내부 추천 및 뱃지용
     private Integer userCount;
 
-
-    public Playroom(PlayroomDto playroomDto, User user) {
-        this.id = playroomDto.getId();
-        this.roomTitle = playroomDto.getRoomTitle();
-        this.roomContent = playroomDto.getRoomContent();
-        this.roomPublic = playroomDto.getRoomPublic();
-//        this.roominviteIds = playroomDto.getInviteIds();
-        this.roomPlaylists = playroomDto.getRoomPlaylists();
-        this.roomTags = playroomDto.getRoomTags();
-        this.roomVideos = playroomDto.getRoomVideos();
-//        this.startTime = playroomDto.getRoomStartTime();
-        this.roomEndTime = playroomDto.getRoomEndTime();
-        this.user = user;
-        this.userCount = 0;
-
-    }
 
 }

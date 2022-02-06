@@ -44,7 +44,17 @@ public class PlaylistDto {
         this.image = playlist.getImage();
         this.createdAt = playlist.getCreatedAt();
         this.updatedAt = playlist.getUpdatedAt();
+<<<<<<< HEAD
         this.playlistInfo = playlist.getPlaylistInfo();
+=======
+        //this.image = playlist.getImage();
+
+        // 유저 정보
+        this.userId = playlist.getUser().getUserSeq();
+        this.userName = playlist.getUser().getUsername();
+        this.userProfileImg = playlist.getUser().getProfileImage();
+        this.userFollowersCnt = playlist.getUser().getTo_user().size();
+>>>>>>> origin
 
         // 연결
         this.user = new SimpleUserDto(playlist.getUser());

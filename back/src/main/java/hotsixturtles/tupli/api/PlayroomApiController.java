@@ -76,12 +76,27 @@ public class PlayroomApiController {
                     .status(HttpStatus.BAD_REQUEST)
                     .body(new ErrorResponse(messageSource.getMessage("error.valid.jwt", null, LocaleContextHolder.getLocale())));
         }
-
         Long userSeq = jwtTokenProvider.getUserSeq(token);
 
-        PlayroomDto playroomResult = playroomService.addPlayroom(playroomDto, userSeq); // userSeq
+        PlayroomDto playroomResult = playroomService.addPlayroom(playroomDto, userSeq);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(playroomResult);
+    }
+
+    @PutMapping("/playroom/{playroomId}/user")
+    public ResponseEntity changePlayroomUser(@RequestHeader(value = "Authorization") String token,
+                                             @PathVariable("playroomId") Long playroomId) {
+
+        if (!jwtTokenProvider.validateToken(token)) {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(new ErrorResponse(messageSource.getMessage("error.valid.jwt", null, LocaleContextHolder.getLocale())));
+        }
+        Long userSeq = jwtTokenProvider.getUserSeq(token);
+
+        playroomService.changePlayroomUser(userSeq, playroomId);
+
+        return ResponseEntity.ok().body(null);
     }
 
     /**

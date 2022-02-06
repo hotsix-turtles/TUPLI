@@ -1,17 +1,24 @@
 package hotsixturtles.tupli.api;
 
 
+import hotsixturtles.tupli.dto.response.ErrorResponse;
+import hotsixturtles.tupli.entity.UserBadge;
 import hotsixturtles.tupli.entity.meta.UserInfo;
 import hotsixturtles.tupli.repository.UserInfoRepository;
+import hotsixturtles.tupli.service.BadgeService;
+import hotsixturtles.tupli.service.UserInfoService;
+import hotsixturtles.tupli.service.token.JwtTokenProvider;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -19,6 +26,12 @@ import org.springframework.web.bind.annotation.RestController;
 public class UserInfoApiController {
 
     private final UserInfoRepository userInfoRepository;
+
+    private final JwtTokenProvider jwtTokenProvider;
+    private final UserInfoService userInfoService;
+    private final BadgeService badgeService;
+
+    private final MessageSource messageSource;
 
     /**
      * 타인의 정보 찾기
@@ -37,6 +50,65 @@ public class UserInfoApiController {
         return ResponseEntity.ok().body(userInfo);
     }
 
+    /**
+     * 유저의 플레이룸 시청시간 갱신
+     * @param time 시청 시간
+     * @param token
+     * @return
+     * 반환 코드 : 200, 403, 404
+     */
+    @PutMapping("/userinfo/watchtime")
+    public ResponseEntity userInfoUpdate(@RequestParam("time") Long time,
+                                         @RequestHeader(value = "Authorization") String token) {
+        // 토큰 유효 확인 및 유저 정보(UseqSeq) 가져오기
+        if (!jwtTokenProvider.validateToken(token)) {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(new ErrorResponse(messageSource.getMessage("error.valid.jwt", null, LocaleContextHolder.getLocale())));
+        }
+        Long userSeq = jwtTokenProvider.getUserSeq(token);
+
+        // UserInfo 갱신
+        userInfoService.userInfoUpdate(userSeq, time);
+
+        List<UserBadge> userBadges = badgeService.getBadgeList(userSeq);
+
+        List<Long> badges = badgeService.getUserBadgeSeq(userBadges);
+
+        // 배지갱신
+        badgeService.checkWatchTime(1, userSeq, badges);
+
+        return ResponseEntity.ok().body(null);
+    }
+
+    /**
+     * 유저의 boardupload 횟수 갱신
+     * @param token
+     * @return
+     * 반환 코드 : 200, 403, 404
+     */
+    @PutMapping("/userinfo/board")
+    public ResponseEntity userInfoUpdateBoard(@RequestHeader(value = "Authorization") String token) {
+        // 토큰 유효 확인 및 유저 정보(UseqSeq) 가져오기
+        if (!jwtTokenProvider.validateToken(token)) {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(new ErrorResponse(messageSource.getMessage("error.valid.jwt", null, LocaleContextHolder.getLocale())));
+        }
+        Long userSeq = jwtTokenProvider.getUserSeq(token);
+
+        // UserInfo 갱신
+        userInfoService.userInfoUpdateBoard(userSeq);
+
+        List<UserBadge> userBadges = badgeService.getBadgeList(userSeq);
+
+        List<Long> badges = badgeService.getUserBadgeSeq(userBadges);
+
+        // 배지갱신
+        badgeService.checkBoardUpload(4, userSeq, badges);
+
+        return ResponseEntity.ok().body(null);
+    }
 
 
 
