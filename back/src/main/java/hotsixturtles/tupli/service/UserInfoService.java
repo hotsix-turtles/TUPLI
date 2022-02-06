@@ -44,4 +44,13 @@ public class UserInfoService {
         userInfoRepository.delete(userinfo);
     }
 
+    @Transactional
+    public void updateDailyLogin(Long userSeq){
+        UserInfo userInfo = userInfoRepository.findOneByUserSeq(userSeq);
+        if(userInfo.getDailyLoginYN().equals("N")) {
+            userInfo.setDailyLoginYN("Y");
+            userInfoRepository.save(userInfo);
+        }
+    }
+
 }

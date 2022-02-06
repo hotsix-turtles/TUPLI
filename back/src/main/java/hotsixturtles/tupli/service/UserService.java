@@ -33,7 +33,7 @@ public class UserService {
         user.encodePassword(passwordEncoder);
 
         userRepository.save(user);
-        UserInfo userInfo = new UserInfo(null, user.getUserSeq(), null, 0L, 0L, 0L, 0L);
+        UserInfo userInfo = new UserInfo(null, user.getUserSeq(), null, 0L, 0L, 0L, 1L, "Y");
         userInfoRepository.save(userInfo);
         return user.getUserSeq();
     }
