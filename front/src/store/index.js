@@ -66,7 +66,7 @@ export default new Vuex.Store({
       axiosConnector.post('/account/login', { email: credentials.email, password: credentials.password })
         .then((res) => {
           commit('TOKEN', res.data.token)
-          router.push({ name: 'Profile' })
+          router.push({ name: 'Home' })
           dispatch('getUserInfo')
         })
         .catch((err) => {
@@ -89,15 +89,6 @@ export default new Vuex.Store({
         username: credentials.username,
         nickname: credentials.nickname,
       })
-      // axios({
-      //   method: 'post',
-      //   url: 'https://i6a102.p.ssafy.io/api/v1' + '/account/signup',
-      //   data: {
-      //     email: credentials.email,
-      //     password: credentials.password,
-      //     username: credentials.nickname,
-      //   }
-      // })
         .then((res) => {
           console.log(res)
           console.log('signup success')
@@ -111,11 +102,6 @@ export default new Vuex.Store({
     // 사용자 정보 얻기
     getUserInfoToken({commit}) {
       axiosConnector.get('/account/userInfo')
-      // axios({
-      //   method: 'GET',
-      //   url: SERVER.URL + SERVER.ROUTES.accounts.getUserInfo,
-      //   headers: {Authorization: token}
-      // })
         .then(res => {
           commit('GET_USER_INFO', res.data)
         })

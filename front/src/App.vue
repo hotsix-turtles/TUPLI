@@ -1,7 +1,10 @@
 <template>
   <v-app>
     <v-main>
-      <router-view :key="$route.path" />
+      <router-view
+        :key="$route.path"
+        style="margin-bottom: 60px;"
+      />
     </v-main>
     <navbar-bottom class="mt-auto fixed" />
   </v-app>

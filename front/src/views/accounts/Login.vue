@@ -91,14 +91,12 @@
       <!-- 그 외 -->
       <v-container>
         <div class="row justify-center mb-4 mt-1">
-          <router-link
-            to="/signup2"
-            class="no-background-hover-text"
+          <p
+            class="mx-1"
+            @click="$router.push({ name: 'Signup2' })"
           >
-            <p class="mx-1">
-              회원가입
-            </p>
-          </router-link>
+            회원가입
+          </p>
           <p class="mx-1">
             |
           </p>
@@ -222,9 +220,6 @@ export default {
     }
   }
 
-  .no-background-hover-text {
-    text-decoration: none !important;
-    text-decoration-color: black !important;
-  }
+
 </style>
 

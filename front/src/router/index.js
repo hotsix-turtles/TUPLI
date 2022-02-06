@@ -1,26 +1,34 @@
 import Vue from 'vue'
 import VueMeta from 'vue-meta'
 import VueRouter from 'vue-router'
+//home
 import Home from '@/views/common/Home'
+import Notice from '../views/home/Notice.vue'
+//account
+import Login from '../views/accounts/Login.vue'
+import Signup from '../views/accounts/Signup1.vue'
+import Signup2 from '../views/accounts/Signup2.vue'
+import Signup3 from '../views/accounts/Signup3.vue'
+//profile
+import EditProfile from '../views/profile/EditProfile.vue'
+import Follow from '../views/profile/Follow.vue'
+import Profile from '../views/profile/Profile.vue'
+import Setting from '../views/profile/Setting.vue'
+//setting
+import ChangePassword from '../views/profile/setting/ChangePassword.vue'
+import History from '../views/profile/setting/History.vue'
+import InviteNoticeAlert from '../views/profile/setting/InviteNoticeAlert.vue'
+import Like from '../views/profile/setting/Like.vue'
+import Payment from '../views/profile/setting/Payment.vue'
+import PrivateTerms from '../views/profile/setting/PrivateTerms.vue'
+import Save from '../views/profile/setting/Save.vue'
+import ServiceTerms from '../views/profile/setting/ServiceTerms.vue'
+//
 import PlaylistForm from '@/views/playlist/PlaylistForm'
 import PlaylistFormVideo from '@/views/playlist/PlaylistFormVideo'
 import PlaylistDetail from '@/views/playlist/PlaylistDetail'
 import Category from '@/views/common/Category'
 import Search from '@/views/common/Search'
-import Login from '../views/accounts/Login.vue'
-import Signup from '../views/accounts/Signup1.vue'
-import Signup2 from '../views/accounts/Signup2.vue'
-import Signup3 from '../views/accounts/Signup3.vue'
-import ChangePassword from '../views/profile/ChangePassword.vue'
-import EditProfile from '../views/profile/EditProfile.vue'
-import History from '../views/profile/History.vue'
-import Like from '../views/profile/Like.vue'
-import Notice from '../views/profile/Notice.vue'
-import Payment from '../views/profile/Payment.vue'
-import Profile from '../views/profile/Profile.vue'
-import Save from '../views/profile/Save.vue'
-import Setting from '../views/profile/Setting.vue'
-import Terms from '../views/profile/Terms.vue'
 import PlayroomForm from '../views/playroom/PlayroomForm.vue'
 import PlayroomFormPlaylist from '../views/playroom/PlayroomFormPlaylist.vue'
 import PlayroomDetail from '../views/playroom/PlayroomDetail.vue'
@@ -43,6 +51,11 @@ const routes = [
     path: '/home',
     name: 'Home',
     component: Home
+  },
+  {
+    path: '/notice',
+    name: 'Notice',
+    component: Notice
   },
 
   // 구글 소셜로그인
@@ -122,34 +135,14 @@ const routes = [
 
   //profile
   {
-    path: '/changepassword',
-    name: 'ChangePassword',
-    component: ChangePassword
-  },
-  {
     path: '/editprofile',
     name: 'EditProfile',
     component: EditProfile
   },
   {
-    path: '/history',
-    name: 'History',
-    component: History
-  },
-  {
-    path: '/like',
-    name: 'Like',
-    component: Like
-  },
-  {
-    path: '/notice',
-    name: 'Notice',
-    component: Notice
-  },
-  {
-    path: '/payment',
-    name: 'Payment',
-    component: Payment
+    path: '/follow',
+    name: 'Follow',
+    component: Follow
   },
   {
     path: '/profile',
@@ -157,9 +150,41 @@ const routes = [
     component: Profile
   },
   {
-    path: '/editprofile',
-    name: 'EditProfile',
-    component: EditProfile
+    path: '/setting',
+    name: 'Setting',
+    component: Setting
+  },
+
+  //setting
+  {
+    path: '/changepassword',
+    name: 'ChangePassword',
+    component: ChangePassword
+  },
+  {
+    path: '/history',
+    name: 'History',
+    component: History
+  },
+  {
+    path: '/invitenotice',
+    name: 'InviteNoticeAlert',
+    component: InviteNoticeAlert
+  },
+  {
+    path: '/like',
+    name: 'Like',
+    component: Like
+  },
+  {
+    path: '/payment',
+    name: 'Payment',
+    component: Payment
+  },
+  {
+    path: '/privateterms',
+    name: 'PrivateTerms',
+    component: PrivateTerms
   },
   {
     path: '/save',
@@ -167,15 +192,15 @@ const routes = [
     component: Save
   },
   {
-    path: '/setting',
-    name: 'Setting',
-    component: Setting
+    path: '/serviceterms',
+    name: 'ServiceTerms',
+    component: ServiceTerms
   },
-  {
-    path: '/terms',
-    name: 'Terms',
-    component: Terms
-  },
+
+
+
+
+
 
 
 

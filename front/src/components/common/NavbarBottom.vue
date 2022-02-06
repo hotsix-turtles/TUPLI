@@ -61,7 +61,11 @@
           class="clickable d-flex-column text-center"
           @click="toggle"
         >
-          <v-icon>mdi-plus-box</v-icon>
+          <v-icon
+            color="#5B5C9D"
+          >
+            mdi-plus-box
+          </v-icon>
           <div>만들기</div>
         </div>
 
@@ -75,6 +79,7 @@
 
         <div
           class="clickable d-flex-column text-center"
+          @click="$router.push({ name: 'Profile' })"
         >
           <v-icon>mdi-account-circle-outline</v-icon>
           <div>프로필</div>
