@@ -107,7 +107,7 @@ public class UserApiController {
 
     @Data
     static class CreateUserRequest {
-        @Size(min=3, max=128, message = "{error.size.username}")
+//        @Size(min=3, max=128, message = "{error.size.username}")
         private String username;
         @Size(min=3, max=128, message = "{error.size.email}")
 //        @Email(message = "{error.format.email}")
@@ -118,10 +118,10 @@ public class UserApiController {
 //        @Length(min=3, max=128, message = "비밀번호 길이 불일치")
         private String password;
         @Size(max = 64) String userId;
-        @Size(max = 1) String emailVerifiedYn;
-        @Size(max = 512) String profileImageUrl;
-        ProviderType providerType;
-        RoleType roleType;
+//        @Size(max = 1) String emailVerifiedYn;
+//        @Size(max = 512) String profileImageUrl;
+//        ProviderType providerType;
+//        RoleType roleType;
         LocalDateTime createdAt;
         LocalDateTime modifiedAt;
     }
@@ -241,7 +241,7 @@ public class UserApiController {
     @ApiOperation(value = "프로필 내용 변경", notes = "회원정보가 안맞을 시 404'유효하지 않은 토큰입니다' 반환, " +
             "프로필 사진 업로드에 문제가 있을 경우 404'잘못된 값입니다' 반환, 성공 시 200 반환")
     public ResponseEntity<?> updateProfile(@RequestPart(value = "image", required = false) MultipartFile file,
-                                           @RequestPart(value = "email", required = false) String email,
+                                           @RequestPart(value = "introduction", required = false) String introduction,
                                             @RequestPart(value = "nickname", required = false) String nickname,
                                            HttpServletRequest request) throws IOException {
         // jwt 유효 확인 + 정보 빼기
@@ -267,7 +267,7 @@ public class UserApiController {
                             .getMessage("error.wrong", null, LocaleContextHolder.getLocale())));
         }
 
-        userService.updateProfile(userSeq, email, nickname, image);
+        userService.updateProfile(userSeq, introduction, nickname, image);
 
         return ResponseEntity.status(HttpStatus.OK).body(null);
     }
@@ -453,6 +453,8 @@ public class UserApiController {
         }
         // user_likes 테이블에 to_user 에 otherUserSeq 이 들어간 리스트 반환하면 될듯
         // 22.02.02 한길 - 미완성... 잘 될지 안될지 모름.
+        // 민구. 네 이대로는 안될겁니다. 이건 중간 테이블이고 가공을 해서 보내주셔야죠. 거의 다 오셨습니다.
+        // 반환은 Entity가 아니라 DTO로 해주세요. 이거 하다보면 눈치 채실겁니당b
         List<UserLikes> followerList = userService.getFollowers(userSeq);
         return ResponseEntity.status(HttpStatus.OK).body(followerList);
     }
