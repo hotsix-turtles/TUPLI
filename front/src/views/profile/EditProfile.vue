@@ -6,24 +6,19 @@
         class="align-center mt-5 justify-space-between"
       >
         <div class="d-flex">
-          <router-link
-            to="/profile"
-            class="no-background-hover"
+          <v-icon
+            size="30"
+            color="#5B5C9D"
+            @click="$router.push({ name: 'Profile' })"
           >
-            <v-icon
-              color="#5B5C9D"
-            >
-              mdi-chevron-left
-            </v-icon>
-          </router-link>
-          <h4 class="">
+            mdi-chevron-left
+          </v-icon>
+          <h3>
             프로필 편집
-          </h4>
+          </h3>
         </div>
-        <router-link
-          to="/profile"
-          class="no-background-hover"
-        >
+
+        <div>
           <v-btn
             class="d-flex justify-end p-5 mx-5"
             small
@@ -31,21 +26,9 @@
             outlined
             color="#5B5C9D"
             depressed
-          >
-            완료
-          </v-btn>
-        </router-link>
-        <div>
-          <v-btn
-            class="d-flex justify-end p-5 mx-5"
-            small
-            rounded
-            outlined
-            color="#FF0000"
-            depressed
             @click="updateProfile"
           >
-            변경(임시)
+            변경
           </v-btn>
         </div>
       </v-row>
@@ -60,9 +43,9 @@
           >
           <!-- 사진 업로드용 임시 -->
           <div class="update-modal mb-3">
-            <label for="profile-photo">사진 변경: </label>
-            <input 
-              type="file" 
+            <label for="profile-photo" />
+            <input
+              type="file"
               @change="getNewImage"
             >
           </div>
@@ -129,6 +112,7 @@ export default {
       axiosConnector.put('/profile', formData)
         .then((response) => {
           console.log(response.data)
+          $router.push({ name: 'Profile' })
           // 필요하면 자체 갱신
           // this.nickname = response.data.email
           // state 갱신
@@ -143,7 +127,5 @@ export default {
 </script>
 
 <style>
-  .no-background-hover {
-      text-decoration: none !important;
-    }
+
 </style>
