@@ -75,6 +75,7 @@
 
         <div
           class="clickable d-flex-column text-center"
+          @click="$router.push({ name: 'Profile' })"
         >
           <v-icon>mdi-account-circle-outline</v-icon>
           <div>프로필</div>

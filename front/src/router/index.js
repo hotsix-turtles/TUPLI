@@ -28,6 +28,9 @@ import VideoSearch from '../views/video/VideoSearch.vue'
 import VideoWatch from '../views/video/VideoWatch.vue'
 import video from '@/store/index.js'
 import AuthHandler from '../views/handler/AuthHandler.vue'
+import KakaoPaySuccess from '../views/handler/kakaoPay/KakaoPaySuccess.vue'
+import KakaoPayCancel from '../views/handler/kakaoPay/KakaoPayCancel.vue'
+import KakaoPayFail from '../views/handler/kakaoPay/KakaoPayFail.vue'
 
 import KakaoPaySuccess from '../views/handler/kakaoPay/KakaoPaySuccess.vue'
 import KakaoPayCancel from '../views/handler/kakaoPay/KakaoPayCancel.vue'
@@ -175,6 +178,24 @@ const routes = [
     path: '/terms',
     name: 'Terms',
     component: Terms
+  },
+
+  //handler
+  //카카오
+  {
+    path: '/kakaoPay/success',
+    name: 'KakaoPaySuccess',
+    component: KakaoPaySuccess
+  },
+  {
+    path: '/kakaoPay/cancel',
+    name: 'KakaoPayCancel',
+    component: KakaoPayCancel
+  },
+  {
+    path: '/kakaoPay/fail',
+    name: 'KakaoPayFail',
+    component: KakaoPayFail
   },
 
 

@@ -92,7 +92,7 @@
       <v-container>
         <div class="row justify-center mb-4 mt-1">
           <router-link
-            to="/signup2"
+            to="/signup"
             class="no-background-hover-text"
           >
             <p class="mx-1">
