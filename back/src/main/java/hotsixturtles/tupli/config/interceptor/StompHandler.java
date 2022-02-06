@@ -66,8 +66,8 @@ public class StompHandler implements ChannelInterceptor {
             if (jwtToken != null) {
                 // 회원일 경우 이름 변경
                 User user = jwtTokenProvider.getUser(jwtToken);
-                name = user.getEmail();  // 나중에 닉네임으로 변경
-                img = user.getProfileImageUrl();
+                name = user.getNickname();
+                img = user.getProfileImage();
             }
             // 채팅방에 들어온 클라이언트 정보를 roomId와 맵핑해 놓는다.(나중에 특정 세션이 어떤 채팅방에 들어가 있는지 알기 위함)
             chatRoomRepository.setUserEnterInfo(sessionId, ChatUserInfo.builder().sender(name).roomId(roomId).build());
