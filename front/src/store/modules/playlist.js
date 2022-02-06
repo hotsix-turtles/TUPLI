@@ -12,6 +12,7 @@ const playlist = {
     selectedPlaylists: [],
     addedPlaylists: [],
     addedPlaylistVideoIds: [],
+    // 아래 두줄은 추후 account.js로 옮길듯
     myPlaylists: [ { playlistId: 1, title: '좋아요한 플레이리스트 1', thumbnail: '', videos: [{ videoId: 'a2dxf-fvfla', title: '냠냠', thumbnail: '' }] }, { playlistId: 2, title: '좋아요한 플레이리스트 2', thumbnail: '' }, { playlistId: 3, title: '좋아요한 플레이리스트 3', thumbnail: '' }, ],
     savedPlaylists: [ { playlistId: 4, title: '저장한 플레이리스트 1', thumbnail: '', videos: [{ videoId: 'a2dxf-fvflb', title: '냠냠', thumbnail: '' }] }, { playlistId: 5, title: '저장한 플레이리스트 2', thumbnail: '' }, { playlistId: 6, title: '저장한 플레이리스트 3', thumbnail: '' }, ]
   },
@@ -109,6 +110,11 @@ const playlist = {
 
       console.log('deselect_all_playlist_video')
     },
+    RESET_ADDED_PLAYLISTS: function (state) {
+      state.selectedPlaylists = []
+      state.addedPlaylists = []
+      state.addedPlaylistVideoIds = []
+    }
   },
   actions: {
     createPlaylist: function ({ commit }, formData) {
@@ -176,6 +182,9 @@ const playlist = {
     },
     deselectAllPlaylistVideo: function ({ commit }) {
       commit('DESELECT_ALL_PLAYLIST_VIDEO')
+    },
+    resetAddedPlaylists: function ({ commit }) {
+      commit('RESET_ADDED_PLAYLISTS')
     }
   },
   modules: {

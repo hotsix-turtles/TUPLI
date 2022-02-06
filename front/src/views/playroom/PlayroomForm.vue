@@ -66,7 +66,7 @@
             class="d-flex flex-row justify-space-between"
           >
             <p class="font-3">
-              공개 설정
+              공개 여부
             </p>
             <p class="font-4 ml-1 mr-auto">
               {{ isPublicMsg }}
@@ -74,6 +74,146 @@
             <v-switch
               v-model="formData.isPublic"
             />
+          </v-col>
+        </v-row>
+
+        <!-- 플레이룸 시작시간 설정 -->
+        <v-row>
+          <v-col
+            cols="12"
+            sm="5"
+            class="d-flex flex-row justify-space-between"
+          >
+            <v-menu
+              ref="startDateMenu"
+              v-model="startDateMenu"
+              :close-on-content-click="false"
+              transition="scale-transition"
+              offset-y
+              max-width="290px"
+              min-width="auto"
+            >
+              <template v-slot:activator="{ on, attrs }">
+                <v-text-field
+                  v-model="startDate"
+                  label="플레이룸 시작 시간"
+                  persistent-hint
+                  prepend-icon="mdi-calendar"
+                  :rules="startDateRules"
+                  v-bind="attrs"
+                  v-on="on"
+                >
+                </v-text-field>
+              </template>
+              <v-date-picker
+                v-model="startDate"
+                no-title
+                @input="startDateMenu = false"
+              >
+              </v-date-picker>
+            </v-menu>
+
+            <v-menu
+              ref="startTimeMenu"
+              v-model="startTimeMenu"
+              :close-on-content-click="false"
+              :nudge-right="40"
+              :return-value.sync="startTime"
+              transition="scale-transition"
+              offset-y
+              max-width="290px"
+              min-width="290px"
+            >
+              <template v-slot:activator="{ on, attrs }">
+                <v-text-field
+                  v-model="startTime"
+                  label=""
+                  prepend-icon="mdi-clock-time-four-outline"
+                  :rules="startTimeRules"
+                  readonly
+                  v-bind="attrs"
+                  v-on="on"
+                >
+                </v-text-field>
+              </template>
+              <v-time-picker
+                v-if="startTimeMenu"
+                v-model="startTime"
+                full-width
+                @click:minute="$refs.startTimeMenu.save(startTime)"
+              >
+              </v-time-picker>
+            </v-menu>
+          </v-col>
+        </v-row>
+
+        <!-- 플레이룸 종료시간 설정 -->
+        <v-row>
+          <v-col
+            cols="12"
+            sm="5"
+            class="d-flex flex-row justify-space-between"
+          >
+            <v-menu
+              ref="endDateMenu"
+              v-model="endDateMenu"
+              :close-on-content-click="false"
+              transition="scale-transition"
+              offset-y
+              max-width="290px"
+              min-width="auto"
+            >
+              <template v-slot:activator="{ on, attrs }">
+                <v-text-field
+                  v-model="endDate"
+                  label="플레이룸 종료 시간"
+                  persistent-hint
+                  prepend-icon="mdi-calendar"
+                  :rules="endDateRules"
+                  v-bind="attrs"
+                  v-on="on"
+                >
+                </v-text-field>
+              </template>
+              <v-date-picker
+                v-model="endDate"
+                no-title
+                @input="endDateMenu = false"
+              >
+              </v-date-picker>
+            </v-menu>
+
+            <v-menu
+              ref="endTimeMenu"
+              v-model="endTimeMenu"
+              :close-on-content-click="false"
+              :nudge-right="40"
+              :return-value.sync="endTime"
+              transition="scale-transition"
+              offset-y
+              max-width="290px"
+              min-width="290px"
+            >
+              <template v-slot:activator="{ on, attrs }">
+                <v-text-field
+                  v-model="endTime"
+                  label=""
+                  prepend-icon="mdi-clock-time-four-outline"
+                  :rules="endTimeRules"
+                  readonly
+                  v-bind="attrs"
+                  v-on="on"
+                >
+                </v-text-field>
+              </template>
+              <v-time-picker
+                v-if="endTimeMenu"
+                v-model="endTime"
+                full-width
+                @click:minute="$refs.endTimeMenu.save(endTime)"
+              >
+              </v-time-picker>
+            </v-menu>
           </v-col>
         </v-row>
 
@@ -242,6 +382,22 @@ export default {
         v => !!v || '제목은 필수입니다.',
         v => v.length > 2 || '제목은 3글자 이상 작성해야 합니다.',
       ],
+      startDateRules: [
+        v => !!v || '시작날짜는 필수입니다.',
+        v => this.startDateTime.getTime() <= this.endDateTime.getTime() || '시작날짜는 종료날짜보다 이전이어야 합니다',
+      ],
+      startTimeRules: [
+        v => !!v || '시작시간은 필수입니다.',
+        v => this.startDateTime.getTime() <= this.endDateTime.getTime() || '시작시간은 종료시간보다 이전이어야 합니다',
+      ],
+      endDateRules: [
+        v => !!v || '종료날짜는 필수입니다.',
+        v => this.startDateTime.getTime() < this.endDateTime.getTime() || '종료날짜은 시작날짜보다 이후이어야 합니다',
+      ],
+      endTimeRules: [
+        v => !!v || '종료시간은 필수입니다.',
+        v => this.startDateTime.getTime() < this.endDateTime.getTime() || '종료시간은 시간시간보다 이후이어야 합니다',
+      ],
       isValid: false,
       // Create할 때 넘길 데이터
       formData: {
@@ -253,19 +409,48 @@ export default {
         playlists: []
       },
       numberOfPlaylist: 0,
-      numberOfPlaylistVideos: 0
+      numberOfPlaylistVideos: 0,
+
+      startDate: (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10),
+      startTime: (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(11, 5),
+      startDateMenu: false,
+      startTimeMenu: false,
+      startDateTime: new Date(),
+
+      endDate: (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10),
+      endTime: (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(11, 5),
+      endDateMenu: false,
+      endTimeMenu: false,
+      endDateTime: new Date(),
     }
   },
   computed: {
+    computedDateFormatted () {
+      return this.formatDate(this.startDate)
+    },
     isPublicMsg () {
       return this.formData.isPublic ? "내 플레이룸을 공개합니다." : "내 플레이룸을 비공개합니다."
     },
     numberOfFriend () {
       return this.formData.friends.length
     },
-    ...mapState('playlist', ['addedPlaylists']),
+    ...mapState('playlist', ['addedPlaylists', 'addedPlaylistVideoIds']),
     ...mapState('playroom', ['savedFormData']),
     ...mapGetters('playlist', ['numberOfAddedPlaylists', 'numberOfAddedPlaylistSelectedVideos', 'numberOfAddedPlaylistVideos'])
+  },
+  watch: {
+    startDate (val) {
+      this.startDateTime = new Date(`${this.startDate}T${this.startTime}:00.000+09:00`)
+    },
+    startTime (val) {
+      this.startDateTime = new Date(`${this.startDate}T${this.startTime}:00.000+09:00`)
+    },
+    endDate (val) {
+      this.endDateTime = new Date(`${this.endDate}T${this.endTime}:00.000+09:00`)
+    },
+    endTime (val) {
+      this.endDateTime = new Date(`${this.endDate}T${this.endTime}:00.000+09:00`)
+    },
   },
   created: function () {
     if (this.savedFormData) {
@@ -282,9 +467,30 @@ export default {
     },
     submit() {
       if (this.formData.tags) this.formData.tags = this.formData.tags.join()
+      this.addedPlaylists.map(addedPlaylist => {
+        if (addedPlaylist.videos)
+          addedPlaylist.videos.map(video =>
+            video.included = Boolean(this.addedPlaylistVideoIds.find(addedPlaylistVideoId => addedPlaylistVideoId == video.videoId))
+          )
+      })
       this.formData.playlists = this.addedPlaylists
+      // '2022-02-06T04:41:08.443Z'
+      this.formData.startDate = `${this.startDate}T${this.startTime}:00.000Z`
+      this.formData.endDate = `${this.endDate}T${this.endTime}:00.000Z`
       console.log(this.formData)
       this.createPlayroom(this.formData)
+      this.clearForm()
+    },
+    clearForm() {
+      this.formData = {
+        title: '',
+        content: '',
+        tags: [],
+        isPublic: true,
+        friends: [],
+        playlists: []
+      }
+      this.resetAddedPlaylists()
     },
     saveAndGo: function () {
       this.saveFormData(this.formData)
@@ -297,7 +503,7 @@ export default {
         this.deselectAllPlaylistVideo()
     },
     ...mapActions('playroom', ['saveFormData', 'createPlayroom']),
-    ...mapActions('playlist', ['selectAllPlaylistVideo', 'deselectAllPlaylistVideo'])
+    ...mapActions('playlist', ['selectAllPlaylistVideo', 'deselectAllPlaylistVideo', 'resetAddedPlaylists'])
   },
 }
 </script>
