@@ -73,8 +73,8 @@ public class PlayroomService {
             for (String videoUrl : entry.getValue()) {
                 YoutubeVideo video = new YoutubeVideo();
                 YoutubeVideo existVideo = youtubeVideoRepository.findOneByVideoId(videoUrl);
-                video.setInit(existVideo);
                 video.setPlayroom(playroom);
+                video.setInit(existVideo);
                 youtubeVideoRepository.save(video);
 
                 // 플레이룸 구성 비디오 정보로 메타 정보 구축
