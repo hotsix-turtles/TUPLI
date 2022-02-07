@@ -515,4 +515,17 @@ public class UserApiController {
         return ResponseEntity.status(HttpStatus.OK).body(followerList);
     }
 
+
+
+    /**
+     * 해당 유저의 팔로워(이 유저를 팔로우 한 사람) 수 보기
+     */
+    @GetMapping("/profile/followers/{userSeq}/count")
+    public ResponseEntity<?> getFollowers(
+            @ApiParam(value = "path로 userSeq가 입력된다.")
+            @PathVariable("userSeq") Long userSeq) {
+
+        int followersCnt = userService.getFollowersCount(userSeq);
+        return ResponseEntity.status(HttpStatus.OK).body(followersCnt);
+    }
 }
