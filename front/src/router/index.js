@@ -197,30 +197,6 @@ const routes = [
     component: ServiceTerms
   },
 
-  //handler
-  //카카오
-  {
-    path: '/kakaoPay/success',
-    name: 'KakaoPaySuccess',
-    component: KakaoPaySuccess
-  },
-  {
-    path: '/kakaoPay/cancel',
-    name: 'KakaoPayCancel',
-    component: KakaoPayCancel
-  },
-  {
-    path: '/kakaoPay/fail',
-    name: 'KakaoPayFail',
-    component: KakaoPayFail
-  },
-
-
-
-
-
-
-
 
   //playroom
   {

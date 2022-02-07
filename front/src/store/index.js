@@ -20,7 +20,7 @@ export default new Vuex.Store({
 
   // data
   state: {
-    authToken: localStorage.getItem('jwt'),
+    authToken: null,
     isLogin: false,
     userInfo: null
   },
@@ -55,10 +55,10 @@ export default new Vuex.Store({
       state.email = res.email
       state.nickname = res.nickname
       state.introduction = res.introduction
-      if (res.profileImageUrl) {
-        state.image = 'https://storage.cloud.google.com/tupli_profile' + res.profileImageUrl
+      if (res.profileImage) {
+        state.image = 'https://storage.cloud.google.com/tupli_profile' + res.profileImage
       } else {
-        state.profileImageUrl = null
+        state.profileImage = null
       }
       state.is_vip = res.is_vip
     },
@@ -75,10 +75,10 @@ export default new Vuex.Store({
           commit('TOKEN', res.data.token)
           router.push({ name: 'Home' })
           // router.push({ name: 'Profile' })  // 자동 로그인, 가입후 바로 로그인 쓰일 수 있으니 store에서 해주지 말아주시고 login view라던가 필요한 상황에서 해주세요(강민구)
-          dispatch('getUserInfo')
+          dispatch('getUserInfo', res.data.token)
         })
         .catch((err) => {
-          console.log(err)
+          console.log(err.response.data)
         })
     },
     // 로그아웃
@@ -103,6 +103,7 @@ export default new Vuex.Store({
           email: credentials.email,
           password: credentials.password,
           username: credentials.username,
+          nickname: credentials.nickname,
         }
       })
         .then((res) => {
@@ -112,16 +113,25 @@ export default new Vuex.Store({
         })
         .catch((err) => {
           console.log('signup fail')
-          console.log(err)
+          console.log(err.response.data)
         })
     },
     // 사용자 정보 얻기
-    getUserInfo({commit}) {
-      axiosConnector.get('/account/userInfo')
+    getUserInfo({commit}, token) {
+      console.log('토큰')
+      console.log(token)
+      console.log(localStorage.getItem('jwt'))
+      // axiosConnector.get('/account/userInfo')
+      axios({
+        method: 'GET',
+        url: 'https://i6a102.p.ssafy.io/api/v1' + '/account/userInfo',
+        headers: {Authorization: token}
+      })
         .then(res => {
+          console.log(res.data)
           commit('GET_USER_INFO', res.data)
         })
-        .catch(err => console.log(err))
+        .catch(err => console.log(err.response.data))
     },
 
     // 프로필
@@ -142,4 +152,3 @@ export default new Vuex.Store({
 
 
 })
-
