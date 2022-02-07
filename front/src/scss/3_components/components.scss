@@ -1,0 +1,57 @@
+.dark-background {
+  position: absolute;
+  background-color: rgba($color: #000000, $alpha: 0.6);
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+}
+
+.light-background {
+  background-color: white;
+}
+
+.fixed-bottom {
+  position: fixed !important;
+  bottom: 0 !important;
+  width: 100% !important;
+}
+
+.fixed-top {
+  display: inline-block;
+  position: fixed !important;
+  top: 0 !important;
+  width: 100% !important;
+}
+
+.navbar-background {
+  background-color: rgb(250, 250, 250);
+}
+
+
+.video-thumbnail {
+  position: relative;
+}
+
+.duration {
+  position: absolute;
+  bottom: 3px;
+  right: 5px;
+  background-color: rgba($color: #000000, $alpha: 0.6);
+  color: white;
+  border-radius: 5px;
+  font-size: 12px;
+  padding: 1px;
+}
+
+.shadow-s {
+  box-shadow: 4px 4px 3px #000;
+}
+
+.shadow-m {
+  box-shadow: 4px 4px 4px rgba($color: #000000, $alpha: 0.6);
+}
+
+.shadow-l {
+  box-shadow: 8px 8px 8px rgba($color: #000000, $alpha: 0.6);
+}

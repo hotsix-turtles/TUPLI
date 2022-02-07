@@ -1,6 +1,6 @@
 <template>
   <div>
-    <cancel :page-name="pageName" />
+    <back :page-name="pageName" />
     <search-bar
       :label="'새로운 영상을 검색해주세요'"
       :router-page="'VideoSearch'"
@@ -23,23 +23,22 @@
 
     <!-- 탭에 따른 결과물 -->
     <video-list-item-small
-      :liked-videos="likedVideos"
+      :videos="likedVideos"
     />
     <video-list-item-small
-      :saved-videos="savedVideos"
+      :videos="savedVideos"
     />
   </div>
 </template>
 
 <script>
 import { mapState } from 'vuex'
-
-import Cancel from '../../components/common/Cancel.vue'
+import Back from '../../components/common/Back.vue'
 import SearchBar from '../../components/common/SearchBar.vue'
 import VideoListItemSmall from '../../components/video/VideoListItemSmall.vue'
 export default {
   name: 'PlaylistFormVideo',
-  components: { Cancel, SearchBar, VideoListItemSmall },
+  components: { SearchBar, VideoListItemSmall, Back },
   data: function() {
     return {
       pageName: "영상 추가하기",
@@ -55,7 +54,7 @@ export default {
       savedVideos: state => state.savedVideos,
     })
   },
-  created: {
+  created: function() {
     // setLikedVideos()
     // setSavedVideos()
   },

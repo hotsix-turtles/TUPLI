@@ -1,12 +1,14 @@
 /* eslint-disable vue/require-default-prop */
 <template>
   <div>
+    <!-- 만들기 버튼 나오면서 나오는 검정 배경 -->
     <div
       v-if="isClickedMakeBtn"
       class="dark-background"
       @click="toggle"
     />
-    <div class="d-flex-column">
+    <!-- 만들기 버튼 (플레이리스트/플레이룸/게시글) -->
+    <div class="d-flex-column pb-5">
       <div
         v-if="isClickedMakeBtn"
         class="d-flex-column text-center"
@@ -14,89 +16,75 @@
         <div class="my-5">
           <v-btn
             rounded
-            @click="toggle"
+            @click="goPlaylistForm"
           >
-            <router-link
-              :to="{ name: 'PlaylistForm' }"
-              class="text-decoration-none text-primary"
-            >
-              PlaylistForm
-            </router-link>
+            플레이리스트
           </v-btn>
         </div>
         <div class="my-5">
           <v-btn
             rounded
-            @click="toggle"
+            @click="goPlayroomForm"
           >
-            <router-link
-              :to="{ name: 'PlaylistFormVideo' }"
-              class="text-decoration-none text-primary"
-            >
-              PlaylistFormVideo
-            </router-link>
+            플레이룸
           </v-btn>
         </div>
+        <div class="my-5">
+          <v-btn
+            rounded
+          >
+            게시글
+          </v-btn>
+        </div><br><br>
       </div>
-      <v-bottom-navigation
-        :value="value"
-        color="#5B5C9D"
-        style=""
-        grow
+      <!-- 네브바 -->
+      <div
+        class="d-flex justify-space-around fixed-bottom navbar-background py-1"
       >
-        <v-btn>
-          <span>홈</span>
+        <div
+          class="clickable d-flex-column text-center"
+          @click="$router.push({ name: 'Home' })"
+        >
           <v-icon>mdi-home</v-icon>
-        </v-btn>
+          <div>홈</div>
+        </div>
 
-        <v-btn>
-          <span>
-            <router-link
-              :to="{ name: 'Search' }"
-              class="text-decoration-none"
-            >
-              검색
-            </router-link>
-          </span>
-          <router-link
-            :to="{ name: 'Search' }"
-            class="text-decoration-none"
+        <div
+          class="clickable d-flex-column text-center"
+          @click="$router.push({ name: 'Search' })"
+        >
+          <v-icon>mdi-magnify</v-icon>
+          <div>검색</div>
+        </div>
+
+        <div
+          class="clickable d-flex-column text-center"
+          @click="toggle"
+        >
+          <v-icon
+            color="#5B5C9D"
           >
-            <v-icon>
-              mdi-magnify
-            </v-icon>
-          </router-link>
-        </v-btn>
+            mdi-plus-box
+          </v-icon>
+          <div>만들기</div>
+        </div>
 
-        <v-btn @click="toggle">
-          <span>만들기</span>
-          <v-icon>mdi-plus-box</v-icon>
-        </v-btn>
+        <div
+          class="clickable d-flex-column text-center"
+          @click="$router.push({ name: 'Category' })"
+        >
+          <v-icon>mdi-compass</v-icon>
+          <div>탐색</div>
+        </div>
 
-        <v-btn>
-          <span>
-            <router-link
-              :to="{ name: 'Category' }"
-              class="text-decoration-none"
-            >
-              둘러보기
-            </router-link>
-          </span>
-          <router-link
-            :to="{ name: 'Category' }"
-            class="text-decoration-none"
-          >
-            <v-icon>
-              mdi-compass
-            </v-icon>
-          </router-link>
-        </v-btn>
-
-        <v-btn>
-          <span>프로필</span>
+        <div
+          class="clickable d-flex-column text-center"
+          @click="$router.push({ name: 'Profile' })"
+        >
           <v-icon>mdi-account-circle-outline</v-icon>
-        </v-btn>
-      </v-bottom-navigation>
+          <div>프로필</div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -115,7 +103,19 @@ export default {
   methods: {
     toggle: function() {
       this.isClickedMakeBtn = !this.isClickedMakeBtn
-    }
+    },
+    goPlaylistForm: function() {
+      this.$router.push({ name: 'PlaylistForm' })
+      this.toggle()
+    },
+    goPlayroomForm: function() {
+      this.$router.push({ name: 'PlayroomForm' })
+      this.toggle()
+    },
+    // goBoardForm: function() {
+    //   this.$router.push({ name: 'BoardForm' })
+    //   this.toggle()
+    // },
   }
 }
 </script>

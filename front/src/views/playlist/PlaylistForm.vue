@@ -1,12 +1,15 @@
 <template>
   <div>
     <!-- 뒤로가기/완료 -->
-    <div class="d-flex justify-space-between">
+    <div class="d-flex justify-space-between fixed-top light-background">
       <back :page-name="pageName" />
-      <span class="clickable">
+      <div
+        class="clickable"
+        @click="onClickCompletion"
+      >
         완료
-      </span>
-    </div>
+      </div>
+    </div><br><br>
 
     <!-- 플레이리스트 생성 폼 -->
     <v-form v-model="valid">
@@ -19,8 +22,8 @@
             class="py-0"
           >
             <v-text-field
-              v-model="title"
-              :rules="titleRules"
+              v-model="formData.title"
+              :rules="[rules.required, rules.counterMin3, rules.counterMax30]"
               :counter="30"
               label="플레이리스트 제목"
               required
@@ -34,7 +37,8 @@
             class="py-0"
           >
             <v-text-field
-              v-model="content"
+              v-model="formData.content"
+              :rules="[rules.counterMax80]"
               :counter="80"
               label="플레이리스트 소개글"
             />
@@ -47,20 +51,10 @@
             class="py-0"
           >
             <tag-input
+              :proped-tags="formData.tags"
               @tag-input="updateTags"
             />
           </v-col>
-          <!-- <v-col
-            cols="12"
-            md="4"
-            class="py-0"
-          >
-            <v-text-field
-              v-model="content"
-              :counter="80"
-              label="플레이리스트 태그를 입력해주세요."
-            />
-          </v-col> -->
 
           <!-- 공개 여부 -->
           <v-col
@@ -79,37 +73,49 @@
             />
           </v-col>
         </v-row>
-        <v-btn
-          color="accent"
-          elevation="2"
-          rounded
-          @click="$router.push({ name: 'PlaylistFormVideo'} )"
-        >
-          <v-icon>mdi-plus</v-icon>
-          <span>영상 추가</span>
-        </v-btn>
-        <!-- 플레이리스트에 담긴 영상 리스트 -->
+        <!-- 플레이리스트 영상 리스트 조작 관련 -->
         <div class="d-flex justify-space-between">
-          <div>
+          <v-btn
+            color="accent"
+            elevation="2"
+            rounded
+            @click="saveAndGo"
+          >
+            <v-icon>mdi-plus</v-icon>
+            <span>영상 추가</span>
+          </v-btn>
+          <div v-if="checkVideoList && addedVideos.length === 0">
+            <span
+              class="font-4"
+              style="color: red;"
+            >영상은 1개 이상 선택해주세요.</span>
+          </div>
+        </div>
+        <div class="d-flex justify-space-between">
+          <div @click="onClickSelectAll">
             <v-icon>mdi-check</v-icon>
             <span class="clickable">전체 선택</span>
           </div>
           <div>
-            <span>{{ addedVideos.length }}개 영상 선택</span>
+            <span>총 {{ addedVideos.length }}개 영상</span>
           </div>
         </div>
+        <!-- 플레이리스트에 담긴 영상 리스트 -->
         <video-list-item-small
-          :added-videos="addedVideos"
+          :videos="addedVideos"
         />
       </v-container>
-    </v-form>
+    </v-form><br><br>
+    <!-- 하단 리스트에 삭제하기 버튼 -->
+    <remove-button-bottom />
   </div>
 </template>
 
 <script>
-import { mapState } from 'vuex'
+import { mapActions, mapState } from 'vuex'
 
 import Back from '../../components/common/Back.vue'
+import RemoveButtonBottom from '../../components/common/removeButtonBottom.vue'
 import TagInput from '../../components/common/TagInput.vue'
 import VideoListItemSmall from '../../components/video/VideoListItemSmall.vue'
 export default {
@@ -118,22 +124,28 @@ export default {
     Back,
     VideoListItemSmall,
     TagInput,
+    RemoveButtonBottom,
   },
   data: function() {
     return {
       pageName: "내 플레이리스트 만들기",
+      isSelectedAll: false,
       // Create할 때 넘길 데이터
       formData: {
-        valid: false,
         title: '',
         content: '',
-        tags: '',
+        tags: [],
         isPublic: true,
-        titleRules: [
-          v => !!v || '제목은 필수입니다.',
-          v => v.length <= 2 || '제목은 3글자 이상 작성해야 합니다.',
-        ],
-      }
+        videos: [],
+      },
+      valid: false,
+      checkVideoList: false,
+      rules: {
+        required: v => !!v || '필수 입력값입니다.',
+        counterMin3: v => v.length >= 3 || '제목은 3글자 이상 작성해야 합니다.',
+        counterMax30: v => v.length <= 30 || '제목은 30글자 이상 작성할 수 없습니다.',
+        counterMax80: v => v.length <= 80 || '소개글은 80글자 이상 작성할 수 없습니다.',
+      },
     }
   },
   computed: {
@@ -143,11 +155,54 @@ export default {
     ...mapState('video', {
       addedVideos: state => state.addedVideos,
     }),
+    ...mapState('playlist', {
+      savedFormData: state => state.savedFormData,
+    }),
+  },
+  created: function () {
+    if (this.savedFormData) {
+      this.formData = this.savedFormData
+    }
   },
   methods: {
+    ...mapActions('playlist', [
+      'createPlaylist',
+      'saveFormData',
+    ]),
+    ...mapActions('video', [
+      'selectAllAddedVideos',
+      'unselectAllAddedVideos',
+      'resetVideoAddState',
+    ]),
     updateTags: function (tags) {
       this.formData.tags = tags
-      console.log(this.formData)
+    },
+    onClickCompletion: function () {
+      if (this.valid && this.addedVideos.length > 0) {
+        const data = {
+          title: this.formData.title,
+          content: this.formData.content,
+          tags: this.formData.tags.join(),
+          isPublic: this.formData.isPublic,
+          videos: this.addedVideos,
+        }
+        this.createPlaylist(data)
+        this.resetVideoAddState()
+      } else {
+        this.checkVideoList = true
+      }
+    },
+    onClickSelectAll: function () {
+      if (this.isSelectedAll) {
+        this.unselectAllAddedVideos()
+      } else {
+        this.selectAllAddedVideos()
+      }
+      this.isSelectedAll = !this.isSelectedAll
+    },
+    saveAndGo: function () {
+      this.saveFormData(this.formData)
+      this.$router.push({ name: 'PlaylistFormVideo'})
     }
   },
 }

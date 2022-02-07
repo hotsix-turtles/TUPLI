@@ -4,7 +4,7 @@
     <v-combobox
       v-model="tags"
       multiple
-      label="플레이리스트 태그"
+      label="태그"
       append-icon
       chips
       deletable-chips
@@ -23,18 +23,25 @@ export default {
   },
   props: {
     // eslint-disable-next-line vue/require-default-prop
+    propedTags: {
+      type: Array
+    }
   },
   data: function () {
     return {
       tags: [],
       items: [],
-      search: "" //sync search
+      search: "", //sync search
+      select: []
     }
   },
   watch: {
     tags: function () {
       this.$emit('tag-input', this.tags)
     }
+  },
+  created: function () {
+    this.tags = this.propedTags
   },
   methods: {
     updateTags: function () {
