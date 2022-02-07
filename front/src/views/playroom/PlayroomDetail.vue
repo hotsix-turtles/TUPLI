@@ -284,7 +284,70 @@
           </v-card-text>
           <v-spacer />
           <v-card-actions>
-            <ChatInput />
+            <!-- 채팅 입력창 -->
+            <v-row>
+              <v-text-field
+                v-model="message"
+                label="메시지를 입력하세요"
+                solo
+                dense
+                :disabled="!canChat"
+                :error="errorOnSend"
+                @click:append-outer="sendMessage"
+              >
+                <template v-slot:append>
+                  <v-menu
+                    v-model="showEmoji"
+                    rounded="lg"
+                    top
+                    left
+                    offset-x
+                    offset-y
+                  >
+                    <template v-slot:activator="{ on, attrs }">
+                      <v-icon
+                        v-if="showEmoji"
+                        v-bind="attrs"
+                        v-on="on"
+                        @click="showEmoji = !showEmoji"
+                      >
+                        mdi-emoticon
+                      </v-icon>
+                      <v-icon
+                        v-else
+                        v-bind="attrs"
+                        v-on="on"
+                        @click="showEmoji = !showEmoji"
+                      >
+                        mdi-emoticon-outline
+                      </v-icon>
+                    </template>
+                    <v-card>
+                      <v-list>
+                        <v-list-item>
+                          이모지
+                        </v-list-item>
+                      </v-list>
+                    </v-card>
+                  </v-menu>
+                </template>
+                <template v-slot:append-outer>
+                  <!-- <v-fade-transition leave-absolute> -->
+                  <v-progress-circular
+                    v-if="sending"
+                    size="24"
+                    indeterminate
+                  />
+                  <v-icon
+                    v-else
+                    @click="sendChat"
+                  >
+                    mdi-send
+                  </v-icon>
+                  <!-- </v-fade-transition> -->
+                </template>
+              </v-text-field>
+            </v-row>
           </v-card-actions>
           <div style="flex: 1 1 auto;" />
         </v-card>
@@ -302,9 +365,10 @@ import TagItem from './TagItem.vue'
 import PlaylistVideoItem from './PlaylistVideoItem.vue'
 import ChatItem from './ChatItem.vue'
 import axiosConnector from '../../utils/axios-connector';
-import wsConnector from '../../utils/ws-connector';
-import ChatInput from './ChatInput.vue'
+// import wsConnector from '../../utils/ws-connector';
 import NavButton from '../../components/common/NavButton.vue'
+import Stomp from "webstomp-client"
+import SockJS from "sockjs-client"
 
 Vue.use(VueYoutube)
 
@@ -314,7 +378,6 @@ export default {
     PlaylistThumbnailItem,
     PlaylistVideoItem,
     ChatItem,
-    ChatInput,
     NavButton,
     TagItem
   },
@@ -327,7 +390,13 @@ export default {
       },
       selectedItem: [],
       isChatting: false,
-      lastPlaytime: 0
+      lastPlaytime: 0,
+      wsConnector: null,
+      showEmoji: false,
+      sending: false,
+      message: '',
+      canChat: true,
+      errorOnSend: false
     }
   },
   metaInfo () {
@@ -350,11 +419,13 @@ export default {
       'roomTitle',
       'roomPublic',
       'roomLiked',
+      'roomAuthorId',
       'roomAuthorProfilePic',
       'roomAuthorName',
       'roomAuthorFollowerCount',
       'roomStartTime',
       'roomEndTime',
+      'roomInviteIds',
       'roomContent',
       'roomTags',
       'roomPlaylists',
@@ -373,17 +444,18 @@ export default {
       'roomReducedContent',
       'roomCurrentPlaylistVideos'
     ]),
-    player() {
-      return this.$refs.youtube.player
-    },
     roomContentReduced() {
       return this.roomContent == this.roomReducedContent
     }
   },
   created() {
-    this.getRoomInfo()
   },
   mounted() {
+    this.$nextTick(() => {
+      this.player = this.$refs.youtube.player;
+      this.getRoomInfo();
+    });
+
     this.$watch('roomCurrentPlaylistVideos', (newVal, oldVal) =>
     {
       this.updateVideoId()
@@ -398,92 +470,110 @@ export default {
       if (newVal - oldVal < 2 && Math.abs(newVal - await this.player.getCurrentTime()) < 1) return;
       this.seekTo()
     });
-
   },
   methods: {
-    getRoomInfo() {
-      axiosConnector.post('/echo', {
-        id: 1,
-        title: '3일만에 다이어트 포기 선언하게 만든 영상들',
-        isPublic: false,
-        isLiked: false,
-        authorProfilePic: 'https://picsum.photos/100/100',
-        authorName: '춘식이',
-        authorFollowerCount: 456,
-        startTime: new Date(2022, 2, 5, 18, 30),
-        endTime: new Date(2022, 2, 5, 20, 30),
-        content: '같이 치맥하면서 먹방 보실분들?\r\n같이 치맥하면서 먹방 보시분들?\r\n같이 치맥하면서 먹방 보시분들?\r\n',
-        tags: ['먹방', '쯔양', '고기먹방' ],
-        currentPlaylistOffset: 1,
-        playlists: [
-          {
-            title: '다이어트 안해',
-            thumbnailUrl: 'https://picsum.photos/90/90',
-            videos: [
-              { id: 1, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/161/90', title: "먹물파스타 먹방", playtime: '01:30', included: true },
-              { id: 2, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/162/90', title: "먹물파스타 먹방", playtime: '01:30', included: true },
-              { id: 3, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/163/90', title: "먹물파스타 먹방", playtime: '01:30', included: true },
-              { id: 4, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/164/90', title: "먹물파스타 먹방", playtime: '01:30', included: true },
-              { id: 5, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/165/90', title: "먹물파스타 먹방", playtime: '01:30', included: true },
-              { id: 6, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/166/90', title: "먹물파스타 먹방", playtime: '01:30', included: true },
-              { id: 7, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/167/90', title: "먹물파스타 먹방", playtime: '01:30', included: true },
-              { id: 8, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/168/90', title: "먹물파스타 먹방", playtime: '01:30', included: true },
-              { id: 9, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/169/90', title: "먹물파스타 먹방", playtime: '01:30', included: true },
-            ]
-          },
-          {
-            title: '다이어트 안해 2',
-            thumbnailUrl: 'https://picsum.photos/90/90',
-            videos: [
-              { id: 1, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/161/90', title: "해물파스타 먹방", playtime: '01:30', included: true },
-              { id: 2, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/162/90', title: "해물파스타 먹방", playtime: '01:30', included: true },
-              { id: 3, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/163/90', title: "해물파스타 먹방", playtime: '01:30', included: true },
-              { id: 4, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/164/90', title: "해물파스타 먹방", playtime: '01:30', included: true },
-              { id: 5, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/165/90', title: "해물파스타 먹방", playtime: '01:30', included: true },
-              { id: 6, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/166/90', title: "해물파스타 먹방", playtime: '01:30', included: true },
-              { id: 7, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/167/90', title: "해물파스타 먹방", playtime: '01:30', included: true },
-              { id: 8, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/168/90', title: "해물파스타 먹방", playtime: '01:30', included: true },
-              { id: 9, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/169/90', title: "해물파스타 먹방", playtime: '01:30', included: true },
-            ]
-          },
-          {
-            title: '다이어트 안해 3',
-            thumbnailUrl: 'https://picsum.photos/90/90',
-            videos: [
-              { id: 1, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/161/90', title: "보물파스타 먹방", playtime: '01:30', included: true },
-              { id: 2, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/162/90', title: "보물파스타 먹방", playtime: '01:30', included: true },
-              { id: 3, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/163/90', title: "보물파스타 먹방", playtime: '01:30', included: true },
-              { id: 4, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/164/90', title: "보물파스타 먹방", playtime: '01:30', included: true },
-              { id: 5, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/165/90', title: "보물파스타 먹방", playtime: '01:30', included: true },
-              { id: 6, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/166/90', title: "보물파스타 먹방", playtime: '01:30', included: true },
-              { id: 7, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/167/90', title: "보물파스타 먹방", playtime: '01:30', included: true },
-              { id: 8, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/168/90', title: "보물파스타 먹방", playtime: '01:30', included: true },
-              { id: 9, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/169/90', title: "보물파스타 먹방", playtime: '01:30', included: true },
-            ]
-          },
-        ],
-        currentVideoOffset: 0,
-        currentVideoPlaytime: 300,
-        chatroomId: '731f3b99-8257-4eae-86b2-ed38ea36ccff'
-      }).then(response => {
-        this.$store.dispatch('playroom/setRoomInfo', response).then(
-          () => {
-            this.initChatRoom()
-
-            setInterval(this.sendSync, 1000)
-          }
-        )
-      });
-      // axiosConnector.get(`/playroom/${this.$route.params.id}`).then(response => {
-      //   this.$store.dispatch('setRoomInfo', response)
+    async getRoomInfo() {
+      // axiosConnector.post('/echo', {
+      //   id: 1,
+      //   title: '3일만에 다이어트 포기 선언하게 만든 영상들',
+      //   isPublic: false,
+      //   isLiked: false,
+      //   authorProfilePic: 'https://picsum.photos/100/100',
+      //   authorName: '춘식이',
+      //   authorFollowerCount: 456,
+      //   startTime: new Date(2022, 2, 5, 18, 30),
+      //   endTime: new Date(2022, 2, 5, 20, 30),
+      //   content: '같이 치맥하면서 먹방 보실분들?\r\n같이 치맥하면서 먹방 보시분들?\r\n같이 치맥하면서 먹방 보시분들?\r\n',
+      //   tags: ['먹방', '쯔양', '고기먹방' ],
+      //   currentPlaylistOffset: 1,
+      //   playlists: [
+      //     {
+      //       title: '다이어트 안해',
+      //       thumbnailUrl: 'https://picsum.photos/90/90',
+      //       videos: [
+      //         { id: 1, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/161/90', title: "먹물파스타 먹방", playtime: '01:30', included: true },
+      //         { id: 2, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/162/90', title: "먹물파스타 먹방", playtime: '01:30', included: true },
+      //         { id: 3, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/163/90', title: "먹물파스타 먹방", playtime: '01:30', included: true },
+      //         { id: 4, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/164/90', title: "먹물파스타 먹방", playtime: '01:30', included: true },
+      //         { id: 5, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/165/90', title: "먹물파스타 먹방", playtime: '01:30', included: true },
+      //         { id: 6, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/166/90', title: "먹물파스타 먹방", playtime: '01:30', included: true },
+      //         { id: 7, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/167/90', title: "먹물파스타 먹방", playtime: '01:30', included: true },
+      //         { id: 8, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/168/90', title: "먹물파스타 먹방", playtime: '01:30', included: true },
+      //         { id: 9, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/169/90', title: "먹물파스타 먹방", playtime: '01:30', included: true },
+      //       ]
+      //     },
+      //     {
+      //       title: '다이어트 안해 2',
+      //       thumbnailUrl: 'https://picsum.photos/90/90',
+      //       videos: [
+      //         { id: 1, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/161/90', title: "해물파스타 먹방", playtime: '01:30', included: true },
+      //         { id: 2, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/162/90', title: "해물파스타 먹방", playtime: '01:30', included: true },
+      //         { id: 3, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/163/90', title: "해물파스타 먹방", playtime: '01:30', included: true },
+      //         { id: 4, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/164/90', title: "해물파스타 먹방", playtime: '01:30', included: true },
+      //         { id: 5, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/165/90', title: "해물파스타 먹방", playtime: '01:30', included: true },
+      //         { id: 6, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/166/90', title: "해물파스타 먹방", playtime: '01:30', included: true },
+      //         { id: 7, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/167/90', title: "해물파스타 먹방", playtime: '01:30', included: true },
+      //         { id: 8, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/168/90', title: "해물파스타 먹방", playtime: '01:30', included: true },
+      //         { id: 9, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/169/90', title: "해물파스타 먹방", playtime: '01:30', included: true },
+      //       ]
+      //     },
+      //     {
+      //       title: '다이어트 안해 3',
+      //       thumbnailUrl: 'https://picsum.photos/90/90',
+      //       videos: [
+      //         { id: 1, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/161/90', title: "보물파스타 먹방", playtime: '01:30', included: true },
+      //         { id: 2, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/162/90', title: "보물파스타 먹방", playtime: '01:30', included: true },
+      //         { id: 3, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/163/90', title: "보물파스타 먹방", playtime: '01:30', included: true },
+      //         { id: 4, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/164/90', title: "보물파스타 먹방", playtime: '01:30', included: true },
+      //         { id: 5, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/165/90', title: "보물파스타 먹방", playtime: '01:30', included: true },
+      //         { id: 6, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/166/90', title: "보물파스타 먹방", playtime: '01:30', included: true },
+      //         { id: 7, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/167/90', title: "보물파스타 먹방", playtime: '01:30', included: true },
+      //         { id: 8, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/168/90', title: "보물파스타 먹방", playtime: '01:30', included: true },
+      //         { id: 9, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/169/90', title: "보물파스타 먹방", playtime: '01:30', included: true },
+      //       ]
+      //     },
+      //   ],
+      //   currentVideoOffset: 0,
+      //   currentVideoPlaytime: 300,
+      //   chatroomId: '731f3b99-8257-4eae-86b2-ed38ea36ccff'
+      // }).then(response => {
+      //   this.$store.dispatch('playroom/setRoomInfo', response).then(
+      //     () => {
+      //       this.checkPermission()
+      //       this.initChatRoom()
+      //       setInterval(this.sendSync, 1000)
+      //     }
+      //   )
       // });
+      const token = localStorage.getItem('jwt')
+
+      const roomInfo = await axiosConnector.get(`/playroom/${this.$route.params.id}`, { headers: { Authorization: token } });
+      await this.$store.dispatch('playroom/setRoomInfo', roomInfo);
+
+      const userFollowerInfo = await axiosConnector.get(`/profile/followers/${this.roomAuthorId}/count`, { headers: { Authorization: token } });
+      this.SET_ROOM_AUTHOR({ follower: parseInt(userFollowerInfo.data.length) })
+
+      // TODO: user profile 부분이 미완성이라 임시로 접속할때 얻어옴. 추후 삭제 필요
+      const userInfo = await axiosConnector.get(`/account/userInfo`, { headers: { Authorization: token } });
+      this.userInfo = userInfo.data;
+
+      this.checkPermission();
+      this.initChatRoom();
+      setInterval(this.sendSync, 1000);
+    },
+    checkPermission() {
+      if (this.roomPublic) return;
+      if (!this.roomPublic && this.roomInviteIds.find(inviteId => inviteId == this.userInfo.userSeq)) return;
     },
     initChatRoom() {
       const token = localStorage.getItem('jwt')
-      wsConnector.connect(
+      const baseURL = "https://i6a102.p.ssafy.io/api/v1" + "/ws-stomp"
+      const sock = new SockJS(baseURL);
+      this.wsConnector = Stomp.over(sock);
+      this.wsConnector.connect(
         token ? { Authorization: this.token } : { },
         async () => {
-          await wsConnector.subscribe(`/sub/chat/room/${this.chatroomId}`, this.onReceiveMessage, token ? { Authorization: token } : undefined)
+          await this.wsConnector.subscribe(`/sub/chat/room/${this.chatroomId}`, this.onReceiveMessage, token ? { Authorization: token } : undefined)
         },
         () => alert("서버 연결에 실패 하였습니다. 다시 접속해 주십시요.")
       )
@@ -515,10 +605,8 @@ export default {
     onVideoPaused() {
     },
     onVideoBuffering() {
-
     },
     onVideoCued() {
-      //this.seekTo()
     },
     async onReceiveMessage(payload) {
       const id = payload.headers['message-id']
@@ -526,8 +614,7 @@ export default {
 
       if (body.type == 'SYNC')
       {
-        // TODO: 내가 방장이면 SYNC 메시지 무시
-        // if (I'm author) return;
+        if (this.userInfo.userSeq == this.roomAuthorId) return;
 
         const currentPlaylistOffset = this.roomCurrentPlaylistOffset
         const currentVideoOffset = this.roomCurrentVideoOffset
@@ -609,10 +696,22 @@ export default {
       this.seekTo()
     },
     playroomLike() {
-      this.SET_ROOOM_LIKED(!this.roomLiked)
+      this.SET_ROOM_LIKED(!this.roomLiked)
       axiosConnector.post(this.roomLiked ? '/playroom/like' : '/playroom/dislike', JSON.stringify({ id: this.roomId }));
     },
+    async sendMessage(payload) {
+      if (!this.chatroomId) return;
+      if (!payload || !payload.type || !payload.message || !payload.token) return;
+
+      return await this.wsConnector.send(
+        "/pub/chat/message",
+        JSON.stringify({ type: payload.type, roomId: this.chatroomId, message: payload.message }),
+        { Authorization: payload.token }
+      );
+    },
     async sendSync() {
+      const token = localStorage.getItem('jwt')
+
       this.SET_ROOM_CURRENT_VIDEO_PLAYTIME(await this.player.getCurrentTime())
 
       const syncData = {
@@ -622,14 +721,53 @@ export default {
         videoPlaytime: this.roomCurrentVideoPlaytime,
         playerState: await this.player.getPlayerState()
       };
-      const token = localStorage.getItem('jwt')
 
       if (!token) return;
+      if (this.userInfo.userSeq != this.roomAuthorId) return;
+
       this.sendMessage({ type: 'SYNC', message: JSON.stringify(syncData), token })
     },
-    ...mapMutations('playroom', ['SET_ROOOM_LIKED', 'SEEK_VIDEO', 'SET_ROOM_CURRENT_PLAYLIST_OFFSET', 'SET_ROOM_CURRENT_VIDEO_OFFSET', 'SET_ROOM_CURRENT_VIDEO_PLAYTIME']),
-    ...mapActions('playroom', ['sendMessage'])
-  }
+    sendChat() {
+      const token = localStorage.getItem('jwt')
+
+      this.disableChatbox()
+      this.pendingToSendMessage()
+      this.sendMessage({ type: 'TALK', message: this.message, token })
+        .then(() => {
+          this.clearMessage()
+        })
+        .catch((err) => {
+          this.notifySendError()
+        })
+        .finally(() => {
+          this.completeToSendMessage()
+          this.enableChatbox()
+        })
+    },
+    clearMessage() {
+      this.message = ''
+    },
+    pendingToSendMessage() {
+      this.sending = true
+    },
+    completeToSendMessage() {
+      this.sending = false
+    },
+    enableChatbox() {
+      this.canChat = true
+    },
+    disableChatbox() {
+      this.canChat = false
+    },
+    notifySendError() {
+      this.errorOnSend = true;
+      setTimeout(this.clearSendError, 1000);
+    },
+    clearSendError() {
+      this.errorOnSend = false;
+    },
+    ...mapMutations('playroom', ['SET_ROOM_AUTHOR', 'SET_ROOM_LIKED', 'SEEK_VIDEO', 'SET_ROOM_CURRENT_PLAYLIST_OFFSET', 'SET_ROOM_CURRENT_VIDEO_OFFSET', 'SET_ROOM_CURRENT_VIDEO_PLAYTIME']),
+  },
 }
 </script>
 
