@@ -325,4 +325,27 @@ public class PlaylistApiController {
     }
 
 
+    /**
+     * 사용자가 좋아요 누른 플레이리스트
+     * @param token
+     * @return
+     * 반환 코드 : 200, 403, 404
+     */
+    @GetMapping("/playlist/likes")
+    public ResponseEntity<?> getPlaylistLiked(@RequestHeader(value = "Authorization") String token)
+    {
+        if (!jwtTokenProvider.validateToken(token)) {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(new ErrorResponse(messageSource.getMessage("error.valid.jwt", null, LocaleContextHolder.getLocale())));
+        }
+        Long userSeq = jwtTokenProvider.getUserSeq(token);
+
+        List<Playlist> playlists = playlistService.getLikedPlaylists(userSeq);
+
+        List<PlaylistDto> result = playlists.stream().map(b -> new PlaylistDto(b)).collect(Collectors.toList());
+
+        return ResponseEntity.ok().body(result);
+    }
+
 }

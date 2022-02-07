@@ -1,8 +1,10 @@
 package hotsixturtles.tupli.api;
 
 import hotsixturtles.tupli.dto.BoardDto;
+import hotsixturtles.tupli.dto.PlayroomDto;
 import hotsixturtles.tupli.dto.response.ErrorResponse;
 import hotsixturtles.tupli.entity.Board;
+import hotsixturtles.tupli.entity.Playroom;
 import hotsixturtles.tupli.entity.likes.BoardLikes;
 import hotsixturtles.tupli.service.BoardService;
 import hotsixturtles.tupli.service.token.JwtTokenProvider;
@@ -206,6 +208,29 @@ public class BoardApiController {
         // 좋아요를 누른 사람 , 어떤 게시글에 좋아요를 눌렀는지 저장 , 현재 그 게시글의 총 좋아요 수를 return
         boardService.deleteBoardLike(userSeq, boardId);
         return ResponseEntity.status(HttpStatus.OK).body(null);
+    }
+
+    /**
+     * 사용자가 좋아요한 게시글
+     * @param token
+     * @return
+     * * 반환코드 : 200, 403, 404
+     */
+    @GetMapping("/board/likes")
+    public ResponseEntity<?> getPlayroomLiked(@RequestHeader(value = "Authorization") String token)
+    {
+        if (!jwtTokenProvider.validateToken(token)) {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(new ErrorResponse(messageSource.getMessage("error.valid.jwt", null, LocaleContextHolder.getLocale())));
+        }
+        Long userSeq = jwtTokenProvider.getUserSeq(token);
+
+        List<Board> boards = boardService.getLikedBoards(userSeq);
+
+        List<BoardDto> result = boards.stream().map(b -> new BoardDto(b)).collect(Collectors.toList());
+
+        return ResponseEntity.ok().body(result);
     }
 
 }

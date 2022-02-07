@@ -39,6 +39,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -127,17 +128,72 @@ public class UserApiController {
     }
 
     /**
-     *
-     * @param userInfo
+     * 회원 탈퇴
+     * @param token
      * @return
      */
     @DeleteMapping("/account/withdraw")
     @ApiOperation(value = "회원탈퇴", notes = "실행 후 204 반환")
-    public ResponseEntity<?> signout(@ApiParam(value = "userInfo를 받습니다.")@RequestBody Map<String, String> userInfo){
-        userService.deleteUser(Long.parseLong(userInfo.get("userId")));
+    public ResponseEntity<?> signout(@RequestHeader(value = "Authorization") String token) {
+        if (!jwtTokenProvider.validateToken(token)) {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(new ErrorResponse(messageSource.getMessage("error.valid.jwt", null, LocaleContextHolder.getLocale())));
+        }
+        Long userSeq = jwtTokenProvider.getUserSeq(token);
+
+        userService.deleteUser(userSeq);
+
         SecurityContextHolder.clearContext();
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
     }
+
+    @PutMapping("/account/password")
+    public ResponseEntity passwordChange(@RequestHeader(value = "Authorization") String token,
+                                         @Validated @RequestBody passwordChangeRequest request,
+                                         BindingResult bindingResult) {
+
+        if (bindingResult.hasErrors()) {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(new ErrorResponse(bindingResult.getAllErrors().get(0).getDefaultMessage()));
+        }
+
+        // 유저 인증 및 확인
+        if (!jwtTokenProvider.validateToken(token)) {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(new ErrorResponse(messageSource.getMessage("error.valid.jwt", null, LocaleContextHolder.getLocale())));
+        }
+        User user = jwtTokenProvider.getUser(token);
+
+        // 기존 비밀번호 체크
+        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new ErrorResponse(messageSource.getMessage("error.wrong.password", null, LocaleContextHolder.getLocale())));
+        }
+
+        // 비밀번호 변경
+        try {
+            userService.changePassword(user, request.getPasswordChange());
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+        }
+        catch (IllegalStateException e) {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(new ErrorResponse(messageSource
+                            .getMessage("error", null, LocaleContextHolder.getLocale())));
+        }
+    }
+
+    @Data
+    static class passwordChangeRequest {
+        @NotNull
+        private String password;
+        @Size(min=3, max=128, message = "{error.size.password}")
+        private String passwordChange;
+    }
+
 
     /**
      * 로그인 JWT 발급
@@ -196,7 +252,7 @@ public class UserApiController {
      * @return
      */
     @GetMapping("/account/tokenvalidate")
-    public ResponseEntity<?> chackTokenValidate(@RequestHeader(value = "Authorization") String token){
+    public ResponseEntity<?> checkTokenValidate(@RequestHeader(value = "Authorization") String token){
         // 인증 확인후 돌리기
         if (!jwtTokenProvider.validateToken(token)) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)

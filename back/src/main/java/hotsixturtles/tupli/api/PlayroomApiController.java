@@ -1,7 +1,9 @@
 package hotsixturtles.tupli.api;
 
+import hotsixturtles.tupli.dto.PlaylistDto;
 import hotsixturtles.tupli.dto.PlayroomDto;
 import hotsixturtles.tupli.dto.response.ErrorResponse;
+import hotsixturtles.tupli.entity.Playlist;
 import hotsixturtles.tupli.entity.Playroom;
 import hotsixturtles.tupli.service.PlayroomService;
 import hotsixturtles.tupli.service.token.JwtTokenProvider;
@@ -155,5 +157,28 @@ public class PlayroomApiController {
         }
 
         return ResponseEntity.status(HttpStatus.OK).body(null);
+    }
+
+    /**
+     * 사용자가 좋아요한 플레이룸
+     * @param token
+     * @return
+     * * 반환코드 : 200, 403, 404
+     */
+    @GetMapping("/playroom/likes")
+    public ResponseEntity<?> getPlayroomLiked(@RequestHeader(value = "Authorization") String token)
+    {
+        if (!jwtTokenProvider.validateToken(token)) {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(new ErrorResponse(messageSource.getMessage("error.valid.jwt", null, LocaleContextHolder.getLocale())));
+        }
+        Long userSeq = jwtTokenProvider.getUserSeq(token);
+
+        List<Playroom> playrooms = playroomService.getLikedPlayrooms(userSeq);
+
+        List<PlayroomDto> result = playrooms.stream().map(b -> new PlayroomDto(b)).collect(Collectors.toList());
+
+        return ResponseEntity.ok().body(result);
     }
 }

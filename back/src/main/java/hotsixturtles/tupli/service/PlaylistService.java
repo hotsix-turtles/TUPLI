@@ -161,6 +161,11 @@ public class PlaylistService {
 
     }
 
+    // 사용자가 좋아하는 플레이리스트 리스트 가져오기
+    public List<Playlist> getLikedPlaylists(Long userSeq) {
+        return playlistRepository.findLikedPlaylists(userSeq);
+    }
+
     // Querydsl 버전 (굳이 querydsl로 작성할 이유 하나도 없는 쿼리)
     public List<Playlist> searchPlaylistSimple(SimpleCondition condition) {
         // QueryProjection(select에 Q타입 담기) 쓰고 싶으면 다음 기회에!
