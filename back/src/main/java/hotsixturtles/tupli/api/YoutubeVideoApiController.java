@@ -1,8 +1,10 @@
 package hotsixturtles.tupli.api;
 
+import hotsixturtles.tupli.dto.PlayroomDto;
 import hotsixturtles.tupli.dto.simple.SimpleYoutubeVideoDto;
 import hotsixturtles.tupli.dto.response.ErrorResponse;
 import hotsixturtles.tupli.dto.simple.YoutubeVideoLikesSavedDto;
+import hotsixturtles.tupli.entity.Playroom;
 import hotsixturtles.tupli.entity.youtube.YoutubeVideo;
 import hotsixturtles.tupli.service.YoutubeVideoService;
 import hotsixturtles.tupli.service.token.JwtTokenProvider;
@@ -207,7 +209,51 @@ public class YoutubeVideoApiController {
         return ResponseEntity.ok().body(result);
     }
 
+    /**
+     * 사용자가 저장한 유튜브 영상
+     * @param token
+     * @return
+     * * 반환코드 : 200, 403, 404
+     */
+    @GetMapping("/video/saved")
+    public ResponseEntity<?> getVideoSaved(@RequestHeader(value = "Authorization") String token)
+    {
+        if (!jwtTokenProvider.validateToken(token)) {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(new ErrorResponse(messageSource.getMessage("error.valid.jwt", null, LocaleContextHolder.getLocale())));
+        }
+        Long userSeq = jwtTokenProvider.getUserSeq(token);
 
+        List<YoutubeVideo> videos = youtubeVideoService.getSavedVideos(userSeq);
+
+        List<SimpleYoutubeVideoDto> result = videos.stream().map(b -> new SimpleYoutubeVideoDto(b)).collect(Collectors.toList());
+
+        return ResponseEntity.ok().body(result);
+    }
+
+    /**
+     * 사용자가 좋아요 한 유튜브 영상
+     * @param token
+     * @return
+     * * 반환코드 : 200, 403, 404
+     */
+    @GetMapping("/video/likes")
+    public ResponseEntity<?> getVideoLiked(@RequestHeader(value = "Authorization") String token)
+    {
+        if (!jwtTokenProvider.validateToken(token)) {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(new ErrorResponse(messageSource.getMessage("error.valid.jwt", null, LocaleContextHolder.getLocale())));
+        }
+        Long userSeq = jwtTokenProvider.getUserSeq(token);
+
+        List<YoutubeVideo> videos = youtubeVideoService.getLikedVideos(userSeq);
+
+        List<SimpleYoutubeVideoDto> result = videos.stream().map(b -> new SimpleYoutubeVideoDto(b)).collect(Collectors.toList());
+
+        return ResponseEntity.ok().body(result);
+    }
 
 
 }
