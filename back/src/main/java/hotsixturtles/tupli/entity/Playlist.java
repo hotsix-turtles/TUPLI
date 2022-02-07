@@ -67,4 +67,7 @@ public class Playlist {
     @OneToMany(mappedBy = "playlist")  // 단방향 설정
     private List<YoutubeVideo> youtubeVideos = new ArrayList<>();
 
+    @OneToMany(mappedBy = "playlist", cascade = {CascadeType.REMOVE})
+    private List<PlaylistComment> playlistComments = new ArrayList<>();
+
 }
