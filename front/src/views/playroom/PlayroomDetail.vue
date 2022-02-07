@@ -605,10 +605,8 @@ export default {
     onVideoPaused() {
     },
     onVideoBuffering() {
-
     },
     onVideoCued() {
-      //this.seekTo()
     },
     async onReceiveMessage(payload) {
       const id = payload.headers['message-id']
