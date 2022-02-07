@@ -5,10 +5,7 @@ import hotsixturtles.tupli.dto.PlaylistDto;
 import hotsixturtles.tupli.dto.param.SimpleCondition;
 import hotsixturtles.tupli.dto.request.PlaylistRequest;
 import hotsixturtles.tupli.dto.response.ErrorResponse;
-<<<<<<< HEAD
 import hotsixturtles.tupli.dto.response.IdResponse;
-=======
->>>>>>> 2e271a7bd18cd87da6b2056108ea373197c120d5
 import hotsixturtles.tupli.dto.simple.SimpleYoutubeVideoDto;
 import hotsixturtles.tupli.entity.Board;
 import hotsixturtles.tupli.entity.Playlist;

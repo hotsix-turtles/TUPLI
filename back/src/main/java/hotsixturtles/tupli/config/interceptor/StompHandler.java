@@ -3,10 +3,7 @@ package hotsixturtles.tupli.config.interceptor;
 
 import hotsixturtles.tupli.dto.chat.ChatMessage;
 import hotsixturtles.tupli.dto.chat.ChatUserInfo;
-<<<<<<< HEAD
 import hotsixturtles.tupli.entity.User;
-=======
->>>>>>> 2e271a7bd18cd87da6b2056108ea373197c120d5
 import hotsixturtles.tupli.repository.chat.ChatRoomRepository;
 import hotsixturtles.tupli.service.ChatService;
 import hotsixturtles.tupli.service.token.JwtTokenProvider;
@@ -65,7 +62,6 @@ public class StompHandler implements ChannelInterceptor {
             // OAuth가 이것저것 principal 건드리고 다녀서 user_id가 출력됨. 미가입자나 익명의 유저 처리 고민 (강민구)
             String jwtToken = accessor.getFirstNativeHeader("Authorization");
             String name = "익명의 유저";
-<<<<<<< HEAD
             String img = null;
             if (jwtToken != null) {
                 // 회원일 경우 이름 변경
@@ -76,15 +72,6 @@ public class StompHandler implements ChannelInterceptor {
             // 채팅방에 들어온 클라이언트 정보를 roomId와 맵핑해 놓는다.(나중에 특정 세션이 어떤 채팅방에 들어가 있는지 알기 위함)
             chatRoomRepository.setUserEnterInfo(sessionId, ChatUserInfo.builder().sender(name).roomId(roomId).build());
             chatService.sendChatMessage(ChatMessage.builder().type(ChatMessage.MessageType.ENTER).roomId(roomId).sender(name).img(img).build());
-=======
-            if (jwtToken != null) {
-                // 회원일 경우 이름 변경
-                name = jwtTokenProvider.getUser(jwtToken).getEmail();  // 나중에 닉네임으로 변경
-            }
-            // 채팅방에 들어온 클라이언트 정보를 roomId와 맵핑해 놓는다.(나중에 특정 세션이 어떤 채팅방에 들어가 있는지 알기 위함)
-            chatRoomRepository.setUserEnterInfo(sessionId, ChatUserInfo.builder().sender(name).roomId(roomId).build());
-            chatService.sendChatMessage(ChatMessage.builder().type(ChatMessage.MessageType.ENTER).roomId(roomId).sender(name).build());
->>>>>>> 2e271a7bd18cd87da6b2056108ea373197c120d5
             log.info("SUBSCRIBED {}, {}", name, roomId);
         } else if (StompCommand.DISCONNECT == accessor.getCommand()) { // Websocket 연결 종료
             // 연결이 종료된 클라이언트 sesssionId로 채팅방 id를 얻는다.

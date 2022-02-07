@@ -1,33 +1,15 @@
 package hotsixturtles.tupli.service;
 
-<<<<<<< HEAD
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.PathBuilder;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-=======
-import com.nimbusds.oauth2.sdk.util.ListUtils;
-import com.querydsl.core.Tuple;
-import com.querydsl.core.types.Order;
-import com.querydsl.core.types.OrderSpecifier;
-import com.querydsl.core.types.dsl.BooleanExpression;
-import com.querydsl.core.types.dsl.CaseBuilder;
-import com.querydsl.core.types.dsl.NumberExpression;
-import com.querydsl.core.types.dsl.PathBuilder;
-import com.querydsl.jpa.impl.JPAQuery;
-import com.querydsl.jpa.impl.JPAQueryFactory;
-import hotsixturtles.tupli.dto.PlaylistDto;
->>>>>>> 2e271a7bd18cd87da6b2056108ea373197c120d5
 import hotsixturtles.tupli.dto.param.SimpleCondition;
 import hotsixturtles.tupli.dto.request.PlaylistRequest;
 import hotsixturtles.tupli.dto.simple.SimpleYoutubeVideoDto;
 import hotsixturtles.tupli.entity.Playlist;
-<<<<<<< HEAD
-=======
-import hotsixturtles.tupli.entity.QPlaylist;
->>>>>>> 2e271a7bd18cd87da6b2056108ea373197c120d5
 import hotsixturtles.tupli.entity.likes.PlaylistLikes;
 import hotsixturtles.tupli.entity.youtube.YoutubeVideo;
 import hotsixturtles.tupli.repository.PlaylistRepository;
@@ -41,17 +23,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-<<<<<<< HEAD
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
-=======
-import javax.persistence.EntityManager;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
->>>>>>> 2e271a7bd18cd87da6b2056108ea373197c120d5
 
 import static hotsixturtles.tupli.entity.QPlaylist.*;
 import static org.springframework.util.StringUtils.hasText;
@@ -69,10 +42,6 @@ public class PlaylistService {
 
     // 심플 querydsl
     private final JPAQueryFactory jpaQueryFactory;
-<<<<<<< HEAD
-=======
-    private final EntityManager entityManager;
->>>>>>> 2e271a7bd18cd87da6b2056108ea373197c120d5
 
 
     // 단일 Playlist 추가
@@ -116,7 +85,6 @@ public class PlaylistService {
 
     // 단일 Playlist id로 update
     @Transactional
-<<<<<<< HEAD
     public void updatePlaylist(Long playlistId, PlaylistRequest playlistRequest) {
         Playlist playlistUpdate = playlistRepository.findById(playlistId).orElse(null);
 
@@ -153,18 +121,6 @@ public class PlaylistService {
             playlistRepository.save(playlistUpdate);
         } else {
             // 원래는 error throw 라도 해줘야
-=======
-    public void updatePlaylist(Long playlistId, Playlist playlistChange) {
-        Playlist playlistUpdate = playlistRepository.findById(playlistId).orElse(null);
-
-        if (playlistUpdate!= null) {
-            playlistUpdate.setTitle(playlistChange.getTitle());
-            playlistUpdate.setContent(playlistChange.getContent());
-            playlistUpdate.setImage(playlistChange.getImage());
-            // $$$$$ 유튜브 비디오와의 연결은 프론트에서 뭐가 오냐에 따라 조금 갈림..
-
-            playlistRepository.save(playlistUpdate);
->>>>>>> 2e271a7bd18cd87da6b2056108ea373197c120d5
         }
     }
 
