@@ -1,16 +1,9 @@
 # local env files
 .env
-<<<<<<< HEAD
 .envlocallllll
-=======
->>>>>>> 2e271a7bd18cd87da6b2056108ea373197c120d5
 .venv
 env/
 venv/
 ENV/
 env.bak/
-<<<<<<< HEAD
 venv.bak/
-=======
-venv.bak/
->>>>>>> 2e271a7bd18cd87da6b2056108ea373197c120d5

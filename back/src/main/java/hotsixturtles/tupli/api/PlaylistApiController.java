@@ -73,11 +73,7 @@ public class PlaylistApiController {
             e.printStackTrace();
         }
 
-<<<<<<< HEAD
         return ResponseEntity.status(HttpStatus.CREATED).body(new IdResponse(playlist.getId()));
-=======
-        return ResponseEntity.status(HttpStatus.CREATED).body(null);
->>>>>>> 2e271a7bd18cd87da6b2056108ea373197c120d5
     }
 
     /**
@@ -97,22 +93,14 @@ public class PlaylistApiController {
      * 플레이리스트 단일 UPDATE
      * @param token
      * @param id
-<<<<<<< HEAD
      * @param playlistRequest
-=======
-     * @param playlistChange
->>>>>>> 2e271a7bd18cd87da6b2056108ea373197c120d5
      * @return
      * 반환 코드 : 200, 404
      */
     @PutMapping("/playlist/{id}")
     public ResponseEntity<?> updatePlaylist(@RequestHeader(value = "Authorization") String token,
                                          @PathVariable("id") Long id,
-<<<<<<< HEAD
                                             @RequestBody PlaylistRequest playlistRequest){
-=======
-                                         @RequestBody Playlist playlistChange){
->>>>>>> 2e271a7bd18cd87da6b2056108ea373197c120d5
         // 유저 인증
         if (!jwtTokenProvider.validateToken(token)) {
             return ResponseEntity
@@ -120,11 +108,7 @@ public class PlaylistApiController {
                     .body(new ErrorResponse(messageSource.getMessage("error.valid.jwt", null, LocaleContextHolder.getLocale())));
         }
 
-<<<<<<< HEAD
         playlistService.updatePlaylist(id, playlistRequest);
-=======
-        playlistService.updatePlaylist(id, playlistChange);
->>>>>>> 2e271a7bd18cd87da6b2056108ea373197c120d5
 
         return ResponseEntity.status(HttpStatus.OK).body(null);
     }
