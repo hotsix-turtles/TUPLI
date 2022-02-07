@@ -20,6 +20,7 @@ const playroom = {
     roomCurrentPlaylistOffset: 0,
     roomCurrentVideoOffset: '',
     roomCurrentVideoPlaytime: 0,
+    roomPlayerState: 0,
     roomSelectedChatItem: { id: '', type: null },
     roomChats: [],
     chatroomId: '',
@@ -52,7 +53,8 @@ const playroom = {
     SET_ROOM_CURRENT_PLAYLIST_OFFSET: ( state, value ) => state.roomCurrentPlaylistOffset = value,
     SET_ROOM_PLAYLISTS: ( state, value ) => { state.roomPlaylists = value },
     SET_ROOM_CURRENT_VIDEO_OFFSET: ( state, value ) => { state.roomCurrentVideoOffset = value },
-    SET_ROOM_CURRENT_VIDEO_PLAYTIME: ( state, value ) => { state.roomCurrentVideoPlaytime = value },
+    SET_ROOM_CURRENT_VIDEO_PLAYTIME: ( state, value ) => { state.roomCurrentVideoPlaytime = value ? value : state.roomCurrentVideoPlaytime },
+    SET_ROOM_PLAYER_STATE: (state, value) => { state.roomPlayerState = value },
     SET_ROOM_CHATROOM_ID: ( state, value ) => state.chatroomId = value,
     BLOCK_CHAT_BY_ID: ( state, id ) => {
       state.roomChats.map((v) => { if (v.id == id) v.blockedMessage = true; })
@@ -92,9 +94,6 @@ const playroom = {
       Vue.set(roomSelectedChatItem, 'type', null);
       return roomSelectedChatItem;
     },
-    SEEK_VIDEO: ( {roomCurrentVideoPlaytime}, time ) => {
-      roomCurrentVideoPlaytime = time;
-    },
     RECEIVE_MESSAGE: ( { roomChats }, payload ) => {
       roomChats.push(payload);
     }
@@ -109,10 +108,10 @@ const playroom = {
       commit('SET_ROOM_END_TIME', data.endTime);
       commit('SET_ROOM_CONTENT', data.content);
       commit('SET_ROOM_TAGS', data.tags);
-      commit('SET_ROOM_CURRENT_PLAYLIST_OFFSET', data.currentPlaylistOffset)
+      // commit('SET_ROOM_CURRENT_PLAYLIST_OFFSET', data.currentPlaylistOffset)
       commit('SET_ROOM_PLAYLISTS', data.playlists);
-      commit('SET_ROOM_CURRENT_VIDEO_OFFSET', data.currentVideoOffset)
-      commit('SET_ROOM_CURRENT_VIDEO_PLAYTIME', data.currentVideoPlaytime)
+      // commit('SET_ROOM_CURRENT_VIDEO_OFFSET', data.currentVideoOffset)
+      // commit('SET_ROOM_CURRENT_VIDEO_PLAYTIME', data.currentVideoPlaytime)
       commit('SET_ROOM_CHATROOM_ID', data.chatroomId);
     }),
     followUser: ({commit}, id) => {
@@ -155,12 +154,12 @@ const playroom = {
       // 1. 플레이룸 신고 axios 처리 후 결과값(성공여부) 리턴
       console.log('불량 플레이룸 신고 처리')
     },
-    sendMessage: (state, payload) => {
-      if (!this.roomId) return;
+    sendMessage: ({state}, payload) => {
+      if (!state.chatroomId) return;
       if (!payload || !payload.type || !payload.message || !payload.token) return;
       return wsConnector.send(
         "/pub/chat/message",
-        JSON.stringify({ type: payload.type, roomId: state.roomId, message: payload.message }),
+        JSON.stringify({ type: payload.type, roomId: state.chatroomId, message: payload.message }),
         { Authorization: payload.token }
       );
     },
@@ -168,16 +167,9 @@ const playroom = {
       console.log('saveFormData', formData)
       commit('SAVE_FORM_DATA', formData)
     },
-    createPlayroom: function ({ commit }, formData) {
+    createPlayroom: function ({ commit }, {formData, token}) {
       console.log('createPlayroom', formData)
-      axiosConnector.post('/playroom', formData)
-        .then((res) => {
-          console.log(res)
-        })
-        .catch((err) => {
-          console.log(err)
-        })
-      commit('RESET_FORM_DATA')
+      return axiosConnector.post('/playroom', formData, { header: { Authorization: token }})
     },
   },
   getters: {

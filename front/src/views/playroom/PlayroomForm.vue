@@ -366,7 +366,7 @@ import { mapGetters, mapState } from 'vuex'
 import Back from '../../components/common/Back.vue'
 import PlaylistListItemSmall from '../../components/playlist/PlaylistListItemSmall.vue'
 import TagInput from '../../components/common/TagInput.vue'
-import { mapActions } from 'vuex'
+import { mapMutations, mapActions } from 'vuex'
 
 export default {
   name: 'PlaylistForm',
@@ -466,6 +466,9 @@ export default {
       return this.formData.playlists.map((playlist) => playlist.videos.map((v) => v.included = (v.id == id ? !selected : v.included)))
     },
     submit() {
+      // TODO: 원래 axiosConnector에서 알아서 갱신하고 보내야하지만...
+      const token = localStorage.getItem('jwt')
+
       if (this.formData.tags) this.formData.tags = this.formData.tags.join()
       this.addedPlaylists.map(addedPlaylist => {
         if (addedPlaylist.videos)
@@ -478,8 +481,20 @@ export default {
       this.formData.startDate = `${this.startDate}T${this.startTime}:00.000Z`
       this.formData.endDate = `${this.endDate}T${this.endTime}:00.000Z`
       console.log(this.formData)
-      this.createPlayroom(this.formData)
-      this.clearForm()
+
+      this.createPlayroom({ formData: this.formData, token })
+        .then((res) => {
+          console.log(res)
+
+          this.clearForm()
+          this.RESET_FORM_DATA()
+
+          this.$router.push('/playroom/' + playroomId)
+        })
+        .catch((err) => {
+          console.log(err)
+          return null
+        })
     },
     clearForm() {
       this.formData = {
@@ -502,6 +517,7 @@ export default {
       else
         this.deselectAllPlaylistVideo()
     },
+    ...mapMutations('playroom', ['RESET_FORM_DATA']),
     ...mapActions('playroom', ['saveFormData', 'createPlayroom']),
     ...mapActions('playlist', ['selectAllPlaylistVideo', 'deselectAllPlaylistVideo', 'resetAddedPlaylists'])
   },
