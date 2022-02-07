@@ -2,7 +2,6 @@ package hotsixturtles.tupli.service;
 
 import hotsixturtles.tupli.dto.simple.SimpleYoutubeVideoDto;
 import hotsixturtles.tupli.dto.simple.YoutubeVideoLikesSavedDto;
-import hotsixturtles.tupli.entity.likes.BoardLikes;
 import hotsixturtles.tupli.entity.likes.YoutubeVideoLikes;
 import hotsixturtles.tupli.entity.likes.YoutubeVideoSaves;
 import hotsixturtles.tupli.entity.youtube.YoutubeVideo;
@@ -119,5 +118,14 @@ public class YoutubeVideoService {
         dto.setIsLikesList(is_userLikes);
 
         return dto;
+    }
+
+    // 좋아요 영상 최대 전부 보내기
+    public List<YoutubeVideo> getSavedVideos(Long userSeq) {
+        return youtubeVideoRepository.findSavedVideos(userSeq);
+    }    // 좋아요 영상 최대 전부 보내기
+
+    public List<YoutubeVideo> getLikedVideos(Long userSeq) {
+        return youtubeVideoRepository.findLikedVideos(userSeq);
     }
 }

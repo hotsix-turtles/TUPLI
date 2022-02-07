@@ -43,6 +43,10 @@ public class BoardService {
         return board;
     }
 
+    public List<Board> getLikedBoards(Long userSeq){
+        return boardRepository.findLikedBoards(userSeq);
+    }
+
     @Transactional
     public Board addBoard(Long userSeq, Board board){
 

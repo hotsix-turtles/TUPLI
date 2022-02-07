@@ -202,5 +202,14 @@ public class UserService {
         user.setIs_vip("Y");
         userRepository.save(user);
     }
+
+    @Transactional
+    public void changePassword(User user, String passwordChange) {
+        user.setPassword(passwordChange);
+        user.encodePassword(passwordEncoder);
+
+        userRepository.save(user);
+
+    }
 }
 

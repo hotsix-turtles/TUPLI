@@ -41,6 +41,11 @@ public class PlayroomService {
         return playroomRepository.findById(playroomId).orElse(null);
     }
 
+    // 사용자가 좋아요 누른 playroom
+    public List<Playroom> getLikedPlayrooms(Long userSeq){
+        return playroomRepository.findLikedPlayrooms(userSeq);
+    }
+
     @Transactional
     public PlayroomDto addPlayroom(PlayroomDto playroomDto, Long userSeq){
 

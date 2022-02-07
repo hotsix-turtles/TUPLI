@@ -1,18 +1,19 @@
 package hotsixturtles.tupli.api;
 
-import hotsixturtles.tupli.dto.BoardDto;
+import hotsixturtles.tupli.dto.PlaylistCommentDto;
 import hotsixturtles.tupli.dto.PlaylistDto;
 import hotsixturtles.tupli.dto.param.SimpleCondition;
 import hotsixturtles.tupli.dto.request.PlaylistRequest;
 import hotsixturtles.tupli.dto.response.ErrorResponse;
 import hotsixturtles.tupli.dto.response.IdResponse;
 import hotsixturtles.tupli.dto.simple.SimpleYoutubeVideoDto;
-import hotsixturtles.tupli.entity.Board;
 import hotsixturtles.tupli.entity.Playlist;
+import hotsixturtles.tupli.entity.PlaylistComment;
 import hotsixturtles.tupli.entity.likes.BoardLikes;
 import hotsixturtles.tupli.entity.likes.PlaylistLikes;
 import hotsixturtles.tupli.repository.PlaylistRepository;
 import hotsixturtles.tupli.service.FlaskService;
+import hotsixturtles.tupli.service.PlaylistCommentService;
 import hotsixturtles.tupli.service.PlaylistService;
 import hotsixturtles.tupli.service.token.JwtTokenProvider;
 import io.swagger.annotations.Api;
@@ -44,6 +45,7 @@ public class PlaylistApiController {
 
     private final PlaylistService playlistService;
     private final FlaskService flaskService;
+    private final PlaylistCommentService playlistCommentService;
 
     /**
      * 플레이 리스트 추가
@@ -221,5 +223,129 @@ public class PlaylistApiController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
+    /**
+     * playlist 댓글 리스트 가져오기
+     * @param playlistId
+     * @return List<comment>
+     * 반환 코드 : 200, 204, 404
+     */
+    @GetMapping("/playlist/{playlistId}/comment")
+    public ResponseEntity<List<PlaylistCommentDto>> getCommentList(@PathVariable("playlistId") Long playlistId)
+    {
+
+        List<PlaylistComment> commentList = playlistCommentService.getCommentList(playlistId);
+
+        if (commentList.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+        }
+
+        List<PlaylistCommentDto> result = commentList.stream().map(b -> new PlaylistCommentDto(b)).collect(Collectors.toList());
+
+        return ResponseEntity.ok().body(result);
+    }
+
+    /**
+     * playlist 댓글 등록
+     * @param token
+     * @param playlistId
+     * @param playlistComment : {content}
+     * @return null
+     *반환 코드 : 201, 403, 404
+     */
+    @PostMapping("/playlist/{playlistId}/comment")
+    public ResponseEntity<?> addComment(@RequestHeader(value = "Authorization") String token,
+                                        @PathVariable("playlistId") Long playlistId,
+                                        @RequestBody PlaylistComment playlistComment){
+        if (!jwtTokenProvider.validateToken(token)) {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(new ErrorResponse(messageSource.getMessage("error.valid.jwt", null, LocaleContextHolder.getLocale())));
+        }
+
+        Long userSeq = jwtTokenProvider.getUserSeq(token);
+
+        PlaylistComment commentResult = playlistCommentService.addComment(userSeq, playlistId, playlistComment);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(null);
+    }
+
+    /**
+     * playlist 댓글 수정
+     * @param token
+     * @param commentId
+     * @param playlistComment : {content}
+     * @return null
+     * 반환 코드 : 200, 401, 403, 404
+     */
+    @PutMapping("/playlist/{commentId}/comment")
+    public ResponseEntity<?> updateComment(@RequestHeader(value = "Authorization") String token,
+                                           @PathVariable("commentId") Long commentId,
+                                           @RequestBody PlaylistComment playlistComment){
+
+        if (!jwtTokenProvider.validateToken(token)) {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(new ErrorResponse(messageSource.getMessage("error.valid.jwt", null, LocaleContextHolder.getLocale())));
+        }
+
+        Long userSeq = jwtTokenProvider.getUserSeq(token);
+
+        PlaylistComment commentSaved = playlistCommentService.updateComment(userSeq, commentId, playlistComment);
+
+        if(commentSaved == null){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(null);
+    }
+
+    /**
+     * playlist 댓글 삭제
+     * @param token
+     * @param commentId
+     * @return null
+     * 반환 코드 : 200, 401, 403, 404
+     */
+    @DeleteMapping("/playlist/comment/{commentId}")
+    public ResponseEntity<?> deleteComment(@RequestHeader(value = "Authorization") String token,
+                                           @PathVariable("commentId") Long commentId){
+
+        if (!jwtTokenProvider.validateToken(token)) {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(new ErrorResponse(messageSource.getMessage("error.valid.jwt", null, LocaleContextHolder.getLocale())));
+        }
+        Long userSeq = jwtTokenProvider.getUserSeq(token);
+
+        Long result = playlistCommentService.deleteComment(commentId, userSeq);
+
+        if(result == -1L){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(null);
+    }
+
+
+    /**
+     * 사용자가 좋아요 누른 플레이리스트
+     * @param token
+     * @return
+     * 반환 코드 : 200, 403, 404
+     */
+    @GetMapping("/playlist/likes")
+    public ResponseEntity<?> getPlaylistLiked(@RequestHeader(value = "Authorization") String token)
+    {
+        if (!jwtTokenProvider.validateToken(token)) {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(new ErrorResponse(messageSource.getMessage("error.valid.jwt", null, LocaleContextHolder.getLocale())));
+        }
+        Long userSeq = jwtTokenProvider.getUserSeq(token);
+
+        List<Playlist> playlists = playlistService.getLikedPlaylists(userSeq);
+
+        List<PlaylistDto> result = playlists.stream().map(b -> new PlaylistDto(b)).collect(Collectors.toList());
+
+        return ResponseEntity.ok().body(result);
+    }
 
 }
