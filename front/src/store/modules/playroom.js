@@ -1,94 +1,147 @@
 import Vue from 'vue'
+import axiosConnector from '../../utils/axios-connector'
+import wsConnector from '../../utils/ws-connector'
 
 const playroom = {
   namespaced: true,
   state: {
-    roomTitle: '3일만에 다이어트 포기 선언하게 만든 영상들',
+    roomId: -1,
+    roomTitle: '',
     roomPublic: false,
-    roomAuthorProfilePic: 'https://picsum.photos/100/100',
-    roomAuthorName: '춘식이',
-    roomAuthorFollowerCount: 456,
-    roomStartTime: new Date(2022, 1, 23, 18, 30),
-    roomEndTime: new Date(2022, 1, 23, 20, 30),
-    roomContent: '같이 치맥하면서 먹방 보실분들?\r\n같이 치맥하면서 먹방 보시분들?\r\n같이 치맥하면서 먹방 보시분들?\r\n'.replace(/\r?\n/, '\n'),
-    roomTags: ['먹방', '쯔양', '고기먹방', '고기먹방1', '고기먹방2', '고기먹방3', '고기먹방4', ],
-    roomPlaylists: [ 1, 2, 3, 4, 5 ],
-    roomCurrentPlaylist: '0005',
-    roomVideos: [ 1, 2, 3, 4, 5, 6, 7, 8, 9 ],
-    roomCurrentVideo: '0013',
-    roomCurrentPlayTime: '01:30',
-    roomSelectedChatItem: { id: -1, type: null },
-    roomChats: [
-      { id: 1, author: { id: 1, name: '김형준', thumbnail: 'https://picsum.photos/80/80' }, content: '와 맛있겠다 ㅋㅋㅋ', timestamp: 1643448193, blockedUser: false, blockedMessage: false },
-      { id: 2, author: { id: 1, name: '김형준', thumbnail: 'https://picsum.photos/80/80' }, content: '와 맛있겠다 ㅋㅋㅋ', timestamp: 1643448193, blockedUser: false, blockedMessage: false },
-      { id: 3, author: { id: 1, name: '김형준', thumbnail: 'https://picsum.photos/80/80' }, content: '와 맛있겠다 ㅋㅋㅋ', timestamp: 1643448193, blockedUser: false, blockedMessage: false },
-      { id: 4, author: { id: 1, name: '김형준', thumbnail: 'https://picsum.photos/80/80' }, content: '와 맛있겠다 ㅋㅋㅋ', timestamp: 1643448193, blockedUser: false, blockedMessage: false },
-      { id: 5, author: { id: 1, name: '김형준', thumbnail: 'https://picsum.photos/80/80' }, content: '와 맛있겠다 ㅋㅋㅋ', timestamp: 1643448193, blockedUser: false, blockedMessage: false },
-      { id: 6, author: { id: 1, name: '김형준', thumbnail: 'https://picsum.photos/80/80' }, content: '와 맛있겠다 ㅋㅋㅋ', timestamp: 1643448193, blockedUser: false, blockedMessage: false },
-    ]
+    roomLiked: false,
+    roomAuthorProfilePic: '',
+    roomAuthorName: '',
+    roomAuthorFollowerCount: 0,
+    roomStartTime: new Date(),
+    roomEndTime: new Date(),
+    roomContent: '',
+    roomTags: [],
+    roomPlaylists: [],
+    roomCurrentPlaylistOffset: 0,
+    roomCurrentVideoOffset: '',
+    roomCurrentVideoPlaytime: 0,
+    roomSelectedChatItem: { id: '', type: null },
+    roomChats: [],
+    chatroomId: '',
+    chatBlockedId: [],
+    chatBlockedUid: [],
+    savedFormData: ''
   },
   mutations: {
-    selectChatItem: ( {roomSelectedChatItem}, id ) => {
-      if (roomSelectedChatItem.id != -1) return;
+    RESET_FORM_DATA: function (state) {
+      state.savedFormData = ''
+      console.log('RESET_FORM_DATA', state.savedFormData)
+    },
+    SAVE_FORM_DATA: function (state, formData) {
+      state.savedFormData = formData
+      console.log('SAVE_FORM_DATA', state.savedFormData)
+    },
+    SET_ROOM_ID: ( state, value ) => state.roomId = value,
+    SET_ROOM_TITLE: ( state, value ) => state.roomTitle = value,
+    SET_ROOM_PUBLIC: ( state, value ) => state.roomPublic = value,
+    SET_ROOOM_LIKED: ( state, value ) => state.roomLiked = value,
+    SET_ROOM_AUTHOR: ( state, value ) => {
+      state.roomAuthorName = value.name;
+      state.roomAuthorProfilePic = value.pic;
+      state.roomAuthorFollowerCount = value.follower
+    },
+    SET_ROOM_START_TIME: ( state, value ) => state.roomStartTime = new Date(value),
+    SET_ROOM_END_TIME: ( state, value ) => state.roomEndTime = new Date(value),
+    SET_ROOM_CONTENT: ( state, value ) => state.roomContent = value,
+    SET_ROOM_TAGS: ( state, value ) => state.roomTags = value,
+    SET_ROOM_CURRENT_PLAYLIST_OFFSET: ( state, value ) => state.roomCurrentPlaylistOffset = value,
+    SET_ROOM_PLAYLISTS: ( state, value ) => { state.roomPlaylists = value },
+    SET_ROOM_CURRENT_VIDEO_OFFSET: ( state, value ) => { state.roomCurrentVideoOffset = value },
+    SET_ROOM_CURRENT_VIDEO_PLAYTIME: ( state, value ) => { state.roomCurrentVideoPlaytime = value },
+    SET_ROOM_CHATROOM_ID: ( state, value ) => state.chatroomId = value,
+    BLOCK_CHAT_BY_ID: ( state, id ) => {
+      state.roomChats.map((v) => { if (v.id == id) v.blockedMessage = true; })
+      state.chatBlockedId.push(id)
+    },
+    UNBLOCK_CHAT_BY_ID: ( state, id ) => {
+      state.roomChats.map((v) => { if (v.id == id) v.blockedMessage = false; })
+      const idx = state.chatBlockedId.indexOf(id)
+      if (idx > -1) state.chatBlockedId.splice(idx, 1)
+    },
+    BLOCK_CHAT_BY_UID: ( state, id ) => {
+      const authorId = state.roomChats.filter((v) => v.id == id)[0].author.id
+      state.roomChats.map((v) => { if (v.author.id == authorId) v.blockedUser = true; })
+      state.chatBlockedUid.push(authorId)
+    },
+    UNBLOCK_CHAT_BY_UID: ( state, id ) => {
+      const authorId = state.roomChats.filter((v) => v.id == id)[0].author.id
+      state.roomChats.map((v) => { if (v.author.id == authorId) v.blockedUser = false; })
+      const idx = state.chatBlockedUid.indexOf(authorId)
+      if (idx > -1) state.chatBlockedUid.splice(idx, 1)
+    },
+    SELECT_CHAT_ITEM: ( {roomSelectedChatItem}, id ) => {
+      if (roomSelectedChatItem.id != '') return;
       Vue.set(roomSelectedChatItem, 'id', id);
       Vue.set(roomSelectedChatItem, 'type', 'CHAT_ITEM');
       return roomSelectedChatItem;
     },
-    selectChatAvatar: ( {roomSelectedChatItem}, id ) => {
-      if (roomSelectedChatItem.id != -1) return;
+    SELECT_CHAT_AVATAR: ( {roomSelectedChatItem}, id ) => {
+      if (roomSelectedChatItem.id != '') return;
       Vue.set(roomSelectedChatItem, 'id', id);
       Vue.set(roomSelectedChatItem, 'type', 'CHAT_AVATAR');
       return roomSelectedChatItem;
     },
-    deselectChatItem: ( {roomSelectedChatItem} ) => {
-      if (roomSelectedChatItem.id == -1) return;
-      Vue.set(roomSelectedChatItem, 'id', -1);
+    DESELECT_CHAT_ITEM: ( {roomSelectedChatItem} ) => {
+      if (roomSelectedChatItem.id == '') return;
+      Vue.set(roomSelectedChatItem, 'id', '');
       Vue.set(roomSelectedChatItem, 'type', null);
       return roomSelectedChatItem;
     },
-    blockChatById: ( {roomChats}, id ) => {
-      roomChats.map((v) => { if (v.id == id) v.blockedMessage = true; })
+    SEEK_VIDEO: ( {roomCurrentVideoPlaytime}, time ) => {
+      roomCurrentVideoPlaytime = time;
     },
-    unblockChatById: ( {roomChats}, id ) => {
-      roomChats.map((v) => { if (v.id == id) v.blockedMessage = false; })
-    },
-    blockChatByUid: ( {roomChats}, id ) => {
-      const authorId = roomChats.filter((v) => v.id == id)[0].author.id
-      roomChats.map((v) => { if (v.author.id == authorId) v.blockedUser = true; })
-    },
-    unblockChatByUid: ( {roomChats}, id ) => {
-      const authorId = roomChats.filter((v) => v.id == id)[0].author.id
-      roomChats.map((v) => { if (v.author.id == authorId) v.blockedUser = false; })
-    },
+    RECEIVE_MESSAGE: ( { roomChats }, payload ) => {
+      roomChats.push(payload);
+    }
   },
   actions: {
+    setRoomInfo: (({commit}, {data}) => {
+      commit('SET_ROOM_ID', data.id);
+      commit('SET_ROOM_TITLE', data.title);
+      commit('SET_ROOM_PUBLIC', data.isPublic);
+      commit('SET_ROOM_AUTHOR', { name: data.authorName, pic: data.authorProfilePic, follower: data.authorFollowerCount});
+      commit('SET_ROOM_START_TIME', data.startTime);
+      commit('SET_ROOM_END_TIME', data.endTime);
+      commit('SET_ROOM_CONTENT', data.content);
+      commit('SET_ROOM_TAGS', data.tags);
+      commit('SET_ROOM_CURRENT_PLAYLIST_OFFSET', data.currentPlaylistOffset)
+      commit('SET_ROOM_PLAYLISTS', data.playlists);
+      commit('SET_ROOM_CURRENT_VIDEO_OFFSET', data.currentVideoOffset)
+      commit('SET_ROOM_CURRENT_VIDEO_PLAYTIME', data.currentVideoPlaytime)
+      commit('SET_ROOM_CHATROOM_ID', data.chatroomId);
+    }),
     followUser: ({commit}, id) => {
       console.log('유저 팔로우 처리')
-      commit('deselectChatItem')
+      commit('DESELECT_CHAT_ITEM')
     },
     showUserProfile: ({commit}, id) => {
       console.log('유저 프로필 로드 처리')
-      commit('deselectChatItem')
+      commit('DESELECT_CHAT_ITEM')
     },
     blockUser: ({commit}, id) => {
       console.log('유저 차단 처리')
-      commit('blockChatByUid', id)
-      commit('deselectChatItem')
+      commit('BLOCK_CHAT_BY_UID', id)
+      commit('DESELECT_CHAT_ITEM')
     },
     blockMessage: ({commit}, id) => {
       console.log('메시지 차단 처리')
-      commit('blockChatById', id)
-      commit('deselectChatItem')
+      commit('BLOCK_CHAT_BY_ID', id)
+      commit('DESELECT_CHAT_ITEM')
     },
     unblockUser: ({commit}, id) => {
       console.log('유저 차단 해제 처리')
-      commit('unblockChatByUid', id)
-      commit('deselectChatItem')
+      commit('UNBLOCK_CHAT_BY_UID', id)
+      commit('DESELECT_CHAT_ITEM')
     },
     unblockMessage: ({commit}, id) => {
       console.log('메시지 차단 해제 처리')
-      commit('unblockChatById', id)
-      commit('deselectChatItem')
+      commit('UNBLOCK_CHAT_BY_ID', id)
+      commit('DESELECT_CHAT_ITEM')
     },
     sharePlayroom: (state, id) => {
       // TODO:
@@ -102,46 +155,36 @@ const playroom = {
       // 1. 플레이룸 신고 axios 처리 후 결과값(성공여부) 리턴
       console.log('불량 플레이룸 신고 처리')
     },
-    sendMessage: ({commit}, payload) => {
-      if (!payload) return;
-      return new Promise((res, rej) => {
-        setTimeout(() => res(), 1000);
-      })
-    }
+    sendMessage: (state, payload) => {
+      if (!this.roomId) return;
+      if (!payload || !payload.type || !payload.message || !payload.token) return;
+      return wsConnector.send(
+        "/pub/chat/message",
+        JSON.stringify({ type: payload.type, roomId: state.roomId, message: payload.message }),
+        { Authorization: payload.token }
+      );
+    },
+    saveFormData: function ({ commit }, formData) {
+      console.log('saveFormData', formData)
+      commit('SAVE_FORM_DATA', formData)
+    },
+    createPlayroom: function ({ commit }, formData) {
+      console.log('createPlayroom', formData)
+      axiosConnector.post('/playroom', formData)
+        .then((res) => {
+          console.log(res)
+        })
+        .catch((err) => {
+          console.log(err)
+        })
+      commit('RESET_FORM_DATA')
+    },
   },
   getters: {
     roomPlayTime: ( {roomStartTime, roomEndTime} ) => `${roomStartTime.getHours()}:${roomStartTime.getMinutes()} - ${roomEndTime.getHours()}:${roomEndTime.getMinutes()}`,
     roomPublicLabel: ( {roomPublic} ) => roomPublic ? '공개' : '비공개',
     roomReducedContent: ( {roomContent} ) => roomContent.split(/\r?\n/).slice(0, 2).join('\n'),
-    roomPlaylistItems: ( {roomPlaylists} ) => roomPlaylists.map((v) => {
-      const playlistItems = {
-        1: { id: 1, thumbnail_url: 'https://picsum.photos/100/101' },
-        2: { id: 2, thumbnail_url: 'https://picsum.photos/100/102' },
-        3: { id: 3, thumbnail_url: 'https://picsum.photos/100/103' },
-        4: { id: 4, thumbnail_url: 'https://picsum.photos/100/104' },
-        5: { id: 5, thumbnail_url: 'https://picsum.photos/100/105' },
-        6: { id: 6, thumbnail_url: 'https://picsum.photos/100/106' },
-      }
-      // TODO: axios json으로 대체
-
-      return playlistItems[v]
-    }),
-    roomPlaylistVideoItems: ( {roomVideos} ) => roomVideos.map((v) => {
-      const playlistVideoItems = {
-        1: { id: 1, thumbnail_url: 'https://picsum.photos/161/90', title: "먹물파스타 먹방", playtime: '01:30' },
-        2: { id: 2, thumbnail_url: 'https://picsum.photos/162/90', title: "먹물파스타 먹방", playtime: '01:30' },
-        3: { id: 3, thumbnail_url: 'https://picsum.photos/163/90', title: "먹물파스타 먹방", playtime: '01:30' },
-        4: { id: 4, thumbnail_url: 'https://picsum.photos/164/90', title: "먹물파스타 먹방", playtime: '01:30' },
-        5: { id: 5, thumbnail_url: 'https://picsum.photos/165/90', title: "먹물파스타 먹방", playtime: '01:30' },
-        6: { id: 6, thumbnail_url: 'https://picsum.photos/166/90', title: "먹물파스타 먹방", playtime: '01:30' },
-        7: { id: 7, thumbnail_url: 'https://picsum.photos/167/90', title: "먹물파스타 먹방", playtime: '01:30' },
-        8: { id: 8, thumbnail_url: 'https://picsum.photos/168/90', title: "먹물파스타 먹방", playtime: '01:30' },
-        9: { id: 9, thumbnail_url: 'https://picsum.photos/169/90', title: "먹물파스타 먹방", playtime: '01:30' },
-      }
-      // TODO: axios json으로 대체
-
-      return playlistVideoItems[v]
-    })
+    roomCurrentPlaylistVideos: ( {roomPlaylists, roomCurrentPlaylistOffset} ) => roomPlaylists[roomCurrentPlaylistOffset] ? roomPlaylists[roomCurrentPlaylistOffset].videos : []
   }
 };
 

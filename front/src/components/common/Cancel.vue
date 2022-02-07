@@ -1,5 +1,5 @@
 <template>
-  <div class="d-flex">
+  <div class="d-flex fixed-top">
     <span class="font-1 ms-auto">
       {{ pageName }}
     </span>

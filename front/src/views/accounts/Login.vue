@@ -14,7 +14,7 @@
         <div class="mt-4 pt-4">
           <v-form ref="form">
             <v-text-field
-              v-model="email"
+              v-model="credentials.email"
               class="pt-0"
               :rules="emailRules"
               label="이메일을 입력해주세요"
@@ -22,7 +22,7 @@
             />
 
             <v-text-field
-              v-model="password"
+              v-model="credentials.password"
               class="pt-0"
               type="password"
               :rules="[passwordRules.min]"
@@ -37,6 +37,7 @@
             block
             elevation="0"
             rounded
+            @click="requestLogin"
           >
             로그인
           </v-btn>
@@ -58,6 +59,7 @@
                   fab
                   elevation="0"
                   class="mx-3"
+                  :href="socialLoginUrl('google')"
                   :loading="loading"
                   :disabled="loading"
                   @click="loader = 'loading'"
@@ -89,7 +91,10 @@
       <!-- 그 외 -->
       <v-container>
         <div class="row justify-center mb-4 mt-1">
-          <p class="mx-1">
+          <p
+            class="mx-1"
+            @click="$router.push({ name: 'Signup2' })"
+          >
             회원가입
           </p>
           <p class="mx-1">
@@ -111,7 +116,8 @@
 </template>
 
 <script>
-import axios from 'axios'
+import { mapActions } from 'vuex'
+import SERVER from '@/api/server.js'
 
 export default {
   name: 'Login',
@@ -129,7 +135,7 @@ export default {
     loading: false,
 
     // 유효성 검사
-    valid: true,
+    valid: false,
 
     email: '',
     emailRules: [
@@ -157,34 +163,24 @@ export default {
 
   methods: {
     // 로그인
-    login: function () {
-      axios({
-        method: 'post',
-        url: '',
-        data: this.credentials,
-      })
-        .then(res => {
-          console.log(res)
-          localStorage.setItem('jwt', res.data.token)
-          this.$emit('login')
-          this.$router.push({ name: 'empty_main' })
-        })
-        .catch(err => {
-          console.log(err)
-        })
+    requestLogin: function () {
+      this.login(this.credentials)
+      this.valid = true
     },
+    ...mapActions([
+      'login',
+    ]),
 
-    validate () {
-      this.$refs.form.validate()
-    },
-    reset () {
-      this.$refs.form.reset()
-    },
-    resetValidation () {
-      this.$refs.form.resetValidation()
-    },
+    socialLoginUrl: function(socialType){
+      // const BACKEND_PORT = SERVER.BACKEND_PORT === null ? '' : `:${SERVER.BACKEND_PORT}`
+      // const BACKEND_URL = "https://i6a102.p.ssafy.io/api/v1"
+      // const FRONTEND_PORT = SERVER.FRONTEND_PORT === null ? '' : `:${SERVER.FRONTEND_PORT}`
+      // const REDIRECT_URI = `${location.protocol}//${location.hostname}${FRONTEND_PORT}/oauth/redirect`
+      // console.log(`${BACKEND_URL}/oauth2/authorization/${socialType}?redirect_uri=${REDIRECT_URI}`)
+      return `https://i6a102.p.ssafy.io/api/v1/oauth2/authorization/${socialType}?redirect_uri=https://i6a102.p.ssafy.io/oauth/redirect`
+    }
+
   },
-
 
   metaInfo () {
     return {
@@ -214,6 +210,7 @@ export default {
     animation: loader 1s infinite;
     display: flex;
   }
+
   @keyframes loader {
     from {
       transform: rotate(0);
@@ -222,4 +219,7 @@ export default {
       transform: rotate(360deg);
     }
   }
+
+
 </style>
+
