@@ -1,6 +1,8 @@
 package hotsixturtles.tupli.service;
 
 import hotsixturtles.tupli.dto.PlayroomDto;
+import hotsixturtles.tupli.dto.request.RequestPlayroomDto;
+import hotsixturtles.tupli.dto.response.ResponsePlayroomDto;
 import hotsixturtles.tupli.dto.simple.SimpleUserDto;
 import hotsixturtles.tupli.entity.Playroom;
 import hotsixturtles.tupli.entity.User;
@@ -47,7 +49,7 @@ public class PlayroomService {
     }
 
     @Transactional
-    public PlayroomDto addPlayroom(PlayroomDto playroomDto, Long userSeq){
+    public ResponsePlayroomDto addPlayroom(RequestPlayroomDto playroomDto, Long userSeq){
 
         Playroom playroom = new Playroom();
 
@@ -99,11 +101,11 @@ public class PlayroomService {
 
         }
 
-        return new PlayroomDto(playroom);
+        return new ResponsePlayroomDto(playroom);
     }
 
     @Transactional
-    public PlayroomDto updatePlayroom(Long playroomId, PlayroomDto playroomDto, Long userSeq){
+    public ResponsePlayroomDto updatePlayroom(Long playroomId, RequestPlayroomDto playroomDto, Long userSeq){
 
         Playroom playroom = playroomRepository.findById(playroomId).orElse(null);
 
@@ -121,7 +123,7 @@ public class PlayroomService {
 
         playroomRepository.save(playroom);
 
-        return new PlayroomDto(playroom);
+        return new ResponsePlayroomDto(playroom);
     }
 
     @Transactional
