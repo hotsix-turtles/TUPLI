@@ -691,7 +691,7 @@ export default {
       this.seekTo()
     },
     playroomLike() {
-      this.SET_ROOOM_LIKED(!this.roomLiked)
+      this.SET_ROOM_LIKED(!this.roomLiked)
       axiosConnector.post(this.roomLiked ? '/playroom/like' : '/playroom/dislike', JSON.stringify({ id: this.roomId }));
     },
     sendMessage(payload) {
