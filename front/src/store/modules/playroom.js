@@ -1,6 +1,4 @@
 import Vue from 'vue'
-import axiosConnector from '../../utils/axios-connector'
-import wsConnector from '../../utils/ws-connector'
 
 const playroom = {
   namespaced: true,
@@ -154,22 +152,9 @@ const playroom = {
       // 1. 플레이룸 신고 axios 처리 후 결과값(성공여부) 리턴
       console.log('불량 플레이룸 신고 처리')
     },
-    sendMessage: ({state}, payload) => {
-      if (!state.chatroomId) return;
-      if (!payload || !payload.type || !payload.message || !payload.token) return;
-      return wsConnector.send(
-        "/pub/chat/message",
-        JSON.stringify({ type: payload.type, roomId: state.chatroomId, message: payload.message }),
-        { Authorization: payload.token }
-      );
-    },
     saveFormData: function ({ commit }, formData) {
       console.log('saveFormData', formData)
       commit('SAVE_FORM_DATA', formData)
-    },
-    createPlayroom: function ({ commit }, {formData, token}) {
-      console.log('createPlayroom', formData)
-      return axiosConnector.post('/playroom', formData, { header: { Authorization: token }})
     },
   },
   getters: {
