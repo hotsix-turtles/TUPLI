@@ -124,7 +124,7 @@ const playlist = {
       )
         .then((res) => {
           console.log(res)
-          router.push({ name: 'PlaylistDetail', params: { playlistId: res.data.id } }) // 나중에 디테일페이지로 주소 변경
+          router.push({ name: 'PlaylistDetail', params: { playlistId: res.data.id } })
         })
         .catch((err) => {
           console.log(err)
@@ -135,8 +135,6 @@ const playlist = {
       axios({
         url: `https://i6a102.p.ssafy.io/api/v1/playlist/${playlistId}`,
         method: 'get',
-        // headers: {Authorization: 'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJtaW5ndTQ5NjkiLCJ1c2VyX3NlcSI6MiwidXNlcm5hbWUiOiJtaW5ndTQ5NjkiLCJpYXQiOjE2NDM5NTI5MDMsImV4cCI6MTY0NDAzOTMwM30.PwbIqBvx3Tc-2497EPu_PahPUqAtRlMjDVgsF5kJeQQ'},
-        // headers,
       })
         .then((res) => {
           console.log(res)

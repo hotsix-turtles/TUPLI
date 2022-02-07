@@ -2,16 +2,17 @@
 <template>
   <div>
     <!-- 만들기 버튼 나오면서 나오는 검정 배경 -->
-    <div
-      v-if="isClickedMakeBtn"
-      class="dark-background"
-      @click="toggle"
-    />
-    <!-- 만들기 버튼 (플레이리스트/플레이룸/게시글) -->
-    <div class="d-flex-column pb-5">
+    <div>
       <div
         v-if="isClickedMakeBtn"
-        class="d-flex-column text-center"
+        class="dark-background"
+        @click="toggle"
+      >
+      <!-- 만들기 버튼 (플레이리스트/플레이룸/게시글) -->
+      </div>
+      <div
+        v-if="isClickedMakeBtn"
+        class="d-flex-column text-center makeBtns"
       >
         <div class="my-5">
           <v-btn
@@ -37,6 +38,8 @@
           </v-btn>
         </div><br><br>
       </div>
+    </div>
+    <div class="d-flex-column pb-5">
       <!-- 네브바 -->
       <div
         class="d-flex justify-space-around fixed-bottom navbar-background py-1"
@@ -119,3 +122,13 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+  /* 만들기 버튼 일반 문서 흐름에서 제거 */
+  .makeBtns {
+    position: fixed;
+    bottom: 1vh;
+    left: 50%;
+    transform: translate(-50%, 0%);
+  }
+</style>

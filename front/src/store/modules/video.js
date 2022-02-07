@@ -175,7 +175,7 @@ const video = {
         fields: 'nextPageToken,items(id/videoId,snippet(title,publishTime,thumbnails/default,channelTitle))',
         type: 'video',
         q: query, // 검색어
-        eventType: 'completed', // 완료된 영상만 검색
+        // eventType: 'completed', // 완료된 영상만 검색
         maxResults: 5, // 반환할 영상 개수
       }
       axios({
@@ -234,7 +234,7 @@ const video = {
             fields: 'nextPageToken,items(id/videoId,snippet(title,publishTime,thumbnails/default,channelTitle))',
             type: 'video',
             q: state.query, // 검색어
-            eventType: 'completed', // 완료된 영상만 검색
+            // eventType: 'completed', // 완료된 영상만 검색
             maxResults: 5, // 반환할 영상 개수
             pageToken: state.nextPageToken,
           }

@@ -187,7 +187,7 @@ export default {
           videos: this.addedVideos,
         }
         this.createPlaylist(data)
-        this.resetVideoAddState()
+        setTimeout(() => {this.resetVideoAddState()}, 1000)
       } else {
         this.checkVideoList = true
       }
