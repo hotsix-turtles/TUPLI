@@ -7,6 +7,7 @@ const playroom = {
     roomTitle: '',
     roomPublic: false,
     roomLiked: false,
+    roomAuthorId: -1,
     roomAuthorProfilePic: '',
     roomAuthorName: '',
     roomAuthorFollowerCount: 0,
@@ -35,25 +36,27 @@ const playroom = {
       state.savedFormData = formData
       console.log('SAVE_FORM_DATA', state.savedFormData)
     },
-    SET_ROOM_ID: ( state, value ) => state.roomId = value,
-    SET_ROOM_TITLE: ( state, value ) => state.roomTitle = value,
-    SET_ROOM_PUBLIC: ( state, value ) => state.roomPublic = value,
-    SET_ROOOM_LIKED: ( state, value ) => state.roomLiked = value,
+    SET_ROOM_ID: ( state, value ) => state.roomId = value ? value : state.roomId,
+    SET_ROOM_TITLE: ( state, value ) => state.roomTitle = value ? value : state.roomTitle,
+    SET_ROOM_PUBLIC: ( state, value ) => state.roomPublic = value ? value : state.roomPublic,
+    SET_ROOOM_LIKED: ( state, value ) => state.roomLiked = value ? value : state.roomLiked,
     SET_ROOM_AUTHOR: ( state, value ) => {
-      state.roomAuthorName = value.name;
-      state.roomAuthorProfilePic = value.pic;
-      state.roomAuthorFollowerCount = value.follower
+      state.roomAuthorId = value.id ? value.id : state.roomAuthorId;
+      state.roomAuthorName = value.name ? value.name : state.roomAuthorName;
+      state.roomAuthorProfilePic = value.profileImage ? value.profileImage : state.roomAuthorProfilePic;
+      state.roomAuthorFollowerCount = value.follower != undefined ? value.follower : state.roomAuthorFollowerCount
     },
-    SET_ROOM_START_TIME: ( state, value ) => state.roomStartTime = new Date(value),
-    SET_ROOM_END_TIME: ( state, value ) => state.roomEndTime = new Date(value),
-    SET_ROOM_CONTENT: ( state, value ) => state.roomContent = value,
-    SET_ROOM_TAGS: ( state, value ) => state.roomTags = value,
-    SET_ROOM_CURRENT_PLAYLIST_OFFSET: ( state, value ) => state.roomCurrentPlaylistOffset = value,
-    SET_ROOM_PLAYLISTS: ( state, value ) => { state.roomPlaylists = value },
-    SET_ROOM_CURRENT_VIDEO_OFFSET: ( state, value ) => { state.roomCurrentVideoOffset = value },
-    SET_ROOM_CURRENT_VIDEO_PLAYTIME: ( state, value ) => { state.roomCurrentVideoPlaytime = value ? value : state.roomCurrentVideoPlaytime },
-    SET_ROOM_PLAYER_STATE: (state, value) => { state.roomPlayerState = value },
-    SET_ROOM_CHATROOM_ID: ( state, value ) => state.chatroomId = value,
+    SET_ROOM_START_TIME: ( state, value ) => state.roomStartTime = value ? new Date(value * 1000) : new Date(),
+    SET_ROOM_END_TIME: ( state, value ) => state.roomEndTime = value ? new Date(value * 1000) : new Date(),
+    SET_ROOM_CONTENT: ( state, value ) => state.roomContent = value ? value : state.roomContent,
+    SET_ROOM_INVITE_IDS: ( state, value ) => state.roomInviteIds = value ? value : state.roomInviteIds,
+    SET_ROOM_TAGS: ( state, value ) => state.roomTags = value ? value : state.roomTags,
+    SET_ROOM_CURRENT_PLAYLIST_OFFSET: ( state, value ) => state.roomCurrentPlaylistOffset = value ? value : roomCurrentPlaylistOffset,
+    SET_ROOM_PLAYLISTS: ( state, value ) => state.roomPlaylists = value ? value : state.roomPlaylists,
+    SET_ROOM_CURRENT_VIDEO_OFFSET: ( state, value ) => state.roomCurrentVideoOffset = value ? value : state.roomCurrentVideoOffset,
+    SET_ROOM_CURRENT_VIDEO_PLAYTIME: ( state, value ) => state.roomCurrentVideoPlaytime = value ? value : state.roomCurrentVideoPlaytime,
+    SET_ROOM_PLAYER_STATE: (state, value) => state.roomPlayerState = value ? value : state.roomPlayerState,
+    SET_ROOM_CHATROOM_ID: ( state, value ) => state.chatroomId = value ? value : state.chatroomId,
     BLOCK_CHAT_BY_ID: ( state, id ) => {
       state.roomChats.map((v) => { if (v.id == id) v.blockedMessage = true; })
       state.chatBlockedId.push(id)
@@ -97,20 +100,21 @@ const playroom = {
     }
   },
   actions: {
-    setRoomInfo: (({commit}, {data}) => {
+    setRoomInfo: (({state, commit}, {data}) => {
       commit('SET_ROOM_ID', data.id);
       commit('SET_ROOM_TITLE', data.title);
       commit('SET_ROOM_PUBLIC', data.isPublic);
-      commit('SET_ROOM_AUTHOR', { name: data.authorName, pic: data.authorProfilePic, follower: data.authorFollowerCount});
+      commit('SET_ROOM_AUTHOR', { id: data.user.userSeq, name: (data.user.nickname ? data.user.nickname : data.user.username), profileImage: data.user.profileImage });
       commit('SET_ROOM_START_TIME', data.startTime);
       commit('SET_ROOM_END_TIME', data.endTime);
       commit('SET_ROOM_CONTENT', data.content);
+      commit('SET_ROOM_INVITE_IDS', data.inviteIds);
       commit('SET_ROOM_TAGS', data.tags);
       // commit('SET_ROOM_CURRENT_PLAYLIST_OFFSET', data.currentPlaylistOffset)
       commit('SET_ROOM_PLAYLISTS', data.playlists);
       // commit('SET_ROOM_CURRENT_VIDEO_OFFSET', data.currentVideoOffset)
       // commit('SET_ROOM_CURRENT_VIDEO_PLAYTIME', data.currentVideoPlaytime)
-      commit('SET_ROOM_CHATROOM_ID', data.chatroomId);
+      commit('SET_ROOM_CHATROOM_ID', '731f3b99-8257-4eae-86b2-ed38ea36ccff');//data.chatroomId);
     }),
     followUser: ({commit}, id) => {
       console.log('유저 팔로우 처리')
@@ -158,7 +162,11 @@ const playroom = {
     },
   },
   getters: {
-    roomPlayTime: ( {roomStartTime, roomEndTime} ) => `${roomStartTime.getHours()}:${roomStartTime.getMinutes()} - ${roomEndTime.getHours()}:${roomEndTime.getMinutes()}`,
+    roomPlayTime: ( {roomStartTime, roomEndTime} ) => {
+      const roomStartDate = new Date(roomStartTime);
+      const roomEndDate = new Date(roomEndTime);
+      return `${roomStartDate.getHours()}:${roomStartDate.getMinutes()} - ${roomEndDate.getHours()}:${roomEndDate.getMinutes()}`
+    },
     roomPublicLabel: ( {roomPublic} ) => roomPublic ? '공개' : '비공개',
     roomReducedContent: ( {roomContent} ) => roomContent.split(/\r?\n/).slice(0, 2).join('\n'),
     roomCurrentPlaylistVideos: ( {roomPlaylists, roomCurrentPlaylistOffset} ) => roomPlaylists[roomCurrentPlaylistOffset] ? roomPlaylists[roomCurrentPlaylistOffset].videos : []

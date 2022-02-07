@@ -419,11 +419,13 @@ export default {
       'roomTitle',
       'roomPublic',
       'roomLiked',
+      'roomAuthorId',
       'roomAuthorProfilePic',
       'roomAuthorName',
       'roomAuthorFollowerCount',
       'roomStartTime',
       'roomEndTime',
+      'roomInviteIds',
       'roomContent',
       'roomTags',
       'roomPlaylists',
@@ -442,17 +444,18 @@ export default {
       'roomReducedContent',
       'roomCurrentPlaylistVideos'
     ]),
-    player() {
-      return this.$refs.youtube.player
-    },
     roomContentReduced() {
       return this.roomContent == this.roomReducedContent
     }
   },
   created() {
-    this.getRoomInfo()
   },
   mounted() {
+    this.$nextTick(() => {
+      this.player = this.$refs.youtube.player;
+      this.getRoomInfo();
+    });
+
     this.$watch('roomCurrentPlaylistVideos', (newVal, oldVal) =>
     {
       this.updateVideoId()
@@ -467,85 +470,92 @@ export default {
       if (newVal - oldVal < 2 && Math.abs(newVal - await this.player.getCurrentTime()) < 1) return;
       this.seekTo()
     });
-
   },
   methods: {
-    getRoomInfo() {
-      axiosConnector.post('/echo', {
-        id: 1,
-        title: '3일만에 다이어트 포기 선언하게 만든 영상들',
-        isPublic: false,
-        isLiked: false,
-        authorProfilePic: 'https://picsum.photos/100/100',
-        authorName: '춘식이',
-        authorFollowerCount: 456,
-        startTime: new Date(2022, 2, 5, 18, 30),
-        endTime: new Date(2022, 2, 5, 20, 30),
-        content: '같이 치맥하면서 먹방 보실분들?\r\n같이 치맥하면서 먹방 보시분들?\r\n같이 치맥하면서 먹방 보시분들?\r\n',
-        tags: ['먹방', '쯔양', '고기먹방' ],
-        currentPlaylistOffset: 1,
-        playlists: [
-          {
-            title: '다이어트 안해',
-            thumbnailUrl: 'https://picsum.photos/90/90',
-            videos: [
-              { id: 1, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/161/90', title: "먹물파스타 먹방", playtime: '01:30', included: true },
-              { id: 2, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/162/90', title: "먹물파스타 먹방", playtime: '01:30', included: true },
-              { id: 3, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/163/90', title: "먹물파스타 먹방", playtime: '01:30', included: true },
-              { id: 4, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/164/90', title: "먹물파스타 먹방", playtime: '01:30', included: true },
-              { id: 5, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/165/90', title: "먹물파스타 먹방", playtime: '01:30', included: true },
-              { id: 6, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/166/90', title: "먹물파스타 먹방", playtime: '01:30', included: true },
-              { id: 7, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/167/90', title: "먹물파스타 먹방", playtime: '01:30', included: true },
-              { id: 8, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/168/90', title: "먹물파스타 먹방", playtime: '01:30', included: true },
-              { id: 9, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/169/90', title: "먹물파스타 먹방", playtime: '01:30', included: true },
-            ]
-          },
-          {
-            title: '다이어트 안해 2',
-            thumbnailUrl: 'https://picsum.photos/90/90',
-            videos: [
-              { id: 1, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/161/90', title: "해물파스타 먹방", playtime: '01:30', included: true },
-              { id: 2, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/162/90', title: "해물파스타 먹방", playtime: '01:30', included: true },
-              { id: 3, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/163/90', title: "해물파스타 먹방", playtime: '01:30', included: true },
-              { id: 4, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/164/90', title: "해물파스타 먹방", playtime: '01:30', included: true },
-              { id: 5, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/165/90', title: "해물파스타 먹방", playtime: '01:30', included: true },
-              { id: 6, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/166/90', title: "해물파스타 먹방", playtime: '01:30', included: true },
-              { id: 7, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/167/90', title: "해물파스타 먹방", playtime: '01:30', included: true },
-              { id: 8, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/168/90', title: "해물파스타 먹방", playtime: '01:30', included: true },
-              { id: 9, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/169/90', title: "해물파스타 먹방", playtime: '01:30', included: true },
-            ]
-          },
-          {
-            title: '다이어트 안해 3',
-            thumbnailUrl: 'https://picsum.photos/90/90',
-            videos: [
-              { id: 1, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/161/90', title: "보물파스타 먹방", playtime: '01:30', included: true },
-              { id: 2, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/162/90', title: "보물파스타 먹방", playtime: '01:30', included: true },
-              { id: 3, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/163/90', title: "보물파스타 먹방", playtime: '01:30', included: true },
-              { id: 4, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/164/90', title: "보물파스타 먹방", playtime: '01:30', included: true },
-              { id: 5, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/165/90', title: "보물파스타 먹방", playtime: '01:30', included: true },
-              { id: 6, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/166/90', title: "보물파스타 먹방", playtime: '01:30', included: true },
-              { id: 7, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/167/90', title: "보물파스타 먹방", playtime: '01:30', included: true },
-              { id: 8, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/168/90', title: "보물파스타 먹방", playtime: '01:30', included: true },
-              { id: 9, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/169/90', title: "보물파스타 먹방", playtime: '01:30', included: true },
-            ]
-          },
-        ],
-        currentVideoOffset: 0,
-        currentVideoPlaytime: 300,
-        chatroomId: '731f3b99-8257-4eae-86b2-ed38ea36ccff'
-      }).then(response => {
-        this.$store.dispatch('playroom/setRoomInfo', response).then(
-          () => {
-            this.initChatRoom()
-
-            setInterval(this.sendSync, 1000)
-          }
-        )
-      });
-      // axiosConnector.get(`/playroom/${this.$route.params.id}`).then(response => {
-      //   this.$store.dispatch('setRoomInfo', response)
+    async getRoomInfo() {
+      // axiosConnector.post('/echo', {
+      //   id: 1,
+      //   title: '3일만에 다이어트 포기 선언하게 만든 영상들',
+      //   isPublic: false,
+      //   isLiked: false,
+      //   authorProfilePic: 'https://picsum.photos/100/100',
+      //   authorName: '춘식이',
+      //   authorFollowerCount: 456,
+      //   startTime: new Date(2022, 2, 5, 18, 30),
+      //   endTime: new Date(2022, 2, 5, 20, 30),
+      //   content: '같이 치맥하면서 먹방 보실분들?\r\n같이 치맥하면서 먹방 보시분들?\r\n같이 치맥하면서 먹방 보시분들?\r\n',
+      //   tags: ['먹방', '쯔양', '고기먹방' ],
+      //   currentPlaylistOffset: 1,
+      //   playlists: [
+      //     {
+      //       title: '다이어트 안해',
+      //       thumbnailUrl: 'https://picsum.photos/90/90',
+      //       videos: [
+      //         { id: 1, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/161/90', title: "먹물파스타 먹방", playtime: '01:30', included: true },
+      //         { id: 2, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/162/90', title: "먹물파스타 먹방", playtime: '01:30', included: true },
+      //         { id: 3, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/163/90', title: "먹물파스타 먹방", playtime: '01:30', included: true },
+      //         { id: 4, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/164/90', title: "먹물파스타 먹방", playtime: '01:30', included: true },
+      //         { id: 5, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/165/90', title: "먹물파스타 먹방", playtime: '01:30', included: true },
+      //         { id: 6, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/166/90', title: "먹물파스타 먹방", playtime: '01:30', included: true },
+      //         { id: 7, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/167/90', title: "먹물파스타 먹방", playtime: '01:30', included: true },
+      //         { id: 8, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/168/90', title: "먹물파스타 먹방", playtime: '01:30', included: true },
+      //         { id: 9, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/169/90', title: "먹물파스타 먹방", playtime: '01:30', included: true },
+      //       ]
+      //     },
+      //     {
+      //       title: '다이어트 안해 2',
+      //       thumbnailUrl: 'https://picsum.photos/90/90',
+      //       videos: [
+      //         { id: 1, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/161/90', title: "해물파스타 먹방", playtime: '01:30', included: true },
+      //         { id: 2, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/162/90', title: "해물파스타 먹방", playtime: '01:30', included: true },
+      //         { id: 3, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/163/90', title: "해물파스타 먹방", playtime: '01:30', included: true },
+      //         { id: 4, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/164/90', title: "해물파스타 먹방", playtime: '01:30', included: true },
+      //         { id: 5, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/165/90', title: "해물파스타 먹방", playtime: '01:30', included: true },
+      //         { id: 6, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/166/90', title: "해물파스타 먹방", playtime: '01:30', included: true },
+      //         { id: 7, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/167/90', title: "해물파스타 먹방", playtime: '01:30', included: true },
+      //         { id: 8, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/168/90', title: "해물파스타 먹방", playtime: '01:30', included: true },
+      //         { id: 9, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/169/90', title: "해물파스타 먹방", playtime: '01:30', included: true },
+      //       ]
+      //     },
+      //     {
+      //       title: '다이어트 안해 3',
+      //       thumbnailUrl: 'https://picsum.photos/90/90',
+      //       videos: [
+      //         { id: 1, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/161/90', title: "보물파스타 먹방", playtime: '01:30', included: true },
+      //         { id: 2, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/162/90', title: "보물파스타 먹방", playtime: '01:30', included: true },
+      //         { id: 3, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/163/90', title: "보물파스타 먹방", playtime: '01:30', included: true },
+      //         { id: 4, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/164/90', title: "보물파스타 먹방", playtime: '01:30', included: true },
+      //         { id: 5, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/165/90', title: "보물파스타 먹방", playtime: '01:30', included: true },
+      //         { id: 6, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/166/90', title: "보물파스타 먹방", playtime: '01:30', included: true },
+      //         { id: 7, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/167/90', title: "보물파스타 먹방", playtime: '01:30', included: true },
+      //         { id: 8, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/168/90', title: "보물파스타 먹방", playtime: '01:30', included: true },
+      //         { id: 9, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/169/90', title: "보물파스타 먹방", playtime: '01:30', included: true },
+      //       ]
+      //     },
+      //   ],
+      //   currentVideoOffset: 0,
+      //   currentVideoPlaytime: 300,
+      //   chatroomId: '731f3b99-8257-4eae-86b2-ed38ea36ccff'
+      // }).then(response => {
+      //   this.$store.dispatch('playroom/setRoomInfo', response).then(
+      //     () => {
+      //       this.checkPermission()
+      //       this.initChatRoom()
+      //       setInterval(this.sendSync, 1000)
+      //     }
+      //   )
       // });
+      const token = localStorage.getItem('jwt')
+
+      const roomInfo = await axiosConnector.get(`/playroom/${this.$route.params.id}`, { headers: { Authorization: token } });
+      await this.$store.dispatch('playroom/setRoomInfo', roomInfo);
+
+      const userFollowerInfo = await axiosConnector.get(`/profile/followers/${this.roomAuthorId}/count`, { headers: { Authorization: token } });
+      this.SET_ROOM_AUTHOR({ follower: parseInt(userFollowerInfo.data.length) })
+
+      this.checkPermission();
+      this.initChatRoom();
+      setInterval(this.sendSync, 1000);
     },
     initChatRoom() {
       const token = localStorage.getItem('jwt')
