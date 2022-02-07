@@ -10,7 +10,7 @@ import video from './modules/video.js'
 import playlist from './modules/playlist.js'
 
 import axios from 'axios'
-import axiosConnector from '../utils/axios-connector.js'
+import SERVER from '@/api/server'
 import createPersistedState from "vuex-persistedstate";
 
 export default new Vuex.Store({
@@ -22,7 +22,7 @@ export default new Vuex.Store({
   state: {
     authToken: null,
     isLogin: false,
-    userInfo: null
+    // userInfo: null
   },
   modules: {
     playroom: playroom,
@@ -56,25 +56,58 @@ export default new Vuex.Store({
       state.nickname = res.nickname
       state.introduction = res.introduction
       if (res.profileImage) {
-        state.image = 'https://storage.cloud.google.com/tupli_profile' + res.profileImage
+        state.image = SERVER.ROUTES.image + res.profileImage
       } else {
         state.profileImage = null
       }
       state.is_vip = res.is_vip
+      state.following = res.to_user
+      state.followers = res.from_user
     },
-    // 회원정보
-    PROFILE: function (state, userInfo) {
-      state.userInfo
+    // 프로필 변경
+    UPDATE_PROFILE(state, res) {
+      console.log('프로필 변경', res)
+      state.nickname = res.nickname
+      state.introduction = res.introduction
+      if (res.image) {
+        image = SERVER.ROUTES.image + res.image
+      } else {
+        image = state.image
+      }
     }
   },
   actions: {
     // 로그인
     login: function ({ commit, dispatch }, credentials) {
-      axiosConnector.post('/account/login', { email: credentials.email, password: credentials.password })
+      axios({
+        method: 'POST',
+        url: SERVER.URL + '/account/login',
+        data: {
+          email: credentials.email,
+          password: credentials.password,
+        }
+      })
+        .then((res) => {
+          commit('TOKEN', res.data.token)          
+          dispatch('getUserInfo', res.data.token)
+          router.push({ name: 'Home' })
+        })
+        .catch((err) => {
+          console.log(err.response.data)
+        })
+    },
+    // 로그인 (회원가입, 자동로그인 등을 위한 라우터 이동 없는 버전)
+    loginHere: function ({ commit, dispatch }, credentials) {
+      axios({
+        method: 'POST',
+        url: SERVER.URL + '/account/login',
+        data: {
+          email: credentials.email,
+          password: credentials.password,
+        }
+      })
         .then((res) => {
           commit('TOKEN', res.data.token)
-          router.push({ name: 'Home' })
-          // router.push({ name: 'Profile' })  // 자동 로그인, 가입후 바로 로그인 쓰일 수 있으니 store에서 해주지 말아주시고 login view라던가 필요한 상황에서 해주세요(강민구)
           dispatch('getUserInfo', res.data.token)
         })
         .catch((err) => {
@@ -88,17 +121,9 @@ export default new Vuex.Store({
     },
     // 회원가입
     signup: function (context, credentials) {
-      // const formData = new FormData()
-      // formData.append('email', credentials.email)
-      // formData.append('password', credentials.password)
-      // formData.append('passwordCheck', credentials.passwordCheck)
-      // formData.append('nickname', credentials.nickname)
-      // formData.append('username', credentials.username)
-      // console.log('토큰있는상태로 이거 하면 또 토큰 보내서 사고 터지는거 아님?', formData) (강민구<< 로그아웃 버튼 만들고 다시 실험해주세요)
-      // axiosConnector.post('/account/signup', credentials)
       axios({
-        method: 'post',
-        url: 'https://i6a102.p.ssafy.io/api/v1' + '/account/signup',
+        method: 'POST',
+        url: SERVER.URL + '/account/signup',
         data: {
           email: credentials.email,
           password: credentials.password,
@@ -108,7 +133,7 @@ export default new Vuex.Store({
       })
         .then((res) => {
           // 회원가입시 자동 로그인까지 하고 signup 3으로 보내기 (강민구)
-          this.dispatch('login', credentials)
+          this.dispatch('loginHere', credentials)
           router.push( { name: 'Signup3' })
         })
         .catch((err) => {
@@ -118,13 +143,9 @@ export default new Vuex.Store({
     },
     // 사용자 정보 얻기
     getUserInfo({commit}, token) {
-      console.log('토큰')
-      console.log(token)
-      console.log(localStorage.getItem('jwt'))
-      // axiosConnector.get('/account/userInfo')
       axios({
         method: 'GET',
-        url: 'https://i6a102.p.ssafy.io/api/v1' + '/account/userInfo',
+        url: SERVER.URL + '/account/userInfo',
         headers: {Authorization: token}
       })
         .then(res => {
@@ -134,20 +155,6 @@ export default new Vuex.Store({
         .catch(err => console.log(err.response.data))
     },
 
-    // 프로필
-    // getProfile: function ({ commit }) {
-    //   axios({
-    //     method: 'get',
-    //     url: 'i6a102.p.ssafy.io/api/v1' + '/profile',
-    //     headers: state.authToken
-    //   })
-    //     .then((res) => {
-    //       commit('PROFILE', res.data.userInfo)
-    //     })
-    //     .catch((err) => {
-    //       console.log(err)
-    //     })
-    // }
   },
 
 
