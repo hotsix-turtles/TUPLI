@@ -2,8 +2,9 @@ package hotsixturtles.tupli.api;
 
 import hotsixturtles.tupli.dto.PlaylistDto;
 import hotsixturtles.tupli.dto.PlayroomDto;
+import hotsixturtles.tupli.dto.request.RequestPlayroomDto;
 import hotsixturtles.tupli.dto.response.ErrorResponse;
-import hotsixturtles.tupli.entity.Playlist;
+import hotsixturtles.tupli.dto.response.ResponsePlayroomDto;
 import hotsixturtles.tupli.entity.Playroom;
 import hotsixturtles.tupli.service.PlayroomService;
 import hotsixturtles.tupli.service.token.JwtTokenProvider;
@@ -71,8 +72,7 @@ public class PlayroomApiController {
      */
     @PostMapping("/playroom")
     public ResponseEntity<?> addPlayroom(@RequestHeader(value = "Authorization") String token,
-                                         @RequestBody PlayroomDto playroomDto){
-
+                                         @RequestBody RequestPlayroomDto playroomDto){
         if (!jwtTokenProvider.validateToken(token)) {
             return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
@@ -80,7 +80,7 @@ public class PlayroomApiController {
         }
         Long userSeq = jwtTokenProvider.getUserSeq(token);
 
-        PlayroomDto playroomResult = playroomService.addPlayroom(playroomDto, userSeq);
+        ResponsePlayroomDto playroomResult = playroomService.addPlayroom(playroomDto, userSeq);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(playroomResult);
     }
@@ -112,7 +112,7 @@ public class PlayroomApiController {
     @PutMapping("/playroom/{playroomId}")
     public ResponseEntity<?> updatePlayroom(@RequestHeader(value = "Authorization") String token,
                                             @PathVariable("playroomId") Long playroomId,
-                                            @RequestBody PlayroomDto playroomDto){
+                                            @RequestBody RequestPlayroomDto playroomDto){
 
         if (!jwtTokenProvider.validateToken(token)) {
             return ResponseEntity
@@ -122,7 +122,7 @@ public class PlayroomApiController {
 
         Long userSeq = jwtTokenProvider.getUserSeq(token);
 
-        PlayroomDto result = playroomService.updatePlayroom(playroomId, playroomDto, userSeq);
+        ResponsePlayroomDto result = playroomService.updatePlayroom(playroomId, playroomDto, userSeq);
 
         if(result == null){
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);

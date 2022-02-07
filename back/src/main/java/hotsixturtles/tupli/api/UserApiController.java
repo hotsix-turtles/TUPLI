@@ -1,7 +1,9 @@
 package hotsixturtles.tupli.api;
 
 import hotsixturtles.tupli.dto.UserDto;
+import hotsixturtles.tupli.dto.UserProfileDto;
 import hotsixturtles.tupli.dto.response.ErrorResponse;
+import hotsixturtles.tupli.dto.simple.SimpleUpdateProfileDto;
 import hotsixturtles.tupli.dto.simple.SimpleUserDto;
 import hotsixturtles.tupli.entity.Board;
 import hotsixturtles.tupli.entity.User;
@@ -239,7 +241,7 @@ public class UserApiController {
     public ResponseEntity getMyProfile(@RequestHeader(value = "Authorization") String token) {
         try {
             User user = jwtTokenProvider.getUser(token);
-            return ResponseEntity.ok().body(new UserDto(user));
+            return ResponseEntity.ok().body(new UserProfileDto(user));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
@@ -289,7 +291,7 @@ public class UserApiController {
      * @param email
      * @param nickname
      * @param request
-     * @return
+     * @return SimpleUpdateProfileDto {content : introduction, nickname, image }
      * @throws IOException
      * 반환 코드 : 200, 404
      */
@@ -325,7 +327,8 @@ public class UserApiController {
 
         userService.updateProfile(userSeq, introduction, nickname, image);
 
-        return ResponseEntity.status(HttpStatus.OK).body(null);
+        SimpleUpdateProfileDto updateProfileDto = new SimpleUpdateProfileDto(introduction, nickname, image);
+        return ResponseEntity.status(HttpStatus.OK).body(updateProfileDto);
     }
 
     
