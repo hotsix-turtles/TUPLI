@@ -40,9 +40,6 @@ import KakaoPaySuccess from '../views/handler/kakaoPay/KakaoPaySuccess.vue'
 import KakaoPayCancel from '../views/handler/kakaoPay/KakaoPayCancel.vue'
 import KakaoPayFail from '../views/handler/kakaoPay/KakaoPayFail.vue'
 
-import KakaoPaySuccess from '../views/handler/kakaoPay/KakaoPaySuccess.vue'
-import KakaoPayCancel from '../views/handler/kakaoPay/KakaoPayCancel.vue'
-import KakaoPayFail from '../views/handler/kakaoPay/KakaoPayFail.vue'
 
 
 Vue.use(VueRouter)
