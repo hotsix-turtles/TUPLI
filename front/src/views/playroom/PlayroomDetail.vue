@@ -699,10 +699,11 @@ export default {
       this.SET_ROOM_LIKED(!this.roomLiked)
       axiosConnector.post(this.roomLiked ? '/playroom/like' : '/playroom/dislike', JSON.stringify({ id: this.roomId }));
     },
-    sendMessage(payload) {
-      if (this.chatroomId) return;
+    async sendMessage(payload) {
+      if (!this.chatroomId) return;
       if (!payload || !payload.type || !payload.message || !payload.token) return;
-      return wsConnector.send(
+
+      return await this.wsConnector.send(
         "/pub/chat/message",
         JSON.stringify({ type: payload.type, roomId: this.chatroomId, message: payload.message }),
         { Authorization: payload.token }
