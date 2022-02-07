@@ -228,7 +228,8 @@ public class BadgeService {
 
     // 프리미엄 유저 확인
     public int checkPremium(int i, Long userSeq, List<Long> badges){
-        if(userRepository.findByUserSeq(userSeq).getIs_vip().equals("Y")) {
+        String isPremium = userRepository.findByUserSeq(userSeq).getIs_vip();
+        if(isPremium != null && isPremium.equals("Y")) {
             if(!badges.contains(Long.valueOf(i))){
                 UserBadge userBadge = new UserBadge(null, userSeq, Long.valueOf(i), OffsetDateTime.now());
                 userBadgeRepository.save(userBadge);
@@ -364,6 +365,7 @@ public class BadgeService {
     // 플레이룸 최고 인원 수
     public int checkPlayroomMaxUsers(int i, Long userSeq, List<Long> badges){
         Long maxUser = playroomRepository.findRoomMaxUser(userSeq);
+        if(maxUser == null) return 32;
         for(i = 29; i <= Badge11_increment; i++){
             if(maxUser >= Badge11List.get(i-29)){
                 if(!badges.contains(Long.valueOf(i))){
