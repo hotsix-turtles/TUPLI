@@ -60,7 +60,7 @@ public class Playroom {
     @OneToMany(mappedBy = "playroom")
     private List<PlayroomLikes> playroomLikes = new ArrayList<>();
 
-    @OneToMany(mappedBy = "playroom", cascade = {CascadeType.REMOVE})
+    @OneToMany(mappedBy = "playroom", cascade = {CascadeType.ALL})
     private List<YoutubeVideo> videos = new ArrayList<>();
 
     // 기타 : DTO 외 내부 추천 및 뱃지용
