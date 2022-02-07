@@ -28,11 +28,11 @@ public class YoutubeVideo {
     private Integer categoryId;  // 유튜브 기준 카테고리 분류
 
     // 플레이리스트 생성시에는 연결. (단순한 저장, 좋아요시에는 연결 없음)
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name="playlist_id")
     private Playlist playlist;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name="playroom_id")
     private Playroom playroom;
 
