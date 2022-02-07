@@ -86,7 +86,7 @@ export default {
           this.$router.push({ name: 'empty_main' })
         })
         .catch(err => {
-          console.log(err)
+          console.log(err.response.data)
         })
     },
 

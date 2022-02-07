@@ -102,15 +102,13 @@
                   :rules="startDateRules"
                   v-bind="attrs"
                   v-on="on"
-                >
-                </v-text-field>
+                />
               </template>
               <v-date-picker
                 v-model="startDate"
                 no-title
                 @input="startDateMenu = false"
-              >
-              </v-date-picker>
+              />
             </v-menu>
 
             <v-menu
@@ -133,16 +131,14 @@
                   readonly
                   v-bind="attrs"
                   v-on="on"
-                >
-                </v-text-field>
+                />
               </template>
               <v-time-picker
                 v-if="startTimeMenu"
                 v-model="startTime"
                 full-width
                 @click:minute="$refs.startTimeMenu.save(startTime)"
-              >
-              </v-time-picker>
+              />
             </v-menu>
           </v-col>
         </v-row>
@@ -172,15 +168,13 @@
                   :rules="endDateRules"
                   v-bind="attrs"
                   v-on="on"
-                >
-                </v-text-field>
+                />
               </template>
               <v-date-picker
                 v-model="endDate"
                 no-title
                 @input="endDateMenu = false"
-              >
-              </v-date-picker>
+              />
             </v-menu>
 
             <v-menu
@@ -203,16 +197,14 @@
                   readonly
                   v-bind="attrs"
                   v-on="on"
-                >
-                </v-text-field>
+                />
               </template>
               <v-time-picker
                 v-if="endTimeMenu"
                 v-model="endTime"
                 full-width
                 @click:minute="$refs.endTimeMenu.save(endTime)"
-              >
-              </v-time-picker>
+              />
             </v-menu>
           </v-col>
         </v-row>
