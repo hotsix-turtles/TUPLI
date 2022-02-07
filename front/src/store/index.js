@@ -13,7 +13,9 @@ import axiosConnector from '../utils/axios-connector.js'
 import createPersistedState from "vuex-persistedstate";
 
 export default new Vuex.Store({
-  // 새로고침, 외부진입시에도 state 정보 온존 
+  // TODO: createPersistedState 사용시 사용 모듈 한정 필요 (playroom, playlist등엔 사용 x)
+
+  // 새로고침, 외부진입시에도 state 정보 온존
   plugins: [createPersistedState()],
   //plugins: [createPersistedState({storage: window.sessionStorage})], // 창 종료시 state 초기화 하는 타입
   // data
