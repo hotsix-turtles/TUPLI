@@ -11,7 +11,7 @@ import router from '@/router'
 import { mapMutations} from 'vuex'
 
 import axios from 'axios'
-import axiosConnector from '@/utils/axios-connector.js'
+import SERVER from '@/api/server'
 
 export default {
 // 이 부분 헷갈리시는 분 위해 기술  
@@ -29,13 +29,10 @@ export default {
 
     // 결제 성공시 정보 받아오기
     kakaoPayRequest: function (pg_token){
-      // axiosConnector.post('/kakaoPay/success/', {
-      //   params: {pgToken: pg_token},
-      // })
       axios({
         method: 'POST',
-        headers: {Authorization: localStorage.getItem('jwt')},  // axiosConnector 나중에 연결해달라고 하세요
-        url: 'http://127.0.0.1:8080/kakaoPay/success/',
+        headers: {Authorization: localStorage.getItem('jwt')},
+        url: SERVER.URL +'/kakaoPay/success/',
         params: {pgToken: pg_token},
       })
         .then((res) => {
