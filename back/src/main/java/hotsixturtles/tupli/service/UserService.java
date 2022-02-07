@@ -211,5 +211,9 @@ public class UserService {
         userRepository.save(user);
 
     }
+
+    public int getFollowersCount(Long userSeq){
+        return userLikesRepository.findFollowersCount(userSeq);
+    }
 }
 
