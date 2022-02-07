@@ -553,9 +553,17 @@ export default {
       const userFollowerInfo = await axiosConnector.get(`/profile/followers/${this.roomAuthorId}/count`, { headers: { Authorization: token } });
       this.SET_ROOM_AUTHOR({ follower: parseInt(userFollowerInfo.data.length) })
 
+      // TODO: user profile 부분이 미완성이라 임시로 접속할때 얻어옴. 추후 삭제 필요
+      const userInfo = await axiosConnector.get(`/account/userInfo`, { headers: { Authorization: token } });
+      this.userInfo = userInfo.data;
+
       this.checkPermission();
       this.initChatRoom();
       setInterval(this.sendSync, 1000);
+    },
+    checkPermission() {
+      if (this.roomPublic) return;
+      if (!this.roomPublic && this.roomInviteIds.find(inviteId => inviteId == this.userInfo.userSeq)) return;
     },
     initChatRoom() {
       const token = localStorage.getItem('jwt')
@@ -608,8 +616,7 @@ export default {
 
       if (body.type == 'SYNC')
       {
-        // TODO: 내가 방장이면 SYNC 메시지 무시
-        // if (I'm author) return;
+        if (this.userInfo.userSeq == this.roomAuthorId) return;
 
         const currentPlaylistOffset = this.roomCurrentPlaylistOffset
         const currentVideoOffset = this.roomCurrentVideoOffset
@@ -717,6 +724,8 @@ export default {
       };
 
       if (!token) return;
+      if (this.userInfo.userSeq != this.roomAuthorId) return;
+
       this.sendMessage({ type: 'SYNC', message: JSON.stringify(syncData), token })
     },
     sendChat() {

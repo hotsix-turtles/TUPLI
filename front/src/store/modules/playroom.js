@@ -36,25 +36,25 @@ const playroom = {
       state.savedFormData = formData
       console.log('SAVE_FORM_DATA', state.savedFormData)
     },
-    SET_ROOM_ID: ( state, value ) => state.roomId = value ? value : state.roomId,
+    SET_ROOM_ID: ( state, value ) => state.roomId = value != undefined ? parseInt(value) : state.roomId,
     SET_ROOM_TITLE: ( state, value ) => state.roomTitle = value ? value : state.roomTitle,
     SET_ROOM_PUBLIC: ( state, value ) => state.roomPublic = value ? value : state.roomPublic,
     SET_ROOOM_LIKED: ( state, value ) => state.roomLiked = value ? value : state.roomLiked,
     SET_ROOM_AUTHOR: ( state, value ) => {
-      state.roomAuthorId = value.id ? value.id : state.roomAuthorId;
+      state.roomAuthorId = value.id != undefined ? parseInt(value.id) : state.roomAuthorId;
       state.roomAuthorName = value.name ? value.name : state.roomAuthorName;
       state.roomAuthorProfilePic = value.profileImage ? value.profileImage : state.roomAuthorProfilePic;
-      state.roomAuthorFollowerCount = value.follower != undefined ? value.follower : state.roomAuthorFollowerCount
+      state.roomAuthorFollowerCount = value.follower != undefined ? parseInt(value.follower) : state.roomAuthorFollowerCount
     },
     SET_ROOM_START_TIME: ( state, value ) => state.roomStartTime = value ? new Date(value * 1000) : new Date(),
     SET_ROOM_END_TIME: ( state, value ) => state.roomEndTime = value ? new Date(value * 1000) : new Date(),
     SET_ROOM_CONTENT: ( state, value ) => state.roomContent = value ? value : state.roomContent,
     SET_ROOM_INVITE_IDS: ( state, value ) => state.roomInviteIds = value ? value : state.roomInviteIds,
     SET_ROOM_TAGS: ( state, value ) => state.roomTags = value ? value : state.roomTags,
-    SET_ROOM_CURRENT_PLAYLIST_OFFSET: ( state, value ) => state.roomCurrentPlaylistOffset = value ? value : roomCurrentPlaylistOffset,
+    SET_ROOM_CURRENT_PLAYLIST_OFFSET: ( state, value ) => state.roomCurrentPlaylistOffset = value != undefined ? parseInt(value) : roomCurrentPlaylistOffset,
     SET_ROOM_PLAYLISTS: ( state, value ) => state.roomPlaylists = value ? value : state.roomPlaylists,
-    SET_ROOM_CURRENT_VIDEO_OFFSET: ( state, value ) => state.roomCurrentVideoOffset = value ? value : state.roomCurrentVideoOffset,
-    SET_ROOM_CURRENT_VIDEO_PLAYTIME: ( state, value ) => state.roomCurrentVideoPlaytime = value ? value : state.roomCurrentVideoPlaytime,
+    SET_ROOM_CURRENT_VIDEO_OFFSET: ( state, value ) => state.roomCurrentVideoOffset = value != undefined ? parseInt(value) : state.roomCurrentVideoOffset,
+    SET_ROOM_CURRENT_VIDEO_PLAYTIME: ( state, value ) => state.roomCurrentVideoPlaytime = value != undefined ? parseInt(value) : state.roomCurrentVideoPlaytime,
     SET_ROOM_PLAYER_STATE: (state, value) => state.roomPlayerState = value ? value : state.roomPlayerState,
     SET_ROOM_CHATROOM_ID: ( state, value ) => state.chatroomId = value ? value : state.chatroomId,
     BLOCK_CHAT_BY_ID: ( state, id ) => {
