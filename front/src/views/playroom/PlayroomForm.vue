@@ -367,6 +367,7 @@ import Back from '../../components/common/Back.vue'
 import PlaylistListItemSmall from '../../components/playlist/PlaylistListItemSmall.vue'
 import TagInput from '../../components/common/TagInput.vue'
 import { mapMutations, mapActions } from 'vuex'
+import axiosConnector from '../../utils/axios-connector';
 
 export default {
   name: 'PlaylistForm',
@@ -476,7 +477,7 @@ export default {
           if (curPlaylist.videos)
           {
             // 현재 플레이리스트에 비디오가 존재한다면
-            prevPlaylists[curPlaylist.playlistId] = curPlaylist.videos.reduce((prevVideoIds, curVideo) => {
+            prevPlaylists[curPlaylist.id] = curPlaylist.videos.reduce((prevVideoIds, curVideo) => {
               if (this.addedPlaylistVideoIds.find(addedPlaylistVideoId => addedPlaylistVideoId == curVideo.videoId))
                 prevVideoIds.push(curVideo.videoId)
               return prevVideoIds
@@ -529,7 +530,7 @@ export default {
       return axiosConnector.post('/playroom', formData, { header: { Authorization: token }})
     },
     ...mapMutations('playroom', ['RESET_FORM_DATA']),
-    ...mapActions('playroom', ['saveFormData', 'createPlayroom']),
+    ...mapActions('playroom', ['saveFormData']),
     ...mapActions('playlist', ['selectAllPlaylistVideo', 'deselectAllPlaylistVideo', 'resetAddedPlaylists'])
   },
 }
