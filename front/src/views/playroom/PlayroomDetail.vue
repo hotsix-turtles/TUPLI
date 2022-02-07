@@ -394,8 +394,8 @@ export default {
     this.$watch('roomCurrentVideoOffset', (newVal, oldVal) => {
       this.updateVideoId()
     });
-    this.$watch('roomCurrentVideoPlaytime', (newVal, oldVal) => {
-      if (Math.abs(newVal - oldVal) < 0.5) return;
+    this.$watch('roomCurrentVideoPlaytime', async (newVal, oldVal) => {
+      if (newVal - oldVal < 2 && Math.abs(newVal - await this.player.getCurrentTime()) < 1) return;
       this.seekTo()
     });
 
@@ -469,6 +469,8 @@ export default {
         this.$store.dispatch('playroom/setRoomInfo', response).then(
           () => {
             this.initChatRoom()
+
+            setInterval(this.sendSync, 1000)
           }
         )
       });
@@ -480,7 +482,9 @@ export default {
       const token = localStorage.getItem('jwt')
       wsConnector.connect(
         token ? { Authorization: this.token } : { },
-        () => wsConnector.subscribe(`/sub/chat/room/${this.chatroomId}`, this.onReceiveMessage, token ? { Authorization: token } : undefined),
+        async () => {
+          await wsConnector.subscribe(`/sub/chat/room/${this.chatroomId}`, this.onReceiveMessage, token ? { Authorization: token } : undefined)
+        },
         () => alert("서버 연결에 실패 하였습니다. 다시 접속해 주십시요.")
       )
     },
@@ -501,39 +505,20 @@ export default {
       }
     },
     onVideoReady() {
-
     },
     onVideoEnded() {
       console.log('ended')
       this.loadNextVideo()
     },
-    async onVideoPlaying() {
-      const currentPlaytime = await this.player.getCurrentTime()
-      console.log('sync event', {
-        state: 'play',
-        timestamp: new Date().getTime(),
-        playlistId: this.roomCurrentPlaylistOffset,
-        videoOffset: this.roomCurrentVideoOffset,
-        videoPlaytime: currentPlaytime
-      })
-      this.SET_ROOM_CURRENT_VIDEO_PLAYTIME(currentPlaytime)
+    onVideoPlaying() {
     },
-    async onVideoPaused() {
-      const currentPlaytime = await this.player.getCurrentTime()
-      console.log('sync event', {
-        state: 'pause',
-        timestamp: new Date().getTime(),
-        playlistId: this.roomCurrentPlaylistOffset,
-        videoOffset: this.roomCurrentVideoOffset,
-        videoPlaytime: currentPlaytime
-      })
-      this.SET_ROOM_CURRENT_VIDEO_PLAYTIME(currentPlaytime)
+    onVideoPaused() {
     },
     onVideoBuffering() {
 
     },
     onVideoCued() {
-      this.seekTo()
+      //this.seekTo()
     },
     async onReceiveMessage(payload) {
       const id = payload.headers['message-id']
@@ -541,7 +526,28 @@ export default {
 
       if (body.type == 'SYNC')
       {
-        this.$store.commit('playroom/SEEK_VIDEO', parseFloat(body.message));
+        // TODO: 내가 방장이면 SYNC 메시지 무시
+        // if (I'm author) return;
+
+        const currentPlaylistOffset = this.roomCurrentPlaylistOffset
+        const currentVideoOffset = this.roomCurrentVideoOffset
+        const currentVideoTime = await this.player.getCurrentTime();
+        const currentPlayerState = await this.player.getPlayerState();
+
+        const syncData = JSON.parse(body.message)
+        const syncPlaylistOffset = syncData.playlistOffset
+        const syncVideoOffset = syncData.videoOffset
+        const syncVideoTime = syncData.videoPlaytime
+        const syncPlayerState = syncData.playerState
+
+        if (currentPlaylistOffset != syncPlaylistOffset) this.SET_ROOM_CURRENT_PLAYLIST_OFFSET(syncPlaylistOffset)
+        if (currentVideoOffset != syncVideoOffset) this.SET_ROOM_CURRENT_VIDEO_OFFSET(syncVideoOffset)
+        if (currentPlayerState != syncPlayerState) {
+          if (syncPlayerState == 1) this.player.playVideo()
+          else if (syncPlayerState == 2) this.player.pauseVideo()
+        }
+        console.log('syncVideoTime', syncVideoTime, 'currentVideoTime', currentVideoTime)
+        if (Math.abs(syncVideoTime - currentVideoTime) > 2) this.SET_ROOM_CURRENT_VIDEO_PLAYTIME(syncVideoTime);
       }
       else// if (body.type == 'TALK')
       {
@@ -589,6 +595,7 @@ export default {
       this.player.playVideo()
     },
     seekTo() {
+      console.log('seekTo', this.roomCurrentVideoPlaytime)
       this.player.seekTo(this.roomCurrentVideoPlaytime)
     },
     playThisVideo() {
@@ -605,7 +612,23 @@ export default {
       this.SET_ROOOM_LIKED(!this.roomLiked)
       axiosConnector.post(this.roomLiked ? '/playroom/like' : '/playroom/dislike', JSON.stringify({ id: this.roomId }));
     },
-    ...mapMutations('playroom', ['SET_ROOOM_LIKED', 'SET_ROOM_CURRENT_PLAYLIST_OFFSET', 'SET_ROOM_CURRENT_VIDEO_OFFSET', 'SET_ROOM_CURRENT_VIDEO_PLAYTIME'])
+    async sendSync() {
+      this.SET_ROOM_CURRENT_VIDEO_PLAYTIME(await this.player.getCurrentTime())
+
+      const syncData = {
+        timestamp: new Date().getTime(),
+        playlistOffset: this.roomCurrentPlaylistOffset,
+        videoOffset: this.roomCurrentVideoOffset,
+        videoPlaytime: this.roomCurrentVideoPlaytime,
+        playerState: await this.player.getPlayerState()
+      };
+      const token = localStorage.getItem('jwt')
+
+      if (!token) return;
+      this.sendMessage({ type: 'SYNC', message: JSON.stringify(syncData), token })
+    },
+    ...mapMutations('playroom', ['SET_ROOOM_LIKED', 'SEEK_VIDEO', 'SET_ROOM_CURRENT_PLAYLIST_OFFSET', 'SET_ROOM_CURRENT_VIDEO_OFFSET', 'SET_ROOM_CURRENT_VIDEO_PLAYTIME']),
+    ...mapActions('playroom', ['sendMessage'])
   }
 }
 </script>
