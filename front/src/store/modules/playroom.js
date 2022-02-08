@@ -16,8 +16,9 @@ const playroom = {
     roomContent: '',
     roomTags: [],
     roomPlaylists: [],
-    roomCurrentPlaylistOffset: 0,
-    roomCurrentVideoOffset: '',
+    roomVideos: [],
+    roomCurrentPlaylistId: 0,
+    roomCurrentVideoId: 0,
     roomCurrentVideoPlaytime: 0,
     roomPlayerState: 0,
     roomSelectedChatItem: { id: '', type: null },
@@ -51,9 +52,10 @@ const playroom = {
     SET_ROOM_CONTENT: ( state, value ) => state.roomContent = value ? value : state.roomContent,
     SET_ROOM_INVITE_IDS: ( state, value ) => state.roomInviteIds = value ? value : state.roomInviteIds,
     SET_ROOM_TAGS: ( state, value ) => state.roomTags = value ? value : state.roomTags,
-    SET_ROOM_CURRENT_PLAYLIST_OFFSET: ( state, value ) => state.roomCurrentPlaylistOffset = value != undefined ? parseInt(value) : roomCurrentPlaylistOffset,
+    SET_ROOM_CURRENT_PLAYLIST_ID: ( state, value ) => state.roomCurrentPlaylistId = value != undefined ? parseInt(value) : roomCurrentPlaylistId,
     SET_ROOM_PLAYLISTS: ( state, value ) => state.roomPlaylists = value ? value : state.roomPlaylists,
-    SET_ROOM_CURRENT_VIDEO_OFFSET: ( state, value ) => state.roomCurrentVideoOffset = value != undefined ? parseInt(value) : state.roomCurrentVideoOffset,
+    SET_ROOM_VIDEOS: ( state, value ) => state.roomVideos = value ? value : state.roomVideos,
+    SET_ROOM_CURRENT_VIDEO_ID: ( state, value ) => state.roomCurrentVideoId = value != undefined ? parseInt(value) : state.roomCurrentVideoId,
     SET_ROOM_CURRENT_VIDEO_PLAYTIME: ( state, value ) => state.roomCurrentVideoPlaytime = value != undefined ? parseInt(value) : state.roomCurrentVideoPlaytime,
     SET_ROOM_PLAYER_STATE: (state, value) => state.roomPlayerState = value ? value : state.roomPlayerState,
     SET_ROOM_CHATROOM_ID: ( state, value ) => state.chatroomId = value ? value : state.chatroomId,
@@ -110,9 +112,10 @@ const playroom = {
       commit('SET_ROOM_CONTENT', data.content);
       commit('SET_ROOM_INVITE_IDS', data.inviteIds);
       commit('SET_ROOM_TAGS', data.tags);
-      // commit('SET_ROOM_CURRENT_PLAYLIST_OFFSET', data.currentPlaylistOffset)
+      // commit('SET_ROOM_CURRENT_PLAYLIST_ID', data.currentPlaylistOffset)
       commit('SET_ROOM_PLAYLISTS', data.playlists);
-      // commit('SET_ROOM_CURRENT_VIDEO_OFFSET', data.currentVideoOffset)
+      commit('SET_ROOM_VIDEOS', data.videos);
+      // commit('SET_ROOM_CURRENT_VIDEO_ID', data.currentVideoOffset)
       // commit('SET_ROOM_CURRENT_VIDEO_PLAYTIME', data.currentVideoPlaytime)
       commit('SET_ROOM_CHATROOM_ID', '731f3b99-8257-4eae-86b2-ed38ea36ccff');//data.chatroomId);
     }),
@@ -169,7 +172,96 @@ const playroom = {
     },
     roomPublicLabel: ( {roomPublic} ) => roomPublic ? '공개' : '비공개',
     roomReducedContent: ( {roomContent} ) => roomContent.split(/\r?\n/).slice(0, 2).join('\n'),
-    roomCurrentPlaylistVideos: ( {roomPlaylists, roomCurrentPlaylistOffset} ) => roomPlaylists[roomCurrentPlaylistOffset] ? roomPlaylists[roomCurrentPlaylistOffset].videos : []
+    roomCurrentPlaylistVideos: ( {roomPlaylists, roomVideos, roomCurrentPlaylistId} ) => {
+      //console.log(roomPlaylists[roomCurrentPlaylistId] ? roomPlaylists[roomCurrentPlaylistId].reduce((prev, cur) => { prev.push(roomVideos.find(video => cur == video.id)); return prev; }, []) : [])
+      return roomPlaylists[roomCurrentPlaylistId] ? roomPlaylists[roomCurrentPlaylistId].reduce((prev, cur) => { prev.push(roomVideos.find(video => cur == video.id)); return prev; }, []) : []
+    },
+    roomFirstVideo: ( {roomPlaylists, roomCurrentPlaylistId } ) => {
+      if (!Object.keys(roomPlaylists[roomCurrentPlaylistId]).length) return null;
+
+      var firstVideo = {};
+
+      firstVideo.playlistOffset = 0;
+      firstVideo.playlistId = Object.keys(roomPlaylists)[firstVideo.playlistOffset];
+      firstVideo.videoOffset = 0;
+      firstVideo.videoId = roomPlaylists[firstVideo.playlistId][firstVideo.videoOffset];
+
+      return firstVideo;
+    },
+    roomPrevVideo: ( {roomPlaylists, roomVideos, roomCurrentPlaylistId, roomCurrentVideoId} ) => {
+      const roomCurrentPlaylistOffset = Object.keys(roomPlaylists).findIndex(roomPlaylistId => roomPlaylistId == roomCurrentPlaylistId)
+      const roomCurrentVideoOffset = roomPlaylists[roomCurrentPlaylistId].findIndex(roomVideoId => roomVideoId == roomCurrentVideoId)
+
+      var prevVideo = {};
+
+      // 현재 플레이리스트의 첫번째 비디오라면
+      if (roomCurrentVideoOffset == 0)
+      {
+        // 현재 플레이리스트가 첫번째인지 확인
+        if (roomCurrentPlaylistOffset == 0)
+        {
+          prevVideo = null; // 이전 비디오가 없으므로 null
+        } else {
+          // 첫번째가 아니라면 이전 플레이리스트의 마지막 비디오 ID를 반환
+          prevVideo.playlistOffset = roomCurrentPlaylistOffset - 1;
+          prevVideo.playlistId = Object.keys(roomPlaylists)[prevVideo.playlistOffset];
+          prevVideo.videoOffset = roomPlaylists[prevVideo.playlistId].length - 1;
+          prevVideo.videoId = roomPlaylists[prevVideo.playlistId][prevVideo.videoOffset];
+        }
+      } else {
+        // 현재 플레이리스트의 이전 비디오 ID를 반환
+        prevVideo.playlistOffset = roomCurrentPlaylistOffset;
+        prevVideo.playlistId = Object.keys(roomPlaylists)[prevVideo.playlistOffset];
+        prevVideo.videoOffset = roomCurrentVideoOffset - 1;
+        prevVideo.videoId = roomPlaylists[prevVideo.playlistId][prevVideo.videoOffset];
+      }
+
+      return prevVideo;
+    },
+    roomNextVideo: ( {roomPlaylists, roomCurrentPlaylistId, roomCurrentVideoId} ) => {
+      const roomCurrentPlaylistOffset = Object.keys(roomPlaylists).findIndex(roomPlaylistId => roomPlaylistId == roomCurrentPlaylistId)
+      const roomCurrentVideoOffset = roomPlaylists[roomCurrentPlaylistId].findIndex(roomVideoId => roomVideoId == roomCurrentVideoId)
+
+      var nextVideo = {}
+
+      // 현재 플레이리스트의 마지막 비디오라면
+      if (roomCurrentVideoOffset >= roomPlaylists[roomCurrentPlaylistId].length - 1)
+      {
+        // 현재 플레이리스트가 마지막인지 확인
+        if (roomCurrentPlaylistOffset >= Object.keys(roomPlaylists).length - 1)
+        {
+          nextVideo = null; // 더이상 비디오가 없으므로 null
+        } else {
+          // 마지막이 아니라면 다음 플레이리스트의 첫번째 비디오 ID를 반환
+          nextVideo.playlistOffset = roomCurrentPlaylistOffset + 1;
+          nextVideo.playlistId = Object.keys(roomPlaylists)[nextVideo.playlistOffset];
+          nextVideo.videoOffset = 0;
+          nextVideo.videoId = roomPlaylists[nextVideo.playlistId][nextVideo.videoOffset];
+        }
+      } else {
+        // 현재 플레이리스트의 다음 비디오 ID를 반환
+        nextVideo.playlistOffset = roomCurrentPlaylistOffset;
+        nextVideo.playlistId = Object.keys(roomPlaylists)[nextVideo.playlistOffset];
+        nextVideo.videoOffset = roomCurrentVideoOffset + 1;
+        nextVideo.videoId = roomPlaylists[nextVideo.playlistId][nextVideo.videoOffset];
+      }
+
+      return nextVideo;
+      // if (roomCurrentPlaylistVideos.filter(v => v.included).length < this.roomCurrentVideoId + 1)
+      // {
+      //   if (Object.keys(this.roomPlaylists).length <= this.roomCurrentPlaylistId + 1)
+      //     this.SET_ROOM_CURRENT_PLAYLIST_ID(0)
+      //   else
+      //     this.SET_ROOM_CURRENT_PLAYLIST_ID(this.roomCurrentPlaylistId + 1)
+      //   this.SET_ROOM_CURRENT_VIDEO_ID(0)
+      //   this.SET_ROOM_CURRENT_VIDEO_PLAYTIME(0)
+      // }
+      // else
+      // {
+      //   this.SET_ROOM_CURRENT_VIDEO_ID(this.roomCurrentVideoId + 1)
+      //   this.SET_ROOM_CURRENT_VIDEO_PLAYTIME(0)
+      // }
+    }
   }
 };
 
