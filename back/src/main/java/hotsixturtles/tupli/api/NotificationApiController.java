@@ -18,7 +18,7 @@ public class NotificationApiController {
 
     @GetMapping("/saveAlarm")
     public ResponseEntity<?> saveAlarm() {
-        notificationService.notiFollow();
+        notificationService.notiTest();
         return ResponseEntity.status(HttpStatus.OK).body(null);
     }
 

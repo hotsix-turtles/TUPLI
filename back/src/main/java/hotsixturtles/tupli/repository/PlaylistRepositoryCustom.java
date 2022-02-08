@@ -10,4 +10,5 @@ public interface PlaylistRepositoryCustom {
     List<Playlist> searchByPageSimplePlaylist(PlaylistSearchCondition playlistSearchCondition, Pageable pageable);
     List<Playlist> listByHomePlaylist(Pageable pageable);
 
+    List<Playlist> categorizedByPageSimplePlaylist(String category, Pageable pageable);
 }

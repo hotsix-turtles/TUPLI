@@ -8,6 +8,7 @@ import hotsixturtles.tupli.dto.params.PlayroomSearchCondition;
 import hotsixturtles.tupli.dto.request.PlaylistRequest;
 import hotsixturtles.tupli.dto.response.ErrorResponse;
 import hotsixturtles.tupli.dto.response.IdResponse;
+import hotsixturtles.tupli.dto.simple.SimplePlaylistCategoryDto;
 import hotsixturtles.tupli.dto.simple.SimpleYoutubeVideoDto;
 import hotsixturtles.tupli.entity.Playlist;
 import hotsixturtles.tupli.entity.PlaylistComment;
@@ -36,7 +37,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Nullable;
+import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -223,7 +228,7 @@ public class PlaylistApiController {
      */
     @GetMapping("/playlist/search")
     public ResponseEntity searchPlaylistSimple(@RequestParam String keyword,
-                                               @PageableDefault(size = 1000, sort ="roomTitle",  direction = Sort.Direction.ASC) Pageable pageable) {
+                                               @PageableDefault(size = 1000, sort ="id",  direction = Sort.Direction.ASC) Pageable pageable) {
 
 //        List<Playlist> playlists = playlistService.searchPlaylistSimple(condition);
         SearchHistory searchHistory = new SearchHistory(null, "플레이리스트",keyword.trim(),0);
@@ -234,6 +239,58 @@ public class PlaylistApiController {
         List<PlaylistDto> response = playlists.stream().map(x -> new PlaylistDto(x)).collect(Collectors.toList());
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    /**
+     * 카테고리 분류별 반환 (회원, 비회원 구분 있음)
+     * @param categoryKeyword
+     * @param pageable
+     * @param request
+     * @return
+     */
+    @GetMapping("/playlist/category/{categoryKeyword}")
+    public ResponseEntity categoryPlaylist(@PathVariable("categoryKeyword") String categoryKeyword,
+                                           @PageableDefault(size = 50, sort ="id",  direction = Sort.Direction.DESC) Pageable pageable,
+                                           HttpServletRequest request) {
+        // 카테고리 분류
+        Map<String, String> categorys = new HashMap<>();
+        categorys.put("trip", "여행");
+        categorys.put("game", "게임");
+        categorys.put("life", "일상");
+        categorys.put("style", "노하우/스타일");
+        categorys.put("animal", "동물");
+        categorys.put("entertainment", "엔터테인먼트");
+        categorys.put("movie", "영화/드라마");
+        categorys.put("music", "음악");
+        categorys.put("education", "교육/시사");
+        categorys.put("sports", "스포츠");
+        categorys.put("etc", "기타");
+        categorys.put("all", "");  // 전체검색
+        categorys.put("hot", "지금핫한");
+        String category = categorys.getOrDefault(categoryKeyword, "일상");
+
+        // 회원, 비회원(유효하지 않은 토큰) 구분
+        String token = request.getHeader("Authorization");
+        if (token == null || !jwtTokenProvider.validateToken(token)) {
+            List<Playlist> playlists = searchService.categoryPlaylist(category, pageable);
+            List<SimplePlaylistCategoryDto> response = playlists.stream().map(x -> new SimplePlaylistCategoryDto(x)).collect(Collectors.toList());
+
+            return ResponseEntity.status(HttpStatus.OK).body(response);
+        } else {
+            Long userSeq = jwtTokenProvider.getUserSeq(token);
+            List<Playlist> playlists = searchService.categoryPlaylist(category, pageable);
+            List<SimplePlaylistCategoryDto> response = new ArrayList<>();
+            for (Playlist playlist : playlists) {
+                Boolean isLiked = false;
+                if (playlistService.getPlaylistLike(userSeq, playlist.getId()) != null) {
+                    isLiked = true;
+                }
+                SimplePlaylistCategoryDto res = new SimplePlaylistCategoryDto(playlist, isLiked);
+                response.add(res);
+            }
+            return ResponseEntity.status(HttpStatus.OK).body(response);
+        }
+
     }
 
     /**

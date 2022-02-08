@@ -13,6 +13,7 @@ import javax.persistence.*;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Entity
@@ -55,6 +56,11 @@ public class Playlist {
     @Type(type = "json")
     @Column(columnDefinition = "json")
     private ConcurrentHashMap<Integer, Integer> playlistInfo;  // 유튜브 Tag + Custom Tag 리스트 등의 메타정보 조합
+
+//    @Type(type = "json")
+//    @Column(columnDefinition = "json")
+//    private Set<String> playlistCate;  // 유튜브 Tag 기준으로 한 분류
+    private String playlistCate;
 
     // 연결
     @ManyToOne(fetch = FetchType.LAZY)
