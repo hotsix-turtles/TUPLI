@@ -39,6 +39,7 @@ import AuthHandler from '../views/handler/AuthHandler.vue'
 import KakaoPaySuccess from '../views/handler/kakaoPay/KakaoPaySuccess.vue'
 import KakaoPayCancel from '../views/handler/kakaoPay/KakaoPayCancel.vue'
 import KakaoPayFail from '../views/handler/kakaoPay/KakaoPayFail.vue'
+import NotFound from '../views/handler/NotFound.vue'
 
 
 
@@ -232,7 +233,16 @@ const routes = [
     name: 'KakaoPayFail',
     component: KakaoPayFail
   },
-
+  // 올바르지 못한 주소 404 일괄 처리
+  {
+    path: "/404",
+    name: "NotFound",
+    component: NotFound,
+  },
+  {
+    path: "*",
+    redirect: "/404",
+  },
 ]
 
 const router = new VueRouter({
