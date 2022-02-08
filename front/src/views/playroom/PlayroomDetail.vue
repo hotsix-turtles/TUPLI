@@ -397,7 +397,10 @@ export default {
       message: '',
       canChat: true,
       errorOnSend: false,
-      playlistThumbnails: []
+      playlistThumbnails: [],
+      userInfo: {
+        userSeq: null
+      }
     }
   },
   metaInfo () {
@@ -494,8 +497,11 @@ export default {
       this.SET_ROOM_AUTHOR({ follower: parseInt(userFollowerInfo.data) })
 
       // TODO: user profile 부분이 미완성이라 임시로 접속할때 얻어옴. 추후 삭제 필요
-      const userInfo = await axiosConnector.get(`/account/userInfo`);
-      this.userInfo = userInfo.data;
+      if (this.$store.state.isLogin)
+      {
+        var userInfo = await axiosConnector.get(`/account/userInfo`);
+        this.userInfo = userInfo.data;
+      }
 
       this.checkPermission();
       this.loadFirstVideo();
