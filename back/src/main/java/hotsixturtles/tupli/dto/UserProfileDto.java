@@ -3,12 +3,16 @@ package hotsixturtles.tupli.dto;
 import hotsixturtles.tupli.dto.simple.SimpleUserDto;
 import hotsixturtles.tupli.entity.User;
 import hotsixturtles.tupli.entity.auth.RoleType;
+import lombok.Data;
+import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 import static java.util.stream.Collectors.toList;
 
+@Data
+@RequiredArgsConstructor
 public class UserProfileDto {
 
     private Long userSeq;
