@@ -177,6 +177,7 @@ export default new Vuex.Store({
           tmp.fromId = res.fromId
           tmp.img = res.image
           tmp.to = res.to
+          tmp.toId = res.toId
           tmp.type = res.type
           tmp.isRead = false
           commit('SET_REALTIME_ALARM', tmp);
