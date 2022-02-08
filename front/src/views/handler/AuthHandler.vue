@@ -15,7 +15,7 @@ export default {
       this.TOKEN(token)
       this.getUserInfo(token) // 쿼리로 유저 네임이나 정보도 보내줘야되나...
     }
-    this.$router.push('/home')
+    this.$router.push('/')
   },
   methods: {
     ...mapActions(['getUserInfo']),

@@ -49,10 +49,15 @@ Vue.use(VueMeta)
 const routes = [
   // 홈
   {
-    path: '/home',
+    path: '/',
     name: 'Home',
     component: Home
   },
+  // {
+  //   path: '/home',
+  //   name: 'Home',
+  //   component: Home
+  // },
   {
     path: '/notice',
     name: 'Notice',

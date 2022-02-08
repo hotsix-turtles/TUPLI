@@ -41,7 +41,7 @@
             튜플리 가입을 환영합니다!
           </p>
           <v-btn
-            to="/home"
+            to="/"
             class="white--text my-5"
             color="#5B5C9D"
             block
