@@ -16,14 +16,15 @@ import java.util.stream.Collectors;
 @NoArgsConstructor
 public class PlayroomDto {
 
+    // get(playroom/{playroomid} 에서 사용중입니다 response용
     private Long id;
 
     private String title;
     private String content;
     private Boolean isPublic;
     private String tags;
-    private Map<Long, List<String>> playlists;  // 들어오기만 하고 나가지는 않음
-    private List<Long> inviteIds;  // 들어오기만 하고 나가지는 않음
+    private Map<Long, List<Long>> playlists;
+    private List<Long> inviteIds;
     private OffsetDateTime startTime;
     private OffsetDateTime endTime;
 
@@ -38,8 +39,8 @@ public class PlayroomDto {
         this.content = playroom.getContent();
         this.isPublic = playroom.getIsPublic();
         this.tags = playroom.getTags();
-//        this.playlists = playlists;
-//        this.inviteIds = inviteIds;
+        this.playlists = playroom.getPlaylists();
+        this.inviteIds = inviteIds;
         this.startTime = playroom.getStartTime();
         this.endTime = playroom.getEndTime();
 
