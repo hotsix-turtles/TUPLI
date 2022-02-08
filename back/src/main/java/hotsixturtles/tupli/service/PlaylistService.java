@@ -12,9 +12,7 @@ import hotsixturtles.tupli.dto.simple.SimpleYoutubeVideoDto;
 import hotsixturtles.tupli.entity.Playlist;
 import hotsixturtles.tupli.entity.likes.PlaylistLikes;
 import hotsixturtles.tupli.entity.youtube.YoutubeVideo;
-import hotsixturtles.tupli.repository.PlaylistRepository;
-import hotsixturtles.tupli.repository.UserRepository;
-import hotsixturtles.tupli.repository.YoutubeVideoRepository;
+import hotsixturtles.tupli.repository.*;
 import hotsixturtles.tupli.repository.likes.PlaylistLikesRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -39,6 +37,7 @@ public class PlaylistService {
     private final PlaylistRepository playlistRepository;
     private final PlaylistLikesRepository playlistLikesRepository;
     private final YoutubeVideoRepository youtubeVideoRepository;
+    private final PlaylistRepositoryCustom playlistRepositoryCustom;
 
     // 심플 querydsl
     private final JPAQueryFactory jpaQueryFactory;
@@ -83,6 +82,9 @@ public class PlaylistService {
         return playlistRepository.findById(playlistId).orElse(null);
     }
 
+    public List<Playlist> getHomePlaylists(Pageable pageable){
+        return playlistRepositoryCustom.listByHomePlaylist(pageable);
+    }
     // 단일 Playlist id로 update
     @Transactional
     public void updatePlaylist(Long playlistId, PlaylistRequest playlistRequest) {

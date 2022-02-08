@@ -42,10 +42,10 @@ public class Playroom {
 
     private OffsetDateTime startTime;
 
-    @PrePersist
-    private void beforeSaving() {
-        startTime = OffsetDateTime.now();
-    }
+//    @PrePersist
+//    private void beforeSaving() {
+//        startTime = OffsetDateTime.now();
+//    }
 
     private OffsetDateTime endTime;
 

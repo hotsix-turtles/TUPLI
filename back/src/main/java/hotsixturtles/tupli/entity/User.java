@@ -124,6 +124,8 @@ public class User implements UserDetails {
     @OneToMany(mappedBy = "user")
     private List<PlayroomLikes> playroomLikes = new ArrayList<>();
 
+    @OneToOne(mappedBy = "user")
+    private UserSetting userSetting;
 
 
     /**
