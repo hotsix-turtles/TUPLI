@@ -683,6 +683,8 @@ export default {
       this.seekTo()
     },
     async loadLikeState() {
+      if (!this.$store.state.isLogin) return;
+
       const { status, data } = await axiosConnector.get(`/playroom/${this.roomId}/like`)
       if (status != 200) return;
       this.SET_ROOM_LIKED(Boolean(data))
