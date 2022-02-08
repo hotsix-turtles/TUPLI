@@ -111,7 +111,7 @@ export default {
     async getUserPlaylistInfo() {
       const token = localStorage.getItem('jwt')
 
-      const likedPlaylists = await axiosConnector.get(`/playlist/likes`, { headers: { Authorization: token } });
+      const likedPlaylists = await axiosConnector.get(`/playlist/likes`);
       //const savedPlaylists = await axiosConnector.get(`/playlist/saved`, { headers: { Authorization: token } });
       console.log('liked', likedPlaylists.data)
       this.setLikedPlaylist(likedPlaylists)

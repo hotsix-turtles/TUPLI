@@ -498,7 +498,7 @@ export default {
           this.clearForm()
           this.RESET_FORM_DATA()
 
-          this.$router.push('/playroom/' + playroomId)
+          this.$router.push('/playroom/' + res.data.id)
         })
         .catch((err) => {
           console.log(err)
@@ -527,7 +527,7 @@ export default {
         this.deselectAllPlaylistVideo()
     },
     createPlayroom: function ({formData, token}) {
-      return axiosConnector.post('/playroom', formData, { header: { Authorization: token }})
+      return axiosConnector.post('/playroom', formData)
     },
     ...mapMutations('playroom', ['RESET_FORM_DATA']),
     ...mapActions('playroom', ['saveFormData']),
