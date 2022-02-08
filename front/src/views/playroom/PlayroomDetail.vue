@@ -2,7 +2,6 @@
   <v-card
     class="playroom mx-auto overflow-hidden"
     height="100vh"
-    max-width="640"
   >
     <!-- 하단 네비게이션 (플레이리스트 조작) -->
     <v-bottom-navigation
@@ -255,6 +254,7 @@
         hide-overlay
         transition="dialog-bottom-transition"
         scrollable
+        class="fixed-bottom"
       >
         <v-card
           height="d-flex flex-column"
@@ -487,9 +487,9 @@ export default {
       this.updateVideoId()
     });
     this.$watch('roomCurrentVideoPlaytime', async (newVal, oldVal) => {
-
       if (newVal - oldVal < 2 && Math.abs(newVal - await this.player.getCurrentTime()) < 1) return;
       if (this.userInfo.userSeq == this.roomAuthorId) return;
+      if (document.hidden) return;
       this.seekTo()
     });
   },
@@ -527,7 +527,7 @@ export default {
       // 방 운영시간 내이면 OK
       if (this.roomStartTime <= Date.now() && this.roomEndTime >= Date.now()) return;
       // TODO: 에러 페이지로 라우팅
-      this.$router.push({ name: 'Error' })
+      this.$router.push('/404')
     },
     loadFirstVideo() {
       if (this.roomFirstVideo)
@@ -807,8 +807,8 @@ iframe {
 
 .v-dialog {
   position: absolute;
-  width: 100vw;
-  height: calc(100vh - 200px);
+  width: 100%;
+  height: calc(100% - 200px);
   margin-bottom: 0;
   padding-bottom: 0;
   bottom: 0;
