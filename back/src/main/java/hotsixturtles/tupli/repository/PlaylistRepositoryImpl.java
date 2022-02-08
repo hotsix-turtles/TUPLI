@@ -63,4 +63,26 @@ public class PlaylistRepositoryImpl implements PlaylistRepositoryCustom{
         List<Playlist> result = query.fetch();
         return result;
     }
+
+    @Override
+    public List<Playlist> categorizedByPageSimplePlaylist(String category, Pageable pageable) {
+        System.out.println("MMM = " + category);
+        JPAQuery<Playlist> query = jpaQueryFactory
+                .selectFrom(playlist)
+                .where(
+                        playlist.playlistCate.contains(category)
+                )
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize());
+        System.out.println("query = " + query);
+
+        for (Sort.Order o : pageable.getSort()) {
+            PathBuilder pathBuilder = new PathBuilder(playlist.getType(), playlist.getMetadata());
+            query.orderBy(new OrderSpecifier(o.isAscending() ? Order.ASC : Order.DESC,
+                    pathBuilder.get(o.getProperty())));
+        }
+
+        List<Playlist> result = query.fetch();
+        return result;
+    }
 }

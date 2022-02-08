@@ -70,4 +70,13 @@ public class SearchService {
         searchHistory.setScore(1);
         searchHistoryRepository.save(searchHistory);
     }
+
+    // 카테고리 분류 플레이리스트 (나중에 이동)
+    public List<Playlist> categoryPlaylist(String category, Pageable pageable) {
+        if (category == "지금핫한") {
+            // 현재 비교방식 애매함
+            return playlistRepository.listByHomePlaylist(pageable);
+        }
+        return playlistRepository.categorizedByPageSimplePlaylist(category, pageable);
+    }
 }
