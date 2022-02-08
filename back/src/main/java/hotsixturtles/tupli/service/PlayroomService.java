@@ -115,7 +115,7 @@ public class PlayroomService {
         if (false) {
             List<UserLikes> followers = userService.getFollowers(userSeq);
             for (UserLikes follower : followers) {
-                notificationService.notiPlayroomMake(userSeq, follower.getFromUser().getUserSeq());
+                notificationService.notiInvite(userSeq, follower.getFromUser().getUserSeq());
             }
 
         }

@@ -19,13 +19,15 @@ import java.util.List;
 @Transactional(readOnly = true)  // 기본적으로 트랜잭션 안에서만 데이터 변경하게 설정(그만큼 최적화 되어 읽는게 빨라짐)
 @RequiredArgsConstructor
 public class UserService {
-    private final UserRepository userRepository;
+
     private final PasswordEncoder passwordEncoder;
 
+    private final UserRepository userRepository;
     private final UserInfoRepository userInfoRepository;
     private final UserLikesRepository userLikesRepository;
     private final UserBadgeRepository userBadgeRepository;
     private final UserDislikesRepository userDislikesRepository;
+    private final NotificationService notificationService;
 
     private final JwtTokenProvider jwtTokenProvider;
 
@@ -133,6 +135,9 @@ public class UserService {
             userLikes.setFromUser(userRepository.findById(userSeq).orElse(null));
             userLikes.setToUser(userRepository.findById(otherUserSeq).orElse(null));
             userLikesRepository.save(userLikes);
+
+            // 팔로우 알림 보내기
+            notificationService.notiFollow(userSeq, otherUserSeq);
         }
         else {
             // 이미 팔로우 되어있음.
