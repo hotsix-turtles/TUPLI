@@ -12,8 +12,16 @@
 
 <script>
 import NavbarBottom from './components/common/NavbarBottom.vue';
+import { mapActions } from 'vuex';
+
 export default {
   name: 'App',
   components: { NavbarBottom },
+  created() {
+    this.getRealtimeAlarm();
+  },
+  methods: {
+    ...mapActions(['getRealtimeAlarm']),
+  },
 };
 </script>

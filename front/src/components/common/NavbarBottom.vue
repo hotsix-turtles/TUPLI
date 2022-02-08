@@ -7,8 +7,8 @@
       class="dark-background"
       @click="toggle"
     />
-    <!-- 만들기 버튼 (플레이리스트/플레이룸/게시글) -->
-    <div class="d-flex-column pb-5">
+    <div class="d-flex-column">
+      <!-- 만들기 버튼 (플레이리스트/플레이룸/게시글) -->
       <div
         v-if="isClickedMakeBtn"
         class="d-flex-column text-center"
@@ -76,29 +76,46 @@
           <v-icon>mdi-compass</v-icon>
           <div>탐색</div>
         </div>
-
+        <!--$$$$-->
         <div
+          v-if="isLogin"
           class="clickable d-flex-column text-center"
           @click="$router.push({ name: 'Profile' })"
         >
           <v-icon>mdi-account-circle-outline</v-icon>
           <div>프로필</div>
         </div>
+        <div
+          v-else
+          class="clickable d-flex-column text-center"
+          @click="$router.push({ name: 'Login' })"
+        >
+          <v-icon>mdi-account-circle-outline</v-icon>
+          <div>로그인</div>
+        </div>
       </div>
     </div>
+    <Alarm />
   </div>
 </template>
 
 <script>
+import { mapState } from 'vuex'
+import Alarm from '@/components/alarm/Alarm'
+
 export default {
   name: 'NavbarBottom',
   components: {
+    Alarm
   },
   data: function() {
     return {
       value: 1,
       isClickedMakeBtn: false
     }
+  },
+  computed : {
+    ...mapState(['isLogin']),
   },
   methods: {
     toggle: function() {

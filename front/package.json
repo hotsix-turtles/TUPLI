@@ -10,6 +10,7 @@
   "dependencies": {
     "axios": "^0.25.0",
     "core-js": "^3.6.5",
+    "firebase": "^9.6.6",
     "sockjs-client": "^1.5.2",
     "sweetalert2": "^11.3.10",
     "vue": "^2.6.11",
