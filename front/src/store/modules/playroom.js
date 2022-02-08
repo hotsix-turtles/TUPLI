@@ -125,10 +125,6 @@ const playroom = {
       console.log('유저 팔로우 처리')
       commit('DESELECT_CHAT_ITEM')
     },
-    showUserProfile: ({commit}, id) => {
-      console.log('유저 프로필 로드 처리')
-      commit('DESELECT_CHAT_ITEM')
-    },
     blockUser: ({commit}, id) => {
       console.log('유저 차단 처리')
       commit('BLOCK_CHAT_BY_UID', id)

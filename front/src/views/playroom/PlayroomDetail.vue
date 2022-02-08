@@ -252,12 +252,13 @@
       <!-- 플레이룸 채팅창 -->
       <v-dialog
         v-model="isChatting"
-        fullscreen
         hide-overlay
         transition="dialog-bottom-transition"
         scrollable
       >
-        <v-card tile>
+        <v-card
+          height="d-flex flex-column"
+        >
           <v-card-title>
             <v-toolbar-title>채팅</v-toolbar-title>
             <v-btn
@@ -268,7 +269,9 @@
               <v-icon>mdi-close</v-icon>
             </v-btn>
           </v-card-title>
-          <v-card-text>
+          <v-card-text
+            class="my-1"
+          >
             <v-container>
               <ChatItem
                 v-for="chat in roomChats"
@@ -283,8 +286,10 @@
               />
             </v-container>
           </v-card-text>
-          <v-spacer />
-          <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-card-actions
+            class="mx-1 mb-0 align-item-bottom"
+          >
             <!-- 채팅 입력창 -->
             <v-row>
               <v-text-field
@@ -294,6 +299,7 @@
                 dense
                 :disabled="!canChat"
                 :error="errorOnSend"
+                @keydown.enter="sendChat"
                 @click:append-outer="sendMessage"
               >
                 <template v-slot:append>
@@ -350,7 +356,6 @@
               </v-text-field>
             </v-row>
           </v-card-actions>
-          <div style="flex: 1 1 auto;" />
         </v-card>
       </v-dialog>
     </v-sheet>
@@ -621,7 +626,7 @@ export default {
         //   nickname: '시스템',
         //   profilePictureUrl: 'https://picsum.photos/80/80'
         // })
-        const author = { id: body.id, name: body.sender ? body.sender : "익명의 유저", thumbnail: body.img };
+        const author = { id: body.userSeq, name: body.sender ? body.sender : "익명의 유저", thumbnail: body.img };
         const content = body.message;
         const timestamp = new Date().getTime();
         const blockedUser = ( this.chatBlockedUid.find((v) => v == author.id) != undefined );
@@ -774,6 +779,15 @@ export default {
 iframe {
   width: 100%;
   max-width: 650px; /* Also helpful. Optional. */
+}
+
+.v-dialog {
+  position: absolute;
+  width: 100vw;
+  height: calc(100vh - 200px);
+  margin-bottom: 0;
+  padding-bottom: 0;
+  bottom: 0;
 }
 
 .playroomInfo {
