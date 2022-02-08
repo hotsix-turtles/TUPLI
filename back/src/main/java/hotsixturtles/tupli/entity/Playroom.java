@@ -32,9 +32,13 @@ public class Playroom {
     private Boolean isPublic;
     private String tags;
 
+//    @Type(type = "json")
+//    @Column(columnDefinition = "json")
+//    private List<Long> playlists;  // request에서 번호만 추출해서 저장
+
     @Type(type = "json")
     @Column(columnDefinition = "json")
-    private List<Long> playlists;  // request에서 번호만 추출해서 저장
+    private ConcurrentHashMap<Long, List<Long>> playlists;
 
     private OffsetDateTime startTime;
 

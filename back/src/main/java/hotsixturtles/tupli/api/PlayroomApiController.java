@@ -80,7 +80,7 @@ public class PlayroomApiController {
         }
         Long userSeq = jwtTokenProvider.getUserSeq(token);
 
-        ResponsePlayroomDto playroomResult = playroomService.addPlayroom(playroomDto, userSeq);
+        PlayroomDto playroomResult = playroomService.addPlayroom(playroomDto, userSeq);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(playroomResult);
     }
@@ -122,7 +122,7 @@ public class PlayroomApiController {
 
         Long userSeq = jwtTokenProvider.getUserSeq(token);
 
-        ResponsePlayroomDto result = playroomService.updatePlayroom(playroomId, playroomDto, userSeq);
+        PlayroomDto result = playroomService.updatePlayroom(playroomId, playroomDto, userSeq);
 
         if(result == null){
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
