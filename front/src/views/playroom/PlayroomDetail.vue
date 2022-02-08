@@ -611,14 +611,20 @@ export default {
 
         if (this.userInfo.userSeq == this.roomAuthorId) return;
 
-        if (currentPlaylistId != syncPlaylistId) this.SET_ROOM_CURRENT_PLAYLIST_ID(syncPlaylistId)
-        if (currentVideoId != syncVideoId) this.SET_ROOM_CURRENT_VIDEO_ID(syncVideoId)
         if (currentPlayerState != syncPlayerState) {
+          if (currentPlaylistId != syncPlaylistId) this.SET_ROOM_CURRENT_PLAYLIST_ID(syncPlaylistId)
+          if (currentVideoId != syncVideoId) this.SET_ROOM_CURRENT_VIDEO_ID(syncVideoId)
+
           if (syncPlayerState == 1) this.player.playVideo()
           else if (syncPlayerState == 2) this.player.pauseVideo()
         }
         //console.log('syncVideoTime', syncVideoTime, 'currentVideoTime', currentVideoTime)
-        if (Math.abs(syncVideoTime - currentVideoTime) > 2) this.SET_ROOM_CURRENT_VIDEO_PLAYTIME(syncVideoTime);
+        if (Math.abs(syncVideoTime - currentVideoTime) > 2) {
+          // if (currentPlaylistId != syncPlaylistId) this.SET_ROOM_CURRENT_PLAYLIST_ID(syncPlaylistId)
+          // if (currentVideoId != syncVideoId) this.SET_ROOM_CURRENT_VIDEO_ID(syncVideoId)
+
+          this.SET_ROOM_CURRENT_VIDEO_PLAYTIME(syncVideoTime);
+        }
         this.heartbeat = 0;
       }
       else// if (body.type == 'TALK')
