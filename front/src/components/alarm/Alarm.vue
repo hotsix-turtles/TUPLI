@@ -16,7 +16,7 @@ export default {
     }
   },
   computed: {
-    ...mapState(['nickname', 'realtimeBoolean']),
+    ...mapState(['nickname', 'realtimeBoolean', 'userId']),
     ...mapGetters({
       realtime: ['getRealtimeAlarmList']
     })
@@ -25,9 +25,9 @@ export default {
     realtime: {
       immediate: true,
       handler(val) {
-        console.log('env 작동 chk', val)
+        console.log('실시간 알림 input', val)
         // this.newAlarms = val;
-        if ((val.fromId == this.userId) && (val.isRead == false) && (this.realtimeBoolean == false) ) {this.realtimeNoti(val)}
+        if ((val.toId == this.userId) && (val.isRead == false) && (this.realtimeBoolean == false) ) {this.realtimeNoti(val)}
       }
     }
   },
@@ -53,7 +53,7 @@ export default {
           text: val.from + '님이 회원님을 팔로우 하였습니다.',
           scrollbarPadding: false,
           showConfirmButton: false,
-          timer: 1200
+          timer: 1800
         })
       // XX님이 플레이룸을 만드셨습니다.
       } else if (val.type == "playroomMake") {
@@ -64,7 +64,7 @@ export default {
           text: val.from + '님이 회원님을 플레이룸을 만드셨습니다.',
           scrollbarPadding: false,
           showConfirmButton: false,
-          timer: 1200
+          timer: 1800
         })
       // XX님이 회원님을 플레이룸으로 초대하셨습니다.
       } else if (val.type == "invite") {
@@ -75,7 +75,7 @@ export default {
           text: val.from + '님이 회원님을 플레이룸에 초대하였습니다.',
           scrollbarPadding: false,
           showConfirmButton: false,
-          timer: 1200
+          timer: 1800
         })
 
       }

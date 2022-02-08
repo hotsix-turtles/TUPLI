@@ -9,8 +9,6 @@ import firebase from 'firebase/compat/app';
 
 Vue.config.productionTip = false
 
-console.log('env 체크2')
-console.log(process.env.VUE_APP_FIREBASE_PROJECTID)
 
 var firebaseConfig = {
   apiKey: process.env.VUE_APP_FIREBASE_APIKEY,
