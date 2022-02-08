@@ -252,12 +252,13 @@
       <!-- 플레이룸 채팅창 -->
       <v-dialog
         v-model="isChatting"
-        fullscreen
         hide-overlay
         transition="dialog-bottom-transition"
         scrollable
       >
-        <v-card tile>
+        <v-card
+          height="d-flex flex-column"
+        >
           <v-card-title>
             <v-toolbar-title>채팅</v-toolbar-title>
             <v-btn
@@ -268,7 +269,9 @@
               <v-icon>mdi-close</v-icon>
             </v-btn>
           </v-card-title>
-          <v-card-text>
+          <v-card-text
+            class="my-1"
+          >
             <v-container>
               <ChatItem
                 v-for="chat in roomChats"
@@ -283,8 +286,10 @@
               />
             </v-container>
           </v-card-text>
-          <v-spacer />
-          <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-card-actions
+            class="mx-1 mb-0 align-item-bottom"
+          >
             <!-- 채팅 입력창 -->
             <v-row>
               <v-text-field
@@ -294,6 +299,7 @@
                 dense
                 :disabled="!canChat"
                 :error="errorOnSend"
+                @keydown.enter="sendChat"
                 @click:append-outer="sendMessage"
               >
                 <template v-slot:append>
@@ -350,7 +356,6 @@
               </v-text-field>
             </v-row>
           </v-card-actions>
-          <div style="flex: 1 1 auto;" />
         </v-card>
       </v-dialog>
     </v-sheet>
@@ -461,9 +466,9 @@ export default {
   created() {
   },
   mounted() {
-    this.$nextTick(() => {
+    this.$nextTick(async () => {
       this.player = this.$refs.youtube.player;
-      this.getRoomInfo();
+      await this.getRoomInfo();
     });
 
     this.$watch('roomCurrentPlaylistVideos', (newVal, oldVal) =>
@@ -505,9 +510,10 @@ export default {
         this.userInfo = userInfo.data;
       }
 
-      this.checkPermission();
-      this.loadFirstVideo();
-      this.initChatRoom();
+      await this.checkPermission();
+      await this.loadFirstVideo();
+      await this.loadLikeState();
+      await this.initChatRoom();
       clearInterval(this.sendSync);
       clearInterval(this.checkHeartbeat)
       setInterval(this.sendSync, 1000);
@@ -605,14 +611,20 @@ export default {
 
         if (this.userInfo.userSeq == this.roomAuthorId) return;
 
-        if (currentPlaylistId != syncPlaylistId) this.SET_ROOM_CURRENT_PLAYLIST_ID(syncPlaylistId)
-        if (currentVideoId != syncVideoId) this.SET_ROOM_CURRENT_VIDEO_ID(syncVideoId)
         if (currentPlayerState != syncPlayerState) {
+          if (currentPlaylistId != syncPlaylistId) this.SET_ROOM_CURRENT_PLAYLIST_ID(syncPlaylistId)
+          if (currentVideoId != syncVideoId) this.SET_ROOM_CURRENT_VIDEO_ID(syncVideoId)
+
           if (syncPlayerState == 1) this.player.playVideo()
           else if (syncPlayerState == 2) this.player.pauseVideo()
         }
         //console.log('syncVideoTime', syncVideoTime, 'currentVideoTime', currentVideoTime)
-        if (Math.abs(syncVideoTime - currentVideoTime) > 2) this.SET_ROOM_CURRENT_VIDEO_PLAYTIME(syncVideoTime);
+        if (Math.abs(syncVideoTime - currentVideoTime) > 2) {
+          // if (currentPlaylistId != syncPlaylistId) this.SET_ROOM_CURRENT_PLAYLIST_ID(syncPlaylistId)
+          // if (currentVideoId != syncVideoId) this.SET_ROOM_CURRENT_VIDEO_ID(syncVideoId)
+
+          this.SET_ROOM_CURRENT_VIDEO_PLAYTIME(syncVideoTime);
+        }
         this.heartbeat = 0;
       }
       else// if (body.type == 'TALK')
@@ -621,7 +633,7 @@ export default {
         //   nickname: '시스템',
         //   profilePictureUrl: 'https://picsum.photos/80/80'
         // })
-        const author = { id: body.id, name: body.sender ? body.sender : "익명의 유저", thumbnail: body.img };
+        const author = { id: body.userSeq, name: body.sender ? body.sender : "익명의 유저", thumbnail: body.img };
         const content = body.message;
         const timestamp = new Date().getTime();
         const blockedUser = ( this.chatBlockedUid.find((v) => v == author.id) != undefined );
@@ -670,9 +682,26 @@ export default {
       this.selectedItem = []
       this.seekTo()
     },
-    playroomLike() {
-      this.SET_ROOM_LIKED(!this.roomLiked)
-      axiosConnector.post(this.roomLiked ? '/playroom/like' : '/playroom/dislike', JSON.stringify({ id: this.roomId }));
+    async loadLikeState() {
+      const { status, data } = await axiosConnector.get(`/playroom/${this.roomId}/like`)
+      if (status != 200) return;
+      this.SET_ROOM_LIKED(Boolean(data))
+    },
+    async playroomLike() {
+      if (this.roomLiked)
+      {
+        // 좋아요 되어있으면 좋아요 해제
+        this.SET_ROOM_LIKED(false)
+        await axiosConnector.delete(`/playroom/${this.roomId}/like`);
+      }
+      else
+      {
+        // 좋아요 안되어있으면 좋아요 설정
+        this.SET_ROOM_LIKED(true)
+        await axiosConnector.post(`/playroom/${this.roomId}/like`);
+      }
+
+      await this.loadLikeState();
     },
     async sendMessage(payload) {
       if (!this.chatroomId) return;
@@ -692,7 +721,7 @@ export default {
       const syncData = {
         timestamp: new Date().getTime(),
         playlistId: this.roomCurrentPlaylistId,
-        videoOffset: this.roomCurrentVideoId,
+        videoId: this.roomCurrentVideoId,
         videoPlaytime: this.roomCurrentVideoPlaytime,
         playerState: await this.player.getPlayerState()
       };
@@ -774,6 +803,15 @@ export default {
 iframe {
   width: 100%;
   max-width: 650px; /* Also helpful. Optional. */
+}
+
+.v-dialog {
+  position: absolute;
+  width: 100vw;
+  height: calc(100vh - 200px);
+  margin-bottom: 0;
+  padding-bottom: 0;
+  bottom: 0;
 }
 
 .playroomInfo {

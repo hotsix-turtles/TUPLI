@@ -1,4 +1,5 @@
 const account = {
+  namespaced: true,
   state: {
     // 사용자 정보
     userId: null,
