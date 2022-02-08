@@ -12,7 +12,7 @@ public interface YoutubeVideoRepository extends JpaRepository<YoutubeVideo, Long
 
     YoutubeVideo findByVideoId(String url);
 
-    YoutubeVideo findOneByVideoId(String url);
+    YoutubeVideo findFirstByVideoId(String url);
 
     @Query("select y from YoutubeVideo y join YoutubeVideoLikes yl on y.id = yl.youtubeVideo.id " +
             "where yl.user.userSeq = :userSeq")
