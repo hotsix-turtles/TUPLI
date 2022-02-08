@@ -6,7 +6,7 @@
         style="margin-bottom: 60px;"
       />
     </v-main>
-    <navbar-bottom class="mt-auto fixed" />
+    <navbar-bottom />
   </v-app>
 </template>
 
@@ -25,3 +25,13 @@ export default {
   },
 };
 </script>
+
+
+<style>
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+
+* {
+  font-family: 'SUIT';
+}
+
+</style>

@@ -36,12 +36,6 @@ export default new Vuex.Store({
       return state.realtimeAlarmList;
     }
   },
-  modules: {
-    playroom: playroom,
-    account: account,
-    video: video,
-    playlist: playlist,
-  },
   mutations: {
     // 로그인
     TOKEN: function (state, token) {
@@ -104,7 +98,7 @@ export default new Vuex.Store({
         }
       })
         .then((res) => {
-          commit('TOKEN', res.data.token)          
+          commit('TOKEN', res.data.token)
           dispatch('getUserInfo', res.data.token)
           router.push({ name: 'Home' })
         })
@@ -184,12 +178,15 @@ export default new Vuex.Store({
           tmp.img = res.image
           tmp.to = res.to
           tmp.type = res.type
-          tmp.isRead = false       
+          tmp.isRead = false
           commit('SET_REALTIME_ALARM', tmp);
         });
     },
-
   },
-
-
+  modules: {
+    playroom: playroom,
+    account: account,
+    video: video,
+    playlist: playlist,
+  },
 })

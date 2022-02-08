@@ -23,18 +23,24 @@ import Payment from '../views/profile/setting/Payment.vue'
 import PrivateTerms from '../views/profile/setting/PrivateTerms.vue'
 import Save from '../views/profile/setting/Save.vue'
 import ServiceTerms from '../views/profile/setting/ServiceTerms.vue'
-//
+// playlist
 import PlaylistForm from '@/views/playlist/PlaylistForm'
 import PlaylistFormVideo from '@/views/playlist/PlaylistFormVideo'
 import PlaylistDetail from '@/views/playlist/PlaylistDetail'
+import PlaylistComment from '@/views/playlist/PlaylistComment'
+// category
 import Category from '@/views/common/Category'
+// search
 import Search from '@/views/common/Search'
+import SearchDetail from '@/views/common/SearchDetail'
+// video
+import VideoSearch from '../views/video/VideoSearch.vue'
+import VideoWatch from '../views/video/VideoWatch.vue'
+
 import PlayroomForm from '../views/playroom/PlayroomForm.vue'
 import PlayroomFormPlaylist from '../views/playroom/PlayroomFormPlaylist.vue'
 import PlayroomDetail from '../views/playroom/PlayroomDetail.vue'
-import VideoSearch from '../views/video/VideoSearch.vue'
-import VideoWatch from '../views/video/VideoWatch.vue'
-import video from '@/store/index.js'
+
 import AuthHandler from '../views/handler/AuthHandler.vue'
 import KakaoPaySuccess from '../views/handler/kakaoPay/KakaoPaySuccess.vue'
 import KakaoPayCancel from '../views/handler/kakaoPay/KakaoPayCancel.vue'
@@ -82,6 +88,11 @@ const routes = [
     name: 'PlaylistDetail',
     component: PlaylistDetail
   },
+  {
+    path: '/playlist/:playlistId/comment', // router.push({ name: 'user', params: { userId: '123' } })
+    name: 'PlaylistComment',
+    component: PlaylistComment
+  },
 
   // 둘러보기
   {
@@ -94,6 +105,11 @@ const routes = [
     path: '/search',
     name: 'Search',
     component: Search
+  },
+  {
+    path: '/search/detail',
+    name: 'SearchDetail',
+    component: SearchDetail
   },
   // 동영상
   {

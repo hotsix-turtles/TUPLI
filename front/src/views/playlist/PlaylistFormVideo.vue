@@ -25,9 +25,6 @@
     <video-list-item-small
       :videos="likedVideos"
     />
-    <video-list-item-small
-      :videos="savedVideos"
-    />
   </div>
 </template>
 
@@ -44,19 +41,17 @@ export default {
       pageName: "영상 추가하기",
       tab: null,
       items: [
-        '좋아한 영상', '저장한 영상',
+        '저장한 영상',
       ],
     }
   },
   computed: {
     ...mapState('video', {
       likedVideos: state => state.likedVideos,
-      savedVideos: state => state.savedVideos,
     })
   },
   created: function() {
     // setLikedVideos()
-    // setSavedVideos()
   },
 }
 </script>

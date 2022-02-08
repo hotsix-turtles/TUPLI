@@ -1,13 +1,13 @@
 <template>
   <v-card
     height="13vh"
-    class="d-flex"
+    class="d-flex align-center"
     outlined
     tile
     :color="color"
   >
     <div
-      class="d-flex justify-space-between container"
+      class="d-flex justify-space-between"
       width="100%"
       @click="selectVideo"
     >
@@ -38,32 +38,6 @@
         <v-icon>mdi-dots-vertical</v-icon>
       </div>
     </div>
-    <!-- 점3개 눌렀을시 -->
-    <!-- <v-card-actions>
-        <v-menu bottom>
-          <template v-slot:activator="{ on, attrs }">
-            <v-btn
-              v-bind="attrs"
-              small
-              text
-              style="align-self: start"
-              fab
-              v-on="on"
-            >
-              <v-icon>mdi-dots-vertical</v-icon>
-            </v-btn>
-          </template>
-
-          <v-list>
-            <v-list-item
-              v-for="(item, index) in items"
-              :key="index"
-            >
-              <v-list-item-title>{{ item.title }}</v-list-item-title>
-            </v-list-item>
-          </v-list>
-        </v-menu>
-      </v-card-actions> -->
   </v-card>
 </template>
 
