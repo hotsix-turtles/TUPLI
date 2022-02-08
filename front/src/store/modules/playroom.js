@@ -41,7 +41,7 @@ const playroom = {
     SET_ROOM_ID: ( state, value ) => state.roomId = value != undefined ? parseInt(value) : state.roomId,
     SET_ROOM_TITLE: ( state, value ) => state.roomTitle = value ? value : state.roomTitle,
     SET_ROOM_PUBLIC: ( state, value ) => state.roomPublic = value ? value : state.roomPublic,
-    SET_ROOM_LIKED: ( state, value ) => state.roomLiked = value ? value : state.roomLiked,
+    SET_ROOM_LIKED: ( state, value ) => state.roomLiked = value != undefined ? value : state.roomLiked,
     SET_ROOM_AUTHOR: ( state, value ) => {
       state.roomAuthorId = value.id != undefined ? parseInt(value.id) : state.roomAuthorId;
       state.roomAuthorName = value.name ? value.name : state.roomAuthorName;

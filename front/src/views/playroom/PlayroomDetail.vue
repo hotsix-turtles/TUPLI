@@ -466,9 +466,9 @@ export default {
   created() {
   },
   mounted() {
-    this.$nextTick(() => {
+    this.$nextTick(async () => {
       this.player = this.$refs.youtube.player;
-      this.getRoomInfo();
+      await this.getRoomInfo();
     });
 
     this.$watch('roomCurrentPlaylistVideos', (newVal, oldVal) =>
@@ -510,9 +510,10 @@ export default {
         this.userInfo = userInfo.data;
       }
 
-      this.checkPermission();
-      this.loadFirstVideo();
-      this.initChatRoom();
+      await this.checkPermission();
+      await this.loadFirstVideo();
+      await this.loadLikeState();
+      await this.initChatRoom();
       clearInterval(this.sendSync);
       clearInterval(this.checkHeartbeat)
       setInterval(this.sendSync, 1000);
@@ -675,9 +676,26 @@ export default {
       this.selectedItem = []
       this.seekTo()
     },
-    playroomLike() {
-      this.SET_ROOM_LIKED(!this.roomLiked)
-      axiosConnector.post(this.roomLiked ? '/playroom/like' : '/playroom/dislike', JSON.stringify({ id: this.roomId }));
+    async loadLikeState() {
+      const { status, data } = await axiosConnector.get(`/playroom/${this.roomId}/like`)
+      if (status != 200) return;
+      this.SET_ROOM_LIKED(Boolean(data))
+    },
+    async playroomLike() {
+      if (this.roomLiked)
+      {
+        // 좋아요 되어있으면 좋아요 해제
+        this.SET_ROOM_LIKED(false)
+        await axiosConnector.delete(`/playroom/${this.roomId}/like`);
+      }
+      else
+      {
+        // 좋아요 안되어있으면 좋아요 설정
+        this.SET_ROOM_LIKED(true)
+        await axiosConnector.post(`/playroom/${this.roomId}/like`);
+      }
+
+      await this.loadLikeState();
     },
     async sendMessage(payload) {
       if (!this.chatroomId) return;
