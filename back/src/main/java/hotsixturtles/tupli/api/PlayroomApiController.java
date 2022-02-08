@@ -199,6 +199,7 @@ public class PlayroomApiController {
         }
         Long userSeq = jwtTokenProvider.getUserSeq(token);
         PlayroomLikes playroomLikes = playroomService.getPlayroomLike(userSeq, playroomId);
+        if(playroomLikes == null) return ResponseEntity.status(HttpStatus.OK).body(null);
         return ResponseEntity.status(HttpStatus.OK).body(new PlayroomLikesDto(playroomLikes));
     }
 
