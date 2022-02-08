@@ -2,6 +2,7 @@ package hotsixturtles.tupli.api;
 
 import hotsixturtles.tupli.dto.PlaylistDto;
 import hotsixturtles.tupli.dto.PlayroomDto;
+import hotsixturtles.tupli.dto.PlayroomLikesDto;
 import hotsixturtles.tupli.dto.request.RequestPlayroomDto;
 import hotsixturtles.tupli.dto.response.ErrorResponse;
 import hotsixturtles.tupli.dto.response.ResponsePlayroomDto;
@@ -198,7 +199,7 @@ public class PlayroomApiController {
         }
         Long userSeq = jwtTokenProvider.getUserSeq(token);
         PlayroomLikes playroomLikes = playroomService.getPlayroomLike(userSeq, playroomId);
-        return ResponseEntity.status(HttpStatus.OK).body(playroomLikes);
+        return ResponseEntity.status(HttpStatus.OK).body(new PlayroomLikesDto(playroomLikes));
     }
 
     @PostMapping("/playroom/{playroomId}/like")
