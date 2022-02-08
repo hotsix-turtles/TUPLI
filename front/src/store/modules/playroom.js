@@ -41,7 +41,7 @@ const playroom = {
     SET_ROOM_ID: ( state, value ) => state.roomId = value != undefined ? parseInt(value) : state.roomId,
     SET_ROOM_TITLE: ( state, value ) => state.roomTitle = value ? value : state.roomTitle,
     SET_ROOM_PUBLIC: ( state, value ) => state.roomPublic = value ? value : state.roomPublic,
-    SET_ROOM_LIKED: ( state, value ) => state.roomLiked = value ? value : state.roomLiked,
+    SET_ROOM_LIKED: ( state, value ) => state.roomLiked = value != undefined ? value : state.roomLiked,
     SET_ROOM_AUTHOR: ( state, value ) => {
       state.roomAuthorId = value.id != undefined ? parseInt(value.id) : state.roomAuthorId;
       state.roomAuthorName = value.name ? value.name : state.roomAuthorName;
@@ -123,10 +123,6 @@ const playroom = {
     }),
     followUser: ({commit}, id) => {
       console.log('유저 팔로우 처리')
-      commit('DESELECT_CHAT_ITEM')
-    },
-    showUserProfile: ({commit}, id) => {
-      console.log('유저 프로필 로드 처리')
       commit('DESELECT_CHAT_ITEM')
     },
     blockUser: ({commit}, id) => {
