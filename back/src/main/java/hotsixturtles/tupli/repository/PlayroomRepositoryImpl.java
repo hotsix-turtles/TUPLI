@@ -7,7 +7,6 @@ import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import hotsixturtles.tupli.dto.params.PlayroomSearchCondition;
 import hotsixturtles.tupli.entity.Playroom;
-import hotsixturtles.tupli.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -45,4 +44,21 @@ public class PlayroomRepositoryImpl implements PlayroomRepositoryCustom{
         return result;
     }
 
+    @Override
+    public List<Playroom> listByHomePlayroom(Pageable pageable){
+
+        JPAQuery<Playroom> query = jpaQueryFactory
+                .selectFrom(playroom)
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize());
+
+        for (Sort.Order o : pageable.getSort()) {
+            PathBuilder pathBuilder = new PathBuilder(playroom.getType(), playroom.getMetadata());
+            query.orderBy(new OrderSpecifier(o.isAscending() ? Order.ASC : Order.DESC,
+                    pathBuilder.get(o.getProperty())));
+        }
+
+        List<Playroom> result = query.fetch();
+        return result;
+    }
 }

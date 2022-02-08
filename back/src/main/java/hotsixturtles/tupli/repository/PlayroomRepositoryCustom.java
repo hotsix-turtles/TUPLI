@@ -8,4 +8,5 @@ import java.util.List;
 
 public interface PlayroomRepositoryCustom {
     List<Playroom> searchByPageSimplePlayroom(PlayroomSearchCondition playroomSearchCondition, Pageable pageable);
+    List<Playroom> listByHomePlayroom( Pageable pageable);
 }
