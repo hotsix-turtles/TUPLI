@@ -2,11 +2,9 @@ package hotsixturtles.tupli.service;
 
 import hotsixturtles.tupli.entity.Board;
 import hotsixturtles.tupli.entity.likes.BoardLikes;
-import hotsixturtles.tupli.repository.BoardLikesRepository;
-import hotsixturtles.tupli.repository.BoardRepository;
-import hotsixturtles.tupli.repository.CommentRepository;
-import hotsixturtles.tupli.repository.UserRepository;
+import hotsixturtles.tupli.repository.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,6 +23,8 @@ public class BoardService {
 
     private final BoardLikesRepository boardLikesRepository;
 
+    private final BoardRepositoryCustom boardRepositoryCustom;
+
     //    @Transactional
 //    public Board boardPost(Long id, String title, String content) {
 //        Board board = new Board();
@@ -38,7 +38,11 @@ public class BoardService {
         return boardRepository.findAll();
     }
 
-    public Board getBoard(Long boardId){
+    public List<Board> getHomeBoardList(Pageable pageable){
+        return boardRepositoryCustom.listByHomeBoard(pageable);
+    }
+
+    public Board getBoard(Long boardId) {
         Board board = boardRepository.findById(boardId).orElse(null);
         return board;
     }

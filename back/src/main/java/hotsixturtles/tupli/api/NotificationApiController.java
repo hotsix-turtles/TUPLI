@@ -21,4 +21,9 @@ public class NotificationApiController {
         notificationService.notiFollow();
         return ResponseEntity.status(HttpStatus.OK).body(null);
     }
+
+    @GetMapping("/notiReset")
+    public void notiReset() {
+        notificationService.realtimeNotiReset();
+    }
 }

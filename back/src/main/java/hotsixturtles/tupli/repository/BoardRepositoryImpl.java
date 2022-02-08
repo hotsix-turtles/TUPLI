@@ -45,4 +45,22 @@ public class BoardRepositoryImpl implements BoardRepositoryCustom{
         List<Board> result = query.fetch();
         return result;
     }
+
+    @Override
+    public List<Board> listByHomeBoard(Pageable pageable){
+
+        JPAQuery<Board> query = jpaQueryFactory
+                .selectFrom(board)
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize());
+
+        for (Sort.Order o : pageable.getSort()) {
+            PathBuilder pathBuilder = new PathBuilder(board.getType(), board.getMetadata());
+            query.orderBy(new OrderSpecifier(o.isAscending() ? Order.ASC : Order.DESC,
+                    pathBuilder.get(o.getProperty())));
+        }
+
+        List<Board> result = query.fetch();
+        return result;
+    }
 }

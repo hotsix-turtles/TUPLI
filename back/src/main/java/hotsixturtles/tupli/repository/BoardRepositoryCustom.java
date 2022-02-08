@@ -8,4 +8,5 @@ import java.util.List;
 
 public interface BoardRepositoryCustom {
     List<Board> searchByPageSimpleBoard(BoardSearchCondition boardSearchCondition, Pageable pageable);
+    List<Board> listByHomeBoard(Pageable pageable);
 }

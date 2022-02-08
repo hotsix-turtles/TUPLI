@@ -92,6 +92,11 @@ public class NotificationService {
         rtref.setValueAsync(notificationDto);
     }
 
-
+    public void realtimeNotiReset() {
+        // 실시간 알림 내용 초기화(읽음)
+        final FirebaseDatabase rtdatabase = FirebaseDatabase.getInstance();
+        DatabaseReference rtref = rtdatabase.getReference("tupli").child("realtime");
+        rtref.setValueAsync(null);
+    }
 
 }
