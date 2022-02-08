@@ -128,11 +128,12 @@
         <div class="playroomAuthorWrapper">
           <!-- 플레이룸 작성자 프로필 사진 -->
           <div class="authorProfilePic">
-            <v-img
+            <img
               :src="roomAuthorProfilePic"
-              alt="John"
+              alt=""
               class="rounded-circle"
               style="width: 100%; height: auto;"
+              @click="$router.push(`/profile/${roomAuthorId}`)"
             />
           </div>
 
@@ -397,7 +398,11 @@ export default {
       message: '',
       canChat: true,
       errorOnSend: false,
-      playlistThumbnails: []
+      playlistThumbnails: [],
+      userInfo: {
+        userSeq: null
+      },
+      heartbeat: 0
     }
   },
   metaInfo () {
@@ -494,14 +499,19 @@ export default {
       this.SET_ROOM_AUTHOR({ follower: parseInt(userFollowerInfo.data) })
 
       // TODO: user profile 부분이 미완성이라 임시로 접속할때 얻어옴. 추후 삭제 필요
-      const userInfo = await axiosConnector.get(`/account/userInfo`);
-      this.userInfo = userInfo.data;
+      if (this.$store.state.isLogin)
+      {
+        var userInfo = await axiosConnector.get(`/account/userInfo`);
+        this.userInfo = userInfo.data;
+      }
 
       this.checkPermission();
       this.loadFirstVideo();
       this.initChatRoom();
       clearInterval(this.sendSync);
+      clearInterval(this.checkHeartbeat)
       setInterval(this.sendSync, 1000);
+      setInterval(this.checkHeartbeat, 1000);
     },
     checkPermission() {
       // 공개방이면 그냥 OK
@@ -571,36 +581,47 @@ export default {
 
       if (body.type == 'SYNC')
       {
-        if (this.userInfo.userSeq == this.roomAuthorId) return;
-
         const currentPlaylistId = this.roomCurrentPlaylistId
-        const currentVideoOffset = this.roomCurrentVideoId
+        const currentVideoId = this.roomCurrentVideoId
         const currentVideoTime = await this.player.getCurrentTime();
         const currentPlayerState = await this.player.getPlayerState();
+        const currentSyncSender = this.roomLastSyncSender
 
         const syncData = JSON.parse(body.message)
         const syncPlaylistId = syncData.playlistId
-        const syncVideoOffset = syncData.videoOffset
+        const syncVideoId = syncData.videoId
         const syncVideoTime = syncData.videoPlaytime
         const syncPlayerState = syncData.playerState
+        const syncSender = syncData.sender
+
+        if (!currentSyncSender) {
+          this.SET_ROOM_LAST_SYNC_SENDER(syncSender)
+        }
+        else if (currentSyncSender != syncSender)
+        {
+          await this.getRoomInfo()
+          this.SET_ROOM_LAST_SYNC_SENDER(syncSender)
+        }
+
+        if (this.userInfo.userSeq == this.roomAuthorId) return;
 
         if (currentPlaylistId != syncPlaylistId) this.SET_ROOM_CURRENT_PLAYLIST_ID(syncPlaylistId)
-        if (currentVideoOffset != syncVideoOffset) this.SET_ROOM_CURRENT_VIDEO_ID(syncVideoOffset)
+        if (currentVideoId != syncVideoId) this.SET_ROOM_CURRENT_VIDEO_ID(syncVideoId)
         if (currentPlayerState != syncPlayerState) {
           if (syncPlayerState == 1) this.player.playVideo()
           else if (syncPlayerState == 2) this.player.pauseVideo()
         }
-        console.log('syncVideoTime', syncVideoTime, 'currentVideoTime', currentVideoTime)
+        //console.log('syncVideoTime', syncVideoTime, 'currentVideoTime', currentVideoTime)
         if (Math.abs(syncVideoTime - currentVideoTime) > 2) this.SET_ROOM_CURRENT_VIDEO_PLAYTIME(syncVideoTime);
+        this.heartbeat = 0;
       }
       else// if (body.type == 'TALK')
       {
-        const profile = await axiosConnector.post('/echo', {
-          nickname: '시스템',
-          profilePictureUrl: 'https://picsum.photos/80/80'
-        })
-        //const profile = await axiosConnector.get(`/profile/${body.id}`)
-        const author = { id: body.id, name: profile.data.nickname, thumbnail: profile.data.profilePictureUrl };
+        // const profile = await axiosConnector.post('/echo', {
+        //   nickname: '시스템',
+        //   profilePictureUrl: 'https://picsum.photos/80/80'
+        // })
+        const author = { id: body.id, name: body.sender ? body.sender : "익명의 유저", thumbnail: body.img };
         const content = body.message;
         const timestamp = new Date().getTime();
         const blockedUser = ( this.chatBlockedUid.find((v) => v == author.id) != undefined );
@@ -720,7 +741,30 @@ export default {
     clearSendError() {
       this.errorOnSend = false;
     },
-    ...mapMutations('playroom', ['SET_ROOM_AUTHOR', 'SET_ROOM_LIKED', 'SEEK_VIDEO', 'SET_ROOM_CURRENT_PLAYLIST_ID', 'SET_ROOM_CURRENT_VIDEO_ID', 'SET_ROOM_CURRENT_VIDEO_PLAYTIME']),
+    checkHeartbeat() {
+      if (this.heartbeat > 30)
+      {
+        // 방 접속자 정보가 있다면 (ID리스트)
+        // Date.now().getTime() % this.roomUsers.length
+        // const userOffset = this.roomUsers.findIndex(roomUser => roomUser == this.userInfo.userSeq)
+
+        // 그런거 없으니까 일단은.. 무작정 도전!
+        if (this.userInfo.userSeq)
+          if ((parseInt(this.userInfo.userSeq) + Date.now()) % 10 == (parseInt(this.roomId) + parseInt(this.roomAuthorId)) % 10)
+            this.requestRoomAuthor()
+      }
+
+      if (this.userInfo.userSeq && this.userInfo.userSeq == this.roomAuthorId) return;
+      this.heartbeat += 1;
+    },
+    async requestRoomAuthor() {
+      await axiosConnector.put(`/playroom/${this.roomId}/user`);
+      await this.getRoomInfo();
+      this.heartbeat = 0;
+    },
+    ...mapMutations('playroom', ['SET_ROOM_AUTHOR', 'SET_ROOM_LIKED', 'SEEK_VIDEO',
+      'SET_ROOM_CURRENT_PLAYLIST_ID', 'SET_ROOM_CURRENT_VIDEO_ID', 'SET_ROOM_CURRENT_VIDEO_PLAYTIME',
+      'SET_ROOM_LAST_SYNC_SENDER']),
   },
 }
 </script>

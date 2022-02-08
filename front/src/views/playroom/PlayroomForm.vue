@@ -479,8 +479,8 @@ export default {
         }, {})
 
       // '2022-02-06T04:41:08.443Z'
-      this.formData.startTime = `${this.startDate}T${this.startTime}:00.000Z`
-      this.formData.endTime = `${this.endDate}T${this.endTime}:00.000Z`
+      this.formData.startTime = `${this.startDate}T${this.startTime}:00.000+09:00`
+      this.formData.endTime = `${this.endDate}T${this.endTime}:00.000+09:00`
       console.log(this.formData)
 
       this.createPlayroom({ formData: this.formData, token })
