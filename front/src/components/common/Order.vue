@@ -1,14 +1,21 @@
 <template>
   <div class="d-flex">
     <div class="ms-auto">
-      <select
+      <!-- <select
+        v-model="order"
         name="order"
+        @change="onChangeOrder"
+      > -->
+      <!-- {{ order }} -->
+      <select
+        v-model="order"
+        name="order"
+        @change="onChangeOrder(order)"
       >
         <option
           v-for="(select, idx) in Object.keys(selectList)"
           :key="idx"
           :value="selectList.select"
-          @click="onChangeSelect(selectList.select)"
         >
           {{ select }}
         </option>
@@ -18,6 +25,7 @@
 </template>
 
 <script>
+import { mapActions } from 'vuex'
 export default {
   name: 'Order',
   components: {
@@ -30,13 +38,13 @@ export default {
   },
   data: function () {
     return {
+      order: '관련순',
     }
   },
   methods: {
-    onChangeSelect: function (order) {
-      console.log(order)
-      this.$emit('onChangeSelect', order)
-    },
+    ...mapActions('video', [
+      'onChangeOrder',
+    ]),
   }
 }
 </script>

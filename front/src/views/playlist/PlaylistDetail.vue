@@ -9,11 +9,17 @@
           <v-icon>mdi-youtube</v-icon>
         </div>
         <!-- 좋아요 -->
-        <div @click="likePlaylist(playlistDetail.id)">
-          <div v-if="isLiked">
+        <div>
+          <div
+            v-if="isLiked"
+            @click="unlikePlaylist(playlistDetail.id)"
+          >
             <v-icon>mdi-cards-heart</v-icon>
           </div>
-          <div v-else>
+          <div
+            v-else
+            @click="likePlaylist(playlistDetail.id)"
+          >
             <v-icon>mdi-cards-heart-outline</v-icon>
           </div>
         </div>
@@ -93,13 +99,12 @@ export default {
   data: function() {
     return {
       isSelectedAll: false,
-      isLiked: false,
     }
   },
   computed: {
     ...mapState('playlist', {
       playlistDetail: state => state.playlistDetail,
-      isPlaylistLiked: state => state.isPlaylistLiked,
+      isLiked: state => state.isLiked,
     }),
     ...mapState('account', {
       userId: state => state.userId,
@@ -108,12 +113,12 @@ export default {
   },
   created: function() {
     this.getPlaylistDetail(this.$route.params.playlistId)
-    this.isLiked =  this.isPlaylistLiked
   },
   methods: {
     ...mapActions('playlist', [
       'getPlaylistDetail',
       'likePlaylist',
+      'unlikePlaylist',
     ]),
     ...mapActions('video', [
       'deselectAllDetailVideos',

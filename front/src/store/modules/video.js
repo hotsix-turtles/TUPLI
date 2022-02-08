@@ -31,18 +31,24 @@ const video = {
       state.selectedVideos = []
       console.log('RESET_VIDEO_ADD_STATE')
     },
+    // 정렬 변경
+    ON_CHANGE_ORDER: function (state, order) {
+      console.log(order)
+      state.order = order
+    },
     // 유튜브 검색 (기본 정보)
     SEARCH_VIDEOS: function (state, searchedVideos) {
       console.log('video.js 35 searchedVideos', searchedVideos)
       state.selectedVideos = []
       state.searchedVideos = []
       state.searchedVideoIds = []
+      console.log('SEARCH_VIDEOS', searchedVideos)
       for (let searchedVideo of searchedVideos) {
         const data = {
           videoId: searchedVideo.id.videoId,
           title: searchedVideo.snippet.title,
           date: searchedVideo.snippet.publishTime,
-          thumbnail: searchedVideo.snippet.thumbnails.default.url,
+          thumbnail: searchedVideo.snippet.thumbnails.medium.url,
           channelTitle: searchedVideo.snippet.channelTitle,
         }
         state.searchedVideos.push(data)
@@ -101,7 +107,7 @@ const video = {
           videoId: searchedVideo.id.videoId,
           title: searchedVideo.snippet.title,
           date: searchedVideo.snippet.publishTime,
-          thumbnail: searchedVideo.snippet.thumbnails.default.url,
+          thumbnail: searchedVideo.snippet.thumbnails.medium.url,
           channelTitle: searchedVideo.snippet.channelTitle,
         }
         state.searchedVideos.push(data)
@@ -129,13 +135,6 @@ const video = {
         const idx = state.addedVideos.findIndex(i => i.videoId === selectedVideo.videoId)
         state.addedVideos.splice(idx, 1)
       }
-      // let i = 0
-      // while (state.selectedVideos.length > 0) {
-      //   const idx = state.addedVideos.findIndex(x => x.videoId === state.selectedVideos[i].videoId)
-      //   console.log(state.selectedVideos[i].videoId)
-      //   state.addedVideos.splice(idx, 1)
-      //   i++
-      // }
       state.selectedVideos = []
     },
     SELECT_ALL_ADDED_VIDEOS: function (state) {
@@ -171,6 +170,10 @@ const video = {
     resetVideoAddState: function ({ state, commit }) {
       commit('RESET_VIDEO_ADD_STATE')
     },
+    // 정렬 변경
+    onChangeOrder: function ({ commit }, order) {
+      commit('ON_CHANGE_ORDER', order)
+    },
     // 유튜브 API로 영상 리스트 검색
     searchVideos: function ({ state, commit, dispatch }, query) {
       const SEARCH_API_URL = 'https://www.googleapis.com/youtube/v3/search'
@@ -181,7 +184,7 @@ const video = {
       const searchParams = {
         key: API_KEY,
         part: 'snippet',
-        fields: 'nextPageToken,items(id/videoId,snippet(title,publishTime,thumbnails/default,channelTitle))',
+        fields: 'nextPageToken,items(id/videoId,snippet(title,publishTime,thumbnails/medium,channelTitle))',
         type: 'video',
         q: query, // 검색어
         // order: state.order,
@@ -241,7 +244,7 @@ const video = {
           const params = {
             key: API_KEY,
             part: 'snippet',
-            fields: 'nextPageToken,items(id/videoId,snippet(title,publishTime,thumbnails/default,channelTitle))',
+            fields: 'nextPageToken,items(id/videoId,snippet(title,publishTime,thumbnails/medium,channelTitle))',
             type: 'video',
             q: state.query, // 검색어
             // order: state.order,

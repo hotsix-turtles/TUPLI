@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import axios from 'axios'
 import router from '@/router/index.js'
+import axiosConnector from '../../utils/axios-connector';
 
 
 const playlist = {
@@ -13,7 +14,7 @@ const playlist = {
     // [플레이리스트 디테일]
     playlistDetail: '',
     playlistComments: [],
-    isPlaylistLiked: false,
+    isLiked: false,
 
     // [플레이룸]
     selectedPlaylists: [],
@@ -52,6 +53,23 @@ const playlist = {
       playlistDetail.createdAt = timeConverter(playlistDetail.createdAt)
       state.playlistDetail = playlistDetail
       console.log(state.playlistDetail)
+    },
+    // 플레이리스트 좋아요 여부 조회
+    IS_LIKED: function (state, isLiked) {
+      console.log('is_LIKED', isLiked)
+      if (isLiked === "ok") {
+        state.isLiked = true
+      } else {
+        state.isLiked = false
+      }
+    },
+    // 플레이리스트 좋아요 하기
+    LIKE_PLAYLIST: function (state) {
+      state.isLiked = true
+    },
+    // 플레이리스트 좋아요 취소하기
+    UNLIKE_PLAYLIST: function (state) {
+      state.isLiked = false
     },
     // 플레이리스트 디테일 댓글 조회
     GET_PLAYLIST_COMMENTS: function (state, playlistComments) {
@@ -138,23 +156,17 @@ const playlist = {
   },
   actions: {
     // [플레이리스트 생성]
-    createPlaylist: function ({ commit, getters }, formData) {
-      axios({
-        url: `https://i6a102.p.ssafy.io/api/v1/playlist/`,
-        method: 'post',
-        data: formData,
-        headers: getters.config,
+    createPlaylist: function ({ commit }, formData) {
+      axiosConnector.post('/playlist',
+        formData
+      ).then((res) => {
+        console.log(res)
+        router.push({ name: 'PlaylistDetail', params: { playlistId: res.data.id } })
+        commit('RESET_FORM_DATA')
       })
-        .then((res) => {
-          console.log(res)
-          router.push({ name: 'PlaylistDetail', params: { playlistId: res.data.id } })
-          commit('RESET_FORM_DATA')
-        })
         .catch((err) => {
           console.log(err)
         })
-      console.log('createPlaylist', formData)
-
     },
     // [플레이리스트 디테일]
     getPlaylistDetail: function ({ commit, dispatch }, playlistId) {
@@ -165,7 +177,8 @@ const playlist = {
         .then((res) => {
           console.log(res)
           commit('GET_PLAYLIST_DETAIL', res.data)
-          dispatch('isPlaylistLiked', playlistId)
+          console.log('playlistId', playlistId)
+          dispatch('isLiked', playlistId)
         })
         .catch((err) => {
           console.log(err)
@@ -177,49 +190,62 @@ const playlist = {
       commit('SAVE_FORM_DATA', formData)
     },
     // 플레이리스트 좋아요 여부 확인
-    isPlaylistLiked: function (playlistId) {
-      console.log(`https://i6a102.p.ssafy.io/api/v1/playlist/${playlistId}/like`)
-      axios({
-        url: `https://i6a102.p.ssafy.io/api/v1/playlist/1/like`,
-        method: 'get',
+    isLiked: function ({ commit }, playlistId) {
+      console.log('isLiked', playlistId)
+      axiosConnector.get(`/playlist/${playlistId}/like`,
+      ).then((res) => {
+        console.log('isLiked 197', res)
+        commit('IS_LIKED', res.data)
       })
-        .then((res) => {
-          console.log('playlist.js 170 isPlaylistLiked', res)
-          // commit('GET_PLAYLIST_DETAIL', res.data)
-        })
         .catch((err) => {
           console.log(err)
         })
     },
     // 플레이리스트 좋아요
-    likePlaylist: function ({ getters }, playlistId) {
-      axios({
-        url: `https://i6a102.p.ssafy.io/api/v1/playlist/${playlistId}/like`,
-        method: 'post',
-        headers: getters.config
+    likePlaylist: function ({ commit }, playlistId) {
+      axiosConnector.post(`/playlist/${playlistId}/like`,
+      ).then((res) => {
+        console.log('playlist.js 189 likePlaylist', res)
+        commit('LIKE_PLAYLIST')
       })
-        .then((res) => {
-          console.log('playlist.js 189 likePlaylist', res)
-          // commit('GET_PLAYLIST_DETAIL', res.data)
-        })
         .catch((err) => {
           console.log(err)
         })
+      // axios({
+      //   url: `https://i6a102.p.ssafy.io/api/v1/playlist/${playlistId}/like`,
+      //   method: 'post',
+      //   headers: getters.config
+      // })
+      //   .then((res) => {
+      //     console.log('playlist.js 189 likePlaylist', res)
+      //     // commit('GET_PLAYLIST_DETAIL', res.data)
+      //   })
+      //   .catch((err) => {
+      //     console.log(err)
+      //   })
     },
     // 플레이리스트 좋아요 취소
-    dislikePlaylist: function ({ getters }, playlistId) {
-      axios({
-        url: `https://i6a102.p.ssafy.io/api/v1/playlist/${playlistId}/like`,
-        method: 'delete',
-        headers: getters.config
+    unlikePlaylist: function ({ commit }, playlistId) {
+      axiosConnector.delete(`/playlist/${playlistId}/like`,
+      ).then((res) => {
+        console.log('playlist.js 189 likePlaylist', res)
+        commit('UNLIKE_PLAYLIST')
       })
-        .then((res) => {
-          console.log('playlist.js 203 dislikePlaylist', res)
-          // commit('GET_PLAYLIST_DETAIL', res.data)
-        })
         .catch((err) => {
           console.log(err)
         })
+      // axios({
+      //   url: `https://i6a102.p.ssafy.io/api/v1/playlist/${playlistId}/like`,
+      //   method: 'delete',
+      //   headers: getters.config
+      // })
+      //   .then((res) => {
+      //     console.log('playlist.js 203 dislikePlaylist', res)
+      //     // commit('GET_PLAYLIST_DETAIL', res.data)
+      //   })
+      //   .catch((err) => {
+      //     console.log(err)
+      //   })
     },
     // 플레이리스트 댓글
     getPlaylistComments: function (playlistId) {
