@@ -692,7 +692,7 @@ export default {
       const syncData = {
         timestamp: new Date().getTime(),
         playlistId: this.roomCurrentPlaylistId,
-        videoOffset: this.roomCurrentVideoId,
+        videoId: this.roomCurrentVideoId,
         videoPlaytime: this.roomCurrentVideoPlaytime,
         playerState: await this.player.getPlayerState()
       };
