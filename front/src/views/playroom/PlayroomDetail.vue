@@ -581,8 +581,6 @@ export default {
 
       if (body.type == 'SYNC')
       {
-        if (this.userInfo.userSeq == this.roomAuthorId) return;
-
         const currentPlaylistId = this.roomCurrentPlaylistId
         const currentVideoId = this.roomCurrentVideoId
         const currentVideoTime = await this.player.getCurrentTime();
@@ -596,14 +594,23 @@ export default {
         const syncPlayerState = syncData.playerState
         const syncSender = syncData.sender
 
+        if (!currentSyncSender) {
+          this.SET_ROOM_LAST_SYNC_SENDER(syncSender)
+        }
+        else if (currentSyncSender != syncSender)
+        {
+          await this.getRoomInfo()
+          this.SET_ROOM_LAST_SYNC_SENDER(syncSender)
+        }
+
+        if (this.userInfo.userSeq == this.roomAuthorId) return;
+
         if (currentPlaylistId != syncPlaylistId) this.SET_ROOM_CURRENT_PLAYLIST_ID(syncPlaylistId)
         if (currentVideoId != syncVideoId) this.SET_ROOM_CURRENT_VIDEO_ID(syncVideoId)
         if (currentPlayerState != syncPlayerState) {
           if (syncPlayerState == 1) this.player.playVideo()
           else if (syncPlayerState == 2) this.player.pauseVideo()
         }
-        if (!currentSyncSender) this.currentSyncSender = syncSender
-        else if (currentSyncSender != syncSender) await this.getRoomInfo()
         //console.log('syncVideoTime', syncVideoTime, 'currentVideoTime', currentVideoTime)
         if (Math.abs(syncVideoTime - currentVideoTime) > 2) this.SET_ROOM_CURRENT_VIDEO_PLAYTIME(syncVideoTime);
         this.heartbeat = 0;
@@ -746,6 +753,9 @@ export default {
           if ((parseInt(this.userInfo.userSeq) + Date.now()) % 10 == (parseInt(this.roomId) + parseInt(this.roomAuthorId)) % 10)
             this.requestRoomAuthor()
       }
+
+      if (this.userInfo.userSeq && this.userInfo.userSeq == this.roomAuthorId) return;
+      this.heartbeat += 1;
     },
     requestRoomAuthor() {
       axiosConnector.put(`/playroom/${this.roomId}/user`);
