@@ -101,8 +101,8 @@
 </template>
 
 <script>
-import ProfilePlaylist from '../../components/profile/ProfilePlaylist.vue'
-import ProfileTaste from '../../components/profile/ProfileTaste.vue'
+import ProfilePlaylist from '../../components/profile/timeline/ProfilePlaylist.vue'
+import ProfileTaste from '../../components/profile/timeline/ProfileTaste.vue'
 
 import axiosConnector from '../../utils/axios-connector.js'
 
