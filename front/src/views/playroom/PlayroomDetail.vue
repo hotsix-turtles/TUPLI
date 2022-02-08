@@ -1,13 +1,14 @@
 <template>
   <v-card
-    class="playroom mx-auto overflow-hidden"
-    height="100vh"
+    class="playroom mx-auto overflow-hidden mb-10"
+    height="100%"
   >
     <!-- 하단 네비게이션 (플레이리스트 조작) -->
     <v-bottom-navigation
       absolute
       background-color="#5B5C9D"
-      height="65px"
+      height="60px"
+      class="fixed-bottom"
       :input-value="selectedItem.length > 0"
     >
       <!-- 선택된 동영상 개수 뱃지 -->
@@ -45,9 +46,7 @@
     <!-- 플레이룸 페이지 -->
     <v-sheet
       id="scroll-threshold-example"
-      class="overflow-y-auto"
-      :class="{ 'pb-16': selectedItem.length > 0 }"
-      max-height="100%"
+      class="overflow-y-auto playroom-sheet"
     >
       <!-- 유튜브 동영상 플레이어 Wrapper (필요없음) -->
       <div class="playerWrapper">
@@ -57,7 +56,7 @@
           :video-id="videoId"
           :player-vars="playerVars"
           width="100%"
-          height="200"
+          height="200vh"
           @ready="onVideoReady"
           @ended="onVideoEnded"
           @playing="onVideoPlaying"
@@ -683,6 +682,8 @@ export default {
       this.seekTo()
     },
     async loadLikeState() {
+      if (!this.$store.state.isLogin) return;
+
       const { status, data } = await axiosConnector.get(`/playroom/${this.roomId}/like`)
       if (status != 200) return;
       this.SET_ROOM_LIKED(Boolean(data))
@@ -802,7 +803,7 @@ export default {
 
 iframe {
   width: 100%;
-  max-width: 650px; /* Also helpful. Optional. */
+  /*max-width: 650px; /* Also helpful. Optional. */
 }
 
 .v-dialog {
