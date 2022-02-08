@@ -24,11 +24,13 @@ export default new Vuex.Store({
     isLogin: false,
     userInfo: null
   },
-  modules: {
-    playroom: playroom,
-    account: account,
-    video: video,
-    playlist: playlist,
+  // 모듈에서 쓸 JWT
+  getters: {
+    config: function (state) {
+      return {
+        Authorization: `JWT ${state.authToken}`
+      }
+    },
   },
   mutations: {
     // 로그인
@@ -138,8 +140,13 @@ export default new Vuex.Store({
     //       console.log(err)
     //     })
     // }
+
   },
-
-
+  modules: {
+    playroom: playroom,
+    account: account,
+    video: video,
+    playlist: playlist,
+  },
 })
 

@@ -115,7 +115,7 @@
 import { mapActions, mapState } from 'vuex'
 
 import Back from '../../components/common/Back.vue'
-import RemoveButtonBottom from '../../components/common/removeButtonBottom.vue'
+import RemoveButtonBottom from '../../components/common/RemoveButtonBottom.vue'
 import TagInput from '../../components/common/TagInput.vue'
 import VideoListItemSmall from '../../components/video/VideoListItemSmall.vue'
 export default {
@@ -157,11 +157,14 @@ export default {
     }),
     ...mapState('playlist', {
       savedFormData: state => state.savedFormData,
+      isSaved: state => state.isSaved,
     }),
   },
   created: function () {
-    if (this.savedFormData) {
+    if (this.isSaved) {
       this.formData = this.savedFormData
+    } else {
+      this.resetVideoAddState()
     }
   },
   methods: {
@@ -171,7 +174,7 @@ export default {
     ]),
     ...mapActions('video', [
       'selectAllAddedVideos',
-      'unselectAllAddedVideos',
+      'deselectAllAddedVideos',
       'resetVideoAddState',
     ]),
     updateTags: function (tags) {
@@ -194,7 +197,7 @@ export default {
     },
     onClickSelectAll: function () {
       if (this.isSelectedAll) {
-        this.unselectAllAddedVideos()
+        this.deselectAllAddedVideos()
       } else {
         this.selectAllAddedVideos()
       }

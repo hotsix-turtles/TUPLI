@@ -32,6 +32,7 @@ const video = {
     },
     // 유튜브 검색 (기본 정보)
     SEARCH_VIDEOS: function (state, searchedVideos) {
+      console.log('video.js 35 searchedVideos', searchedVideos)
       state.selectedVideos = []
       state.searchedVideos = []
       state.searchedVideoIds = []
@@ -139,7 +140,13 @@ const video = {
     SELECT_ALL_ADDED_VIDEOS: function (state) {
       state.selectedVideos = state.addedVideos.slice()
     },
-    UNSELECT_ALL_ADDED_VIDEOS: function (state) {
+    DESELECT_ALL_ADDED_VIDEOS: function (state) {
+      state.selectedVideos = []
+    },
+    SELECT_ALL_DETAIL_VIDEOS: function (state, videos) {
+      state.selectedVideos = videos.slice()
+    },
+    DESELECT_ALL_DETAIL_VIDEOS: function (state) {
       state.selectedVideos = []
     },
     ADD_SELECTED_VIDEO: function (state, video) {
@@ -164,7 +171,7 @@ const video = {
       commit('RESET_VIDEO_ADD_STATE')
     },
     // 유튜브 API로 영상 리스트 검색
-    searchVideos: function ({ commit, dispatch }, query) {
+    searchVideos: function ({ commit, dispatch }, query, order) {
       const SEARCH_API_URL = 'https://www.googleapis.com/youtube/v3/search'
       const API_KEY = process.env.VUE_APP_YOUTUBE_API_KEY
 
@@ -175,6 +182,7 @@ const video = {
         fields: 'nextPageToken,items(id/videoId,snippet(title,publishTime,thumbnails/default,channelTitle))',
         type: 'video',
         q: query, // 검색어
+        order: order,
         // eventType: 'completed', // 완료된 영상만 검색
         maxResults: 5, // 반환할 영상 개수
       }
@@ -222,7 +230,7 @@ const video = {
         })
     },
     // 유튜브 검색 (무한스크롤)
-    searchVideosByScroll: function ({ state, commit, dispatch }, $state) {
+    searchVideosByScroll: function ({ state, commit, dispatch }, $state, order) {
       const SEARCH_API_URL = 'https://www.googleapis.com/youtube/v3/search'
       const API_KEY = process.env.VUE_APP_YOUTUBE_API_KEY
 
@@ -234,6 +242,7 @@ const video = {
             fields: 'nextPageToken,items(id/videoId,snippet(title,publishTime,thumbnails/default,channelTitle))',
             type: 'video',
             q: state.query, // 검색어
+            order: order,
             // eventType: 'completed', // 완료된 영상만 검색
             maxResults: 5, // 반환할 영상 개수
             pageToken: state.nextPageToken,
@@ -273,8 +282,14 @@ const video = {
     selectAllAddedVideos: function ({ commit }) {
       commit('SELECT_ALL_ADDED_VIDEOS')
     },
-    unselectAllAddedVideos: function ({ commit }) {
-      commit('UNSELECT_ALL_ADDED_VIDEOS')
+    deselectAllAddedVideos: function ({ commit }) {
+      commit('DESELECT_ALL_ADDED_VIDEOS')
+    },
+    selectAllDetailVideos: function ({ commit }, videos) {
+      commit('SELECT_ALL_DETAIL_VIDEOS', videos)
+    },
+    deselectAllDetailVideos: function ({ commit }) {
+      commit('DESELECT_ALL_DETAIL_VIDEOS')
     },
     // 선택한 영상 리스트에 추가
     addSelectedVideo: function ({ commit }, video) {

@@ -1,13 +1,13 @@
 <template>
   <div>
-    <div
+    <span
       v-for="(tag, idx) in tags"
       :key="idx"
     >
-      <span class="tag">
+      <span class="tag me-1">
         {{ tag }}
       </span>
-    </div>
+    </span>
   </div>
 </template>
 

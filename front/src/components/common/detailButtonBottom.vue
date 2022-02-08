@@ -11,23 +11,48 @@
     <v-badge
       :content="selectedVideos.length"
       color="#F6F7FF"
-      offset-x="120"
+      offset-x="30"
       offset-y="10"
       overlap
       class="videoCounter"
     />
-    <div
-      class="d-flex align-center"
-      @click="removeVideos"
-    >
-      <div>
-        <v-icon color="white">
-          mdi-trash-can-outline
-        </v-icon>
+    <div class="d-flex text-center align-center">
+      <div
+        class="d-flex-column justify-center mx-5 font-3 clickable"
+      >
+        <div>
+          <v-icon color="white">
+            mdi-youtube
+          </v-icon>
+        </div>
+        <div style="color: white;">
+          플레이룸
+        </div>
       </div>
-      <div style="color: white;">
-        삭제
+      <div
+        class="d-flex-column justify-center mx-5 font-3 clickable"
+      >
+        <div>
+          <v-icon color="white">
+            mdi-play-circle
+          </v-icon>
+        </div>
+        <div style="color: white;">
+          내 플레이리스트
+        </div>
       </div>
+      <!-- <div
+        class="d-flex-column justify-center mx-3 font-3 clickable"
+      >
+        <div>
+          <v-icon color="white">
+            mdi-bookmark-outline
+          </v-icon>
+        </div>
+        <div style="color: white;">
+          저장하기
+        </div>
+      </div> -->
     </div>
   </v-bottom-navigation>
 </template>

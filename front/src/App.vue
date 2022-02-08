@@ -6,7 +6,7 @@
         style="margin-bottom: 60px;"
       />
     </v-main>
-    <navbar-bottom class="mt-auto fixed" />
+    <navbar-bottom />
   </v-app>
 </template>
 

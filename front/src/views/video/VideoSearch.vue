@@ -5,6 +5,7 @@
       :label="'새로운 영상을 검색해주세요.'"
       @input-change="searchVideos"
     />
+    <order :select-list="selectList" />
     <video-list-item-small
       :key="rerenderKey"
       :videos="searchedVideos"
@@ -16,7 +17,7 @@
     <infinite-loading
       v-if="searchedVideos.length > 0"
       spinner="waveDots"
-      @infinite="searchVideosByScroll"
+      @infinite="searchVideosByScroll(order)"
     >
       <div slot="no-results" />
     </infinite-loading><br><br>
@@ -30,7 +31,8 @@ import InfiniteLoading from "vue-infinite-loading"
 import BackOnly from '@/components/common/BackOnly.vue'
 import SearchBar from '@/components/common/SearchBar.vue'
 import VideoListItemSmall from '../../components/video/VideoListItemSmall.vue'
-import AddButtonBottom from '../../components/common/addButtonBottom.vue'
+import AddButtonBottom from '../../components/common/AddButtonBottom.vue'
+import Order from '../../components/common/Order.vue'
 
 export default {
   name: 'VideoSearch',
@@ -40,16 +42,22 @@ export default {
     VideoListItemSmall,
     InfiniteLoading,
     AddButtonBottom,
+    Order,
   },
   data: function () {
     return {
+      selectList: {
+        '관련순': 'relevance',
+        '최근순': 'date',
+        '조회순': 'viewCount',
+      },
     }
   },
   computed: {
     ...mapState('video', {
       searchedVideos: state => state.searchedVideos,
       selectedVideos: state => state.selectedVideos,
-      rerenderKey: state => state.rerenderKey,
+      rerenderKey: state => state.rerenderKey,  // video는 API 두번 요청해서 변경내용 반영하기 위한 key
       nextPageToken: state => state.nextPageToken,
     })
   },

@@ -1,13 +1,13 @@
 <template>
   <v-card
     height="13vh"
-    class="d-flex"
+    class="d-flex align-center"
     outlined
     tile
     :color="color"
   >
     <div
-      class="d-flex justify-space-between container"
+      class="d-flex justify-space-between"
       width="100%"
       @click="selectVideo"
     >

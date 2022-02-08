@@ -42,7 +42,7 @@
     <div class="d-flex-column pb-5">
       <!-- 네브바 -->
       <div
-        class="d-flex justify-space-around fixed-bottom navbar-background py-1"
+        class="d-flex justify-space-around fixed-bottom-navbar navbar-background py-1"
       >
         <div
           class="clickable d-flex-column text-center"
@@ -126,6 +126,7 @@ export default {
 <style scoped>
   /* 만들기 버튼 일반 문서 흐름에서 제거 */
   .makeBtns {
+    z-index: 10;
     position: fixed;
     bottom: 1vh;
     left: 50%;
