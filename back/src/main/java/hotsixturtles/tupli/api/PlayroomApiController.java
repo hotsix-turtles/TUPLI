@@ -6,6 +6,7 @@ import hotsixturtles.tupli.dto.request.RequestPlayroomDto;
 import hotsixturtles.tupli.dto.response.ErrorResponse;
 import hotsixturtles.tupli.dto.response.ResponsePlayroomDto;
 import hotsixturtles.tupli.entity.Playroom;
+import hotsixturtles.tupli.entity.likes.PlayroomLikes;
 import hotsixturtles.tupli.service.PlayroomService;
 import hotsixturtles.tupli.service.token.JwtTokenProvider;
 import io.swagger.annotations.ApiOperation;
@@ -196,8 +197,8 @@ public class PlayroomApiController {
                             getMessage("error.valid.jwt", null, LocaleContextHolder.getLocale())));
         }
         Long userSeq = jwtTokenProvider.getUserSeq(token);
-        playroomService.getPlayroomLike(userSeq, playroomId);
-        return ResponseEntity.status(HttpStatus.OK).body(null);
+        PlayroomLikes playroomLikes = playroomService.getPlayroomLike(userSeq, playroomId);
+        return ResponseEntity.status(HttpStatus.OK).body(playroomLikes);
     }
 
     @PostMapping("/playroom/{playroomId}/like")
