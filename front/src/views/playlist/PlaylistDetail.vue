@@ -75,7 +75,8 @@
 import { mapActions, mapState } from 'vuex'
 
 import BackOnly from '../../components/common/BackOnly.vue'
-import DetailButtonBottom from '../../components/common/detailButtonBottom.vue'
+import DetailButtonBottom from '../../components/playlist/DetailButtonBottom.vue'
+
 import Tags from '../../components/common/Tags.vue'
 import PlaylistCd from '../../components/playlist/PlaylistCd.vue'
 

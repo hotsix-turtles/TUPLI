@@ -1,15 +1,19 @@
 <template>
-  <div>
-    <select
-      name="order"
-    >
-      <option
-        v-for="(select, idx) in Object.keys(selectList)"
-        :key="idx"
+  <div class="d-flex">
+    <div class="ms-auto">
+      <select
+        name="order"
       >
-        {{ select }}
-      </option>
-    </select>
+        <option
+          v-for="(select, idx) in Object.keys(selectList)"
+          :key="idx"
+          :value="selectList.select"
+          @click="onChangeSelect(selectList.select)"
+        >
+          {{ select }}
+        </option>
+      </select>
+    </div>
   </div>
 </template>
 
@@ -24,12 +28,15 @@ export default {
       type: Object
     }
   },
-  computed: {
-    selectKeys: function () {
-      return Object.keys(this.selectList)
+  data: function () {
+    return {
     }
   },
   methods: {
+    onChangeSelect: function (order) {
+      console.log(order)
+      this.$emit('onChangeSelect', order)
+    },
   }
 }
 </script>

@@ -1,11 +1,17 @@
 <template>
   <div>
     <back-only />
+    <!-- 검색바 -->
     <search-bar
       :label="'새로운 영상을 검색해주세요.'"
-      @input-change="searchVideos"
+      @input-change="onEnterSearch"
     />
-    <order :select-list="selectList" />
+    <!-- 정렬 필터 -->
+    <order
+      :select-list="selectList"
+      @on-change-select="onChangeSelect"
+    />
+    <!-- 영상 리스트 -->
     <video-list-item-small
       :key="rerenderKey"
       :videos="searchedVideos"
@@ -16,8 +22,9 @@
     <!-- 무한스크롤 -->
     <infinite-loading
       v-if="searchedVideos.length > 0"
+      :identifier="infiniteId"
       spinner="waveDots"
-      @infinite="searchVideosByScroll(order)"
+      @infinite="searchVideosByScroll"
     >
       <div slot="no-results" />
     </infinite-loading><br><br>
@@ -31,7 +38,7 @@ import InfiniteLoading from "vue-infinite-loading"
 import BackOnly from '@/components/common/BackOnly.vue'
 import SearchBar from '@/components/common/SearchBar.vue'
 import VideoListItemSmall from '../../components/video/VideoListItemSmall.vue'
-import AddButtonBottom from '../../components/common/AddButtonBottom.vue'
+import AddButtonBottom from '../../components/playlist/AddButtonBottom.vue'
 import Order from '../../components/common/Order.vue'
 
 export default {
@@ -51,6 +58,12 @@ export default {
         '최근순': 'date',
         '조회순': 'viewCount',
       },
+      order: '',
+      query: '',
+      identifier: this.query + this.order,
+
+      newsType: 'story',
+      infiniteId: +new Date(),
     }
   },
   computed: {
@@ -79,6 +92,23 @@ export default {
       'searchVideosByScroll',
       'resetVideoSearchState',
     ]),
+    onChangeSelect: function (order) {
+      this.resetVideoSearchState()
+      this.infiniteId += 1;
+      this.order = order
+      console.log(this.order)
+    },
+    onEnterSearch: function (query) {
+      console.log(this.infiniteId)
+      this.resetVideoSearchState()
+      this.infiniteId += 1;
+      console.log(this.infiniteId)
+      this.query = query
+      this.searchVideos(query)
+    },
+    changeType() {
+
+    },
   },
 }
 </script>

@@ -15,6 +15,7 @@ const video = {
     query: '', // 검색어
     likedVideos: [], // 좋아한 영상
     savedVideos: [], // 저장한 영상
+    order: 'relevance', // 정렬 타입
   },
   mutations: {
     // Video Search State 초기화
@@ -171,9 +172,10 @@ const video = {
       commit('RESET_VIDEO_ADD_STATE')
     },
     // 유튜브 API로 영상 리스트 검색
-    searchVideos: function ({ commit, dispatch }, query, order) {
+    searchVideos: function ({ state, commit, dispatch }, query) {
       const SEARCH_API_URL = 'https://www.googleapis.com/youtube/v3/search'
       const API_KEY = process.env.VUE_APP_YOUTUBE_API_KEY
+      console.log(state.order)
 
       // 검색 API
       const searchParams = {
@@ -182,7 +184,7 @@ const video = {
         fields: 'nextPageToken,items(id/videoId,snippet(title,publishTime,thumbnails/default,channelTitle))',
         type: 'video',
         q: query, // 검색어
-        order: order,
+        // order: state.order,
         // eventType: 'completed', // 완료된 영상만 검색
         maxResults: 5, // 반환할 영상 개수
       }
@@ -230,10 +232,10 @@ const video = {
         })
     },
     // 유튜브 검색 (무한스크롤)
-    searchVideosByScroll: function ({ state, commit, dispatch }, $state, order) {
+    searchVideosByScroll: function ({ state, commit, dispatch }, $state) {
       const SEARCH_API_URL = 'https://www.googleapis.com/youtube/v3/search'
       const API_KEY = process.env.VUE_APP_YOUTUBE_API_KEY
-
+      console.log('searchVideosByScroll')
       if (state.nextPageToken != '') {
         setTimeout(() => {
           const params = {
@@ -242,7 +244,7 @@ const video = {
             fields: 'nextPageToken,items(id/videoId,snippet(title,publishTime,thumbnails/default,channelTitle))',
             type: 'video',
             q: state.query, // 검색어
-            order: order,
+            // order: state.order,
             // eventType: 'completed', // 완료된 영상만 검색
             maxResults: 5, // 반환할 영상 개수
             pageToken: state.nextPageToken,

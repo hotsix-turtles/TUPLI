@@ -59,7 +59,7 @@ import InfiniteLoading from "vue-infinite-loading"
 import BackOnly from '@/components/common/BackOnly.vue'
 import SearchBar from '@/components/common/SearchBar.vue'
 import VideoListItemSmall from '../../components/video/VideoListItemSmall.vue'
-import AddButtonBottom from '../../components/common/AddButtonBottom.vue'
+import AddButtonBottom from '../../components/playlist/AddButtonBottom.vue'
 
 export default {
   name: 'SearchDetail',
@@ -121,16 +121,16 @@ export default {
     },
     onChangeTab: function() {
       if (this.tab === 0 && this.playlistQuery !== this.query) {
-        this.playlistQuery = query
+        this.playlistQuery = this.query
         // searchPlaylists(query)
       } else if (this.tab === 1 && this.playroomQuery !== this.query) {
-        this.playroomQuery = query
+        this.playroomQuery = this.query
         // searchPlayrooms(query)
       } else if (this.tab === 2 && this.accountQuery !== this.query) {
-        this.accountQuery = query
+        this.accountQuery = this.query
         // searchAccounts(query)
       } else if (this.tab === 3 && this.videoQuery !== this.query) {
-        this.videoQuery = query
+        this.videoQuery = this.query
         this.searchVideos(query)
       }
     }

@@ -115,7 +115,7 @@
 import { mapActions, mapState } from 'vuex'
 
 import Back from '../../components/common/Back.vue'
-import RemoveButtonBottom from '../../components/common/RemoveButtonBottom.vue'
+import RemoveButtonBottom from '../../components/playlist/RemoveButtonBottom.vue'
 import TagInput from '../../components/common/TagInput.vue'
 import VideoListItemSmall from '../../components/video/VideoListItemSmall.vue'
 export default {
