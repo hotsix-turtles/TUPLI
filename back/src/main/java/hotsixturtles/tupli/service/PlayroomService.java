@@ -72,7 +72,7 @@ public class PlayroomService {
             // 비디오 저장(플레이리스트 삭제 대비 및 편한 추가 삭제를 위해 DB 별도 저장)
             for (String videoUrl : entry.getValue()) {
                 YoutubeVideo video = new YoutubeVideo();
-                YoutubeVideo existVideo = youtubeVideoRepository.findOneByVideoId(videoUrl);
+                YoutubeVideo existVideo = youtubeVideoRepository.findFirstByVideoId(videoUrl);
                 video.setPlayroom(playroom);
                 video.setInit(existVideo);
                 youtubeVideoRepository.save(video);
