@@ -112,10 +112,10 @@ const playroom = {
       commit('SET_ROOM_CONTENT', data.content);
       commit('SET_ROOM_INVITE_IDS', data.inviteIds);
       commit('SET_ROOM_TAGS', data.tags);
-      // commit('SET_ROOM_CURRENT_PLAYLIST_ID', data.currentPlaylistOffset)
+      commit('SET_ROOM_CURRENT_PLAYLIST_ID', Object.keys(data.playlists).length ? Object.keys(data.playlists)[0] : 0)
       commit('SET_ROOM_PLAYLISTS', data.playlists);
       commit('SET_ROOM_VIDEOS', data.videos);
-      // commit('SET_ROOM_CURRENT_VIDEO_ID', data.currentVideoOffset)
+      commit('SET_ROOM_CURRENT_VIDEO_ID', data.playlists.length ? data.playlists[0] : 0)
       // commit('SET_ROOM_CURRENT_VIDEO_PLAYTIME', data.currentVideoPlaytime)
       commit('SET_ROOM_CHATROOM_ID', '731f3b99-8257-4eae-86b2-ed38ea36ccff');//data.chatroomId);
     }),
@@ -177,6 +177,7 @@ const playroom = {
       return roomPlaylists[roomCurrentPlaylistId] ? roomPlaylists[roomCurrentPlaylistId].reduce((prev, cur) => { prev.push(roomVideos.find(video => cur == video.id)); return prev; }, []) : []
     },
     roomFirstVideo: ( {roomPlaylists, roomCurrentPlaylistId } ) => {
+      if (!roomPlaylists || !roomCurrentPlaylistId) return null;
       if (!Object.keys(roomPlaylists[roomCurrentPlaylistId]).length) return null;
 
       var firstVideo = {};
