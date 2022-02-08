@@ -1,44 +1,30 @@
-// import baseAxios from 'axios';
-// import { getToken } from './JWT';
+import axios from 'axios';
 
-// const axios = baseAxios.create({
-//   baseURL: SERVER.URL,
-//   headers: {
-//     'Content-Type': 'application/json',
-//   },
-// });
+const baseURL = "https://i6a102.p.ssafy.io/api/v1"
+const axiosConnector = axios.create({
+  baseURL
+})
 
-// axios.interceptors.request.use((config) => {
-//   config.headers.Authorization = `${getToken()}`;
-//   return config;
-// });
+axiosConnector.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('jwt')
 
-// export default axios;
+    if (token)
+    {
+      config.headers['Authorization'] = token;
+      // true로 하면 cors
+      // config.withCredentials = false;
+    } else {
+      config.withCredentials = false;
+    }
 
-// import axios from "axios";
-// import SERVER from '@/api/server'
-// import { getToken } from './JWT';
+    return config;
+  },
+  (error) => {
 
-// const baseURL = SERVER.URL
-// // const token = localStorage.getItem('jwt')
-
-// // axios 객체 생성
-// export default axios.create({
-//   baseURL,
-//   headers: getToken() ? { Authorization: `${getToken()}` } : { },
-//   xhrFields: getToken() ? { withCredentials: true } : { },
-// });
-
-import axios from "axios";
-import SERVER from '@/api/server'
+    return Promise.reject(error);
+  }
+);
 
 // axios 객체 생성
-export default axios.create({
-  baseURL: SERVER.URL,
-  headers: {
-    Authorization:localStorage.getItem("jwt")
-  },
-  xhrFields: {
-    withCredentials: true
-  }
-});
+export default axiosConnector;

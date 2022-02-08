@@ -82,7 +82,9 @@
 </template>
 
 <script>
-import axiosConnector from '@/utils/axios-connector.js'
+import axios from 'axios'
+import SERVER from '@/api/server'
+import { mapState } from 'vuex'
 
 export default {
   name: 'EditProfile',
@@ -95,29 +97,37 @@ export default {
       }
     }
   },
+  computed: {
+    ...mapState(['nickname', 'introduction', 'image', 'authToken'])
+  },
   created() {
     this.init()
   },
   methods: {
     init: function() {
-      this.credentials.newNickname = '김춘식'
-      this.credentials.newIntroduction = '안녕하세요?!'
+      this.credentials.newNickname = this.nickname
+      this.credentials.newIntroduction = this.introduction
       this.credentials.newImage = ''
     },
     updateProfile: function(){
       const formData = new FormData()
+      formData.append('image', this.credentials.newImage)
       formData.append('nickname', this.credentials.newNickname)
       formData.append('introduction', this.credentials.newIntroduction)
-      formData.append('image', this.credentials.newImage)
-      axiosConnector.put('/profile', formData)
+      axios({
+        method: 'PUT',
+        headers: {Authorization: this.authToken},
+        url: SERVER.URL + '/profile',
+        data: formData        
+      })
         .then((response) => {
-          console.log(response.data)
-          $router.push({ name: 'Profile' })
+          this.$router.push({ name: 'Profile' })
           // 필요하면 자체 갱신
           // this.nickname = response.data.email
           // state 갱신
-          // this.$store.dispatch('updateProfile', formData)
+          this.$store.commit('UPDATE_PROFILE', formData)
         })
+        .catch((err) => console.log(err.response.data))
     },
     getNewImage: function(event) {
       this.credentials.newImage = event.target.files[0]

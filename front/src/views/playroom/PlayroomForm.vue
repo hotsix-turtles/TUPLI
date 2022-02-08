@@ -280,11 +280,11 @@
                   초대할 친구 리스트
                 </v-expansion-panel-header>
                 <v-expansion-panel-content
-                  v-for="friend in formData.friends"
-                  :id="friend.id"
-                  :key="friend.id"
+                  v-for="(inviteId, idx) in formData.inviteIds"
+                  :id="idx"
+                  :key="idx"
                 >
-                  {{ friend.name }}
+                  {{ inviteId }}
                 </v-expansion-panel-content>
               </v-expansion-panel>
             </v-expansion-panels>
@@ -358,7 +358,8 @@ import { mapGetters, mapState } from 'vuex'
 import Back from '../../components/common/Back.vue'
 import PlaylistListItemSmall from '../../components/playlist/PlaylistListItemSmall.vue'
 import TagInput from '../../components/common/TagInput.vue'
-import { mapActions } from 'vuex'
+import { mapMutations, mapActions } from 'vuex'
+import axiosConnector from '../../utils/axios-connector';
 
 export default {
   name: 'PlaylistForm',
@@ -376,11 +377,11 @@ export default {
       ],
       startDateRules: [
         v => !!v || '시작날짜는 필수입니다.',
-        v => this.startDateTime.getTime() <= this.endDateTime.getTime() || '시작날짜는 종료날짜보다 이전이어야 합니다',
+        //v => this.startDateTime.getTime() <= this.endDateTime.getTime() || '시작날짜는 종료날짜보다 이전이어야 합니다',
       ],
       startTimeRules: [
         v => !!v || '시작시간은 필수입니다.',
-        v => this.startDateTime.getTime() <= this.endDateTime.getTime() || '시작시간은 종료시간보다 이전이어야 합니다',
+        //v => this.startDateTime.getTime() <= this.endDateTime.getTime() || '시작시간은 종료시간보다 이전이어야 합니다',
       ],
       endDateRules: [
         v => !!v || '종료날짜는 필수입니다.',
@@ -397,7 +398,7 @@ export default {
         content: '',
         tags: [],
         isPublic: true,
-        friends: [],
+        inviteIds: [],
         playlists: []
       },
       numberOfPlaylist: 0,
@@ -424,7 +425,8 @@ export default {
       return this.formData.isPublic ? "내 플레이룸을 공개합니다." : "내 플레이룸을 비공개합니다."
     },
     numberOfFriend () {
-      return this.formData.friends.length
+      console.log(this.formData, this.formData.inviteIds)
+      return this.formData.inviteIds.length
     },
     ...mapState('playlist', ['addedPlaylists', 'addedPlaylistVideoIds']),
     ...mapState('playroom', ['savedFormData']),
@@ -458,20 +460,42 @@ export default {
       return this.formData.playlists.map((playlist) => playlist.videos.map((v) => v.included = (v.id == id ? !selected : v.included)))
     },
     submit() {
+      // TODO: 원래 axiosConnector에서 알아서 갱신하고 보내야하지만...
+      const token = localStorage.getItem('jwt')
+
       if (this.formData.tags) this.formData.tags = this.formData.tags.join()
-      this.addedPlaylists.map(addedPlaylist => {
-        if (addedPlaylist.videos)
-          addedPlaylist.videos.map(video =>
-            video.included = Boolean(this.addedPlaylistVideoIds.find(addedPlaylistVideoId => addedPlaylistVideoId == video.videoId))
-          )
-      })
-      this.formData.playlists = this.addedPlaylists
+      this.formData.playlists =
+        this.addedPlaylists.reduce((prevPlaylists, curPlaylist) => {
+          if (curPlaylist.videos)
+          {
+            // 현재 플레이리스트에 비디오가 존재한다면
+            prevPlaylists[curPlaylist.id] = curPlaylist.videos.reduce((prevVideoIds, curVideo) => {
+              if (this.addedPlaylistVideoIds.find(addedPlaylistVideoId => addedPlaylistVideoId == curVideo.videoId))
+                prevVideoIds.push(curVideo.videoId)
+              return prevVideoIds
+            }, [])
+          }
+          return prevPlaylists
+        }, {})
+
       // '2022-02-06T04:41:08.443Z'
-      this.formData.startDate = `${this.startDate}T${this.startTime}:00.000Z`
-      this.formData.endDate = `${this.endDate}T${this.endTime}:00.000Z`
+      this.formData.startTime = `${this.startDate}T${this.startTime}:00.000+09:00`
+      this.formData.endTime = `${this.endDate}T${this.endTime}:00.000+09:00`
       console.log(this.formData)
-      this.createPlayroom(this.formData)
-      this.clearForm()
+
+      this.createPlayroom({ formData: this.formData, token })
+        .then((res) => {
+          console.log(res)
+
+          this.clearForm()
+          this.RESET_FORM_DATA()
+
+          this.$router.push('/playroom/' + res.data.id)
+        })
+        .catch((err) => {
+          console.log(err)
+          return null
+        })
     },
     clearForm() {
       this.formData = {
@@ -479,7 +503,7 @@ export default {
         content: '',
         tags: [],
         isPublic: true,
-        friends: [],
+        inviteIds: [],
         playlists: []
       }
       this.resetAddedPlaylists()
@@ -494,7 +518,11 @@ export default {
       else
         this.deselectAllPlaylistVideo()
     },
-    ...mapActions('playroom', ['saveFormData', 'createPlayroom']),
+    createPlayroom: function ({formData, token}) {
+      return axiosConnector.post('/playroom', formData)
+    },
+    ...mapMutations('playroom', ['RESET_FORM_DATA']),
+    ...mapActions('playroom', ['saveFormData']),
     ...mapActions('playlist', ['selectAllPlaylistVideo', 'deselectAllPlaylistVideo', 'resetAddedPlaylists'])
   },
 }

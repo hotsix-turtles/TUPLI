@@ -1,6 +1,6 @@
 /* eslint-disable vue/require-default-prop */
 <template>
-  <div class="fixed-top">
+  <div>
     <v-icon @click="goBack">
       mdi-arrow-left
     </v-icon>

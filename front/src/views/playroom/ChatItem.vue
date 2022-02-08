@@ -142,7 +142,9 @@ export default {
     timeLabel () {
       //const dt = new Date(this.timestamp);
       const dt = new Date();
-      return `${dt.getHours() < 12 ? "오전" : "오후"} ${dt.getHours() % 12}:${dt.getMinutes()}`;
+      dt.setHours(dt.getHours() + 9);
+
+      return dt.toISOString().substr(11,5);
     },
     blocked () {
       return this.blockedUser || this.blockedMessage;
@@ -153,8 +155,12 @@ export default {
     ...mapState('playroom', ['roomSelectedChatItem'])
   },
   methods: {
+    showUserProfile(id) {
+      this.$router.push(`/profile/${this.id}`)
+      this.DESELECT_CHAT_ITEM();
+    },
     ...mapMutations('playroom', ['SELECT_CHAT_ITEM', 'SELECT_CHAT_AVATAR', 'DESELECT_CHAT_ITEM']),
-    ...mapActions('playroom', [ 'followUser', 'showUserProfile', 'blockUser', 'blockMessage', 'unblockUser', 'unblockMessage' ])
+    ...mapActions('playroom', [ 'followUser', 'blockUser', 'blockMessage', 'unblockUser', 'unblockMessage' ])
   }
 }
 </script>

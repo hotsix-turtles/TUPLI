@@ -3,7 +3,7 @@
     size="80"
     class="ml-2 my-2"
     :class="{ selected: selected, not_selected: !selected }"
-    @click="SET_ROOM_CURRENT_PLAYLIST_OFFSET(id)"
+    @click="SET_ROOM_CURRENT_PLAYLIST_ID(parseInt(id))"
   >
     <v-img
       :src="src"
@@ -17,7 +17,7 @@ import { mapMutations } from 'vuex'
 export default {
   name: 'PlaylistThumbnailItem',
   props: {
-    id: {type: Number, default: 0},
+    id: {type: String, default: ''},
     src: {type: String, default: ''},
     selected: {type: Boolean, default: false},
   },
@@ -27,7 +27,7 @@ export default {
     }
   },
   methods: {
-    ...mapMutations('playroom', ['SET_ROOM_CURRENT_PLAYLIST_OFFSET'])
+    ...mapMutations('playroom', ['SET_ROOM_CURRENT_PLAYLIST_ID'])
   }
 }
 </script>
