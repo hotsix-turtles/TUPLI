@@ -95,15 +95,18 @@
         </div>
       </div>
     </div>
+    <Alarm />
   </div>
 </template>
 
 <script>
 import { mapState } from 'vuex'
+import Alarm from '@/components/alarm/Alarm'
 
 export default {
   name: 'NavbarBottom',
   components: {
+    Alarm
   },
   data: function() {
     return {
