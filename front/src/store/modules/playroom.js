@@ -26,7 +26,8 @@ const playroom = {
     chatroomId: '',
     chatBlockedId: [],
     chatBlockedUid: [],
-    savedFormData: ''
+    savedFormData: '',
+    roomLastSyncSender: 0
   },
   mutations: {
     RESET_FORM_DATA: function (state) {
@@ -59,6 +60,7 @@ const playroom = {
     SET_ROOM_CURRENT_VIDEO_PLAYTIME: ( state, value ) => state.roomCurrentVideoPlaytime = value != undefined ? parseInt(value) : state.roomCurrentVideoPlaytime,
     SET_ROOM_PLAYER_STATE: (state, value) => state.roomPlayerState = value ? value : state.roomPlayerState,
     SET_ROOM_CHATROOM_ID: ( state, value ) => state.chatroomId = value ? value : state.chatroomId,
+    SET_ROOM_LAST_SYNC_SENDER: ( state, value ) => state.roomLastSyncSender = value ? value : state.roomLastSyncSender,
     BLOCK_CHAT_BY_ID: ( state, id ) => {
       state.roomChats.map((v) => { if (v.id == id) v.blockedMessage = true; })
       state.chatBlockedId.push(id)
@@ -117,7 +119,7 @@ const playroom = {
       commit('SET_ROOM_VIDEOS', data.videos);
       commit('SET_ROOM_CURRENT_VIDEO_ID', data.playlists.length ? data.playlists[0] : 0)
       // commit('SET_ROOM_CURRENT_VIDEO_PLAYTIME', data.currentVideoPlaytime)
-      commit('SET_ROOM_CHATROOM_ID', '731f3b99-8257-4eae-86b2-ed38ea36ccff');//data.chatroomId);
+      commit('SET_ROOM_CHATROOM_ID', `playroom-${data.id}`);//'731f3b99-8257-4eae-86b2-ed38ea36ccff');//data.chatroomId);
     }),
     followUser: ({commit}, id) => {
       console.log('유저 팔로우 처리')
