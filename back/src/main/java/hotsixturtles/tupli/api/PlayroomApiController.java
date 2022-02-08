@@ -8,6 +8,8 @@ import hotsixturtles.tupli.dto.response.ResponsePlayroomDto;
 import hotsixturtles.tupli.entity.Playroom;
 import hotsixturtles.tupli.service.PlayroomService;
 import hotsixturtles.tupli.service.token.JwtTokenProvider;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
@@ -181,4 +183,59 @@ public class PlayroomApiController {
 
         return ResponseEntity.ok().body(result);
     }
+
+    @GetMapping("/playroom/{playroomId}/like")
+    @ApiOperation(value = "플레이룸 좋아요 확인", notes = "유저 정보가 일치하지 않으면 404, '유효하지 않은 토큰입니다' 반환," +
+            "정상 등록 시 200, null 반환")
+    public ResponseEntity<?> getBoardLike(@ApiParam(value = "auth token")
+                                          @RequestHeader(value = "Authorization") String token,
+                                          @ApiParam(value = "플레이룸 id") @PathVariable("playroomId") Long playroomId) {
+        if (!jwtTokenProvider.validateToken(token)) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ErrorResponse(messageSource.
+                            getMessage("error.valid.jwt", null, LocaleContextHolder.getLocale())));
+        }
+        Long userSeq = jwtTokenProvider.getUserSeq(token);
+        playroomService.getPlayroomLike(userSeq, playroomId);
+        return ResponseEntity.status(HttpStatus.OK).body(null);
+    }
+
+    @PostMapping("/playroom/{playroomId}/like")
+    @ApiOperation(value = "플레이룸에 좋아요 등록", notes = "유저 정보가 일치하지 않으면 404, '유효하지 않은 토큰입니다' 반환," +
+            "정상 등록 시 200, null 반환")
+    public ResponseEntity<?> addBoardLike(@ApiParam(value = "auth token")
+                                          @RequestHeader(value = "Authorization") String token,
+                                          @ApiParam(value = "플레이룸 id") @PathVariable("playroomId") Long playroomId) {
+        if (!jwtTokenProvider.validateToken(token)) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ErrorResponse(messageSource.
+                            getMessage("error.valid.jwt", null, LocaleContextHolder.getLocale())));
+        }
+        Long userSeq = jwtTokenProvider.getUserSeq(token);
+        playroomService.addPlaylistLike(userSeq, playroomId);
+        return ResponseEntity.status(HttpStatus.OK).body(null);
+    }
+
+    /**
+     * 게시글에 좋아요 취소하기
+     * @param token
+     * @param playroomId
+     * @return
+     */
+    @DeleteMapping("/playroom/{playroomId}/like")
+    @ApiOperation(value = "플레이룸 좋아요 해제", notes = "유저 정보가 일치하지 않으면 404, '유효하지 않은 토큰입니다' 반환," +
+            "정상 등록 시 200, null 반환")
+    public ResponseEntity<?> deleteBoardLike(@ApiParam(value = "auth token")
+                                             @RequestHeader(value = "Authorization") String token,
+                                             @ApiParam(value = "플레이룸 id") @PathVariable("playroomId") Long playroomId) {
+        if (!jwtTokenProvider.validateToken(token)) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ErrorResponse(messageSource.
+                            getMessage("error.valid.jwt", null, LocaleContextHolder.getLocale())));
+        }
+        Long userSeq = jwtTokenProvider.getUserSeq(token);
+        playroomService.deletePlayroomLike(userSeq, playroomId);
+        return ResponseEntity.status(HttpStatus.OK).body(null);
+    }
+
 }

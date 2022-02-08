@@ -7,9 +7,13 @@ import hotsixturtles.tupli.dto.simple.SimpleUserDto;
 import hotsixturtles.tupli.entity.Playlist;
 import hotsixturtles.tupli.entity.Playroom;
 import hotsixturtles.tupli.entity.User;
+import hotsixturtles.tupli.entity.likes.BoardLikes;
+import hotsixturtles.tupli.entity.likes.PlaylistLikes;
+import hotsixturtles.tupli.entity.likes.PlayroomLikes;
 import hotsixturtles.tupli.entity.likes.UserLikes;
 import hotsixturtles.tupli.entity.youtube.YoutubeVideo;
 import hotsixturtles.tupli.repository.*;
+import hotsixturtles.tupli.repository.likes.PlayroomLikesRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -30,6 +34,7 @@ public class PlayroomService {
     private final YoutubeVideoRepository youtubeVideoRepository;
     private final NotificationService notificationService;
     private final PlayroomRepositoryCustom playroomRepositoryCustom;
+    private final PlayroomLikesRepository playroomLikesRepository;
 
     public List<Playroom> getPlayroomList(){
 
@@ -159,6 +164,34 @@ public class PlayroomService {
         if (playroom != null) {
             playroom.setUser(userRepository.findByUserSeq(userSeq));
             playroomRepository.save(playroom);
+        }
+    }
+
+    public PlayroomLikes getPlayroomLike(Long userSeq, Long playroomId) {
+        return playroomLikesRepository.findExist(userSeq, playroomId);
+    }
+
+    @Transactional
+    public void addPlaylistLike(Long userSeq, Long playroomId){
+        PlayroomLikes playroomlike = playroomLikesRepository.findExist(userSeq, playroomId);
+        if(playroomlike == null) {
+            PlayroomLikes playroomLikes = new PlayroomLikes();
+            playroomLikes.setPlayroom(playroomRepository.findById(playroomId).orElse(null));
+            playroomLikes.setUser(userRepository.findByUserSeq(userSeq));
+            playroomLikesRepository.save(playroomLikes);
+        } else {
+            // 익셉션 발생
+        }
+    }
+
+    @Transactional
+    public void deletePlayroomLike(Long userSeq, Long playroomId) {
+
+        PlayroomLikes existPlayroomLikes = playroomLikesRepository.findExist(userSeq, playroomId);
+        if(existPlayroomLikes != null) {
+            playroomLikesRepository.delete(existPlayroomLikes);
+        } else {
+            // 익셉션 발생
         }
     }
 }
