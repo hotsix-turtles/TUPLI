@@ -40,7 +40,10 @@ public class PlayroomService {
     public Playroom getPlayroom(Long playroomId){
 
         // Paging 조건 정해서 추가
-        return playroomRepository.findById(playroomId).orElse(null);
+        Playroom playroom = playroomRepository.findById(playroomId).orElse(null);
+        System.out.println(playroom.getPlaylists());
+        return playroom;
+//        return playroomRepository.findById(playroomId).orElse(null);
     }
 
     // 사용자가 좋아요 누른 playroom
@@ -49,7 +52,7 @@ public class PlayroomService {
     }
 
     @Transactional
-    public ResponsePlayroomDto addPlayroom(RequestPlayroomDto playroomDto, Long userSeq){
+    public PlayroomDto addPlayroom(RequestPlayroomDto playroomDto, Long userSeq){
 
         Playroom playroom = new Playroom();
 
@@ -61,20 +64,24 @@ public class PlayroomService {
         playroom.setContent(playroomDto.getContent());
         playroom.setIsPublic(playroomDto.getIsPublic());
         playroom.setTags(playroomDto.getTags());
+        playroom.setEndTime(playroomDto.getEndTime());
 
         // 플레이리스트 비디오 분리하고 저장 + ID만 저장
-        List<Long> playlists = new ArrayList<>();
+        ConcurrentHashMap<Long, List<Long>> playlists = new ConcurrentHashMap<>();
         ConcurrentHashMap<Integer, Integer> playroomInfo = new ConcurrentHashMap<Integer, Integer>();
         for (Map.Entry<Long, List<String>> entry : playroomDto.getPlaylists().entrySet()) {
             // 플레이리스트 ID만 저장
-            playlists.add(entry.getKey());
+//            playlists.add(entry.getKey());
+            List<Long> playroomPlList = new ArrayList<>();
 
             // 비디오 저장(플레이리스트 삭제 대비 및 편한 추가 삭제를 위해 DB 별도 저장)
             for (String videoUrl : entry.getValue()) {
+
                 YoutubeVideo video = new YoutubeVideo();
                 YoutubeVideo existVideo = youtubeVideoRepository.findFirstByVideoId(videoUrl);
                 video.setPlayroom(playroom);
                 video.setInit(existVideo);
+                playroomPlList.add(existVideo.getId());
                 youtubeVideoRepository.save(video);
 
                 // 플레이룸 구성 비디오 정보로 메타 정보 구축
@@ -82,6 +89,8 @@ public class PlayroomService {
                 Integer count = playroomInfo.getOrDefault(categoryId, 0);
                 playroomInfo.put(categoryId, count+1);
             }
+            playlists.put(entry.getKey(), playroomPlList);
+
         }
         playroom.setPlayroomInfo(playroomInfo);
         playroom.setPlaylists(playlists);
@@ -101,11 +110,11 @@ public class PlayroomService {
 
         }
 
-        return new ResponsePlayroomDto(playroom);
+        return new PlayroomDto(playroom);
     }
 
     @Transactional
-    public ResponsePlayroomDto updatePlayroom(Long playroomId, RequestPlayroomDto playroomDto, Long userSeq){
+    public PlayroomDto updatePlayroom(Long playroomId, RequestPlayroomDto playroomDto, Long userSeq){
 
         Playroom playroom = playroomRepository.findById(playroomId).orElse(null);
 
@@ -123,7 +132,7 @@ public class PlayroomService {
 
         playroomRepository.save(playroom);
 
-        return new ResponsePlayroomDto(playroom);
+        return new PlayroomDto(playroom);
     }
 
     @Transactional
