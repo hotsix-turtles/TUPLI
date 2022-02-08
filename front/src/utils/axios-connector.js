@@ -1,10 +1,4 @@
-<<<<<<< HEAD
-// import baseAxios from 'axios';
-// import { getToken } from './JWT';
-import axios from 'axios'
-=======
 import axios from 'axios';
->>>>>>> 5487458d42b3c97ac02b153739ec10cc44928cce
 
 const baseURL = "https://i6a102.p.ssafy.io/api/v1"
 const axiosConnector = axios.create({
