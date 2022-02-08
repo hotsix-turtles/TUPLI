@@ -128,11 +128,12 @@
         <div class="playroomAuthorWrapper">
           <!-- 플레이룸 작성자 프로필 사진 -->
           <div class="authorProfilePic">
-            <v-img
+            <img
               :src="roomAuthorProfilePic"
-              alt="John"
+              alt=""
               class="rounded-circle"
               style="width: 100%; height: auto;"
+              @click="$router.push(`/profile/${roomAuthorId}`)"
             />
           </div>
 
@@ -193,11 +194,11 @@
           class="playlistThumbnailWrapper"
         >
           <PlaylistThumbnailItem
-            v-for="(playlistItem, playlistIdx) in roomPlaylists"
-            :id="playlistIdx"
-            :key="playlistIdx"
-            :src="playlistItem.thumbnailUrl"
-            :selected="playlistIdx == roomCurrentPlaylistOffset"
+            v-for="(videos, playlistId, playlistIdx) in roomPlaylists"
+            :id="playlistId"
+            :key="playlistId"
+            :src="playlistThumbnails[playlistIdx]"
+            :selected="playlistId == roomCurrentPlaylistId"
           />
         </v-card>
       </div>
@@ -239,7 +240,7 @@
             :id="video.id"
             :key="video.id"
             :title="video.title"
-            :thumbnail="video.thumbnailUrl"
+            :thumbnail="video.thumbnail"
             :playtime="video.playtime"
             :selected="isSelectedVideo(video.id)"
             :visible="video.included"
@@ -284,7 +285,70 @@
           </v-card-text>
           <v-spacer />
           <v-card-actions>
-            <ChatInput />
+            <!-- 채팅 입력창 -->
+            <v-row>
+              <v-text-field
+                v-model="message"
+                label="메시지를 입력하세요"
+                solo
+                dense
+                :disabled="!canChat"
+                :error="errorOnSend"
+                @click:append-outer="sendMessage"
+              >
+                <template v-slot:append>
+                  <v-menu
+                    v-model="showEmoji"
+                    rounded="lg"
+                    top
+                    left
+                    offset-x
+                    offset-y
+                  >
+                    <template v-slot:activator="{ on, attrs }">
+                      <v-icon
+                        v-if="showEmoji"
+                        v-bind="attrs"
+                        v-on="on"
+                        @click="showEmoji = !showEmoji"
+                      >
+                        mdi-emoticon
+                      </v-icon>
+                      <v-icon
+                        v-else
+                        v-bind="attrs"
+                        v-on="on"
+                        @click="showEmoji = !showEmoji"
+                      >
+                        mdi-emoticon-outline
+                      </v-icon>
+                    </template>
+                    <v-card>
+                      <v-list>
+                        <v-list-item>
+                          이모지
+                        </v-list-item>
+                      </v-list>
+                    </v-card>
+                  </v-menu>
+                </template>
+                <template v-slot:append-outer>
+                  <!-- <v-fade-transition leave-absolute> -->
+                  <v-progress-circular
+                    v-if="sending"
+                    size="24"
+                    indeterminate
+                  />
+                  <v-icon
+                    v-else
+                    @click="sendChat"
+                  >
+                    mdi-send
+                  </v-icon>
+                  <!-- </v-fade-transition> -->
+                </template>
+              </v-text-field>
+            </v-row>
           </v-card-actions>
           <div style="flex: 1 1 auto;" />
         </v-card>
@@ -302,9 +366,10 @@ import TagItem from './TagItem.vue'
 import PlaylistVideoItem from './PlaylistVideoItem.vue'
 import ChatItem from './ChatItem.vue'
 import axiosConnector from '../../utils/axios-connector';
-import wsConnector from '../../utils/ws-connector';
-import ChatInput from './ChatInput.vue'
+// import wsConnector from '../../utils/ws-connector';
 import NavButton from '../../components/common/NavButton.vue'
+import Stomp from "webstomp-client"
+import SockJS from "sockjs-client"
 
 Vue.use(VueYoutube)
 
@@ -314,7 +379,6 @@ export default {
     PlaylistThumbnailItem,
     PlaylistVideoItem,
     ChatItem,
-    ChatInput,
     NavButton,
     TagItem
   },
@@ -327,7 +391,18 @@ export default {
       },
       selectedItem: [],
       isChatting: false,
-      lastPlaytime: 0
+      lastPlaytime: 0,
+      wsConnector: null,
+      showEmoji: false,
+      sending: false,
+      message: '',
+      canChat: true,
+      errorOnSend: false,
+      playlistThumbnails: [],
+      userInfo: {
+        userSeq: null
+      },
+      heartbeat: 0
     }
   },
   metaInfo () {
@@ -350,16 +425,19 @@ export default {
       'roomTitle',
       'roomPublic',
       'roomLiked',
+      'roomAuthorId',
       'roomAuthorProfilePic',
       'roomAuthorName',
       'roomAuthorFollowerCount',
       'roomStartTime',
       'roomEndTime',
+      'roomInviteIds',
       'roomContent',
       'roomTags',
       'roomPlaylists',
-      'roomCurrentPlaylistOffset',
-      'roomCurrentVideoOffset',
+      'roomVideos',
+      'roomCurrentPlaylistId',
+      'roomCurrentVideoId',
       'roomCurrentVideoPlaytime',
       'roomChats',
       'roomSendingMessage',
@@ -371,119 +449,98 @@ export default {
       'roomPlayTime',
       'roomPublicLabel',
       'roomReducedContent',
-      'roomCurrentPlaylistVideos'
+      'roomCurrentPlaylistVideos',
+      'roomFirstVideo',
+      'roomPrevVideo',
+      'roomNextVideo'
     ]),
-    player() {
-      return this.$refs.youtube.player
-    },
     roomContentReduced() {
       return this.roomContent == this.roomReducedContent
     }
   },
   created() {
-    this.getRoomInfo()
   },
   mounted() {
+    this.$nextTick(() => {
+      this.player = this.$refs.youtube.player;
+      this.getRoomInfo();
+    });
+
     this.$watch('roomCurrentPlaylistVideos', (newVal, oldVal) =>
     {
-      this.updateVideoId()
+      this.playlistThumbnails = Object.keys(this.roomPlaylists).reduce((prevPlaylistIds, curPlaylistId) => {
+        if (this.roomPlaylists[curPlaylistId])
+          prevPlaylistIds.push(this.roomVideos.find(roomVideo => roomVideo.id == this.roomPlaylists[curPlaylistId][0]).thumbnail);
+
+        return prevPlaylistIds;
+      }, []);
     });
-    this.$watch('roomCurrentPlaylistOffset', (newVal, oldVal) => {
-      this.updateVideoId()
+    this.$watch('roomCurrentPlaylistId', (newVal, oldVal) => {
+      //this.updateVideoId()
     });
-    this.$watch('roomCurrentVideoOffset', (newVal, oldVal) => {
+    this.$watch('roomCurrentVideoId', (newVal, oldVal) => {
       this.updateVideoId()
     });
     this.$watch('roomCurrentVideoPlaytime', async (newVal, oldVal) => {
+
       if (newVal - oldVal < 2 && Math.abs(newVal - await this.player.getCurrentTime()) < 1) return;
+      if (this.userInfo.userSeq == this.roomAuthorId) return;
       this.seekTo()
     });
-
   },
   methods: {
-    getRoomInfo() {
-      axiosConnector.post('/echo', {
-        id: 1,
-        title: '3일만에 다이어트 포기 선언하게 만든 영상들',
-        isPublic: false,
-        isLiked: false,
-        authorProfilePic: 'https://picsum.photos/100/100',
-        authorName: '춘식이',
-        authorFollowerCount: 456,
-        startTime: new Date(2022, 2, 5, 18, 30),
-        endTime: new Date(2022, 2, 5, 20, 30),
-        content: '같이 치맥하면서 먹방 보실분들?\r\n같이 치맥하면서 먹방 보시분들?\r\n같이 치맥하면서 먹방 보시분들?\r\n',
-        tags: ['먹방', '쯔양', '고기먹방' ],
-        currentPlaylistOffset: 1,
-        playlists: [
-          {
-            title: '다이어트 안해',
-            thumbnailUrl: 'https://picsum.photos/90/90',
-            videos: [
-              { id: 1, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/161/90', title: "먹물파스타 먹방", playtime: '01:30', included: true },
-              { id: 2, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/162/90', title: "먹물파스타 먹방", playtime: '01:30', included: true },
-              { id: 3, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/163/90', title: "먹물파스타 먹방", playtime: '01:30', included: true },
-              { id: 4, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/164/90', title: "먹물파스타 먹방", playtime: '01:30', included: true },
-              { id: 5, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/165/90', title: "먹물파스타 먹방", playtime: '01:30', included: true },
-              { id: 6, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/166/90', title: "먹물파스타 먹방", playtime: '01:30', included: true },
-              { id: 7, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/167/90', title: "먹물파스타 먹방", playtime: '01:30', included: true },
-              { id: 8, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/168/90', title: "먹물파스타 먹방", playtime: '01:30', included: true },
-              { id: 9, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/169/90', title: "먹물파스타 먹방", playtime: '01:30', included: true },
-            ]
-          },
-          {
-            title: '다이어트 안해 2',
-            thumbnailUrl: 'https://picsum.photos/90/90',
-            videos: [
-              { id: 1, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/161/90', title: "해물파스타 먹방", playtime: '01:30', included: true },
-              { id: 2, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/162/90', title: "해물파스타 먹방", playtime: '01:30', included: true },
-              { id: 3, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/163/90', title: "해물파스타 먹방", playtime: '01:30', included: true },
-              { id: 4, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/164/90', title: "해물파스타 먹방", playtime: '01:30', included: true },
-              { id: 5, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/165/90', title: "해물파스타 먹방", playtime: '01:30', included: true },
-              { id: 6, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/166/90', title: "해물파스타 먹방", playtime: '01:30', included: true },
-              { id: 7, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/167/90', title: "해물파스타 먹방", playtime: '01:30', included: true },
-              { id: 8, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/168/90', title: "해물파스타 먹방", playtime: '01:30', included: true },
-              { id: 9, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/169/90', title: "해물파스타 먹방", playtime: '01:30', included: true },
-            ]
-          },
-          {
-            title: '다이어트 안해 3',
-            thumbnailUrl: 'https://picsum.photos/90/90',
-            videos: [
-              { id: 1, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/161/90', title: "보물파스타 먹방", playtime: '01:30', included: true },
-              { id: 2, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/162/90', title: "보물파스타 먹방", playtime: '01:30', included: true },
-              { id: 3, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/163/90', title: "보물파스타 먹방", playtime: '01:30', included: true },
-              { id: 4, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/164/90', title: "보물파스타 먹방", playtime: '01:30', included: true },
-              { id: 5, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/165/90', title: "보물파스타 먹방", playtime: '01:30', included: true },
-              { id: 6, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/166/90', title: "보물파스타 먹방", playtime: '01:30', included: true },
-              { id: 7, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/167/90', title: "보물파스타 먹방", playtime: '01:30', included: true },
-              { id: 8, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/168/90', title: "보물파스타 먹방", playtime: '01:30', included: true },
-              { id: 9, videoId: 'lG0Ys-2d4MA', thumbnailUrl: 'https://picsum.photos/169/90', title: "보물파스타 먹방", playtime: '01:30', included: true },
-            ]
-          },
-        ],
-        currentVideoOffset: 0,
-        currentVideoPlaytime: 300,
-        chatroomId: '731f3b99-8257-4eae-86b2-ed38ea36ccff'
-      }).then(response => {
-        this.$store.dispatch('playroom/setRoomInfo', response).then(
-          () => {
-            this.initChatRoom()
+    async getRoomInfo() {
+      // const token = localStorage.getItem('jwt')
 
-            setInterval(this.sendSync, 1000)
-          }
-        )
-      });
-      // axiosConnector.get(`/playroom/${this.$route.params.id}`).then(response => {
-      //   this.$store.dispatch('setRoomInfo', response)
-      // });
+      const roomInfo = await axiosConnector.get(`/playroom/${this.$route.params.id}`);
+      await this.$store.dispatch('playroom/setRoomInfo', roomInfo);
+
+      const userFollowerInfo = await axiosConnector.get(`/profile/followers/${this.roomAuthorId}/count`);
+      this.SET_ROOM_AUTHOR({ follower: parseInt(userFollowerInfo.data) })
+
+      // TODO: user profile 부분이 미완성이라 임시로 접속할때 얻어옴. 추후 삭제 필요
+      if (this.$store.state.isLogin)
+      {
+        var userInfo = await axiosConnector.get(`/account/userInfo`);
+        this.userInfo = userInfo.data;
+      }
+
+      this.checkPermission();
+      this.loadFirstVideo();
+      this.initChatRoom();
+      clearInterval(this.sendSync);
+      clearInterval(this.checkHeartbeat)
+      setInterval(this.sendSync, 1000);
+      setInterval(this.checkHeartbeat, 1000);
+    },
+    checkPermission() {
+      // 공개방이면 그냥 OK
+      if (this.roomPublic) return;
+      // 비공개방이지만 내가 초대된 유저면 OK
+      if (!this.roomPublic && this.roomInviteIds.find(inviteId => inviteId == this.userInfo.userSeq)) return;
+      // 방 운영시간 내이면 OK
+      if (this.roomStartTime <= Date.now() && this.roomEndTime >= Date.now()) return;
+      // TODO: 에러 페이지로 라우팅
+      this.$router.push({ name: 'Error' })
+    },
+    loadFirstVideo() {
+      if (this.roomFirstVideo)
+      {
+        this.SET_ROOM_CURRENT_PLAYLIST_ID(this.roomFirstVideo.playlistId)
+        this.SET_ROOM_CURRENT_VIDEO_ID(this.roomFirstVideo.videoId)
+        this.SET_ROOM_CURRENT_VIDEO_PLAYTIME(0)
+        this.updateVideoId();
+      }
     },
     initChatRoom() {
       const token = localStorage.getItem('jwt')
-      wsConnector.connect(
+      const baseURL = "https://i6a102.p.ssafy.io/api/v1" + "/ws-stomp"
+      const sock = new SockJS(baseURL);
+      this.wsConnector = Stomp.over(sock);
+      this.wsConnector.connect(
         token ? { Authorization: this.token } : { },
         async () => {
-          await wsConnector.subscribe(`/sub/chat/room/${this.chatroomId}`, this.onReceiveMessage, token ? { Authorization: token } : undefined)
+          await this.wsConnector.subscribe(`/sub/chat/room/${this.chatroomId}`, this.onReceiveMessage, token ? { Authorization: token } : undefined)
         },
         () => alert("서버 연결에 실패 하였습니다. 다시 접속해 주십시요.")
       )
@@ -507,7 +564,6 @@ export default {
     onVideoReady() {
     },
     onVideoEnded() {
-      console.log('ended')
       this.loadNextVideo()
     },
     onVideoPlaying() {
@@ -515,10 +571,9 @@ export default {
     onVideoPaused() {
     },
     onVideoBuffering() {
-
     },
     onVideoCued() {
-      //this.seekTo()
+      this.playVideo()
     },
     async onReceiveMessage(payload) {
       const id = payload.headers['message-id']
@@ -526,37 +581,47 @@ export default {
 
       if (body.type == 'SYNC')
       {
-        // TODO: 내가 방장이면 SYNC 메시지 무시
-        // if (I'm author) return;
-
-        const currentPlaylistOffset = this.roomCurrentPlaylistOffset
-        const currentVideoOffset = this.roomCurrentVideoOffset
+        const currentPlaylistId = this.roomCurrentPlaylistId
+        const currentVideoId = this.roomCurrentVideoId
         const currentVideoTime = await this.player.getCurrentTime();
         const currentPlayerState = await this.player.getPlayerState();
+        const currentSyncSender = this.roomLastSyncSender
 
         const syncData = JSON.parse(body.message)
-        const syncPlaylistOffset = syncData.playlistOffset
-        const syncVideoOffset = syncData.videoOffset
+        const syncPlaylistId = syncData.playlistId
+        const syncVideoId = syncData.videoId
         const syncVideoTime = syncData.videoPlaytime
         const syncPlayerState = syncData.playerState
+        const syncSender = syncData.sender
 
-        if (currentPlaylistOffset != syncPlaylistOffset) this.SET_ROOM_CURRENT_PLAYLIST_OFFSET(syncPlaylistOffset)
-        if (currentVideoOffset != syncVideoOffset) this.SET_ROOM_CURRENT_VIDEO_OFFSET(syncVideoOffset)
+        if (!currentSyncSender) {
+          this.SET_ROOM_LAST_SYNC_SENDER(syncSender)
+        }
+        else if (currentSyncSender != syncSender)
+        {
+          await this.getRoomInfo()
+          this.SET_ROOM_LAST_SYNC_SENDER(syncSender)
+        }
+
+        if (this.userInfo.userSeq == this.roomAuthorId) return;
+
+        if (currentPlaylistId != syncPlaylistId) this.SET_ROOM_CURRENT_PLAYLIST_ID(syncPlaylistId)
+        if (currentVideoId != syncVideoId) this.SET_ROOM_CURRENT_VIDEO_ID(syncVideoId)
         if (currentPlayerState != syncPlayerState) {
           if (syncPlayerState == 1) this.player.playVideo()
           else if (syncPlayerState == 2) this.player.pauseVideo()
         }
-        console.log('syncVideoTime', syncVideoTime, 'currentVideoTime', currentVideoTime)
+        //console.log('syncVideoTime', syncVideoTime, 'currentVideoTime', currentVideoTime)
         if (Math.abs(syncVideoTime - currentVideoTime) > 2) this.SET_ROOM_CURRENT_VIDEO_PLAYTIME(syncVideoTime);
+        this.heartbeat = 0;
       }
       else// if (body.type == 'TALK')
       {
-        const profile = await axiosConnector.post('/echo', {
-          nickname: '시스템',
-          profilePictureUrl: 'https://picsum.photos/80/80'
-        })
-        //const profile = await axiosConnector.get(`/profile/${body.id}`)
-        const author = { id: body.id, name: profile.data.nickname, thumbnail: profile.data.profilePictureUrl };
+        // const profile = await axiosConnector.post('/echo', {
+        //   nickname: '시스템',
+        //   profilePictureUrl: 'https://picsum.photos/80/80'
+        // })
+        const author = { id: body.id, name: body.sender ? body.sender : "익명의 유저", thumbnail: body.img };
         const content = body.message;
         const timestamp = new Date().getTime();
         const blockedUser = ( this.chatBlockedUid.find((v) => v == author.id) != undefined );
@@ -573,23 +638,18 @@ export default {
       return this.selectedItem.findIndex(el => el == id) > -1
     },
     loadNextVideo() {
-      if (this.roomCurrentPlaylistVideos.filter(v => v.included).length < this.roomCurrentVideoOffset + 1)
+      if (this.roomNextVideo)
       {
-        if (Object.keys(this.roomPlaylists).length <= this.roomCurrentPlaylistOffset + 1)
-          this.SET_ROOM_CURRENT_PLAYLIST_OFFSET(0)
-        else
-          this.SET_ROOM_CURRENT_PLAYLIST_OFFSET(this.roomCurrentPlaylistOffset + 1)
-        this.SET_ROOM_CURRENT_VIDEO_OFFSET(0)
-        this.SET_ROOM_CURRENT_VIDEO_PLAYTIME(0)
-      }
-      else
-      {
-        this.SET_ROOM_CURRENT_VIDEO_OFFSET(this.roomCurrentVideoOffset + 1)
+        this.SET_ROOM_CURRENT_PLAYLIST_ID(this.roomNextVideo.playlistId)
+        this.SET_ROOM_CURRENT_VIDEO_ID(this.roomNextVideo.videoId)
         this.SET_ROOM_CURRENT_VIDEO_PLAYTIME(0)
       }
     },
     updateVideoId() {
-      this.videoId = this.roomCurrentPlaylistVideos.filter(v => v.included).map(v => v.videoId)[this.roomCurrentVideoOffset];
+      //console.log('updateVideoId', this.roomCurrentPlaylistVideos, this.roomCurrentPlaylistId, this.roomCurrentVideoId)
+      if (!this.roomCurrentPlaylistVideos) return;
+      if (!this.roomCurrentVideoId) return;
+      this.videoId = this.roomCurrentPlaylistVideos.find(roomCurrentPlaylistVideo => roomCurrentPlaylistVideo.id == this.roomCurrentVideoId).videoId;
     },
     playVideo() {
       this.player.playVideo()
@@ -597,39 +657,115 @@ export default {
     seekTo() {
       console.log('seekTo', this.roomCurrentVideoPlaytime)
       this.player.seekTo(this.roomCurrentVideoPlaytime)
+      //setTimeout(this.player.playVideo, 1000)
     },
     playThisVideo() {
       if (this.selectedItem.length != 1) {
         alert('바로 재생할 영상을 1개만 선택해주세요')
         return;
       }
-      this.SET_ROOM_CURRENT_VIDEO_OFFSET(this.selectedItem[0])
+      console.log(this.selectedItem)
+      this.SET_ROOM_CURRENT_VIDEO_ID(this.selectedItem[0])
       this.SET_ROOM_CURRENT_VIDEO_PLAYTIME(0)
       this.selectedItem = []
       this.seekTo()
     },
     playroomLike() {
-      this.SET_ROOOM_LIKED(!this.roomLiked)
+      this.SET_ROOM_LIKED(!this.roomLiked)
       axiosConnector.post(this.roomLiked ? '/playroom/like' : '/playroom/dislike', JSON.stringify({ id: this.roomId }));
     },
+    async sendMessage(payload) {
+      if (!this.chatroomId) return;
+      if (!payload || !payload.type || !payload.message || !payload.token) return;
+
+      return await this.wsConnector.send(
+        "/pub/chat/message",
+        JSON.stringify({ type: payload.type, roomId: this.chatroomId, message: payload.message }),
+        { Authorization: payload.token }
+      );
+    },
     async sendSync() {
+      const token = localStorage.getItem('jwt')
+
       this.SET_ROOM_CURRENT_VIDEO_PLAYTIME(await this.player.getCurrentTime())
 
       const syncData = {
         timestamp: new Date().getTime(),
-        playlistOffset: this.roomCurrentPlaylistOffset,
-        videoOffset: this.roomCurrentVideoOffset,
+        playlistId: this.roomCurrentPlaylistId,
+        videoId: this.roomCurrentVideoId,
         videoPlaytime: this.roomCurrentVideoPlaytime,
         playerState: await this.player.getPlayerState()
       };
-      const token = localStorage.getItem('jwt')
 
       if (!token) return;
+      if (this.userInfo.userSeq != this.roomAuthorId) return;
+
       this.sendMessage({ type: 'SYNC', message: JSON.stringify(syncData), token })
     },
-    ...mapMutations('playroom', ['SET_ROOOM_LIKED', 'SEEK_VIDEO', 'SET_ROOM_CURRENT_PLAYLIST_OFFSET', 'SET_ROOM_CURRENT_VIDEO_OFFSET', 'SET_ROOM_CURRENT_VIDEO_PLAYTIME']),
-    ...mapActions('playroom', ['sendMessage'])
-  }
+    sendChat() {
+      const token = localStorage.getItem('jwt')
+
+      this.disableChatbox()
+      this.pendingToSendMessage()
+      this.sendMessage({ type: 'TALK', message: this.message, token })
+        .then(() => {
+          this.clearMessage()
+        })
+        .catch((err) => {
+          this.notifySendError()
+        })
+        .finally(() => {
+          this.completeToSendMessage()
+          this.enableChatbox()
+        })
+    },
+    clearMessage() {
+      this.message = ''
+    },
+    pendingToSendMessage() {
+      this.sending = true
+    },
+    completeToSendMessage() {
+      this.sending = false
+    },
+    enableChatbox() {
+      this.canChat = true
+    },
+    disableChatbox() {
+      this.canChat = false
+    },
+    notifySendError() {
+      this.errorOnSend = true;
+      setTimeout(this.clearSendError, 1000);
+    },
+    clearSendError() {
+      this.errorOnSend = false;
+    },
+    checkHeartbeat() {
+      if (this.heartbeat > 30)
+      {
+        // 방 접속자 정보가 있다면 (ID리스트)
+        // Date.now().getTime() % this.roomUsers.length
+        // const userOffset = this.roomUsers.findIndex(roomUser => roomUser == this.userInfo.userSeq)
+
+        // 그런거 없으니까 일단은.. 무작정 도전!
+        if (this.userInfo.userSeq)
+          if ((parseInt(this.userInfo.userSeq) + Date.now()) % 10 == (parseInt(this.roomId) + parseInt(this.roomAuthorId)) % 10)
+            this.requestRoomAuthor()
+      }
+
+      if (this.userInfo.userSeq && this.userInfo.userSeq == this.roomAuthorId) return;
+      this.heartbeat += 1;
+    },
+    async requestRoomAuthor() {
+      await axiosConnector.put(`/playroom/${this.roomId}/user`);
+      await this.getRoomInfo();
+      this.heartbeat = 0;
+    },
+    ...mapMutations('playroom', ['SET_ROOM_AUTHOR', 'SET_ROOM_LIKED', 'SEEK_VIDEO',
+      'SET_ROOM_CURRENT_PLAYLIST_ID', 'SET_ROOM_CURRENT_VIDEO_ID', 'SET_ROOM_CURRENT_VIDEO_PLAYTIME',
+      'SET_ROOM_LAST_SYNC_SENDER']),
+  },
 }
 </script>
 

@@ -8,6 +8,9 @@ const account = {
     introduction: null,
     image: null,
     is_vip: null,
+    // 팔로잉, 팔로워
+    following: null,
+    followers: null,
   },
   mutations: {
   },
@@ -17,4 +20,3 @@ const account = {
   }
 }
 export default account
-

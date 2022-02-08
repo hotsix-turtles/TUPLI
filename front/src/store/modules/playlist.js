@@ -20,6 +20,7 @@ const playlist = {
     addedPlaylists: [],
     addedPlaylistVideoIds: [],
     // 아래 두줄은 추후 account.js로 옮길듯
+    likedPlaylists: [],
     myPlaylists: [ { playlistId: 1, title: '좋아요한 플레이리스트 1', thumbnail: '', videos: [{ videoId: 'a2dxf-fvfla', title: '냠냠', thumbnail: '' }] }, { playlistId: 2, title: '좋아요한 플레이리스트 2', thumbnail: '' }, { playlistId: 3, title: '좋아요한 플레이리스트 3', thumbnail: '' }, ],
     savedPlaylists: [ { playlistId: 4, title: '저장한 플레이리스트 1', thumbnail: '', videos: [{ videoId: 'a2dxf-fvflb', title: '냠냠', thumbnail: '' }] }, { playlistId: 5, title: '저장한 플레이리스트 2', thumbnail: '' }, { playlistId: 6, title: '저장한 플레이리스트 3', thumbnail: '' }, ]
   },
@@ -130,6 +131,9 @@ const playlist = {
       state.selectedPlaylists = []
       state.addedPlaylists = []
       state.addedPlaylistVideoIds = []
+    },
+    SET_LIKED_PLAYLISTS: function (state, value) {
+      state.likedPlaylists = value ? value : state.likedPlaylists;
     }
   },
   actions: {
@@ -266,6 +270,9 @@ const playlist = {
     },
     resetAddedPlaylists: function ({ commit }) {
       commit('RESET_ADDED_PLAYLISTS')
+    },
+    setLikedPlaylist: function ({ commit }, { data }) {
+      commit('SET_LIKED_PLAYLISTS', data);
     }
   },
   modules: {

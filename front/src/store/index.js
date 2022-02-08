@@ -10,27 +10,31 @@ import video from './modules/video.js'
 import playlist from './modules/playlist.js'
 
 import axios from 'axios'
-import axiosConnector from '../utils/axios-connector.js'
+import SERVER from '@/api/server'
 import createPersistedState from "vuex-persistedstate";
+import firebase from 'firebase/compat/app';
+import 'firebase/compat/database';
 
 export default new Vuex.Store({
+  // TODO: createPersistedState 사용시 사용 모듈 한정 필요 (playroom, playlist등엔 사용 x)
+
   // 새로고침, 외부진입시에도 state 정보 온존
   plugins: [createPersistedState()],
   //plugins: [createPersistedState({storage: window.sessionStorage})], // 창 종료시 state 초기화 하는 타입
 
   // data
   state: {
-    authToken: localStorage.getItem('jwt'),
+    authToken: null,
     isLogin: false,
-    userInfo: null
+    // userInfo: null
+    // 실시간 알람
+    realtimeAlarmList: null,
+    realtimeBoolean:false  // 플레이룸 등 특정 상황에서 비활성화
   },
-  // 모듈에서 쓸 JWT
   getters: {
-    config: function (state) {
-      return {
-        Authorization: `JWT ${state.authToken}`
-      }
-    },
+    getRealtimeAlarmList: function(state) {
+      return state.realtimeAlarmList;
+    }
   },
   mutations: {
     // 로그인
@@ -57,30 +61,67 @@ export default new Vuex.Store({
       state.email = res.email
       state.nickname = res.nickname
       state.introduction = res.introduction
-      if (res.profileImageUrl) {
-        state.image = 'https://storage.cloud.google.com/tupli_profile' + res.profileImageUrl
+      if (res.profileImage) {
+        state.image = SERVER.ROUTES.image + res.profileImage
       } else {
-        state.profileImageUrl = null
+        state.profileImage = null
       }
       state.is_vip = res.is_vip
+      state.following = res.to_user
+      state.followers = res.from_user
     },
-    // 회원정보
-    PROFILE: function (state, userInfo) {
-      state.userInfo
-    }
+    // 프로필 변경
+    UPDATE_PROFILE(state, res) {
+      console.log('프로필 변경', res)
+      state.nickname = res.nickname
+      state.introduction = res.introduction
+      if (res.image) {
+        image = SERVER.ROUTES.image + res.image
+      } else {
+        image = state.image
+      }
+    },
+    // 가져온 알람 갱신
+    SET_REALTIME_ALARM(state, res) {
+      state.realtimeAlarmList = res;
+    },
   },
   actions: {
     // 로그인
     login: function ({ commit, dispatch }, credentials) {
-      axiosConnector.post('/account/login', { email: credentials.email, password: credentials.password })
+      axios({
+        method: 'POST',
+        url: SERVER.URL + '/account/login',
+        data: {
+          email: credentials.email,
+          password: credentials.password,
+        }
+      })
         .then((res) => {
           commit('TOKEN', res.data.token)
+          dispatch('getUserInfo', res.data.token)
           router.push({ name: 'Home' })
-          // router.push({ name: 'Profile' })  // 자동 로그인, 가입후 바로 로그인 쓰일 수 있으니 store에서 해주지 말아주시고 login view라던가 필요한 상황에서 해주세요(강민구)
-          dispatch('getUserInfo')
         })
         .catch((err) => {
-          console.log(err)
+          console.log(err.response.data)
+        })
+    },
+    // 로그인 (회원가입, 자동로그인 등을 위한 라우터 이동 없는 버전)
+    loginHere: function ({ commit, dispatch }, credentials) {
+      axios({
+        method: 'POST',
+        url: SERVER.URL + '/account/login',
+        data: {
+          email: credentials.email,
+          password: credentials.password,
+        }
+      })
+        .then((res) => {
+          commit('TOKEN', res.data.token)
+          dispatch('getUserInfo', res.data.token)
+        })
+        .catch((err) => {
+          console.log(err.response.data)
         })
     },
     // 로그아웃
@@ -90,57 +131,57 @@ export default new Vuex.Store({
     },
     // 회원가입
     signup: function (context, credentials) {
-      // const formData = new FormData()
-      // formData.append('email', credentials.email)
-      // formData.append('password', credentials.password)
-      // formData.append('passwordCheck', credentials.passwordCheck)
-      // formData.append('nickname', credentials.nickname)
-      // formData.append('username', credentials.username)
-      // console.log('토큰있는상태로 이거 하면 또 토큰 보내서 사고 터지는거 아님?', formData) (강민구<< 로그아웃 버튼 만들고 다시 실험해주세요)
-      // axiosConnector.post('/account/signup', credentials)
       axios({
-        method: 'post',
-        url: 'https://i6a102.p.ssafy.io/api/v1' + '/account/signup',
+        method: 'POST',
+        url: SERVER.URL + '/account/signup',
         data: {
           email: credentials.email,
           password: credentials.password,
-          username: credentials.username,
+          // username: credentials.username,
+          nickname: credentials.nickname,
         }
       })
         .then((res) => {
           // 회원가입시 자동 로그인까지 하고 signup 3으로 보내기 (강민구)
-          this.dispatch('login', credentials)
+          this.dispatch('loginHere', credentials)
           router.push( { name: 'Signup3' })
         })
         .catch((err) => {
           console.log('signup fail')
-          console.log(err)
+          console.log(err.response.data)
         })
     },
     // 사용자 정보 얻기
-    getUserInfo({commit}) {
-      axiosConnector.get('/account/userInfo')
+    getUserInfo({commit}, token) {
+      axios({
+        method: 'GET',
+        url: SERVER.URL + '/account/userInfo',
+        headers: {Authorization: token}
+      })
         .then(res => {
+          console.log(res.data)
           commit('GET_USER_INFO', res.data)
         })
-        .catch(err => console.log(err))
+        .catch(err => console.log(err.response.data))
     },
-
-    // 프로필
-    // getProfile: function ({ commit }) {
-    //   axios({
-    //     method: 'get',
-    //     url: 'i6a102.p.ssafy.io/api/v1' + '/profile',
-    //     headers: state.authToken
-    //   })
-    //     .then((res) => {
-    //       commit('PROFILE', res.data.userInfo)
-    //     })
-    //     .catch((err) => {
-    //       console.log(err)
-    //     })
-    // }
-
+    // 실시간 알람 가져오기 (로그인 등 이후에 호출할 것!)
+    getRealtimeAlarm({state, commit}) {
+      firebase
+        .database()
+        .ref('tupli/realtime')  // 기초 버전 : 전부 다 받는 버전
+        .limitToLast(20)
+        .on('value', (snap) => {
+          let res = snap.val()
+          const tmp = {}
+          tmp.from = res.from
+          tmp.fromId = res.fromId
+          tmp.img = res.image
+          tmp.to = res.to
+          tmp.type = res.type
+          tmp.isRead = false
+          commit('SET_REALTIME_ALARM', tmp);
+        });
+    },
   },
   modules: {
     playroom: playroom,
@@ -149,4 +190,3 @@ export default new Vuex.Store({
     playlist: playlist,
   },
 })
-

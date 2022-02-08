@@ -8,10 +8,12 @@ export default{
   ROUTES: {
     accounts: {
       default: '/account',
-      getUserInfo: '/account/userinfo'
+      getUserInfo: '/account/userinfo',
+
+      kakaoPay: '/kakaoPay/'
     },
     // GCS
-    image : 'https://storage.cloud.google.com/moviecurator-profile',
+    image : 'https://storage.cloud.google.com/tupli_profile',
   }
 
 }

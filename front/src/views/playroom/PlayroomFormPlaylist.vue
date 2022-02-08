@@ -63,7 +63,7 @@
           :key="item"
         >
           <playlist-list-item-small
-            :playlists="item == '저장한 플레이리스트' ? savedPlaylists : myPlaylists"
+            :playlists="item == '저장한 플레이리스트' ? savedPlaylists : likedPlaylists"
             :playlist-readonly="false"
             :video-readonly="true"
           />
@@ -79,6 +79,7 @@ import Back from '../../components/common/Back.vue'
 import SearchBar from '../../components/common/SearchBar.vue'
 import PlaylistListItemSmall from '../../components/playlist/PlaylistListItemSmall.vue'
 import NavButton from '../../components/common/NavButton.vue'
+import axiosConnector from '../../utils/axios-connector';
 
 export default {
   name: 'PlayroomFormPlaylist',
@@ -93,7 +94,7 @@ export default {
     }
   },
   computed: {
-    ...mapState('playlist', ['addedPlaylists', 'selectedPlaylists', 'myPlaylists', 'savedPlaylists']),
+    ...mapState('playlist', ['addedPlaylists', 'selectedPlaylists', 'myPlaylists', 'likedPlaylists', 'savedPlaylists']),
   },
   created: function () {
     if (this.addedPlaylists.length) {
@@ -101,12 +102,25 @@ export default {
     }
     console.log(this.addedPlaylists, this.selectedPlaylists)
   },
+  mounted () {
+    this.$nextTick(() => {
+      this.getUserPlaylistInfo();
+    });
+  },
   methods: {
+    async getUserPlaylistInfo() {
+      const token = localStorage.getItem('jwt')
+
+      const likedPlaylists = await axiosConnector.get(`/playlist/likes`);
+      //const savedPlaylists = await axiosConnector.get(`/playlist/saved`, { headers: { Authorization: token } });
+      console.log('liked', likedPlaylists.data)
+      this.setLikedPlaylist(likedPlaylists)
+    },
     async requestAddPlaylists() {
       await this.addPlaylists()
       this.$router.go(-1)
     },
-    ...mapActions('playlist', ['addPlaylists', 'revokePlaylists'])
+    ...mapActions('playlist', ['setLikedPlaylist', 'setSavedPlaylist', 'addPlaylists', 'revokePlaylists'])
   }
 }
 </script>

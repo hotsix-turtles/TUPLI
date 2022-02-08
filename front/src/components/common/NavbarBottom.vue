@@ -79,29 +79,46 @@
           <v-icon>mdi-compass</v-icon>
           <div>탐색</div>
         </div>
-
+        <!--$$$$-->
         <div
+          v-if="isLogin"
           class="clickable d-flex-column text-center"
           @click="$router.push({ name: 'Profile' })"
         >
           <v-icon>mdi-account-circle-outline</v-icon>
           <div>프로필</div>
         </div>
+        <div
+          v-else
+          class="clickable d-flex-column text-center"
+          @click="$router.push({ name: 'Login' })"
+        >
+          <v-icon>mdi-account-circle-outline</v-icon>
+          <div>로그인</div>
+        </div>
       </div>
     </div>
+    <Alarm />
   </div>
 </template>
 
 <script>
+import { mapState } from 'vuex'
+import Alarm from '@/components/alarm/Alarm'
+
 export default {
   name: 'NavbarBottom',
   components: {
+    Alarm
   },
   data: function() {
     return {
       value: 1,
       isClickedMakeBtn: false
     }
+  },
+  computed : {
+    ...mapState(['isLogin']),
   },
   methods: {
     toggle: function() {

@@ -31,20 +31,22 @@
 </template>
 
 <script>
-import axiosConnector from '@/utils/axios-connector.js'
+import axios from 'axios'
+import SERVER from '@/api/server'
+import { mapState } from 'vuex'
 
 export default {
-
   name: 'Payment',
+  computed: {
+    ...mapState(['authToken'])
+  },
   methods: {
     buyPremium: function() {
-      axiosConnector.get('/kakaoPay/')
-      // 실제 적용시에는, 이미 프리미엄 유저인지 확인하는 것 필요
-      // axios({
-      //   method: 'GET',
-      //   url: SERVER.URL + SERVER.ROUTES.accounts.kakaoPay,
-      //   headers: {Authorization: this.token},
-      // })
+      axios({
+        method: 'GET',  // 주소얻어오는거라 GET
+        url: SERVER.URL + SERVER.ROUTES.accounts.kakaoPay,
+        headers: {Authorization: this.authToken},
+      })
         .then((res) => {
           window.location.href = res.data
         })
