@@ -59,6 +59,7 @@
                   fab
                   elevation="0"
                   class="mx-3"
+                  :href="socialLoginUrl('google')"
                   :loading="loading"
                   :disabled="loading"
                   @click="loader = 'loading'"
@@ -90,14 +91,12 @@
       <!-- 그 외 -->
       <v-container>
         <div class="row justify-center mb-4 mt-1">
-          <router-link
-            to="/signup2"
-            class="no-background-hover-text"
+          <p
+            class="mx-1"
+            @click="$router.push({ name: 'Signup2' })"
           >
-            <p class="mx-1">
-              회원가입
-            </p>
-          </router-link>
+            회원가입
+          </p>
           <p class="mx-1">
             |
           </p>
@@ -169,7 +168,16 @@ export default {
     },
     ...mapActions([
       'login',
-    ])
+    ]),
+
+    socialLoginUrl: function(socialType){
+      // const BACKEND_PORT = SERVER.BACKEND_PORT === null ? '' : `:${SERVER.BACKEND_PORT}`
+      // const BACKEND_URL = "https://i6a102.p.ssafy.io/api/v1"
+      // const FRONTEND_PORT = SERVER.FRONTEND_PORT === null ? '' : `:${SERVER.FRONTEND_PORT}`
+      // const REDIRECT_URI = `${location.protocol}//${location.hostname}${FRONTEND_PORT}/oauth/redirect`
+      // console.log(`${BACKEND_URL}/oauth2/authorization/${socialType}?redirect_uri=${REDIRECT_URI}`)
+      return `https://i6a102.p.ssafy.io/api/v1/oauth2/authorization/${socialType}?redirect_uri=https://i6a102.p.ssafy.io/oauth/redirect`
+    }
 
   },
 
@@ -211,8 +219,6 @@ export default {
     }
   }
 
-  .no-background-hover-text {
-    text-decoration: none !important;
-    text-decoration-color: black !important;
-  }
+
 </style>
+

@@ -1,7 +1,7 @@
 <template>
   <v-app>
     <div class="background-login px-5">
-      <h1>회원가입 페이지</h1>
+      <!-- <h1>회원가입 페이지</h1> -->
       <v-container>
         <v-container class="mb-5">
           <v-row
@@ -63,13 +63,13 @@
               label="닉네임"
             />
 
-            <h3>이름</h3>
+            <!-- <h3>이름</h3>
             <v-text-field
               v-model="credentials.username"
               class="pt-0"
               type=""
               label="이름"
-            />
+            /> -->
           </v-form>
 
           <v-btn
@@ -103,7 +103,7 @@ export default {
         password: null,
         passwordCheck: null,
         nickname: null,
-        username: null,
+        // username: null,
       },
 
       // 유효성 검사

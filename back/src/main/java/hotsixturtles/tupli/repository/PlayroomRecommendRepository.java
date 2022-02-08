@@ -71,7 +71,7 @@ public class PlayroomRecommendRepository {
         return jpaQueryFactory
                 .select(playroom)
                 .from(playroom)
-                .where(playroom.roomStartTime.gt(nowTime))
+                .where(playroom.startTime.gt(nowTime))
                 .orderBy(playroom.userCount.desc())
                 .limit(size)
                 .fetch();

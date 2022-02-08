@@ -1,8 +1,6 @@
 <template>
   <v-app>
-    <h1>
-      좋아요한 게시물
-    </h1>
+    게시글
   </v-app>
 </template>
 

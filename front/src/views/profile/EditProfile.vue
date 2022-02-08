@@ -6,24 +6,19 @@
         class="align-center mt-5 justify-space-between"
       >
         <div class="d-flex">
-          <router-link
-            to="/profile"
-            class="no-background-hover"
+          <v-icon
+            size="30"
+            color="#5B5C9D"
+            @click="$router.push({ name: 'Profile' })"
           >
-            <v-icon
-              color="#5B5C9D"
-            >
-              mdi-chevron-left
-            </v-icon>
-          </router-link>
-          <h4 class="">
+            mdi-chevron-left
+          </v-icon>
+          <h3>
             프로필 편집
-          </h4>
+          </h3>
         </div>
-        <router-link
-          to="/profile"
-          class="no-background-hover"
-        >
+
+        <div>
           <v-btn
             class="d-flex justify-end p-5 mx-5"
             small
@@ -31,21 +26,9 @@
             outlined
             color="#5B5C9D"
             depressed
-          >
-            완료
-          </v-btn>
-        </router-link>
-        <div>
-          <v-btn
-            class="d-flex justify-end p-5 mx-5"
-            small
-            rounded
-            outlined
-            color="#FF0000"
-            depressed
             @click="updateProfile"
           >
-            변경(임시)
+            변경
           </v-btn>
         </div>
       </v-row>
@@ -60,9 +43,9 @@
           >
           <!-- 사진 업로드용 임시 -->
           <div class="update-modal mb-3">
-            <label for="profile-photo">사진 변경: </label>
-            <input 
-              type="file" 
+            <label for="profile-photo" />
+            <input
+              type="file"
               @change="getNewImage"
             >
           </div>
@@ -99,7 +82,9 @@
 </template>
 
 <script>
-import axiosConnector from '@/utils/axios-connector.js'
+import axios from 'axios'
+import SERVER from '@/api/server'
+import { mapState } from 'vuex'
 
 export default {
   name: 'EditProfile',
@@ -112,28 +97,37 @@ export default {
       }
     }
   },
+  computed: {
+    ...mapState(['nickname', 'introduction', 'image', 'authToken'])
+  },
   created() {
     this.init()
   },
   methods: {
     init: function() {
-      this.credentials.newNickname = '김춘식'
-      this.credentials.newIntroduction = '안녕하세요?!'
+      this.credentials.newNickname = this.nickname
+      this.credentials.newIntroduction = this.introduction
       this.credentials.newImage = ''
     },
     updateProfile: function(){
       const formData = new FormData()
+      formData.append('image', this.credentials.newImage)
       formData.append('nickname', this.credentials.newNickname)
       formData.append('introduction', this.credentials.newIntroduction)
-      formData.append('image', this.credentials.newImage)
-      axiosConnector.put('/profile', formData)
+      axios({
+        method: 'PUT',
+        headers: {Authorization: this.authToken},
+        url: SERVER.URL + '/profile',
+        data: formData        
+      })
         .then((response) => {
-          console.log(response.data)
+          this.$router.push({ name: 'Profile' })
           // 필요하면 자체 갱신
           // this.nickname = response.data.email
           // state 갱신
-          // this.$store.dispatch('updateProfile', formData)
+          this.$store.commit('UPDATE_PROFILE', formData)
         })
+        .catch((err) => console.log(err.response.data))
     },
     getNewImage: function(event) {
       this.credentials.newImage = event.target.files[0]
@@ -143,7 +137,5 @@ export default {
 </script>
 
 <style>
-  .no-background-hover {
-      text-decoration: none !important;
-    }
+
 </style>

@@ -1,8 +1,6 @@
 <template>
   <v-app>
-    <h1>
-      약관
-    </h1>
+    게시글
   </v-app>
 </template>
 

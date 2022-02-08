@@ -93,7 +93,7 @@ public class User implements UserDetails {
     @Column(name = "PROFILE_IMAGE_URL", length = 512)
 //    @NotNull
     @Size(max = 512)
-    private String profileImageUrl;
+    private String profileImage;
 
     private String introduction = "안녕하세요. 잘 부탁드리겠습니다";
 
@@ -182,7 +182,7 @@ public class User implements UserDetails {
         this.password = "NO_PASS";
         this.email = email != null ? email : "NO_EMAIL";
         this.emailVerifiedYn = emailVerifiedYn != null ? emailVerifiedYn :"N";
-        this.profileImageUrl = profileImageUrl != null ? profileImageUrl : "";
+        this.profileImage = profileImage != null ? profileImage : "";
         this.providerType = providerType != null ? providerType : ProviderType.LOCAL;
         this.roleType = roleType != null ? roleType : RoleType.USER;
         this.createdAt = createdAt;

@@ -1,7 +1,9 @@
 package hotsixturtles.tupli.entity.youtube;
 
 import hotsixturtles.tupli.dto.simple.SimpleYoutubeVideoDto;
+import hotsixturtles.tupli.entity.Board;
 import hotsixturtles.tupli.entity.Playlist;
+import hotsixturtles.tupli.entity.Playroom;
 import lombok.*;
 
 import javax.persistence.*;
@@ -30,6 +32,10 @@ public class YoutubeVideo {
     @JoinColumn(name="playlist_id")
     private Playlist playlist;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="playroom_id")
+    private Playroom playroom;
+
 
     public void setInit(SimpleYoutubeVideoDto simpleYoutubeVideoDto) {
         this.videoId = simpleYoutubeVideoDto.getVideoId();
@@ -39,5 +45,15 @@ public class YoutubeVideo {
         this.channelTitle = simpleYoutubeVideoDto.getChannelTitle();
         this.duration = simpleYoutubeVideoDto.getDuration();
         this.categoryId = simpleYoutubeVideoDto.getCategoryId();
+    }
+
+    public void setInit(YoutubeVideo youtubeVideo) {
+        this.videoId = youtubeVideo.getVideoId();
+        this.title = youtubeVideo.getTitle();
+        this.date = youtubeVideo.getDate();
+        this.thumbnail = youtubeVideo.getThumbnail();
+        this.channelTitle = youtubeVideo.getChannelTitle();
+        this.duration = youtubeVideo.getDuration();
+        this.categoryId = youtubeVideo.getCategoryId();
     }
 }
