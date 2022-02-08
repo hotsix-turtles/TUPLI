@@ -4,15 +4,14 @@ import hotsixturtles.tupli.dto.PlayroomDto;
 import hotsixturtles.tupli.dto.request.RequestPlayroomDto;
 import hotsixturtles.tupli.dto.response.ResponsePlayroomDto;
 import hotsixturtles.tupli.dto.simple.SimpleUserDto;
+import hotsixturtles.tupli.entity.Playlist;
 import hotsixturtles.tupli.entity.Playroom;
 import hotsixturtles.tupli.entity.User;
 import hotsixturtles.tupli.entity.likes.UserLikes;
 import hotsixturtles.tupli.entity.youtube.YoutubeVideo;
-import hotsixturtles.tupli.repository.PlaylistRepository;
-import hotsixturtles.tupli.repository.PlayroomRepository;
-import hotsixturtles.tupli.repository.UserRepository;
-import hotsixturtles.tupli.repository.YoutubeVideoRepository;
+import hotsixturtles.tupli.repository.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,11 +29,17 @@ public class PlayroomService {
     private final PlayroomRepository playroomRepository;
     private final YoutubeVideoRepository youtubeVideoRepository;
     private final NotificationService notificationService;
+    private final PlayroomRepositoryCustom playroomRepositoryCustom;
 
     public List<Playroom> getPlayroomList(){
 
         // Paging 조건 정해서 추가
         return playroomRepository.findAll();
+    }
+
+    // Home 화면 Playroom 검색
+    public List<Playroom> getHomePlayrooms(Pageable pageable) {
+        return playroomRepositoryCustom.listByHomePlayroom(pageable);
     }
 
     public Playroom getPlayroom(Long playroomId){
