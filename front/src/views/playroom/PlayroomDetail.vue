@@ -757,8 +757,10 @@ export default {
       if (this.userInfo.userSeq && this.userInfo.userSeq == this.roomAuthorId) return;
       this.heartbeat += 1;
     },
-    requestRoomAuthor() {
-      axiosConnector.put(`/playroom/${this.roomId}/user`);
+    async requestRoomAuthor() {
+      await axiosConnector.put(`/playroom/${this.roomId}/user`);
+      await this.getRoomInfo();
+      this.heartbeat = 0;
     },
     ...mapMutations('playroom', ['SET_ROOM_AUTHOR', 'SET_ROOM_LIKED', 'SEEK_VIDEO',
       'SET_ROOM_CURRENT_PLAYLIST_ID', 'SET_ROOM_CURRENT_VIDEO_ID', 'SET_ROOM_CURRENT_VIDEO_PLAYTIME',
