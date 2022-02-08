@@ -99,9 +99,7 @@ public class BoardService {
     public void deleteBoardLike(Long userSeq, Long boardId) {
 
         BoardLikes existBoardLikes = boardLikesRepository.findExist(userSeq, boardId);
-        System.out.println("existBoardLikes = " + existBoardLikes);
         if(existBoardLikes != null) {
-            System.out.println("나는 살아있다");
             boardLikesRepository.delete(existBoardLikes);
         } else {
             // 익셉션 발생
