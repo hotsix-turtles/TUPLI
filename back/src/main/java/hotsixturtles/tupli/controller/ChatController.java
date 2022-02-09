@@ -26,7 +26,7 @@ public class ChatController {
     @MessageMapping("/chat/message")  // websocket으로 들어오는 메시지 발행(/sub/chat/room/{roomId}로 메시지를 send)
     public void message(ChatMessage message, @Header("Authorization") String token) {
         User user = jwtTokenProvider.getUser(token);
-        String nickname = user.getEmail();
+        String nickname = user.getNickname();
 
 
         // 로그인 회원 정보로 대화명 설정
