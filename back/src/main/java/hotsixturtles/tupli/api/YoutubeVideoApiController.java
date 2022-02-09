@@ -1,23 +1,29 @@
 package hotsixturtles.tupli.api;
 
 import hotsixturtles.tupli.dto.PlayroomDto;
+import hotsixturtles.tupli.dto.simple.SimplePlayroomCategoryDto;
+import hotsixturtles.tupli.dto.simple.SimpleVideoCategoryDto;
 import hotsixturtles.tupli.dto.simple.SimpleYoutubeVideoDto;
 import hotsixturtles.tupli.dto.response.ErrorResponse;
 import hotsixturtles.tupli.dto.simple.YoutubeVideoLikesSavedDto;
 import hotsixturtles.tupli.entity.Playroom;
 import hotsixturtles.tupli.entity.youtube.YoutubeVideo;
+import hotsixturtles.tupli.service.SearchService;
 import hotsixturtles.tupli.service.YoutubeVideoService;
 import hotsixturtles.tupli.service.token.JwtTokenProvider;
 import io.swagger.annotations.Api;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Arrays;
-import java.util.List;
+import javax.servlet.http.HttpServletRequest;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RestController
@@ -30,6 +36,8 @@ public class YoutubeVideoApiController {
     private final MessageSource messageSource;
 
     private final YoutubeVideoService youtubeVideoService;
+
+    private final SearchService searchService;
 
     /**
      * 유튜브 영상 저장하기 >> Input 값이 뭐가 올지 확정할 필요 있음
@@ -253,6 +261,52 @@ public class YoutubeVideoApiController {
         List<SimpleYoutubeVideoDto> result = videos.stream().map(b -> new SimpleYoutubeVideoDto(b)).collect(Collectors.toList());
 
         return ResponseEntity.ok().body(result);
+    }
+
+    @GetMapping("/videos/category/{categoryKeyword}")
+    public ResponseEntity categoryVideos(@PathVariable("categoryKeyword") String categoryKeyword,
+                                           @PageableDefault(size = 50, sort ="id",  direction = Sort.Direction.ASC) Pageable pageable,
+                                           HttpServletRequest request) {
+        // 카테고리 분류
+        Map<String, String> categories = new HashMap<>();
+        categories.put("trip", "여행");
+        categories.put("game", "게임");
+        categories.put("life", "일상");
+        categories.put("style", "노하우/스타일");
+        categories.put("animal", "동물");
+        categories.put("entertainment", "엔터테인먼트");
+        categories.put("movie", "영화/드라마");
+        categories.put("music", "음악");
+        categories.put("education", "교육/시사");
+        categories.put("sports", "스포츠");
+        categories.put("etc", "기타");
+        categories.put("all", "");  // 전체검색
+        categories.put("hot", "지금핫한");
+        String category = categories.getOrDefault(categoryKeyword, "일상");
+
+        // 회원, 비회원(유효하지 않은 토큰) 구분
+        String token = request.getHeader("Authorization");
+//        List<YoutubeVideo> videos = new ArrayList<>();
+        if (token == null || !jwtTokenProvider.validateToken(token)) {
+            List<YoutubeVideo> youtubeVideos = searchService.categoryVideos(category, pageable);
+            List<SimpleVideoCategoryDto> response = youtubeVideos.stream().map(x -> new SimpleVideoCategoryDto(x)).collect(Collectors.toList());
+
+            return ResponseEntity.status(HttpStatus.OK).body(response);
+        } else {
+            Long userSeq = jwtTokenProvider.getUserSeq(token);
+            List<YoutubeVideo> youtubeVideos = searchService.categoryVideos(category, pageable);
+            List<SimpleVideoCategoryDto> response = new ArrayList<>();
+            for (YoutubeVideo youtubeVideo : youtubeVideos) {
+                Boolean isLiked = false;
+                if (youtubeVideoService.getLikesVideo(userSeq, youtubeVideo.getId()) != null) {
+                    isLiked = true;
+                }
+                SimpleVideoCategoryDto res = new SimpleVideoCategoryDto(youtubeVideo, isLiked);
+                response.add(res);
+            }
+            return ResponseEntity.status(HttpStatus.OK).body(response);
+        }
+
     }
 
 

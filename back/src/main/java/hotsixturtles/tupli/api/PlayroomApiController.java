@@ -6,9 +6,14 @@ import hotsixturtles.tupli.dto.PlayroomLikesDto;
 import hotsixturtles.tupli.dto.request.RequestPlayroomDto;
 import hotsixturtles.tupli.dto.response.ErrorResponse;
 import hotsixturtles.tupli.dto.response.ResponsePlayroomDto;
+import hotsixturtles.tupli.dto.simple.SimplePlaylistCategoryDto;
+import hotsixturtles.tupli.dto.simple.SimplePlayroomCategoryDto;
+import hotsixturtles.tupli.entity.Playlist;
 import hotsixturtles.tupli.entity.Playroom;
 import hotsixturtles.tupli.entity.likes.PlayroomLikes;
+import hotsixturtles.tupli.entity.youtube.YoutubeVideo;
 import hotsixturtles.tupli.service.PlayroomService;
+import hotsixturtles.tupli.service.SearchService;
 import hotsixturtles.tupli.service.token.JwtTokenProvider;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -16,11 +21,18 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -33,6 +45,8 @@ public class PlayroomApiController {
     private final JwtTokenProvider jwtTokenProvider;
 
     private final MessageSource messageSource;
+
+    private final SearchService searchService;
 
     /**
      * 플레이룸 리스트 출력
@@ -239,6 +253,54 @@ public class PlayroomApiController {
         Long userSeq = jwtTokenProvider.getUserSeq(token);
         playroomService.deletePlayroomLike(userSeq, playroomId);
         return ResponseEntity.status(HttpStatus.OK).body(null);
+    }
+
+
+    // user count로 order by default가 나을듯 << 현재 count null이라 id로 해놓음
+    @GetMapping("/playroom/category/{categoryKeyword}")
+    public ResponseEntity categoryPlayroom(@PathVariable("categoryKeyword") String categoryKeyword,
+                                           @PageableDefault(size = 50, sort ="id",  direction = Sort.Direction.DESC) Pageable pageable,
+                                           HttpServletRequest request) {
+        // 카테고리 분류
+        Map<String, String> categories = new HashMap<>();
+        categories.put("trip", "여행");
+        categories.put("game", "게임");
+        categories.put("life", "일상");
+        categories.put("style", "노하우/스타일");
+        categories.put("animal", "동물");
+        categories.put("entertainment", "엔터테인먼트");
+        categories.put("movie", "영화/드라마");
+        categories.put("music", "음악");
+        categories.put("education", "교육/시사");
+        categories.put("sports", "스포츠");
+        categories.put("etc", "기타");
+        categories.put("all", "");  // 전체검색
+        categories.put("hot", "지금핫한");
+        String category = categories.getOrDefault(categoryKeyword, "일상");
+
+        // 회원, 비회원(유효하지 않은 토큰) 구분
+        String token = request.getHeader("Authorization");
+        List<YoutubeVideo> videos = new ArrayList<>();
+        if (token == null || !jwtTokenProvider.validateToken(token)) {
+            List<Playroom> playrooms = searchService.categoryPlayroom(category, pageable);
+            List<SimplePlayroomCategoryDto> response = playrooms.stream().map(x -> new SimplePlayroomCategoryDto(x)).collect(Collectors.toList());
+
+            return ResponseEntity.status(HttpStatus.OK).body(response);
+        } else {
+            Long userSeq = jwtTokenProvider.getUserSeq(token);
+            List<Playroom> playrooms = searchService.categoryPlayroom(category, pageable);
+            List<SimplePlayroomCategoryDto> response = new ArrayList<>();
+            for (Playroom playroom : playrooms) {
+                Boolean isLiked = false;
+                if (playroomService.getPlayroomLike(userSeq, playroom.getId()) != null) {
+                    isLiked = true;
+                }
+                SimplePlayroomCategoryDto res = new SimplePlayroomCategoryDto(playroom, isLiked);
+                response.add(res);
+            }
+            return ResponseEntity.status(HttpStatus.OK).body(response);
+        }
+
     }
 
 }
