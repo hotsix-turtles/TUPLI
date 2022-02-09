@@ -1,7 +1,8 @@
 package hotsixturtles.tupli.repository;
 
-import hotsixturtles.tupli.entity.Playroom;
 import hotsixturtles.tupli.entity.youtube.YoutubeVideo;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -23,4 +24,5 @@ public interface YoutubeVideoRepository extends JpaRepository<YoutubeVideo, Long
     @Query("select y from YoutubeVideo y join YoutubeVideoSaves ys on y.id = ys.youtubeVideo.id " +
             "where ys.user.userSeq = :userSeq")
     List<YoutubeVideo> findSavedVideos(@Param("userSeq") Long userSeq);
+
 }
