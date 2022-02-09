@@ -12,6 +12,15 @@
   background-color: white;
 }
 
+.gray-background {
+  background-color: rgb(241, 240, 240);
+}
+
+.on-clicked {
+  background-color: $color-main !important;
+  color: white !important;
+}
+
 .fixed-bottom {
   z-index: 10 !important;
   position: fixed !important;
@@ -78,6 +87,7 @@
     border-color: lightgrey;
     width: 300px;
     height: 300px;
+    object-fit: cover;
     box-shadow: 8px 8px 12px 0px rgba($color: #000000, $alpha: 0.4);
   }
   div {
@@ -95,6 +105,34 @@
     }
 }
 
+// 플레이리스트 CD Medium
+.playlist-cd-medium {
+  display: inline-block;
+  position: relative;
+  z-index: 1;
+  img {
+    border-radius: 100%;
+    border: solid 2px;
+    border-color: lightgrey;
+    width: 160px;
+    height: 160px;
+    object-fit: cover;
+    box-shadow: 4px 4px 6px 0px rgba($color: #000000, $alpha: 0.4);
+  }
+  div {
+    border-radius: 100%;
+    background-color: white;
+    border: solid 2px;
+    border-color: lightgrey;
+    width: 20px;
+    height: 20px;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    box-shadow: 1px 1px 4px 1px rgba($color: #000000, $alpha: 0.4) inset;
+    }
+}
 
 // 프로필 사진
 .profileImg {

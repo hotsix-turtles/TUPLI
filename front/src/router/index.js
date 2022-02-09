@@ -12,6 +12,7 @@ import Signup3 from '../views/accounts/Signup3.vue'
 //profile
 import EditProfile from '../views/profile/EditProfile.vue'
 import Follow from '../views/profile/Follow.vue'
+import PersonFollow from '../views/profile/PersonFollow.vue'
 import Profile from '../views/profile/Profile.vue'
 import Setting from '../views/profile/Setting.vue'
 //setting
@@ -166,6 +167,12 @@ const routes = [
     name: 'Follow',
     component: Follow
   },
+  {
+    path: '/personfollow',
+    name: 'PersonFollow',
+    component: PersonFollow
+  },
+
   {
     path: '/profile',
     name: 'Profile',
