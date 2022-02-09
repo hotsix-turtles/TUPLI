@@ -29,83 +29,7 @@ TUPLI는 '플레이리스트'를 만들고 영상 리스트를 업로드하여 �
 
 </br>
 
-## 🎵 TUPLI 서비스 화면 (목업)
----
-</br>
 
-## 메인페이지
-
-<!-- 랜드 페이지 (긴버전) -->
-<img width="45%" src="https://user-images.githubusercontent.com/55949647/153056233-c45f3d6a-9d76-415d-96f0-a63935ab26be.png"/>  
-
-</br>
-
-## 글 생성
-<!-- 만들기 버튼 눌렀을 때 -->
-<img width="45%" src="https://user-images.githubusercontent.com/55949647/153056232-974b197b-a107-4a6e-ba29-15d3f0082e82.png"/>  
-
-</br>
-
-## 플레이리스트 만들기
-<!-- 내 플레이리스트 만들기 -->
-<img width="45%" src="https://user-images.githubusercontent.com/55949647/153053806-9eda2198-5f5f-4c9c-8dce-b64a2feefe9c.png"/>  
-
-</br>
-
-## 플레이룸 만들기
-<!-- 플레이룸 만들기 화면 -->
-<img width="45%" src="https://user-images.githubusercontent.com/55949647/153053845-1553033b-e11a-45a0-9972-73c396f832c6.png"/>  
-
-</br>
-
-## 플레이리스트 접속
-<!-- 플레이리스트 접속시 보이는 화면 -->
-<img width="45%" src="https://user-images.githubusercontent.com/55949647/153053811-cd05445d-dff5-48e5-b212-83e253704bef.png"/>  
-
-</br>
-
-## 플레이룸 접속
-
-<!-- 플레이룸 화면 -->
-<img width="45%" src="https://user-images.githubusercontent.com/55949647/153056248-355f9252-bea8-46b2-99ad-3d5f112727d9.png"/>  
-
-</br>
-
-## 유저 프로필 탐색
-<!-- 타 프로필 -->
-<img width="45%" src="https://user-images.githubusercontent.com/55949647/153056243-01e527ba-1819-47f9-8dfc-4ff80f821280.png"/>  
-
-</br>
-
-## 알림
-<!-- 알림 리스트 -->
-<img width="45%" src="https://user-images.githubusercontent.com/55949647/153056240-5395dcf9-83ae-49b0-a67c-03c903c138ac.png"/>  
-
-</br>
-
-## 실시간 검색어 트렌드
-<!-- 실시간 검색어 트렌드 -->
-<img width="45%" src="https://user-images.githubusercontent.com/55949647/153056221-5f2c854b-35de-46a5-a23b-900e8f803efd.png"/>  
-
-<br>
-
-## 검색하기
-<!-- 검색 -->
-<img width="45%" src="https://user-images.githubusercontent.com/55949647/153056227-0effffdd-bad7-4036-a292-f5e54a68d3d0.png"/>  
-
-</br>
-
-## 플레이룸 내부 채팅방
-<!-- 플레이룸 채팅창 -->
-<img width="45%" src="https://user-images.githubusercontent.com/55949647/153056252-42f17a7f-d0ac-4259-b3c9-920969c6cadb.png"/>  
-
-</br>
-
-## 플레이룸 내부 채팅방 (가로화면)
-<!-- 플레이룸 채팅창(가로버전) -->
-<img width="100%" src="https://user-images.githubusercontent.com/55949647/153056258-c035ea31-ae68-47bd-9520-83f1fc3c848c.png"/>  
-
-</br>
 
 </br>
 
@@ -250,6 +174,12 @@ TUPLI는 '플레이리스트'를 만들고 영상 리스트를 업로드하여 �
   - 태스크 컨벤션
     - 머릿말에 [BE], [FE], [Design], [Extra]를 달아서 분류한다.
 
+## ✔ ERD
+---
+### 초기 ERD를 ERD 클라우드에서 작성하였고, 현재는 DB를 해석하고 자동으로 ERD로 바꿔주는 MySQL 워크벤치를 이용하여 저희 서비스에서 사용되는 테이블을 ERD로 표현하였습니다.  
+
+![TUPLI ERD](https://user-images.githubusercontent.com/55949647/153108823-f4c93aaa-ba38-4a0b-9cde-061fa51e72ab.png)
+
 ## ✔ 요구사항 정의서 (일부)
 ---
 ![요구사항 정의서 일부](https://user-images.githubusercontent.com/55949647/153079097-81b54cea-7715-4362-969d-214eb1312971.png)
@@ -270,16 +200,88 @@ TUPLI는 '플레이리스트'를 만들고 영상 리스트를 업로드하여 �
 취향조사
 ![5  취향조사](https://user-images.githubusercontent.com/55949647/153079498-3f990815-7143-454f-b913-6b5a0d7eeebd.png)
 
-## ✔ ERD
----
-### 초기 ERD를 ERD 클라우드에서 작성하였고, 현재는 DB를 해석하고 자동으로 ERD로 바꿔주는 MySQL 아키텍쳐를 이용하여 저희 서비스에서 사용되는 테이블을 ERD로 표현하였습니다.  
-
-![TUPLI ERD](https://user-images.githubusercontent.com/55949647/153079675-1adc8b4f-8fad-4497-8f5f-7414d2ab9715.png)
-
 
 ## ✔ 팀원 역할 분배
 ---
 ![팀 역할 배분](https://user-images.githubusercontent.com/55949647/153080335-02cacda4-c000-4f0b-9002-a5f392924aaf.png)
+
+## 🎵 TUPLI 서비스 화면 (목업)
+---
+</br>
+
+## 메인페이지
+
+<!-- 랜드 페이지 (긴버전) -->
+<img width="45%" src="https://user-images.githubusercontent.com/55949647/153056233-c45f3d6a-9d76-415d-96f0-a63935ab26be.png"/>  
+
+</br>
+
+## 글 생성
+<!-- 만들기 버튼 눌렀을 때 -->
+<img width="45%" src="https://user-images.githubusercontent.com/55949647/153056232-974b197b-a107-4a6e-ba29-15d3f0082e82.png"/>  
+
+</br>
+
+## 플레이리스트 만들기
+<!-- 내 플레이리스트 만들기 -->
+<img width="45%" src="https://user-images.githubusercontent.com/55949647/153053806-9eda2198-5f5f-4c9c-8dce-b64a2feefe9c.png"/>  
+
+</br>
+
+## 플레이룸 만들기
+<!-- 플레이룸 만들기 화면 -->
+<img width="45%" src="https://user-images.githubusercontent.com/55949647/153053845-1553033b-e11a-45a0-9972-73c396f832c6.png"/>  
+
+</br>
+
+## 플레이리스트 접속
+<!-- 플레이리스트 접속시 보이는 화면 -->
+<img width="45%" src="https://user-images.githubusercontent.com/55949647/153053811-cd05445d-dff5-48e5-b212-83e253704bef.png"/>  
+
+</br>
+
+## 플레이룸 접속
+
+<!-- 플레이룸 화면 -->
+<img width="45%" src="https://user-images.githubusercontent.com/55949647/153056248-355f9252-bea8-46b2-99ad-3d5f112727d9.png"/>  
+
+</br>
+
+## 유저 프로필 탐색
+<!-- 타 프로필 -->
+<img width="45%" src="https://user-images.githubusercontent.com/55949647/153056243-01e527ba-1819-47f9-8dfc-4ff80f821280.png"/>  
+
+</br>
+
+## 알림
+<!-- 알림 리스트 -->
+<img width="45%" src="https://user-images.githubusercontent.com/55949647/153056240-5395dcf9-83ae-49b0-a67c-03c903c138ac.png"/>  
+
+</br>
+
+## 실시간 검색어 트렌드
+<!-- 실시간 검색어 트렌드 -->
+<img width="45%" src="https://user-images.githubusercontent.com/55949647/153056221-5f2c854b-35de-46a5-a23b-900e8f803efd.png"/>  
+
+<br>
+
+## 검색하기
+<!-- 검색 -->
+<img width="45%" src="https://user-images.githubusercontent.com/55949647/153056227-0effffdd-bad7-4036-a292-f5e54a68d3d0.png"/>  
+
+</br>
+
+## 플레이룸 내부 채팅방
+<!-- 플레이룸 채팅창 -->
+<img width="45%" src="https://user-images.githubusercontent.com/55949647/153056252-42f17a7f-d0ac-4259-b3c9-920969c6cadb.png"/>  
+
+</br>
+
+## 플레이룸 내부 채팅방 (가로화면)
+<!-- 플레이룸 채팅창(가로버전) -->
+<img width="100%" src="https://user-images.githubusercontent.com/55949647/153056258-c035ea31-ae68-47bd-9520-83f1fc3c848c.png"/>  
+
+</br>
 
 
 
