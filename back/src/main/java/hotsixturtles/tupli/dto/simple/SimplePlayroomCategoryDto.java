@@ -19,7 +19,7 @@ public class SimplePlayroomCategoryDto {
     private String content;
     private String tags;
     private Boolean isPublic;
-    private String thumbnail;
+    private String image;
     private OffsetDateTime startTime;
     private OffsetDateTime endTime;
     private List<SimpleYoutubeVideoDto> videos;
@@ -37,7 +37,7 @@ public class SimplePlayroomCategoryDto {
         this.isPublic = playroom.getIsPublic();
         this.videos = playroom.getVideos()
                 .stream().map(x -> new SimpleYoutubeVideoDto(x)).collect(Collectors.toList());
-        this.thumbnail = this.videos.get(0).getThumbnail(); // 맨앞 걸로 섬네일 고정.. 어케바꿀까용..
+        this.image = playroom.getImage();
         this.startTime = playroom.getStartTime();
         this.endTime = playroom.getEndTime();
 
@@ -55,7 +55,7 @@ public class SimplePlayroomCategoryDto {
         this.isPublic = playroom.getIsPublic();
         this.videos = playroom.getVideos()
                 .stream().map(x -> new SimpleYoutubeVideoDto(x)).collect(Collectors.toList());
-        this.thumbnail = this.videos.get(0).getThumbnail(); // 맨앞 걸로 섬네일 고정.. 어케바꿀까용..
+        this.image = playroom.getImage();
         this.startTime = playroom.getStartTime();
         this.endTime = playroom.getEndTime();
 

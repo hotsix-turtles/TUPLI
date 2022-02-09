@@ -15,6 +15,7 @@ import hotsixturtles.tupli.entity.likes.PlaylistLikes;
 import hotsixturtles.tupli.entity.youtube.YoutubeVideo;
 import hotsixturtles.tupli.repository.*;
 import hotsixturtles.tupli.repository.likes.PlaylistLikesRepository;
+import hotsixturtles.tupli.service.list.CategoryList;
 import io.swagger.models.auth.In;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -40,10 +41,49 @@ public class PlaylistService {
     private final PlaylistLikesRepository playlistLikesRepository;
     private final YoutubeVideoRepository youtubeVideoRepository;
     private final PlaylistRepositoryCustom playlistRepositoryCustom;
-    private final CategoryRepository categoryRepository;
+//    private final CategoryRepository categoryRepository;
 
     // 심플 querydsl
     private final JPAQueryFactory jpaQueryFactory;
+
+    // private static한 내부 카테고리 정리
+    private static final Map<Integer, String> categoryList = crateCategoryList();
+    private static Map<Integer, String> crateCategoryList() {
+        Map<Integer, String> result = new HashMap<>();
+        result.put(1, "영화/드라마");
+        result.put(2, "기타");
+        result.put(10, "음악");
+        result.put(15, "동물");
+        result.put(17, "스포츠");
+        result.put(18, "영화/드라마");
+        result.put(19, "여행");
+        result.put(20, "게임");
+        result.put(21, "일상");
+        result.put(22, "일상");
+        result.put(23, "엔터테인먼트");
+        result.put(24, "엔터테인먼트");
+        result.put(25, "교육/시사");
+        result.put(26, "노하우/스타일");
+        result.put(27, "교육/시사");
+        result.put(28, "교육/시사");
+        result.put(29, "기타");
+        result.put(30, "영화/드라마");
+        result.put(31, "영화/드라마");
+        result.put(32, "기타");
+        result.put(33, "음악");
+        result.put(34, "엔터테인먼트");
+        result.put(35, "엔터테인먼트");
+        result.put(36, "영화/드라마");
+        result.put(37, "기타");
+        result.put(38, "기타");
+        result.put(39, "기타");
+        result.put(40, "기타");
+        result.put(41, "기타");
+        result.put(42, "기타");
+        result.put(43, "기타");
+        result.put(44, "기타");
+        return Collections.unmodifiableMap(result);
+    }
 
 
     // 단일 Playlist 추가
@@ -59,13 +99,7 @@ public class PlaylistService {
         // 연결
         playlist.setUser(userRepository.findByUserSeq(userSeq));
 
-        // 카테고리 정보
-        Map<Integer, String> categoryList = new HashMap<>();
-        List<Category> categories =  categoryRepository.findAll();
-        for(Category category : categories){
-            categoryList.put(category.getCategoryId().intValue(), category.getSort());
-        }
-
+        // 카테고리 정보 담을 Set
         Set<String> categorys = new HashSet<>();
 
         // Video 정보
@@ -89,8 +123,9 @@ public class PlaylistService {
             Integer count = playlistInfo.getOrDefault(categoryId, 0);
             playlistInfo.put(categoryId, count+1);
 
-            // 카테고리에 따른 분류
-            String category = categoryList.getOrDefault(categoryId, "기타");
+            // 카테고리에 따른 분류 (구현 두 종류)
+            String category = CategoryList.CATEGORY_LIST.getOrDefault(categoryId, "기타");
+//            String category = categoryList.getOrDefault(categoryId, "기타");
             categorys.add(category);
         }
 
@@ -134,9 +169,19 @@ public class PlaylistService {
                 youtubeVideoRepository.delete(youtubeVideo);
             }
 
+            // 카테고리 정보 담을 Set
+            Set<String> categorys = new HashSet<>();
+
             // Video 정보
             ConcurrentHashMap<Integer, Integer> playlistInfo = new ConcurrentHashMap<Integer, Integer>();
+            String image = null;
             for (SimpleYoutubeVideoDto videoDto : playlistRequest.getVideos()) {
+                // 첫 영상 이미지만 저장 (미리보기용)
+                if (image == null) {
+                    image = videoDto.getThumbnail();
+                    playlistUpdate.setImage(image);
+                }
+
                 // 기존에 저장, 좋아요 해놓은것과 상관없이 별도로 제작
                 YoutubeVideo video = new YoutubeVideo();
                 video.setInit(videoDto);
@@ -147,7 +192,19 @@ public class PlaylistService {
                 Integer categoryId = videoDto.getCategoryId();
                 Integer count = playlistInfo.getOrDefault(categoryId, 0);
                 playlistInfo.put(categoryId, count+1);
+
+                // 카테고리에 따른 분류 (구현 두 종류)
+                String category = CategoryList.CATEGORY_LIST.getOrDefault(categoryId, "기타");
+//            String category = categoryList.getOrDefault(categoryId, "기타");
+                categorys.add(category);
             }
+
+            // 검색을 위한 Stringify
+            String categorysString = "";
+            for (String category : categorys) {
+                categorysString = categorysString + category + ", ";
+            }
+            playlistUpdate.setPlaylistCate(categorysString);
             playlistUpdate.setPlaylistInfo(playlistInfo);
 
             playlistRepository.save(playlistUpdate);
