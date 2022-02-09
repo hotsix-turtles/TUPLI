@@ -211,18 +211,6 @@ const playlist = {
         .catch((err) => {
           console.log(err)
         })
-      // axios({
-      //   url: `https://i6a102.p.ssafy.io/api/v1/playlist/${playlistId}/like`,
-      //   method: 'post',
-      //   headers: getters.config
-      // })
-      //   .then((res) => {
-      //     console.log('playlist.js 189 likePlaylist', res)
-      //     // commit('GET_PLAYLIST_DETAIL', res.data)
-      //   })
-      //   .catch((err) => {
-      //     console.log(err)
-      //   })
     },
     // 플레이리스트 좋아요 취소
     unlikePlaylist: function ({ commit }, playlistId) {
@@ -234,18 +222,6 @@ const playlist = {
         .catch((err) => {
           console.log(err)
         })
-      // axios({
-      //   url: `https://i6a102.p.ssafy.io/api/v1/playlist/${playlistId}/like`,
-      //   method: 'delete',
-      //   headers: getters.config
-      // })
-      //   .then((res) => {
-      //     console.log('playlist.js 203 dislikePlaylist', res)
-      //     // commit('GET_PLAYLIST_DETAIL', res.data)
-      //   })
-      //   .catch((err) => {
-      //     console.log(err)
-      //   })
     },
     // 플레이리스트 댓글
     getPlaylistComments: function (playlistId) {
