@@ -5,7 +5,7 @@
 </template>
 
 <script>
-import HistoryItem from '@/components/profile/history/HistoryItem.vue'
+import HistoryItem from '@/components/profile/timeline/history/HistoryItem'
 
 export default {
   name: 'HistoryList',

@@ -15,34 +15,38 @@
         mdi-bell
       </v-icon>
     </div>
-    <v-container>
-      <div class="d-flex mt-4 mx-4">
+    <div>
+      <div class="d-flex mx-4 my-4">
         <p
-          class="deep-purple--text font-weight-bold"
+          class="deep-purple--text font-weight-bold mb-0"
           bold
         >
           라이언
         </p>
-        <p>님이 좋아하는&nbsp;</p>
-        <p class="deep-purple--text">
+        <p class="mb-0">
+          님이 좋아하는&nbsp;
+        </p>
+        <p class="mb-0 deep-purple--text">
           오늘의 추천 컨텐츠
         </p>
       </div>
-    </v-container>
+    </div>
 
     <div>
-      메인 컨텐츠 나열
-      <div style="width: 390px; height:300px; background-color: green; padding: 5px;" />
-      <div style="width: 390px; height:300px; background-color: yellow; padding: 5px;" />
-      <div style="width: 390px; height:300px; background-color: green; padding: 5px;" />
-      <div style="width: 390px; height:300px; background-color: yellow; padding: 5px;" />
+      <playroom-item />
     </div>
   </v-app>
 </template>
 
 <script>
+import PlayroomItem from '@/components/home/PlayroomItem'
+
 export default {
   name: 'Home',
+
+  components: {
+    PlayroomItem,
+  },
 
   methods: {
 
@@ -61,5 +65,6 @@ export default {
   .sticky-header {
     position: sticky;
     top: 0;
+    z-index: 1;
   }
 </style>
