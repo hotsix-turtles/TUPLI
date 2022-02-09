@@ -9,6 +9,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import hotsixturtles.tupli.dto.param.SimpleCondition;
 import hotsixturtles.tupli.dto.request.PlaylistRequest;
 import hotsixturtles.tupli.dto.simple.SimpleYoutubeVideoDto;
+import hotsixturtles.tupli.entity.Category;
 import hotsixturtles.tupli.entity.Playlist;
 import hotsixturtles.tupli.entity.likes.PlaylistLikes;
 import hotsixturtles.tupli.entity.youtube.YoutubeVideo;
@@ -39,6 +40,7 @@ public class PlaylistService {
     private final PlaylistLikesRepository playlistLikesRepository;
     private final YoutubeVideoRepository youtubeVideoRepository;
     private final PlaylistRepositoryCustom playlistRepositoryCustom;
+    private final CategoryRepository categoryRepository;
 
     // 심플 querydsl
     private final JPAQueryFactory jpaQueryFactory;
@@ -59,38 +61,10 @@ public class PlaylistService {
 
         // 카테고리 정보
         Map<Integer, String> categoryList = new HashMap<>();
-        categoryList.put(1, "영화/드라마");
-        categoryList.put(2, "기타");
-        categoryList.put(10, "음악");
-        categoryList.put(15, "동물");
-        categoryList.put(17, "스포츠");
-        categoryList.put(18, "영화/드라마");
-        categoryList.put(19, "여행");
-        categoryList.put(20, "게임");
-        categoryList.put(21, "일상");
-        categoryList.put(22, "일상");
-        categoryList.put(23, "엔터테인먼트");
-        categoryList.put(24, "엔터테인먼트");
-        categoryList.put(25, "교육/시사");
-        categoryList.put(26, "노하우/스타일");
-        categoryList.put(27, "교육/시사");
-        categoryList.put(28, "교육/시사");
-        categoryList.put(29, "기타");
-        categoryList.put(30, "영화/드라마");
-        categoryList.put(31, "영화/드라마");
-        categoryList.put(32, "기타");
-        categoryList.put(33, "음악");
-        categoryList.put(34, "엔터테인먼트");
-        categoryList.put(35, "엔터테인먼트");
-        categoryList.put(36, "영화/드라마");
-        categoryList.put(37, "기타");
-        categoryList.put(38, "기타");
-        categoryList.put(39, "기타");
-        categoryList.put(40, "기타");
-        categoryList.put(41, "기타");
-        categoryList.put(42, "기타");
-        categoryList.put(43, "기타");
-        categoryList.put(44, "기타");
+        List<Category> categories =  categoryRepository.findAll();
+        for(Category category : categories){
+            categoryList.put(category.getCategoryId().intValue(), category.getSort());
+        }
 
         Set<String> categorys = new HashSet<>();
 

@@ -36,7 +36,7 @@ public class SearchService {
 
     private final PlaylistRepository playlistRepository;
 
-    private final TagRepository tagRepository;
+    private final CategoryRepository categoryRepository;
 
     public List<User> searchUser(UserSearchCondition userSearchCondition, Pageable pageable){
         return searchUserRepository.searchByPageSimpleUser(userSearchCondition, pageable);
@@ -87,29 +87,7 @@ public class SearchService {
             return searchPlaylistRepository.listByHomePlaylist(pageable);
         }
 
-        List<Tag> taglist =  tagRepository.findAllBySort(category);
-        List<Long> tagIdList = new ArrayList<>();
-        for(Tag tag : taglist){
-            tagIdList.add(tag.getTagId());
-        }
-
-        // 나중에 고도화 때 쿼리 변경 필요 => 밑에 for문이랑 합쳐서 쿼리 구성해야 할듯
-        Page<Playlist> playlists = playlistRepository.findAll(pageable);
-        List<Playlist> plList = playlists.getContent();
-
-        List<Playlist> result = new ArrayList<>();
-
-        for(Playlist playlist : plList){
-            for(ConcurrentHashMap.Entry<Integer, Integer> entry : playlist.getPlaylistInfo().entrySet()) {
-                Long key = Long.valueOf(entry.getKey());
-                if(tagIdList.contains(key)){
-                    result.add(playlist);
-                    break;
-                }
-            }
-        }
-
-        return result;
+        return searchPlaylistRepository.categorizedByPageSimplePlaylist(category, pageable);
     }
 
     // 카테고리 분류 플레이룸 (나중에 이동)
@@ -118,29 +96,7 @@ public class SearchService {
         if (category == "지금핫한" || category == "") {
             return searchPlayroomRepository.listByHomePlayroom(pageable);
         }
-        List<Tag> taglist =  tagRepository.findAllBySort(category);
-        List<Long> tagIdList = new ArrayList<>();
-        for(Tag tag : taglist){
-            tagIdList.add(tag.getTagId());
-        }
-
-        // 나중에 고도화 때 쿼리 변경 필요 => 밑에 for문이랑 합쳐서 쿼리 구성해야 할듯
-        Page<Playroom> playrooms = playroomRepository.findAll(pageable);
-        List<Playroom> playroomList = playrooms.getContent();
-
-        List<Playroom> result = new ArrayList<>();
-
-        for(Playroom playroom : playroomList){
-            for(ConcurrentHashMap.Entry<Integer, Integer> entry : playroom.getPlayroomInfo().entrySet()) {
-                Long key = Long.valueOf(entry.getKey());
-                if(tagIdList.contains(key)){
-                    result.add(playroom);
-                    break;
-                }
-            }
-        }
-
-        return result;
+        return searchPlayroomRepository.categorizedByPageSimplePlayroom(category, pageable);
     }
 
     // 카테고리 분류 비디오 (나중에 이동)
@@ -148,20 +104,19 @@ public class SearchService {
         if (category == "지금핫한" || category == "") {
             return searchYoutubeVideoRepository.searchNoConditionByPageVideo(pageable);
         }
-        List<Tag> taglist =  tagRepository.findAllBySort(category);
-        List<Long> tagIdList = new ArrayList<>();
-        for(Tag tag : taglist){
-            tagIdList.add(tag.getTagId());
+        List<Category> categorylist =  categoryRepository.findAllBySort(category);
+        List<Long> categoryIdList = new ArrayList<>();
+        for(Category nowCategory : categorylist){
+            categoryIdList.add(nowCategory.getCategoryId());
         }
 
         // 나중에 고도화 때 쿼리 변경 필요 => 밑에 for문이랑 합쳐서 쿼리 구성해야 할듯
         List<YoutubeVideo> videoList = searchYoutubeVideoRepository.findDistinctByVideoId(pageable);
-//        List<YoutubeVideo> videoList = videos.getContent();
 
         List<YoutubeVideo> result = new ArrayList<>();
 
         for(YoutubeVideo video : videoList){
-            if(tagIdList.contains(Long.valueOf(video.getCategoryId()))){
+            if(categoryIdList.contains(Long.valueOf(video.getCategoryId()))){
                 result.add(video);
             }
         }

@@ -9,4 +9,5 @@ import java.util.List;
 public interface PlayroomRepositoryCustom {
     List<Playroom> searchByPageSimplePlayroom(PlayroomSearchCondition playroomSearchCondition, Pageable pageable);
     List<Playroom> listByHomePlayroom( Pageable pageable);
+    List<Playroom> categorizedByPageSimplePlayroom(String category, Pageable pageable);
 }

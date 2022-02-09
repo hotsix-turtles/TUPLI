@@ -4,6 +4,8 @@ import hotsixturtles.tupli.dto.PlayroomDto;
 import hotsixturtles.tupli.dto.request.RequestPlayroomDto;
 import hotsixturtles.tupli.dto.response.ResponsePlayroomDto;
 import hotsixturtles.tupli.dto.simple.SimpleUserDto;
+import hotsixturtles.tupli.dto.simple.SimpleYoutubeVideoDto;
+import hotsixturtles.tupli.entity.Category;
 import hotsixturtles.tupli.entity.Playlist;
 import hotsixturtles.tupli.entity.Playroom;
 import hotsixturtles.tupli.entity.User;
@@ -19,9 +21,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Service
@@ -35,6 +35,7 @@ public class PlayroomService {
     private final NotificationService notificationService;
     private final PlayroomRepositoryCustom playroomRepositoryCustom;
     private final PlayroomLikesRepository playroomLikesRepository;
+    private final CategoryRepository categoryRepository;
 
     public List<Playroom> getPlayroomList(){
 
@@ -105,6 +106,48 @@ public class PlayroomService {
         }
         playroom.setPlayroomInfo(playroomInfo);
         playroom.setPlaylists(playlists);
+
+        // 카테고리 정보
+        Map<Integer, String> categoryList = new HashMap<>();
+        List<Category> categories =  categoryRepository.findAll();
+        for(Category category : categories){
+            categoryList.put(category.getCategoryId().intValue(), category.getSort());
+        }
+
+        Set<String> categorys = new HashSet<>();
+
+        // Video 정보
+        ConcurrentHashMap<Integer, Integer> playroominfo = new ConcurrentHashMap<Integer, Integer>();
+        String image = null;
+        for (SimpleYoutubeVideoDto videoDto : playroomDto.getVideos()) {
+            // 첫 영상 이미지만 저장 (미리보기용)
+            if (image == null) {
+                image = videoDto.getThumbnail();
+                playroom.setImage(image);
+            }
+
+            // 기존에 저장, 좋아요 해놓은것과 상관없이 별도로 제작
+            YoutubeVideo video = new YoutubeVideo();
+            video.setInit(videoDto);
+            video.setPlayroom(playroom);  // 연결
+            youtubeVideoRepository.save(video);
+
+            // Playroominfo에 따라 갈림
+            Integer categoryId = videoDto.getCategoryId();
+            Integer count = playroominfo.getOrDefault(categoryId, 0);
+            playroominfo.put(categoryId, count+1);
+
+            // 카테고리에 따른 분류
+            String category = categoryList.getOrDefault(categoryId, "기타");
+            categorys.add(category);
+        }
+
+        // 검색을 위한 Stringify
+        String categorysString = "";
+        for (String category : categorys) {
+            categorysString = categorysString + category + ", ";
+        }
+
         playroomRepository.save(playroom);
 
         // 플레이룸 개설 알림 보내기 (초청 유저)
