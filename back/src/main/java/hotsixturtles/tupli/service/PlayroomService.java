@@ -75,6 +75,7 @@ public class PlayroomService {
         playroom.setIsPublic(playroomDto.getIsPublic());
         playroom.setTags(playroomDto.getTags());
         playroom.setEndTime(playroomDto.getEndTime());
+        playroom.setStartTime(playroomDto.getStartTime());
 
         // 플레이리스트 비디오 분리하고 저장 + ID만 저장
         ConcurrentHashMap<Long, List<Long>> playlists = new ConcurrentHashMap<>();
