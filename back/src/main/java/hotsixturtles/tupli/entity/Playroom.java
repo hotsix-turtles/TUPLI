@@ -55,6 +55,10 @@ public class Playroom {
     @Column(columnDefinition = "json")
     private ConcurrentHashMap<Integer, Integer> playroomInfo;
 
+    private String playroomCate;
+
+    private String image;
+
 
     // 연결
     @ManyToOne(fetch = FetchType.LAZY)

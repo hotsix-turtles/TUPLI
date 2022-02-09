@@ -6,19 +6,19 @@ import org.checkerframework.common.aliasing.qual.Unique;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "tag")
+@Table(name = "category")
 @Getter
 @Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class Tag {
+public class Category {
 
     @Id
     @GeneratedValue
     private Long id;
 
     @Unique
-    private Long tagId;
+    private Long categoryId;
 
     private String name;
 
