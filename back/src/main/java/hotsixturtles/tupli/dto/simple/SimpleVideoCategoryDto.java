@@ -6,8 +6,7 @@ import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
-public class SimpleYoutubeVideoDto {
-
+public class SimpleVideoCategoryDto {
     private Long id;
 
     private String videoId;  // url로 쓰임. 예시 : oODreucZqmM, https://www.youtube.com/watch?v= 주소와 조합하면 영상이 됨
@@ -18,7 +17,10 @@ public class SimpleYoutubeVideoDto {
     private String duration;  // 영상길이
     private Integer categoryId;  // 유튜브 기준 카테고리 분류
 
-    public SimpleYoutubeVideoDto(YoutubeVideo youtubeVideo) {
+    // 추가 변수
+    private Boolean isLiked;
+
+    public SimpleVideoCategoryDto(YoutubeVideo youtubeVideo) {
         this.id = youtubeVideo.getId();
         this.videoId = youtubeVideo.getVideoId();
         this.title = youtubeVideo.getTitle();
@@ -27,5 +29,19 @@ public class SimpleYoutubeVideoDto {
         this.channelTitle = youtubeVideo.getChannelTitle();
         this.duration = youtubeVideo.getDuration();
         this.categoryId = youtubeVideo.getCategoryId();
+
+        this.isLiked = false;
+    }
+    public SimpleVideoCategoryDto(YoutubeVideo youtubeVideo, Boolean isLiked) {
+        this.id = youtubeVideo.getId();
+        this.videoId = youtubeVideo.getVideoId();
+        this.title = youtubeVideo.getTitle();
+        this.date = youtubeVideo.getDate();
+        this.thumbnail = youtubeVideo.getThumbnail();
+        this.channelTitle = youtubeVideo.getChannelTitle();
+        this.duration = youtubeVideo.getDuration();
+        this.categoryId = youtubeVideo.getCategoryId();
+
+        this.isLiked = isLiked;
     }
 }
