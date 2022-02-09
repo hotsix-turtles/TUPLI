@@ -13,8 +13,8 @@ const video = {
     watchingVideo: '', // 시청하는 영상
     nextPageToken: '', // 다음 페이지(무한 스크롤용)
     query: '', // 검색어
+    order: '', // 정렬 필터
     likedVideos: [], // 좋아한 영상
-    savedVideos: [], // 저장한 영상
     order: 'relevance', // 정렬 타입
   },
   mutations: {
@@ -44,15 +44,18 @@ const video = {
       state.searchedVideoIds = []
       console.log('SEARCH_VIDEOS', searchedVideos)
       for (let searchedVideo of searchedVideos) {
-        const data = {
-          videoId: searchedVideo.id.videoId,
-          title: searchedVideo.snippet.title,
-          date: searchedVideo.snippet.publishTime,
-          thumbnail: searchedVideo.snippet.thumbnails.medium.url,
-          channelTitle: searchedVideo.snippet.channelTitle,
+        const idx = state.searchedVideos.findIndex(i => i.videoId === searchedVideo.videoId)
+        if (idx === -1) {
+          const data = {
+            videoId: searchedVideo.id.videoId,
+            title: searchedVideo.snippet.title,
+            date: searchedVideo.snippet.publishTime,
+            thumbnail: searchedVideo.snippet.thumbnails.medium.url,
+            channelTitle: searchedVideo.snippet.channelTitle,
+          }
+          state.searchedVideos.push(data)
+          state.searchedVideoIds.push(searchedVideo.id.videoId)
         }
-        state.searchedVideos.push(data)
-        state.searchedVideoIds.push(searchedVideo.id.videoId)
       }
     },
     // 카테고리ID, 영상길이 정보 추가
@@ -120,6 +123,9 @@ const video = {
     QUERY: function (state, query) {
       state.query = query
     },
+    ORDER: function (state, order) {
+      state.order = order
+    },
     ADD_VIDEOS: function (state) {
       for (let selectedVideo of state.selectedVideos) {
         const idx = state.addedVideos.findIndex(i => i.videoId === selectedVideo.videoId)
@@ -175,10 +181,10 @@ const video = {
       commit('ON_CHANGE_ORDER', order)
     },
     // 유튜브 API로 영상 리스트 검색
-    searchVideos: function ({ state, commit, dispatch }, query) {
+    searchVideos: function ({ state, commit, dispatch }, { query, order }) {
       const SEARCH_API_URL = 'https://www.googleapis.com/youtube/v3/search'
       const API_KEY = process.env.VUE_APP_YOUTUBE_API_KEY
-      console.log(state.order)
+      console.log('video.js 184 searchVideos', query, order)
 
       // 검색 API
       const searchParams = {
@@ -187,7 +193,7 @@ const video = {
         fields: 'nextPageToken,items(id/videoId,snippet(title,publishTime,thumbnails/medium,channelTitle))',
         type: 'video',
         q: query, // 검색어
-        // order: state.order,
+        order: order,
         // eventType: 'completed', // 완료된 영상만 검색
         maxResults: 5, // 반환할 영상 개수
       }
@@ -197,10 +203,11 @@ const video = {
         params: searchParams,
       })
         .then((res) => {
+          console.log('video.js 203 searchParams', searchParams)
           commit('SEARCH_VIDEOS', res.data.items)
           commit('NEXT_PAGE_TOKEN', res.data.nextPageToken)
           commit('QUERY', query)
-          console.log('113 NEXT_PAGE_TOKEN', res.data.nextPageToken)
+          commit('ORDER', order)
         })
         .then(() => {
           dispatch('searchVideosAddInfo')
@@ -227,7 +234,6 @@ const video = {
         params: videoParams,
       })
         .then((res) => {
-          console.log('res.data.items add Info', res.data.items)
           commit('SEARCH_VIDEOS_ADD_INFO', res.data.items)
         })
         .catch((err) => {
@@ -247,7 +253,7 @@ const video = {
             fields: 'nextPageToken,items(id/videoId,snippet(title,publishTime,thumbnails/medium,channelTitle))',
             type: 'video',
             q: state.query, // 검색어
-            // order: state.order,
+            order: state.order,
             // eventType: 'completed', // 완료된 영상만 검색
             maxResults: 5, // 반환할 영상 개수
             pageToken: state.nextPageToken,

@@ -6,28 +6,41 @@
       :label="'새로운 영상을 검색해주세요.'"
       @input-change="onEnterSearch"
     />
-    <!-- 정렬 필터 -->
-    <order
-      :select-list="selectList"
-      @on-change-select="onChangeSelect"
-    />
-    <!-- 영상 리스트 -->
-    <video-list-item-small
-      :key="rerenderKey"
-      :videos="searchedVideos"
-      width="100vw"
-    />
-    <!-- 하단 리스트에 추가하기 버튼 -->
-    <add-button-bottom />
-    <!-- 무한스크롤 -->
-    <infinite-loading
-      v-if="searchedVideos.length > 0"
-      :identifier="infiniteId"
-      spinner="waveDots"
-      @infinite="searchVideosByScroll"
-    >
-      <div slot="no-results" />
-    </infinite-loading><br><br>
+    <div class="container">
+      <!-- 정렬 필터 -->
+      <div
+        class="text-right clickable"
+        @click="onClickModal"
+      >
+        <span>
+          {{ selected }}
+        </span>
+        <v-icon>mdi-menu-down</v-icon>
+      </div>
+      <!-- 정렬 필터창 -->
+      <modal
+        :items="selectList"
+        :modal-name="'정렬 필터 변경'"
+        @on-select="onSelect"
+      />
+      <!-- 영상 리스트 -->
+      <video-list-item-small
+        :key="rerenderKey"
+        :videos="searchedVideos"
+        width="100vw"
+      />
+      <!-- 하단 리스트에 추가하기 버튼 -->
+      <add-button-bottom />
+      <!-- 무한스크롤 -->
+      <infinite-loading
+        v-if="searchedVideos.length > 0"
+        :identifier="infiniteId"
+        spinner="waveDots"
+        @infinite="searchVideosByScroll"
+      >
+        <div slot="no-results" />
+      </infinite-loading><br><br>
+    </div>
   </div>
 </template>
 
@@ -39,7 +52,7 @@ import BackOnly from '@/components/common/BackOnly.vue'
 import SearchBar from '@/components/common/SearchBar.vue'
 import VideoListItemSmall from '../../components/video/VideoListItemSmall.vue'
 import AddButtonBottom from '../../components/playlist/AddButtonBottom.vue'
-import Order from '../../components/common/Order.vue'
+import Modal from '../../components/common/Modal.vue'
 
 export default {
   name: 'VideoSearch',
@@ -49,7 +62,7 @@ export default {
     VideoListItemSmall,
     InfiniteLoading,
     AddButtonBottom,
-    Order,
+    Modal,
   },
   data: function () {
     return {
@@ -72,6 +85,9 @@ export default {
       selectedVideos: state => state.selectedVideos,
       rerenderKey: state => state.rerenderKey,  // video는 API 두번 요청해서 변경내용 반영하기 위한 key
       nextPageToken: state => state.nextPageToken,
+    }),
+    ...mapState('common', {
+      selected: state => state.selected,
     })
   },
   created: function () {
@@ -92,22 +108,33 @@ export default {
       'searchVideosByScroll',
       'resetVideoSearchState',
     ]),
-    onChangeSelect: function (order) {
-      this.resetVideoSearchState()
-      this.infiniteId += 1;
-      this.order = order
-      console.log(this.order)
+    ...mapActions('common', [
+      'onClickModal',
+    ]),
+    onSelect: function (order) {
+      console.log('VideoSearch', order)
+      if (this.query) {
+        const query = this.query
+        const params = {
+          query,
+          order,
+        }
+        this.resetVideoSearchState()
+        this.infiniteId += 1;
+        this.searchVideos(params)
+      }
     },
     onEnterSearch: function (query) {
-      console.log(this.infiniteId)
+      console.log(this.selected)
+      const order = this.selectList[this.selected]
+      const params = {
+        query,
+        order,
+      }
       this.resetVideoSearchState()
       this.infiniteId += 1;
-      console.log(this.infiniteId)
       this.query = query
-      this.searchVideos(query)
-    },
-    changeType() {
-
+      this.searchVideos(params)
     },
   },
 }
