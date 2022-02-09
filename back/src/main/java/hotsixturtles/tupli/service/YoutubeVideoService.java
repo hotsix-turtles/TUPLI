@@ -79,6 +79,10 @@ public class YoutubeVideoService {
         }
     }
 
+    public YoutubeVideoLikes getLikesVideo(Long userSeq, Long videoId){
+        return youtubeVideoLikesRepository.findExist(userSeq, videoId);
+    }
+
     @Transactional
     public void likesVideo(Long userSeq, YoutubeVideo youtubeVideo) {
         // 해당 유저가 기존에 좋아요 했나 확인, 없을 경우 저장
