@@ -82,7 +82,7 @@ public class SearchService {
 
     // 카테고리 분류 플레이리스트 (나중에 이동)
     public List<Playlist> categoryPlaylist(String category, Pageable pageable) {
-        if (category == "지금핫한" || category == "") {
+        if (category == "지금핫한") {
             // 현재 비교방식 애매함
             return searchPlaylistRepository.listByHomePlaylist(pageable);
         }
@@ -93,6 +93,7 @@ public class SearchService {
     // 카테고리 분류 플레이룸 (나중에 이동)
     // 태그만 들어있는 테이블이 필요할듯.... 대충 만들었습니다.. ( Tag 엔티티 )
     public List<Playroom> categoryPlayroom(String category, Pageable pageable) {
+        // $$$ 다훈씨것도 지워드릴까 하다가 일단 냅뒀습니다! (민구)
         if (category == "지금핫한" || category == "") {
             return searchPlayroomRepository.listByHomePlayroom(pageable);
         }

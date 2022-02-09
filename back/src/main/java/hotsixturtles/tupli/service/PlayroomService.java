@@ -86,11 +86,18 @@ public class PlayroomService {
 //            playlists.add(entry.getKey());
             List<Long> playroomPlList = new ArrayList<>();
 
+
+            String image = null;
+
             // 비디오 저장(플레이리스트 삭제 대비 및 편한 추가 삭제를 위해 DB 별도 저장) 최적화 반드시 필요!!!!! $$$
             for (String videoUrl : entry.getValue()) {
-
                 YoutubeVideo video = new YoutubeVideo();
                 YoutubeVideo existVideo = youtubeVideoRepository.findFirstByVideoId(videoUrl);
+                // 첫 영상 이미지만 저장 (미리보기용)
+                if (image == null) {
+                    image = existVideo.getThumbnail();
+                    playroom.setImage(image);
+                }
                 video.setPlayroom(playroom);
                 video.setInit(existVideo);
                 youtubeVideoRepository.save(video);
