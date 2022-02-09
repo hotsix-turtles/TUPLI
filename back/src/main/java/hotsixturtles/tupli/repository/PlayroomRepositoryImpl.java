@@ -61,4 +61,5 @@ public class PlayroomRepositoryImpl implements PlayroomRepositoryCustom{
         List<Playroom> result = query.fetch();
         return result;
     }
+
 }
