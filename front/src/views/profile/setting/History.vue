@@ -21,7 +21,7 @@
 </template>
 
 <script>
-import HistoryList from '@/components/profile/history/HistoryList'
+import HistoryList from '@/components/profile/timeline/history/HistoryList'
 
 export default {
   name: 'History',
