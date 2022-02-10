@@ -17,7 +17,6 @@
         </span>
         <v-icon>mdi-menu-down</v-icon>
       </div>
-      <!-- 정렬 필터창 -->
       <modal
         :items="selectList"
         :modal-name="'정렬 필터 변경'"
@@ -71,10 +70,7 @@ export default {
         '최근순': 'date',
         '조회순': 'viewCount',
       },
-      order: '',
       query: '',
-      identifier: this.query + this.order,
-
       newsType: 'story',
       infiniteId: +new Date(),
     }
