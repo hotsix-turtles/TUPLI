@@ -4,6 +4,7 @@ import Vuex from 'vuex'
 Vue.use(Vuex)
 
 import account from './modules/account.js'
+import alert from './modules/alert.js'
 import playroom from './modules/playroom.js'
 import router from '../router/index.js'
 import video from './modules/video.js'
@@ -13,8 +14,6 @@ import common from './modules/common.js'
 import axios from 'axios'
 import SERVER from '@/api/server'
 import createPersistedState from "vuex-persistedstate";
-import firebase from 'firebase/compat/app';
-import 'firebase/compat/database';
 
 export default new Vuex.Store({
   // TODO: createPersistedState 사용시 사용 모듈 한정 필요 (playroom, playlist등엔 사용 x)
@@ -28,9 +27,7 @@ export default new Vuex.Store({
     authToken: null,
     isLogin: false,
     // userInfo: null
-    // 실시간 알람
-    realtimeAlarmList: null,
-    realtimeBoolean:false  // 플레이룸 등 특정 상황에서 비활성화
+
   },
   getters: {
     getRealtimeAlarmList: function(state) {
@@ -82,10 +79,7 @@ export default new Vuex.Store({
         image = state.image
       }
     },
-    // 가져온 알람 갱신
-    SET_REALTIME_ALARM(state, res) {
-      state.realtimeAlarmList = res;
-    },
+
   },
   actions: {
     // 로그인
@@ -166,29 +160,12 @@ export default new Vuex.Store({
         .catch(err => console.log(err.response.data))
     },
 
-    // 실시간 알람 가져오기 (로그인 등 이후에 호출할 것!)
-    getRealtimeAlarm({state, commit}) {
-      firebase
-        .database()
-        .ref('tupli/realtime')  // 기초 버전 : 전부 다 받는 버전
-        .limitToLast(20)
-        .on('value', (snap) => {
-          let res = snap.val()
-          const tmp = {}
-          tmp.from = res.from
-          tmp.fromId = res.fromId
-          tmp.img = res.image
-          tmp.to = res.to
-          tmp.toId = res.toId
-          tmp.type = res.type
-          tmp.isRead = false
-          commit('SET_REALTIME_ALARM', tmp);
-        });
-    },
+
   },
   modules: {
     playroom: playroom,
     account: account,
+    alert: alert,
     video: video,
     playlist: playlist,
     common: common,
