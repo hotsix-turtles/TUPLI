@@ -65,12 +65,16 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             updateUser(savedUser, userInfo);
             UserInfo nowUserInfo =  userInfoRepository.findOneByUserSeq(savedUser.getUserSeq());
             nowUserInfo.setLoginCount(nowUserInfo.getLoginCount() + 1L);
+
+            List<UserBadge> userbadges = badgeService.getBadgeList(savedUser.getUserSeq());
+            List<Long> badges = badgeService.getUserBadgeSeq(userbadges);
+
+            badgeService.checkLoginNum(savedUser.getUserSeq(), badges);
+
             if(nowUserInfo.getDailyLoginYN().equals("N")) {
                 nowUserInfo.setDailyLoginYN("Y");
                 nowUserInfo.setDailyCheck(nowUserInfo.getDailyCheck() + 1L);
-                List<UserBadge> userbadges = badgeService.getBadgeList(savedUser.getUserSeq());
-                List<Long> badges = badgeService.getUserBadgeSeq(userbadges);
-                badgeService.checkDaily(26, savedUser.getUserSeq(), badges);
+                badgeService.checkDaily(savedUser.getUserSeq(), badges);
             }
 
             userInfoRepository.save(nowUserInfo);

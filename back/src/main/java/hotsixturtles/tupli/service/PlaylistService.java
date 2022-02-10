@@ -233,6 +233,12 @@ public class PlaylistService {
             playlistLikes.setUser(userRepository.findByUserSeq(userSeq));
             playlistLikes.setPlaylist(playlistRepository.findById(id).orElse(null));
             playlistLikesRepository.save(playlistLikes);
+
+            // 한길 : playlist 에 좋아요 넣으면 +1 하기
+            Playlist playlist = playlistRepository.getById(id);
+            playlist.setLikesCnt(playlist.getLikesCnt()+1);
+            playlistRepository.save(playlist);
+
         } else {
             // exception 발생
         }
@@ -244,10 +250,15 @@ public class PlaylistService {
         PlaylistLikes playlistLikes = playlistLikesRepository.findExist(userSeq, id);
         if(playlistLikes != null) {
             playlistLikesRepository.delete(playlistLikes);
+
+            // 한길 : playlist 에 좋아요 취소하면 -1 하기
+            Playlist playlist = playlistRepository.getById(id);
+            playlist.setLikesCnt(playlist.getLikesCnt()-1);
+            playlistRepository.save(playlist);
+
         } else {
             // exception 발생
         }
-
     }
 
     // 사용자가 좋아하는 플레이리스트 리스트 가져오기

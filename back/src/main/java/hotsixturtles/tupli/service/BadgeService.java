@@ -139,47 +139,58 @@ public class BadgeService {
 
             // 시청 시간 파악
             if(i == 1){
-                i = checkWatchTime(i, userSeq, badges);
+                checkWatchTime(userSeq, badges);
+                i = 4;
             }
             // 게시한 게시글 수 파악
             else if(i == 4){
-                i = checkBoardUpload(i, userSeq, badges);
+                checkBoardUpload(userSeq, badges);
+                i = 7;
             }
             // 프리미엄뱃지
             else if(i == 7){
-                i = checkPremium(i, userSeq, badges);
+                checkPremium( userSeq, badges);
+                i = 8;
             }
             // 좋아요 파악
             else if(i == 8){
-                i = checkPlaylistLikes(i, userSeq, badges);
+                checkPlaylistLikes(userSeq, badges);
+                i = 11;
             }
             // 팔로우 하는
             else if(i == 11){
-                i = checkFollowees(i, userSeq, badges);
+                checkFollowees(userSeq, badges);
+                i = 14;
             }
             // 팔로우 받는
             else if(i == 14){
-                i = checkFollowers(i, userSeq, badges);
+                checkFollowers(userSeq, badges);
+                i = 17;
             }
             // 만든 플레이리스트
             else if(i == 17){
-                i = checkPlaylistMake(i, userSeq, badges);
+                checkPlaylistMake(userSeq, badges);
+                i = 20;
             }
             // 만든 플레이룸
             else if(i == 20){
-                i = checkPlayroomMake(i, userSeq, badges);
+                checkPlayroomMake(userSeq, badges);
+                i = 23;
             }
             // 로그인 횟수
             else if(i == 23){
-                i = checkLoginNum(i, userSeq, badges);
+                checkLoginNum(userSeq, badges);
+                i = 26;
             }
             // 출석 일수
             else if(i == 26){
-                i = checkDaily(i, userSeq, badges);
+                checkDaily(userSeq, badges);
+                i = 29;
             }
             // 플레이룸 최고 인원수
             else if(i == 29){
-                i = checkPlayroomMaxUsers(i, userSeq, badges);
+                checkPlayroomMaxUsers(userSeq, badges);
+                i = 32;
             }
             // 호러 장르 시청( 각 장르 ) 장르마다 시청 시간 저장해야하나??
             // 일단 보류...
@@ -193,193 +204,223 @@ public class BadgeService {
     }
 
     // 시청 시간 파악
-    public int checkWatchTime(int i, Long userSeq, List<Long> badges){
+    public List<Badge> checkWatchTime(Long userSeq, List<Long> badges){
+        List<Badge> result = new ArrayList<>();
+        int i = 1;
         Long nowTime = userInfoRepository.findOneByUserSeq(userSeq).getWatchTime();
         for (i = 1; i <= Badge1_increment; i++) {
             if (nowTime >= Badge1List.get(i-1)) {
                 if(!badges.contains(Long.valueOf(i))){
                     UserBadge userBadge = new UserBadge(null, userSeq, Long.valueOf(i), OffsetDateTime.now());
+                    result.add(badgeRepository.findByBadgeSeq(Long.valueOf(i)));
                     userBadgeRepository.save(userBadge);
                 }
             }
             else {
-                return 4;
+                return result;
             }
         }
-        return i;
+        return result;
     }
 
     // 게시한 게시글 수 파악
-    public int checkBoardUpload(int i, Long userSeq, List<Long> badges){
+    public List<Badge> checkBoardUpload(Long userSeq, List<Long> badges){
+        List<Badge> result = new ArrayList<>();
+        int i = 4;
         Long boardUploadNum = userInfoRepository.findOneByUserSeq(userSeq).getBoardUpload();
         for(i = 4; i <= Badge2_increment; i++){
             if(boardUploadNum >= Badge2List.get(i-4)){
                 if(!badges.contains(Long.valueOf(i))){
                     UserBadge userBadge = new UserBadge(null, userSeq, Long.valueOf(i), OffsetDateTime.now());
+                    result.add(badgeRepository.findByBadgeSeq(Long.valueOf(i)));
                     userBadgeRepository.save(userBadge);
                 }
             }
             else {
-                return 7;
+                return result;
             }
         }
-        return i;
+        return result;
     }
 
     // 프리미엄 유저 확인
-    public int checkPremium(int i, Long userSeq, List<Long> badges){
+    public List<Badge> checkPremium(Long userSeq, List<Long> badges){
+        List<Badge> result = new ArrayList<>();
+        int i = 7;
         String isPremium = userRepository.findByUserSeq(userSeq).getIs_vip();
         if(isPremium != null && isPremium.equals("Y")) {
             if(!badges.contains(Long.valueOf(i))){
                 UserBadge userBadge = new UserBadge(null, userSeq, Long.valueOf(i), OffsetDateTime.now());
+                result.add(badgeRepository.findByBadgeSeq(Long.valueOf(i)));
                 userBadgeRepository.save(userBadge);
             }
         }
-        i++;
-        return i;
+        return result;
     }
 
     // 좋아요 수 확인 ( 해당 유저 플레이 리스트 )
-    public int checkPlaylistLikes(int i, Long userSeq, List<Long> badges){
+    public List<Badge> checkPlaylistLikes(Long userSeq, List<Long> badges){
+        List<Badge> result = new ArrayList<>();
+        int i = 8;
         Long playlistLikes = playlistRepository.findPlaylistLikes(userSeq);
-        for(; i <= Badge4_increment; i++) {
+        for(i = 8; i <= Badge4_increment; i++) {
             if(playlistLikes >= Badge4List.get(i-8)){
                 if(!badges.contains(Long.valueOf(i))){
                     UserBadge userBadge = new UserBadge(null, userSeq, Long.valueOf(i), OffsetDateTime.now());
+                    result.add(badgeRepository.findByBadgeSeq(Long.valueOf(i)));
                     userBadgeRepository.save(userBadge);
                 }
             }
             else {
-                return 11;
+                return result;
             }
         }
-        return i;
+        return result;
     }
 
     // 자신이 팔로우 한 사람 수
-    public int checkFollowees(int i, Long userSeq, List<Long> badges){
+    public List<Badge> checkFollowees(Long userSeq, List<Long> badges){
+        List<Badge> result = new ArrayList<>();
+        int i = 11;
         List<UserLikes> userLikesList = userlikesRepository.findByFromUser(userSeq);
         Long followCount = Long.valueOf(userLikesList.size());
         for(; i <= Badge5_increment; i++){
             if(followCount >= Badge5List.get(i-11)){
                 if(!badges.contains(Long.valueOf(i))){
                     UserBadge userBadge = new UserBadge(null, userSeq, Long.valueOf(i), OffsetDateTime.now());
+                    result.add(badgeRepository.findByBadgeSeq(Long.valueOf(i)));
                     userBadgeRepository.save(userBadge);
                 }
             }
             else {
-                return 14;
+                return result;
             }
         }
-        return i;
+        return result;
     }
 
     // 자신을 팔로우 한 사람 수
-    public int checkFollowers(int i, Long userSeq, List<Long> badges){
+    public List<Badge> checkFollowers(Long userSeq, List<Long> badges){
+        List<Badge> result = new ArrayList<>();
+        int i = 14;
         List<UserLikes> userLikesList = userlikesRepository.findFollowers(userSeq);
         Long followerCount = Long.valueOf(userLikesList.size());
         for(; i <= Badge6_increment; i++){
             if(followerCount >= Badge6List.get(i-14)){
                 if(!badges.contains(Long.valueOf(i))){
                     UserBadge userBadge = new UserBadge(null, userSeq, Long.valueOf(i), OffsetDateTime.now());
+                    result.add(badgeRepository.findByBadgeSeq(Long.valueOf(i)));
                     userBadgeRepository.save(userBadge);
                 }
             }
             else {
-                return 17;
+                return result;
             }
         }
-        return i;
+        return result;
     }
 
     // 만든 플레이리스트 수
-    public int checkPlaylistMake(int i, Long userSeq, List<Long> badges){
+    public List<Badge> checkPlaylistMake(Long userSeq, List<Long> badges){
+        List<Badge> result = new ArrayList<>();
+        int i = 17;
         Long playlistCount = playlistRepository.findCountByUser(userSeq);
         for(i = 17; i <= Badge7_increment; i++){
             if(playlistCount >= Badge7List.get(i-17)){
                 if(!badges.contains(Long.valueOf(i))){
                     UserBadge userBadge = new UserBadge(null, userSeq, Long.valueOf(i), OffsetDateTime.now());
+                    result.add(badgeRepository.findByBadgeSeq(Long.valueOf(i)));
                     userBadgeRepository.save(userBadge);
                 }
             }
             else {
-                return 20;
+                return result;
             }
         }
-        return i;
+        return result;
     }
 
     // 만든 플레이룸 수
-    public int checkPlayroomMake(int i, Long userSeq, List<Long> badges){
+    public List<Badge> checkPlayroomMake(Long userSeq, List<Long> badges){
+        List<Badge> result = new ArrayList<>();
+        int i = 20;
         Long playroomCount = playroomRepository.findCountByUser(userSeq);
         for(i = 20; i <= Badge8_increment; i++){
             if(playroomCount >= Badge8List.get(i-20)){
                 if(!badges.contains(Long.valueOf(i))){
                     UserBadge userBadge = new UserBadge(null, userSeq, Long.valueOf(i), OffsetDateTime.now());
+                    result.add(badgeRepository.findByBadgeSeq(Long.valueOf(i)));
                     userBadgeRepository.save(userBadge);
                 }
             }
             else {
-                return 23;
+                return result;
             }
         }
-        return i;
+        return result;
     }
 
     // 로그인 횟수
-    public int checkLoginNum(int i, Long userSeq, List<Long> badges){
+    public List<Badge> checkLoginNum(Long userSeq, List<Long> badges){
+        List<Badge> result = new ArrayList<>();
+        int i = 23;
         UserInfo nowUserInfo = userInfoRepository.findOneByUserSeq(userSeq);
         Long loginCount = nowUserInfo.getLoginCount();
         for(i = 23; i <= Badge9_increment; i++){
             if(loginCount >= Badge9List.get(i-23)){
                 if(!badges.contains(Long.valueOf(i))){
                     UserBadge userBadge = new UserBadge(null, userSeq, Long.valueOf(i), OffsetDateTime.now());
+                    result.add(badgeRepository.findByBadgeSeq(Long.valueOf(i)));
                     userBadgeRepository.save(userBadge);
                 }
             }
             else {
-                return 26;
+                return result;
             }
         }
-        return i;
+        return result;
     }
 
     // 출석 일 수
-    public int checkDaily(int i, Long userSeq, List<Long> badges){
+    public List<Badge> checkDaily(Long userSeq, List<Long> badges){
+        List<Badge> result = new ArrayList<>();
+        int i = 26;
         UserInfo nowUserInfo = userInfoRepository.findOneByUserSeq(userSeq);
         Long dailyCount = nowUserInfo.getDailyCheck();
         for(i = 26; i <= Badge10_increment; i++){
             if(dailyCount >= Badge10List.get(i-26)){
                 if(!badges.contains(Long.valueOf(i))){
                     UserBadge userBadge = new UserBadge(null, userSeq, Long.valueOf(i), OffsetDateTime.now());
+                    result.add(badgeRepository.findByBadgeSeq(Long.valueOf(i)));
                     userBadgeRepository.save(userBadge);
                 }
             }
             else {
-                return 29;
+                return result;
             }
         }
-        return i;
+        return result;
     }
 
     // 플레이룸 최고 인원 수
-    public int checkPlayroomMaxUsers(int i, Long userSeq, List<Long> badges){
+    public List<Badge> checkPlayroomMaxUsers(Long userSeq, List<Long> badges){
+        List<Badge> result = new ArrayList<>();
+        int i = 29;
         Long maxUser = playroomRepository.findRoomMaxUser(userSeq);
-        if(maxUser == null) return 32;
+        if(maxUser == null) return null;
         for(i = 29; i <= Badge11_increment; i++){
             if(maxUser >= Badge11List.get(i-29)){
                 if(!badges.contains(Long.valueOf(i))){
                     UserBadge userBadge = new UserBadge(null, userSeq, Long.valueOf(i), OffsetDateTime.now());
+                    result.add(badgeRepository.findByBadgeSeq(Long.valueOf(i)));
                     userBadgeRepository.save(userBadge);
                 }
             }
             else {
-                return 32;
+                return result;
             }
         }
-        return i;
+        return result;
     }
-
-
 
 }

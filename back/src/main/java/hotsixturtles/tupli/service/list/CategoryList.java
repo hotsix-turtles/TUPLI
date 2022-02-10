@@ -6,9 +6,9 @@ import java.util.Map;
 
 public class CategoryList {
 
-    public static final Map<Integer, String> CATEGORY_LIST = crateCategoryList();
+    public static final Map<Integer, String> CATEGORY_LIST = createCategoryList();
 
-    private static Map<Integer, String> crateCategoryList() {
+    private static Map<Integer, String> createCategoryList() {
         Map<Integer, String> result = new HashMap<>();
         result.put(1, "영화/드라마");
         result.put(2, "기타");
