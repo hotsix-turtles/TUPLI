@@ -29,6 +29,7 @@ public class UserProfileDto {
     private String profileImage;
     private String introduction;
     private String is_vip;
+    private List<String> taste;
 
 
     // 연결
@@ -58,6 +59,7 @@ public class UserProfileDto {
         }
         this.introduction = user.getIntroduction();
         this.is_vip = user.getIs_vip();
+        this.taste = user.getTaste();
 
         // 연결
         this.from_user = user.getFrom_user().stream().map(u -> new SimpleUserDto(u.getFromUser())).collect(toList());
