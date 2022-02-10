@@ -236,11 +236,8 @@
         >
           <PlaylistVideoItem
             v-for="video in roomCurrentPlaylistVideos"
-            :id="video.id"
             :key="video.id"
-            :title="video.title"
-            :thumbnail="video.thumbnail"
-            :playtime="video.playtime"
+            :video="video"
             :selected="isSelectedVideo(video.id)"
             :visible="video.included"
             @click="onPlaylistVideoSelected"
@@ -271,20 +268,19 @@
           </v-card-title>
           <v-card-text
             class="my-1"
+            ref="chat_messages"
           >
-            <v-container>
-              <ChatItem
-                v-for="chat in roomChats"
-                :id="chat.id"
-                :key="chat.id"
-                :name="chat.author.name"
-                :profile="chat.author.thumbnail"
-                :content="chat.content"
-                :timestamp="chat.timestamp"
-                :blocked-user="chat.blockedUser"
-                :blocked-message="chat.blockedMessage"
-              />
-            </v-container>
+            <ChatItem
+              v-for="chat in roomChats"
+              :id="chat.id"
+              :key="chat.id"
+              :name="chat.author.name"
+              :profile="chat.author.thumbnail"
+              :content="chat.content"
+              :timestamp="chat.timestamp"
+              :blocked-user="chat.blockedUser"
+              :blocked-message="chat.blockedMessage"
+            />
           </v-card-text>
           <v-spacer></v-spacer>
           <v-card-actions
@@ -299,6 +295,7 @@
                 dense
                 :disabled="!canChat"
                 :error="errorOnSend"
+                ref="chat_input"
                 @keydown.enter="sendChat"
                 @click:append-outer="sendMessage"
               >
@@ -590,6 +587,14 @@ export default {
     });
 
     this.$watch('isChatting', (newVal, oldVal) => {
+      if (newVal)
+      {
+        this.$nextTick(() => {
+          let messages = this.$refs.chat_messages;
+          if (!messages) return;
+          messages.scrollTo({ top: messages.scrollHeight, behavior: 'smooth' });
+        });
+      }
       // TODO: 채팅방에서 모바일 뒤로가기버튼 누르면 채팅방만 꺼지게 하고 싶었지만... 실-패
       // if (newVal && !oldVal) {
       //   document.addEventListener("backbutton", this.closeChatting, false);
@@ -607,6 +612,14 @@ export default {
 
     this.$watch('roomEndTime', (newVal, oldVal) => {
       this.loadRoomPlaytime();
+    });
+
+    this.$watch('roomChats', (newVal, oldVal) => {
+      this.$nextTick(() => {
+        let messages = this.$refs.chat_messages;
+        if (!messages) return;
+        messages.scrollTo({ top: messages.scrollHeight, behavior: 'smooth' });
+      });
     });
   },
   beforeDestroy() {
@@ -926,6 +939,7 @@ export default {
     },
     enableChatbox() {
       this.canChat = true
+      this.$nextTick(() => this.$refs.chat_input.focus())
     },
     disableChatbox() {
       this.canChat = false
