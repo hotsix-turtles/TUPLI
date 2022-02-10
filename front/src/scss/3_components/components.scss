@@ -16,9 +16,16 @@
   background-color: rgb(241, 240, 240);
 }
 
+// 카테고리 탭
 .on-clicked {
   background-color: $color-main !important;
   color: white !important;
+}
+
+// 네브바 만들기 버튼 회전
+.rotate {
+  transform: translate(-50%, 0%) rotate(45deg) !important;
+  transition: all 0.5s;
 }
 
 .fixed-bottom {
@@ -29,7 +36,7 @@
 }
 
 .fixed-bottom-navbar {
-  z-index: 9 !important;
+  z-index: 8 !important;
   position: fixed !important;
   bottom: 0 !important;
   width: 100% !important;
@@ -38,7 +45,7 @@
 .fixed-top {
   display: inline-block;
   position: fixed !important;
-  z-index: 10;
+  z-index: 9;
   top: 0 !important;
   width: 100% !important;
 }
