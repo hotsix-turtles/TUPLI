@@ -153,8 +153,6 @@ export default new Vuex.Store({
         })
         .catch(err => console.log(err.response.data))
     },
-
-
   },
   modules: {
     playroom: playroom,
