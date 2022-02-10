@@ -491,8 +491,26 @@ export default {
       if (document.hidden) return;
       this.seekTo()
     });
+
+    this.$watch('isChatting', (newVal, oldVal) => {
+      if (newVal && !oldVal) {
+        document.addEventListener("backbutton", this.closeChatting, false);
+        window.addEventListener("popstate", this.closeChatting, false);
+      }
+      if (!newVal && oldVal) {
+        document.removeEventListener("backbutton", this.closeChatting);
+        window.removeEventListener("popstate", this.closeChatting);
+
+      }
+    })
+  },
+  beforeDestroy() {
+    this.releaseChatroom()
   },
   methods: {
+    closeChatting() {
+      this.isChatting = false;
+    },
     async getRoomInfo() {
       // const token = localStorage.getItem('jwt')
 
@@ -546,6 +564,7 @@ export default {
         token ? { Authorization: this.token } : { },
         async () => {
           await this.wsConnector.subscribe(`/sub/chat/room/${this.chatroomId}`, this.onReceiveMessage, token ? { Authorization: token } : undefined)
+          this.SET_USER_START_TIME(new Date())
         },
         () => alert("서버 연결에 실패 하였습니다. 다시 접속해 주십시요.")
       )
@@ -792,9 +811,21 @@ export default {
       await this.getRoomInfo();
       this.heartbeat = 0;
     },
+    async releaseChatroom() {
+      // 이 방에 있었던 시간 (밀리초 단위)
+      this.SET_USER_END_TIME(new Date())
+
+      var time = Math.floor((this.roomUserEndTime.getTime() - this.roomUserStartTime.getTime()) / 1000)
+      console.log(time, '초 경과')
+
+      //await axiosConnector.put('/userInfo', { time })
+
+      await this.wsConnector.disconnect()
+      this.wsConnector = null
+    },
     ...mapMutations('playroom', ['SET_ROOM_AUTHOR', 'SET_ROOM_LIKED', 'SEEK_VIDEO',
       'SET_ROOM_CURRENT_PLAYLIST_ID', 'SET_ROOM_CURRENT_VIDEO_ID', 'SET_ROOM_CURRENT_VIDEO_PLAYTIME',
-      'SET_ROOM_LAST_SYNC_SENDER']),
+      'SET_ROOM_LAST_SYNC_SENDER', 'SET_USER_START_TIME', 'SET_USER_END_TIME']),
   },
 }
 </script>
