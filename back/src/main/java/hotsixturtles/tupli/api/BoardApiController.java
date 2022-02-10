@@ -3,9 +3,13 @@ package hotsixturtles.tupli.api;
 import hotsixturtles.tupli.dto.BoardDto;
 import hotsixturtles.tupli.dto.PlayroomDto;
 import hotsixturtles.tupli.dto.response.ErrorResponse;
+import hotsixturtles.tupli.dto.simple.SimpleBadgeDto;
+import hotsixturtles.tupli.entity.Badge;
 import hotsixturtles.tupli.entity.Board;
 import hotsixturtles.tupli.entity.Playroom;
+import hotsixturtles.tupli.entity.UserBadge;
 import hotsixturtles.tupli.entity.likes.BoardLikes;
+import hotsixturtles.tupli.service.BadgeService;
 import hotsixturtles.tupli.service.BoardService;
 import hotsixturtles.tupli.service.token.JwtTokenProvider;
 import io.swagger.annotations.Api;
@@ -33,6 +37,8 @@ public class BoardApiController {
     private final JwtTokenProvider jwtTokenProvider;
 
     private final MessageSource messageSource;
+
+    private final BadgeService badgeService;
 
 
     // 전체 board List 가져오기
@@ -88,7 +94,18 @@ public class BoardApiController {
 
         Board boardResult = boardService.addBoard(userSeq, board);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(new BoardDto(boardResult));
+        List<UserBadge> userBadges = badgeService.getBadgeList(userSeq);
+
+        List<Long> badges = badgeService.getUserBadgeSeq(userBadges);
+
+        // 배지갱신
+        List<Badge> badgeResult = badgeService.checkBoardUpload(userSeq, badges);
+
+        if(badgeResult == null || badgeResult.size() == 0) return ResponseEntity.ok().body(new BoardDto(boardResult, null));
+        List<SimpleBadgeDto> result = badgeResult.stream().map(b -> new SimpleBadgeDto(b)).collect(Collectors.toList());
+        
+        // 뱃지 확인
+        return ResponseEntity.status(HttpStatus.CREATED).body(new BoardDto(boardResult, result));
     }
 
     /**

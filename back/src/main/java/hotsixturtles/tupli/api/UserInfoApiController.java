@@ -1,7 +1,10 @@
 package hotsixturtles.tupli.api;
 
 
+import hotsixturtles.tupli.dto.BoardDto;
 import hotsixturtles.tupli.dto.response.ErrorResponse;
+import hotsixturtles.tupli.dto.simple.SimpleBadgeDto;
+import hotsixturtles.tupli.entity.Badge;
 import hotsixturtles.tupli.entity.UserBadge;
 import hotsixturtles.tupli.entity.meta.UserInfo;
 import hotsixturtles.tupli.repository.UserInfoRepository;
@@ -19,6 +22,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
@@ -76,7 +80,7 @@ public class UserInfoApiController {
         List<Long> badges = badgeService.getUserBadgeSeq(userBadges);
 
         // 배지갱신
-        badgeService.checkWatchTime(1, userSeq, badges);
+        badgeService.checkWatchTime(userSeq, badges);
 
         return ResponseEntity.ok().body(null);
     }
@@ -105,9 +109,11 @@ public class UserInfoApiController {
         List<Long> badges = badgeService.getUserBadgeSeq(userBadges);
 
         // 배지갱신
-        badgeService.checkBoardUpload(4, userSeq, badges);
+        List<Badge> badgeResult = badgeService.checkBoardUpload(userSeq, badges);
 
-        return ResponseEntity.ok().body(null);
+        if(badgeResult == null || badgeResult.size() == 0) return ResponseEntity.ok().body(null);
+        List<SimpleBadgeDto> result = badgeResult.stream().map(b -> new SimpleBadgeDto(b)).collect(Collectors.toList());
+        return ResponseEntity.ok().body(result);
     }
 
 
