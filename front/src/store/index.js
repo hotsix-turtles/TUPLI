@@ -164,6 +164,7 @@ export default new Vuex.Store({
         })
         .catch(err => console.log(err.response.data))
     },
+
     // 실시간 알람 가져오기 (로그인 등 이후에 호출할 것!)
     getRealtimeAlarm({state, commit}) {
       firebase
@@ -177,6 +178,7 @@ export default new Vuex.Store({
           tmp.fromId = res.fromId
           tmp.img = res.image
           tmp.to = res.to
+          tmp.toId = res.toId
           tmp.type = res.type
           tmp.isRead = false
           commit('SET_REALTIME_ALARM', tmp);
