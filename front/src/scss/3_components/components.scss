@@ -1,6 +1,6 @@
 .dark-background {
-  position: absolute;
-  z-index: 2;
+  position: fixed;
+  z-index: 7;
   background-color: rgba($color: #000000, $alpha: 0.6);
   width: 100%;
   height: 100%;
@@ -45,7 +45,7 @@
 .fixed-top {
   display: inline-block;
   position: fixed !important;
-  z-index: 9;
+  z-index: 6;
   top: 0 !important;
   width: 100% !important;
 }

@@ -1,3 +1,5 @@
+import axiosConnector from '../../utils/axios-connector'
+
 const account = {
   namespaced: true,
   state: {
@@ -14,6 +16,14 @@ const account = {
   mutations: {
   },
   actions: {
+    async validateToken() {
+      try {
+        const { status } = await axiosConnector.get('/account/tokenvalidate');
+        return (status == 200);
+      } catch(err) {
+        return false;
+      }
+    }
   },
   modules: {
   }

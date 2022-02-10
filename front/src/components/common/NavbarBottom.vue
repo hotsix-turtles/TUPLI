@@ -40,11 +40,12 @@
         </div>
       </div>
     </div>
-    <div class="d-flex-column">
-      <!-- 네브바 -->
+    <!-- 네브바 -->
+    <div class="d-flex-column fixed-bottom-navbar">
       <div
         class="d-flex justify-space-around fixed-bottom-navbar navbar-background py-2"
       >
+        <!-- 홈 버튼 -->
         <div
           class="clickable d-flex-column text-center"
           @click="changeRouter('Home')"
@@ -56,6 +57,7 @@
           </v-icon>
         </div>
 
+        <!-- 검색 버튼 -->
         <div
           class="clickable d-flex-column text-center"
           @click="changeRouter('Search')"
@@ -69,6 +71,7 @@
           class="clickable mx-3"
         />
 
+        <!-- 탐색 버튼 -->
         <div
           class="clickable d-flex-column text-center"
           @click="changeRouter('Category')"
@@ -77,10 +80,12 @@
             mdi-compass-outline
           </v-icon>
         </div>
-        <!--$$$$-->
+
+        <!-- 프로필 버튼 -->
         <div
           v-if="isLogin"
-          class="clickable profileImg"
+          class="clickable profile"
+          :class="{ 'border-colored': selectedPage === 'Profile' }"
           @click="changeRouter('Profile')"
         >
           {{ profileImage }}
@@ -191,6 +196,18 @@ export default {
 
   .colored {
     color: black !important;
+  }
+
+  .border-colored {
+    border-color: black !important;
+  }
+
+  .profile {
+    border-radius: 100%;
+    border: solid 2px;
+    border-color: lightgrey;
+    width: 1.67rem;
+    height: 1.67rem;
   }
 
 </style>
