@@ -38,12 +38,12 @@ public class SearchService {
 
     private final CategoryRepository categoryRepository;
 
-    public List<User> searchUser(UserSearchCondition userSearchCondition, Pageable pageable){
-        return searchUserRepository.searchByPageSimpleUser(userSearchCondition, pageable);
+    public List<User> searchUser(UserSearchCondition userSearchCondition, String order, Pageable pageable){
+        return searchUserRepository.searchByPageSimpleUser(userSearchCondition, order, pageable);
     }
 
-    public List<Playroom> searchPlayroom(PlayroomSearchCondition playroomSearchCondition, Pageable pageable){
-        return searchPlayroomRepository.searchByPageSimplePlayroom(playroomSearchCondition, pageable);
+    public List<Playroom> searchPlayroom(PlayroomSearchCondition playroomSearchCondition, String order, Pageable pageable){
+        return searchPlayroomRepository.searchByPageSimplePlayroom(playroomSearchCondition, order, pageable);
     }
 
     public List<Board> searchBoard(BoardSearchCondition boardSearchCondition, Pageable pageable){

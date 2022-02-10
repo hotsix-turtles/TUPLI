@@ -39,20 +39,20 @@ public class SearchApiController {
     /**
      * 유저 검색
      * @param keyword
-     * @param email
+     * @param order
      * @param pageable : 예시 => {sort=email,desc ...} size, page 값 따로 넘길 수 있음
      * @return
      * 반환 코드 : 200, 404
      */
     @GetMapping("/account/search")
-    public ResponseEntity<?> searchUser(@RequestParam String keyword, @RequestParam @Nullable String email ,
-                                        @PageableDefault(size = 1000, sort ="nickname",  direction = Sort.Direction.ASC) Pageable pageable ){
+    public ResponseEntity<?> searchUser(@RequestParam(value = "keyword") String keyword,
+                                        @RequestParam(value = "order") String order,
+                                        @PageableDefault(size = 1000) Pageable pageable ){
         SearchHistory searchHistory = new SearchHistory(null, "유저",keyword.trim(),0);
         searchService.addScoreNum(searchHistory);
         UserSearchCondition userSearchCondition = new UserSearchCondition();
-        if(email != null ) userSearchCondition.setEmail(email);
         userSearchCondition.setKeyword(keyword);
-        List<User> userList = searchService.searchUser(userSearchCondition, pageable);
+        List<User> userList = searchService.searchUser(userSearchCondition, order, pageable);
         List<SimpleUserDto> result = userList.stream().map(b -> new SimpleUserDto(b)).collect(Collectors.toList());
 
         return ResponseEntity.ok().body(result);
@@ -88,12 +88,13 @@ public class SearchApiController {
 
     @GetMapping("/playroom/search")
     public ResponseEntity<?> searchPlayroom(@RequestParam String keyword,
-                                        @PageableDefault(size = 1000, sort ="roomTitle",  direction = Sort.Direction.ASC) Pageable pageable ){
+                                        @RequestParam String order,
+                                        @PageableDefault(size = 1000) Pageable pageable ){
         SearchHistory searchHistory = new SearchHistory(null, "플레이룸",keyword.trim(),0);
         searchService.addScoreNum(searchHistory);
         PlayroomSearchCondition playroomSearchCondition = new PlayroomSearchCondition();
         playroomSearchCondition.setKeyword(keyword);
-        List<Playroom> playroomList = searchService.searchPlayroom(playroomSearchCondition, pageable);
+        List<Playroom> playroomList = searchService.searchPlayroom(playroomSearchCondition, order, pageable);
         List<PlayroomDto> result = playroomList.stream().map(b -> new PlayroomDto(b)).collect(Collectors.toList());
 
         return ResponseEntity.ok().body(result);

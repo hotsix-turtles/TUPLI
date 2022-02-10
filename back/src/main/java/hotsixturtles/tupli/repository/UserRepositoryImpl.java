@@ -7,6 +7,7 @@ import com.querydsl.core.types.dsl.PathBuilder;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import hotsixturtles.tupli.dto.params.UserSearchCondition;
+import hotsixturtles.tupli.entity.Playroom;
 import hotsixturtles.tupli.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
@@ -16,7 +17,9 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+import static hotsixturtles.tupli.entity.QPlayroom.playroom;
 import static hotsixturtles.tupli.entity.QUser.user;
+import static org.springframework.util.StringUtils.hasText;
 
 
 @Repository
@@ -26,25 +29,42 @@ public class UserRepositoryImpl implements UserRepositoryCustom{
     private final JPAQueryFactory jpaQueryFactory;
 
     @Override
-    public List<User> searchByPageSimpleUser(UserSearchCondition searchCondition, Pageable pageable){
+    public List<User> searchByPageSimpleUser(UserSearchCondition condition, String order, Pageable pageable){
 
-        JPAQuery<User> query = jpaQueryFactory
-                .selectFrom(user)
-                .where(
-                        user.nickname.contains(searchCondition.getKeyword()),
-                        eqEmail(searchCondition.getEmail())
-                )
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize());
+        if(order.equals("relevance")) {
+            JPAQuery<User> query = jpaQueryFactory
+                    .select(user)
+                    .distinct()
+                    .from(user)
+                    .where(nicknameContains(condition.getKeyword())
+                            .or(usernameContains(condition.getKeyword()))
+                            .or(emailContains(condition.getKeyword())))
+                    .orderBy(user.nickname.asc()
+                            ,user.username.asc()
+                            ,user.email.asc()
+                            ,user.createdAt.desc()
+                    )
+                    .offset(pageable.getOffset())
+                    .limit(pageable.getPageSize());
 
-        for (Sort.Order o : pageable.getSort()) {
-            PathBuilder pathBuilder = new PathBuilder(user.getType(), user.getMetadata());
-            query.orderBy(new OrderSpecifier(o.isAscending() ? Order.ASC : Order.DESC,
-                    pathBuilder.get(o.getProperty())));
+            List<User> result = query.fetch();
+            return result;
         }
+        else{
+            JPAQuery<User> query = jpaQueryFactory
+                    .select(user)
+                    .distinct()
+                    .from(user)
+                    .where(nicknameContains(condition.getKeyword())
+                            .or(usernameContains(condition.getKeyword()))
+                            .or(emailContains(condition.getKeyword())))
+                    .orderBy(user.to_user.size().desc())
+                    .offset(pageable.getOffset())
+                    .limit(pageable.getPageSize());
 
-        List<User> result = query.fetch();
-        return result;
+            List<User> result = query.fetch();
+            return result;
+        }
     }
 
 
@@ -53,5 +73,15 @@ public class UserRepositoryImpl implements UserRepositoryCustom{
             return null;
         }
         return user.email.eq(email);
+    }
+
+    private BooleanExpression nicknameContains(String keyword) {
+        return hasText(keyword) ? user.nickname.contains(keyword) : null;
+    }
+    private BooleanExpression usernameContains(String keyword) {
+        return hasText(keyword) ? user.username.contains(keyword) : null;
+    }
+    private BooleanExpression emailContains(String keyword) {
+        return hasText(keyword) ? user.email.contains(keyword) : null;
     }
 }

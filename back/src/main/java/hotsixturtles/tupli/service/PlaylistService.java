@@ -268,40 +268,14 @@ public class PlaylistService {
     }
 
     // Querydsl 버전 (굳이 querydsl로 작성할 이유 하나도 없는 쿼리)
-    public List<Playlist> searchPlaylistSimple(PlaylistSearchCondition condition, Pageable pageable) {
+    public List<Playlist> searchPlaylistSimple(PlaylistSearchCondition condition, String order, Pageable pageable) {
         // QueryProjection(select에 Q타입 담기) 쓰고 싶으면 다음 기회에!
         // QPlaylist.playlist를 -> playlist로 static import 했습니다.(강민구)
         // $$$$ NumberExpression 사용금지!
         // 이유 반환이 Tuple인데 변환하려면 전용 생성자 필요해서 DTO가 더러워짐, 다른 방법 아시는 분 말씀해주심 감사!
                 
         // 기본값 : 관련도 순 (이름순, 작성자, 내용 순 + 나중에 이름 정해졌을때 조건 변경 필요 )
-//        if (condition.getType() == null | condition.getType() == "관련순" ) {
-
-//            List<Playlist> list1 = jpaQueryFactory
-//                    .select(playlist)
-//                    .from(playlist)
-//                    .where(titleContains(condition.getKeyword()))
-//                    .orderBy(playlist.id.desc())
-//                    .fetch();
-//            List<Playlist> list2 = jpaQueryFactory
-//                    .select(playlist)
-//                    .from(playlist)
-//                    .where(usernameContains(condition.getKeyword()))
-//                    .orderBy(playlist.id.desc())
-//                    .fetch();
-//            List<Playlist> list3 = jpaQueryFactory
-//                    .select(playlist)
-//                    .from(playlist)
-//                    .where(descriptionContains(condition.getKeyword()))
-//                    .orderBy(playlist.id.desc())
-//                    .fetch();
-//
-//            // 중복 항목 제거하고 합치기.
-//            list2.removeAll(list1);
-//            list1.addAll(list2);
-//            list3.removeAll(list1);
-//            list1.addAll(list3);
-
+        if(order.equals("relevance")) {
             JPAQuery<Playlist> query = jpaQueryFactory
                     .select(playlist)
                     .distinct()
@@ -310,19 +284,49 @@ public class PlaylistService {
                             .or(tagContains(condition.getKeyword()))
                             .or(usernameContains(condition.getKeyword()))
                             .or(descriptionContains(condition.getKeyword())))
+                    .orderBy(playlist.title.asc()
+                            , playlist.user.username.asc()
+                            , playlist.tags.asc()
+                            , playlist.content.asc()
+                    )
                     .offset(pageable.getOffset())
                     .limit(pageable.getPageSize());
 
-            //이거 끝나면 query의 sort 완료됨
-            for (Sort.Order o : pageable.getSort()) {
-                PathBuilder pathBuilder = new PathBuilder(playlist.getType(), playlist.getMetadata());
-                query.orderBy(new OrderSpecifier(o.isAscending() ? Order.ASC : Order.DESC,
-                        pathBuilder.get(o.getProperty())));
-            }
+            List<Playlist> result = query.fetch();
+            return result;
+        }
+        else if(order.equals("date")){
+            JPAQuery<Playlist> query = jpaQueryFactory
+                    .select(playlist)
+                    .distinct()
+                    .from(playlist)
+                    .where(titleContains(condition.getKeyword())
+                            .or(tagContains(condition.getKeyword()))
+                            .or(usernameContains(condition.getKeyword()))
+                            .or(descriptionContains(condition.getKeyword())))
+                    .orderBy(playlist.createdAt.desc())
+                    .offset(pageable.getOffset())
+                    .limit(pageable.getPageSize());
 
             List<Playlist> result = query.fetch();
             return result;
+        }
+        else{
+            JPAQuery<Playlist> query = jpaQueryFactory
+                    .select(playlist)
+                    .distinct()
+                    .from(playlist)
+                    .where(titleContains(condition.getKeyword())
+                            .or(tagContains(condition.getKeyword()))
+                            .or(usernameContains(condition.getKeyword()))
+                            .or(descriptionContains(condition.getKeyword())))
+                    .orderBy(playlist.likesCnt.desc())
+                    .offset(pageable.getOffset())
+                    .limit(pageable.getPageSize());
 
+            List<Playlist> result = query.fetch();
+            return result;
+        }
 
 //            return list1;
 //        }
