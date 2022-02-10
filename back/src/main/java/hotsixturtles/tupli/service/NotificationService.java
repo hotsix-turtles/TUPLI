@@ -1,7 +1,6 @@
 package hotsixturtles.tupli.service;
 
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.*;
 import hotsixturtles.tupli.dto.noti.NotificationDto;
 import hotsixturtles.tupli.entity.User;
 import hotsixturtles.tupli.repository.UserRepository;
@@ -136,8 +135,6 @@ public class NotificationService {
         rtref.setValueAsync(notificationDto);
     }
 
-
-
     public void realtimeNotiReset() {
         // 실시간 알림 내용 초기화(읽음)
         final FirebaseDatabase rtdatabase = FirebaseDatabase.getInstance();
@@ -145,6 +142,48 @@ public class NotificationService {
         rtref.setValueAsync(null);
     }
 
+    // 해당 유저의 알림 중 일부만 읽은것으로 바꾸기
+    public void notiRead(String id, String notiId) {
+
+        final FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference ref = database.getReference("tupli"); // 최상위 root: noti
+        DatabaseReference notiRef = ref.child(id).child(notiId); // noti의 child node: to의 아이디 값
+        notiRef.child("isRead").setValueAsync(true);
+    }
+
+    // 해당 유저의 알림 전부 읽기
+    public void notiReadAll(String id) {
+
+        final FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference ref = database.getReference("tupli"); // 최상위 root: noti
+        DatabaseReference notiRef = ref.child(id); // noti의 child node: to의 아이디 값
+
+        notiRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                System.out.println(snapshot);
+
+                exFindData: for (DataSnapshot data : snapshot.getChildren()) {
+                    for (DataSnapshot value : data.getChildren()) {
+                        if (value.getKey().equals("isRead")  && value.getValue().equals("false")) {
+                            DatabaseReference updateRef = notiRef.child(data.getKey()).child("isRead");
+                            updateRef.setValueAsync(true);
+                            System.out.println("updateRef = " + updateRef);
+                            System.out.println("예이!");
+                        }
+                        System.out.println("value = " + value);
+                        System.out.println("valuekey = " + value.getValue());
+
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError error) {
+            }
+        });
+
+    }
 
     /**
      * 테스트용
