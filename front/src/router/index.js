@@ -75,12 +75,17 @@ const routes = [
 
   // 플레이리스트
   {
-    path: '/playlist/create',
+    path: '/playlist/create/',
     name: 'PlaylistForm',
     component: PlaylistForm
   },
   {
-    path: '/playlist/create/video',
+    path: '/playlist/update/:playlistId',
+    name: 'PlaylistUpdateForm',
+    component: PlaylistForm
+  },
+  {
+    path: '/playlist/video',
     name: 'PlaylistFormVideo',
     component: PlaylistFormVideo
   },

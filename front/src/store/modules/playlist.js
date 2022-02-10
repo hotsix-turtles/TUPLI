@@ -168,6 +168,20 @@ const playlist = {
           console.log(err)
         })
     },
+    // [플레이리스트 수정]
+    updatePlaylist: function ({ commit }, { formData, id } ) {
+      console.log('updatePlaylist', formData)
+      axiosConnector.put(`/playlist/${id}`,
+        formData
+      ).then((res) => {
+        console.log(res)
+        router.push({ name: 'PlaylistDetail', params: { playlistId: id } })
+        commit('RESET_FORM_DATA')
+      })
+        .catch((err) => {
+          console.log(err)
+        })
+    },
     // [플레이리스트 디테일]
     getPlaylistDetail: function ({ commit, dispatch }, playlistId) {
       axios({

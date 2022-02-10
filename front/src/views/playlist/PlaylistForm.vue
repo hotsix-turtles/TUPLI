@@ -1,13 +1,21 @@
 <template>
   <div>
-    <!-- 뒤로가기/완료 -->
+    <!-- 뒤로가기/완료 or 생성 -->
     <div class="d-flex justify-space-between fixed-top light-background">
       <back :page-name="pageName" />
       <div
+        v-if="formType === 'create'"
         class="clickable"
         @click="onClickCompletion"
       >
         완료
+      </div>
+      <div
+        v-else
+        class="clickable"
+        @click="onClickCompletion"
+      >
+        수정
       </div>
     </div><br><br>
 
@@ -129,6 +137,7 @@ export default {
   data: function() {
     return {
       pageName: "내 플레이리스트 만들기",
+      formType: 'create',  // 생성하기/수정하기
       isSelectedAll: false,
       // Create할 때 넘길 데이터
       formData: {
@@ -160,16 +169,25 @@ export default {
       isSaved: state => state.isSaved,
     }),
   },
+  // 뒤로가기할 때 저장한 데이터 삭제돼도 괜찮은지 확인 후 처리 로직 필요
   created: function () {
     if (this.isSaved) {
       this.formData = this.savedFormData
     } else {
       this.resetVideoAddState()
     }
+    if (this.$route.params.playlistId === 'video' || typeof this.$route.params.playlistId === 'undefined') {
+      console.log('create 완료 페이지')
+      this.formType = 'create'
+    } else {
+      console.log('update 수정 페이지', this.$route.params.playlistId)
+      this.formType = 'update'
+    }
   },
   methods: {
     ...mapActions('playlist', [
       'createPlaylist',
+      'updatePlaylist',
       'saveFormData',
     ]),
     ...mapActions('video', [
@@ -189,7 +207,15 @@ export default {
           isPublic: this.formData.isPublic,
           videos: this.addedVideos,
         }
-        this.createPlaylist(data)
+        if (this.formType === 'create') {
+          this.createPlaylist(data)
+        } else {
+          const params = {
+            id: this.$route.params.playlistId,
+            formData: data,
+          }
+          this.updatePlaylist(params)
+        }
         setTimeout(() => {this.resetVideoAddState()}, 1000)
       } else {
         this.checkVideoList = true
@@ -204,6 +230,7 @@ export default {
       this.isSelectedAll = !this.isSelectedAll
     },
     saveAndGo: function () {
+      console.log('this.formData', this.formData)
       this.saveFormData(this.formData)
       this.$router.push({ name: 'PlaylistFormVideo'})
     }

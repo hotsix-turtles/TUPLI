@@ -35,6 +35,7 @@ const common = {
     },
     // 요소 선택
     onSelectItem: function ({ commit, dispatch }, item) {
+      console.log('onSelectItem', item)
       commit('ON_SELECT_ITEM', item)
       dispatch('onClickModal')  // created할때 얘가 실행돼서 showModal이 true인거
     },

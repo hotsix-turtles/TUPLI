@@ -1,4 +1,4 @@
-/* eslint-disable vue/require-default-prop */
+np/* eslint-disable vue/require-default-prop */
 <template>
   <div>
     <!-- 만들기 버튼 나오면서 나오는 검정 배경 -->

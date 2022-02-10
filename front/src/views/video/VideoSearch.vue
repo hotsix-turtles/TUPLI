@@ -20,6 +20,7 @@
       <modal
         :items="selectList"
         :modal-name="'정렬 필터 변경'"
+        :modal-type="'order'"
         @on-select="onSelect"
       />
       <!-- 영상 리스트 -->
