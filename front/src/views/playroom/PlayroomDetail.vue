@@ -462,7 +462,14 @@ export default {
       return this.roomContent == this.roomReducedContent
     }
   },
-  created() {
+  async created() {
+    const isValid = await this.validateToken();
+    if (!isValid)
+    {
+      // 토큰 만료시 현재 vuex 정보를 초기화하고 로그인 페이지로 이동
+      localStorage.clear();
+      this.$router.push('/login')
+    }
   },
   mounted() {
     this.$nextTick(async () => {
@@ -826,6 +833,7 @@ export default {
     ...mapMutations('playroom', ['SET_ROOM_AUTHOR', 'SET_ROOM_LIKED', 'SEEK_VIDEO',
       'SET_ROOM_CURRENT_PLAYLIST_ID', 'SET_ROOM_CURRENT_VIDEO_ID', 'SET_ROOM_CURRENT_VIDEO_PLAYTIME',
       'SET_ROOM_LAST_SYNC_SENDER', 'SET_USER_START_TIME', 'SET_USER_END_TIME']),
+    ...mapActions('account', ['validateToken']),
   },
 }
 </script>
