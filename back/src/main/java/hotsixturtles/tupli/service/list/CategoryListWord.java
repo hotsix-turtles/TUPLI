@@ -6,9 +6,9 @@ import java.util.Map;
 
 public class CategoryListWord {
 
-    public static final Map<String, String> CATEGORY_LIST_WORD = crateCategoryListWord();
+    public static final Map<String, String> CATEGORY_LIST_WORD = createCategoryListWord();
 
-    private static Map<String, String> crateCategoryListWord() {
+    private static Map<String, String> createCategoryListWord() {
         Map<String, String> result = new HashMap<>();
         result.put("trip", "여행");
         result.put("game", "게임");
