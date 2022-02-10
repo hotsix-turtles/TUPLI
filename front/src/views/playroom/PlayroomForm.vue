@@ -518,7 +518,15 @@ export default {
       }
     },
   },
-  created: function () {
+  async created() {
+    const isValid = await this.validateToken();
+    if (!isValid)
+    {
+      // 토큰 만료시 현재 vuex 정보를 초기화하고 로그인 페이지로 이동
+      localStorage.clear();
+      this.$router.push('/login')
+    }
+
     if (this.savedFormData) {
       console.log('restoreData', this.savedFormData)
       this.formData = this.savedFormData
@@ -599,7 +607,8 @@ export default {
     },
     ...mapMutations('playroom', ['RESET_FORM_DATA']),
     ...mapActions('playroom', ['saveFormData']),
-    ...mapActions('playlist', ['selectAllPlaylistVideo', 'deselectAllPlaylistVideo', 'resetAddedPlaylists'])
+    ...mapActions('playlist', ['selectAllPlaylistVideo', 'deselectAllPlaylistVideo', 'resetAddedPlaylists']),
+    ...mapActions('account', ['validateToken'])
   },
 }
 </script>
