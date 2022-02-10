@@ -27,12 +27,6 @@ export default new Vuex.Store({
     authToken: null,
     isLogin: false,
     // userInfo: null
-
-  },
-  getters: {
-    getRealtimeAlarmList: function(state) {
-      return state.realtimeAlarmList;
-    }
   },
   mutations: {
     // 로그인
