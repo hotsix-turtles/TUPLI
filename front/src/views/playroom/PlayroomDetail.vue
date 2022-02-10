@@ -173,7 +173,7 @@
 
         <!-- 플레이룸 태그 Wrapper -->
         <div class="playroomTagWrapper">
-          <TagItem
+          <tags
             v-for="roomTag in roomTags"
             :key="roomTag"
             :content="roomTag"
@@ -366,7 +366,6 @@ import { mapActions, mapGetters, mapMutations, mapState } from 'vuex';
 import Vue from 'vue'
 import VueYoutube from 'vue-youtube'
 import PlaylistThumbnailItem from './PlaylistThumbnailItem.vue'
-import TagItem from './TagItem.vue'
 import PlaylistVideoItem from './PlaylistVideoItem.vue'
 import ChatItem from './ChatItem.vue'
 import axiosConnector from '../../utils/axios-connector';
@@ -374,6 +373,7 @@ import axiosConnector from '../../utils/axios-connector';
 import NavButton from '../../components/common/NavButton.vue'
 import Stomp from "webstomp-client"
 import SockJS from "sockjs-client"
+import Tags from '../../components/common/Tags.vue';
 
 Vue.use(VueYoutube)
 
@@ -384,7 +384,7 @@ export default {
     PlaylistVideoItem,
     ChatItem,
     NavButton,
-    TagItem
+    Tags
   },
   data() {
     return {
