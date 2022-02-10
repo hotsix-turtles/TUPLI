@@ -38,7 +38,9 @@ public class UserService {
         user.encodePassword(passwordEncoder);
 
         userRepository.save(user);
-        UserInfo userInfo = new UserInfo(null, user.getUserSeq(), null, 0L, 0L, 0L, 1L, "Y");
+//        UserInfo userInfo = new UserInfo(null, user.getUserSeq(), null, 0L, 0L, 0L, 1L, "Y");
+        UserInfo userInfo = new UserInfo();
+        userInfo.setUserSeq(user.getUserSeq());
         userInfoRepository.save(userInfo);
         return user.getUserSeq();
     }

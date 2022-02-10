@@ -12,11 +12,14 @@ import hotsixturtles.tupli.dto.request.PlaylistRequest;
 import hotsixturtles.tupli.dto.simple.SimpleYoutubeVideoDto;
 import hotsixturtles.tupli.entity.Category;
 import hotsixturtles.tupli.entity.Playlist;
+import hotsixturtles.tupli.entity.User;
 import hotsixturtles.tupli.entity.likes.PlaylistLikes;
+import hotsixturtles.tupli.entity.meta.UserInfo;
 import hotsixturtles.tupli.entity.youtube.YoutubeVideo;
 import hotsixturtles.tupli.repository.*;
 import hotsixturtles.tupli.repository.likes.PlaylistLikesRepository;
 import hotsixturtles.tupli.service.list.CategoryList;
+import hotsixturtles.tupli.service.list.TasteScore;
 import io.swagger.models.auth.In;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,6 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 import static hotsixturtles.tupli.entity.QPlaylist.*;
 import static org.springframework.util.StringUtils.hasText;
@@ -38,6 +42,7 @@ import static org.springframework.util.StringUtils.hasText;
 public class PlaylistService {
 
     private final UserRepository userRepository;
+    private final UserInfoRepository userInfoRepository;
     private final PlaylistRepository playlistRepository;
     private final PlaylistLikesRepository playlistLikesRepository;
     private final YoutubeVideoRepository youtubeVideoRepository;
@@ -48,43 +53,43 @@ public class PlaylistService {
     private final JPAQueryFactory jpaQueryFactory;
 
     // private static한 내부 카테고리 정리
-    private static final Map<Integer, String> categoryList = crateCategoryList();
-    private static Map<Integer, String> crateCategoryList() {
-        Map<Integer, String> result = new HashMap<>();
-        result.put(1, "영화/드라마");
-        result.put(2, "기타");
-        result.put(10, "음악");
-        result.put(15, "동물");
-        result.put(17, "스포츠");
-        result.put(18, "영화/드라마");
-        result.put(19, "여행");
-        result.put(20, "게임");
-        result.put(21, "일상");
-        result.put(22, "일상");
-        result.put(23, "엔터테인먼트");
-        result.put(24, "엔터테인먼트");
-        result.put(25, "교육/시사");
-        result.put(26, "노하우/스타일");
-        result.put(27, "교육/시사");
-        result.put(28, "교육/시사");
-        result.put(29, "기타");
-        result.put(30, "영화/드라마");
-        result.put(31, "영화/드라마");
-        result.put(32, "기타");
-        result.put(33, "음악");
-        result.put(34, "엔터테인먼트");
-        result.put(35, "엔터테인먼트");
-        result.put(36, "영화/드라마");
-        result.put(37, "기타");
-        result.put(38, "기타");
-        result.put(39, "기타");
-        result.put(40, "기타");
-        result.put(41, "기타");
-        result.put(42, "기타");
-        result.put(43, "기타");
-        result.put(44, "기타");
-        return Collections.unmodifiableMap(result);
-    }
+//    private static final Map<Integer, String> categoryList = crateCategoryList();
+//    private static Map<Integer, String> crateCategoryList() {
+//        Map<Integer, String> result = new HashMap<>();
+//        result.put(1, "영화/드라마");
+//        result.put(2, "기타");
+//        result.put(10, "음악");
+//        result.put(15, "동물");
+//        result.put(17, "스포츠");
+//        result.put(18, "영화/드라마");
+//        result.put(19, "여행");
+//        result.put(20, "게임");
+//        result.put(21, "일상");
+//        result.put(22, "일상");
+//        result.put(23, "엔터테인먼트");
+//        result.put(24, "엔터테인먼트");
+//        result.put(25, "교육/시사");
+//        result.put(26, "노하우/스타일");
+//        result.put(27, "교육/시사");
+//        result.put(28, "교육/시사");
+//        result.put(29, "기타");
+//        result.put(30, "영화/드라마");
+//        result.put(31, "영화/드라마");
+//        result.put(32, "기타");
+//        result.put(33, "음악");
+//        result.put(34, "엔터테인먼트");
+//        result.put(35, "엔터테인먼트");
+//        result.put(36, "영화/드라마");
+//        result.put(37, "기타");
+//        result.put(38, "기타");
+//        result.put(39, "기타");
+//        result.put(40, "기타");
+//        result.put(41, "기타");
+//        result.put(42, "기타");
+//        result.put(43, "기타");
+//        result.put(44, "기타");
+//        return Collections.unmodifiableMap(result);
+//    }
 
 
     // 단일 Playlist 추가
@@ -98,12 +103,18 @@ public class PlaylistService {
         playlist.setIsPublic(playlistRequest.getIsPublic());
         
         // 연결
-        playlist.setUser(userRepository.findByUserSeq(userSeq));
+        User user = userRepository.findByUserSeq(userSeq);
+        playlist.setUser(user);
+
+        // 유저 취향 가져오기
+        UserInfo userInfo = userInfoRepository.findOneByUserSeq(userSeq);
+        ConcurrentHashMap<String, Integer> tasteInfo = userInfo.getTasteInfo();
 
         // 카테고리 정보 담을 Set
         Set<String> categorys = new HashSet<>();
 
         // Video 정보
+        //List<YoutubeVideo> youtubeVideos = new ArrayList<>();
         ConcurrentHashMap<Integer, Integer> playlistInfo = new ConcurrentHashMap<Integer, Integer>();
         String image = null;
         for (SimpleYoutubeVideoDto videoDto : playlistRequest.getVideos()) {
@@ -117,6 +128,7 @@ public class PlaylistService {
             YoutubeVideo video = new YoutubeVideo();
             video.setInit(videoDto);
             video.setPlaylist(playlist);  // 연결
+            //youtubeVideos.add(video);
             youtubeVideoRepository.save(video);
 
             // Playlistinfo에 따라 갈림
@@ -128,6 +140,10 @@ public class PlaylistService {
             String category = CategoryList.CATEGORY_LIST.getOrDefault(categoryId, "기타");
 //            String category = categoryList.getOrDefault(categoryId, "기타");
             categorys.add(category);
+
+            // 취향 반영
+            Integer tasteScore = tasteInfo.getOrDefault(category, 0);
+            tasteInfo.put(category, tasteScore + TasteScore.SCORE_PLAYLIST_MAKE);
         }
 
         // 검색을 위한 Stringify
@@ -137,10 +153,36 @@ public class PlaylistService {
         }
         playlist.setPlaylistCate(categorysString);
         playlist.setPlaylistInfo(playlistInfo);
+        //playlist.setYoutubeVideos(youtubeVideos);
 
+        // 유저 정보 저장
+        userInfo.setTasteInfo(tasteInfo);
+        userInfoRepository.save(userInfo);
+
+        // 유저 취향 분석 후 저장
+        List<String> userTaste = getTaste(tasteInfo);
+        user.setTaste(userTaste);
+        userRepository.save(user);
+
+        // 최종 저장
         playlistRepository.save(playlist);
 
         return playlist;
+    }
+
+    private List<String> getTaste(ConcurrentHashMap<String, Integer> tasteInfo) {
+        List<String> userTaste = new ArrayList<>();
+        // 유저 정보 분석, MAP을 Value DESC로 나열. 최대 넷.
+        Map<String, Integer> topFour =
+                tasteInfo.entrySet().stream()
+                        .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
+                        .limit(4)
+                        .collect(Collectors.toMap(
+                                Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
+        for (String category : topFour.keySet()) {
+            userTaste.add(category);
+        }
+        return userTaste;
     }
 
     // 단일 Playlist id로 검색

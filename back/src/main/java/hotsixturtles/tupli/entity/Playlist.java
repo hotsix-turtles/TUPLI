@@ -70,7 +70,7 @@ public class Playlist {
     @OneToMany(mappedBy = "playlist")
     private List<PlaylistLikes> playlistLikes = new ArrayList<>();
 
-    @OneToMany(mappedBy = "playlist",  cascade = CascadeType.ALL)  // 단방향 설정
+    @OneToMany(mappedBy = "playlist")//,  cascade = CascadeType.ALL)
     private List<YoutubeVideo> youtubeVideos = new ArrayList<>();
 
     @OneToMany(mappedBy = "playlist", cascade = {CascadeType.REMOVE})

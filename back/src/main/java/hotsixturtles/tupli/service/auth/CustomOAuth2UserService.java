@@ -80,7 +80,9 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             userInfoRepository.save(nowUserInfo);
         } else {
             savedUser = createUser(userInfo, providerType);
-            UserInfo nowUserInfo = new UserInfo(null, savedUser.getUserSeq(), null, 0L, 0L, 1L, 1L, "Y");
+//            UserInfo nowUserInfo = new UserInfo(null, savedUser.getUserSeq(), null, 0L, 0L, 1L, 1L, "Y");
+            UserInfo nowUserInfo = new UserInfo();
+            nowUserInfo.setUserSeq(savedUser.getUserSeq());
             userInfoRepository.save(nowUserInfo);
         }
 
