@@ -57,6 +57,7 @@
 </template>
 
 <script>
+import { mapActions } from 'vuex';
 export default {
   name: 'PlaylistVideoItem',
   props: {
@@ -78,7 +79,8 @@ export default {
     onItemClick () {
       if (this.readonly) return;
       this.$emit('click', { id: this.video.id, selected: this.selected })
-    }
+    },
+    ...mapActions('video', ['watchingVideo'])
   }
 }
 </script>
