@@ -18,12 +18,10 @@
             {{ selected ? 'mdi-check' : 'mdi-plus' }}
           </v-icon>
         </v-btn>
-        <img
-          :src="playlist.thumbnail"
-          style="width: 100px; height: 66px"
-          class=""
+        <playlist-cd-medium
+          :thumbnail="playlist.videos[0].thumbnail"
           @click="watchingVideo(playlist)"
-        >
+        />
         <v-list-item-content
           class="ml-2"
         >
@@ -51,11 +49,12 @@
 
 <script>
 import { mapActions, mapState } from 'vuex'
+import PlaylistCdMedium from './PlaylistCdMedium.vue'
 import PlaylistVideoItemSmall from './PlaylistVideoItemSmall.vue'
 
 export default {
   name: 'PlaylistItemSmall',
-  components: { PlaylistVideoItemSmall },
+  components: { PlaylistVideoItemSmall, PlaylistCdMedium },
   props: {
     playlist: { type: Object, default() { {} } },
     readonly: { type: Boolean, default: false },
@@ -80,7 +79,7 @@ export default {
   created() {
     this.selected = Boolean(this.selectedPlaylists && this.selectedPlaylists
       .find(selectedPlaylist => selectedPlaylist.playlistId == this.playlist.playlistId))
-    console.log(this.readonly, this.selected)
+    console.log(this.playlist)
   },
   methods: {
     clickPlaylist() {
