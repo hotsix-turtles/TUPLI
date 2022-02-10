@@ -101,7 +101,7 @@ const playlist = {
       console.log('select_playlist', state.selectedPlaylists)
     },
     DESELECT_PLAYLIST: function (state, toRemovePlaylist) {
-      const idx = state.selectedPlaylists.findIndex(selectedPlaylist => selectedPlaylist.playlistId == toRemovePlaylist.playlistId)
+      const idx = state.selectedPlaylists.findIndex(selectedPlaylist => selectedPlaylist.id == toRemovePlaylist.id)
       state.selectedPlaylists.splice(idx, 1)
       console.log('deselect_playlist', state.selectedPlaylists)
     },
