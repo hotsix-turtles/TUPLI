@@ -10,10 +10,12 @@ import router from '../router/index.js'
 import video from './modules/video.js'
 import playlist from './modules/playlist.js'
 import common from './modules/common.js'
+import mainContent from './modules/mainContent.js'
 
 import axios from 'axios'
 import SERVER from '@/api/server'
 import createPersistedState from "vuex-persistedstate";
+import axiosConnector from '@/utils/axios-connector.js'
 
 export default new Vuex.Store({
   // TODO: createPersistedState 사용시 사용 모듈 한정 필요 (playroom, playlist등엔 사용 x)
@@ -120,16 +122,17 @@ export default new Vuex.Store({
     },
     // 회원가입
     signup: function (context, credentials) {
-      axios({
-        method: 'POST',
-        url: SERVER.URL + '/account/signup',
-        data: {
-          email: credentials.email,
-          password: credentials.password,
-          // username: credentials.username,
-          nickname: credentials.nickname,
-        }
-      })
+      axiosConnector.post('/account/signup', { email: credentials.email, password: credentials.password, nickname: credentials.nickname })
+      // axios({
+      //   method: 'POST',
+      //   url: SERVER.URL + '/account/signup',
+      //   data: {
+      //     email: credentials.email,
+      //     password: credentials.password,
+      //     // username: credentials.username,
+      //     nickname: credentials.nickname,
+      //   }
+      // })
         .then((res) => {
           // 회원가입시 자동 로그인까지 하고 signup 3으로 보내기 (강민구)
           this.dispatch('loginHere', credentials)
@@ -161,5 +164,6 @@ export default new Vuex.Store({
     video: video,
     playlist: playlist,
     common: common,
+    mainContent: mainContent,
   },
 })
