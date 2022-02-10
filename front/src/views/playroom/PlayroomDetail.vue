@@ -173,11 +173,12 @@
 
         <!-- 플레이룸 태그 Wrapper -->
         <div class="playroomTagWrapper">
-          <tags
+          <!-- <tags
             v-for="roomTag in roomTags"
             :key="roomTag"
             :content="roomTag"
-          />
+          /> -->
+          <tags :tags="roomTags.split(',')" />
         </div>
       </div>
       <!-- 플레이룸 정보 Wrapper 끝 -->
@@ -468,7 +469,7 @@ export default {
     PlaylistVideoItem,
     ChatItem,
     NavButton,
-    Tags
+    Tags,
   },
   data() {
     return {
