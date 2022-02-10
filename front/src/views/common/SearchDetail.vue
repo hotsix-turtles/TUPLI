@@ -36,8 +36,9 @@
             <v-icon>mdi-menu-down</v-icon>
           </div>
           <modal
-            :items="videoSelectList"
+            :items="playlistSelectList"
             :modal-name="'정렬 필터 변경'"
+            :modal-type="'order'"
             @on-select="onSelect"
           />
         </v-tab-item>
@@ -55,8 +56,9 @@
             <v-icon>mdi-menu-down</v-icon>
           </div>
           <modal
-            :items="videoSelectList"
+            :items="playroomSelectList"
             :modal-name="'정렬 필터 변경'"
+            :modal-type="'order'"
             @on-select="onSelect"
           />
         </v-tab-item>
@@ -74,8 +76,9 @@
             <v-icon>mdi-menu-down</v-icon>
           </div>
           <modal
-            :items="videoSelectList"
+            :items="accountSelectList"
             :modal-name="'정렬 필터 변경'"
+            :modal-type="'order'"
             @on-select="onSelect"
           />
         </v-tab-item>
@@ -95,6 +98,7 @@
           <modal
             :items="videoSelectList"
             :modal-name="'정렬 필터 변경'"
+            :modal-type="'order'"
             @on-select="onSelect"
           />
           <!-- 영상 리스트 -->
@@ -146,11 +150,19 @@ export default {
         '플리', '플레이룸', '계정', '영상',
       ],
       tabName: '플리',
-
       query: '',
+
       playlistQuery: '',
+      playlistOrder: '',
+      playlistSelectList: {
+        '관련순': 'relevance',
+        '최근순': 'date',
+        '조회순': 'viewCount',
+      },
+
       playroomQuery: '',
       accountQuery: '',
+
       // 영상 검색
       videoQuery: '',
       videoOrder: '',

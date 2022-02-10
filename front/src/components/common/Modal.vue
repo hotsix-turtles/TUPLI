@@ -26,10 +26,10 @@
         :key="idx"
       >
         <div
-          class="my-3"
+          class="my-4 font-2"
           @click="onSelect(item)"
         >
-          <span :class="{ colored: item === selected }">
+          <span :class="{ colored: modalType === 'order' && item === selected }">
             {{ item }}
           </span>
         </div>
@@ -46,7 +46,8 @@ export default {
   },
   props: {
     items: { type: Object , default() {} }, // 목록 내 아이템들 {이름: 실제값}
-    modalName: { type: String, default: '' }  // 목록 이름
+    modalName: { type: String, default: '' },  // 목록 이름
+    modalType: { type: String, default: '' }  // 모달 종류 (정렬: order)
   },
   data: function () {
     return {
@@ -69,7 +70,7 @@ export default {
       'onSelectItem',
       'resetModalData',
     ]),
-    // 무한스크롤용 emit (common.js에서 selected쓰는게 더 편함)
+    // vuex보다 이게  더편한듯
     onSelect: function (item) {
       this.$emit('on-select', this.items[item])
       this.onSelectItem(item)

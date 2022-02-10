@@ -126,6 +126,7 @@ const video = {
     ORDER: function (state, order) {
       state.order = order
     },
+    // 생성하기
     ADD_VIDEOS: function (state) {
       for (let selectedVideo of state.selectedVideos) {
         const idx = state.addedVideos.findIndex(i => i.videoId === selectedVideo.videoId)
@@ -143,6 +144,11 @@ const video = {
       }
       state.selectedVideos = []
     },
+    // 수정하기
+    SAVE_ADDED_VIDEOS: function (state, videos) {
+      state.addedVideos = videos
+    },
+    // 검색하기
     SELECT_ALL_ADDED_VIDEOS: function (state) {
       state.selectedVideos = state.addedVideos.slice()
     },
@@ -289,13 +295,18 @@ const video = {
     removeVideos: function ({ commit }) {
       commit('REMOVE_VIDEOS')
     },
-    //
+    // 수정하기
+    saveAddedVideos: function ({ commit }, videos) {
+      commit('SAVE_ADDED_VIDEOS', videos)
+    },
+    // 검색하기
     selectAllAddedVideos: function ({ commit }) {
       commit('SELECT_ALL_ADDED_VIDEOS')
     },
     deselectAllAddedVideos: function ({ commit }) {
       commit('DESELECT_ALL_ADDED_VIDEOS')
     },
+    // 디테일
     selectAllDetailVideos: function ({ commit }, videos) {
       commit('SELECT_ALL_DETAIL_VIDEOS', videos)
     },

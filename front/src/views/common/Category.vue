@@ -149,7 +149,7 @@ export default {
     },
     // 임시용 플리(전체)
     onClick: function () {
-      axiosConnector.get(`/playlist/category/trip`,
+      axiosConnector.get(`/playlist/category/all`,
       ).then((res) => {
         this.playlists = res.data
       })
