@@ -40,8 +40,8 @@
         </div>
       </div>
     </div>
-    <div class="d-flex-column">
-      <!-- 네브바 -->
+    <!-- 네브바 -->
+    <div class="d-flex-column fixed-bottom-navbar">
       <div
         class="d-flex justify-space-around fixed-bottom-navbar navbar-background py-2"
       >
