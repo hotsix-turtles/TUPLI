@@ -48,6 +48,8 @@ const playroom = {
       state.roomAuthorProfilePic = value.profileImage ? value.profileImage : state.roomAuthorProfilePic;
       state.roomAuthorFollowerCount = value.follower != undefined ? parseInt(value.follower) : state.roomAuthorFollowerCount
     },
+    SET_USER_START_TIME: ( state, value ) => state.userStartTime = value ? new Date(value * 1000) : new Date(),
+    SET_USER_END_TIME: ( state, value ) => state.userEndTime = value ? new Date(value * 1000) : new Date(),
     SET_ROOM_START_TIME: ( state, value ) => state.roomStartTime = value ? new Date(value * 1000) : new Date(),
     SET_ROOM_END_TIME: ( state, value ) => state.roomEndTime = value ? new Date(value * 1000) : new Date(),
     SET_ROOM_CONTENT: ( state, value ) => state.roomContent = value ? value : state.roomContent,

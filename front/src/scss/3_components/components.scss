@@ -1,6 +1,6 @@
 .dark-background {
-  position: absolute;
-  z-index: 2;
+  position: fixed;
+  z-index: 7;
   background-color: rgba($color: #000000, $alpha: 0.6);
   width: 100%;
   height: 100%;
@@ -12,6 +12,22 @@
   background-color: white;
 }
 
+.gray-background {
+  background-color: rgb(241, 240, 240);
+}
+
+// 카테고리 탭
+.on-clicked {
+  background-color: $color-main !important;
+  color: white !important;
+}
+
+// 네브바 만들기 버튼 회전
+.rotate {
+  transform: translate(-50%, 0%) rotate(45deg) !important;
+  transition: all 0.5s;
+}
+
 .fixed-bottom {
   z-index: 10 !important;
   position: fixed !important;
@@ -20,7 +36,7 @@
 }
 
 .fixed-bottom-navbar {
-  z-index: 9 !important;
+  z-index: 8 !important;
   position: fixed !important;
   bottom: 0 !important;
   width: 100% !important;
@@ -29,7 +45,7 @@
 .fixed-top {
   display: inline-block;
   position: fixed !important;
-  z-index: 10;
+  z-index: 6;
   top: 0 !important;
   width: 100% !important;
 }
@@ -78,6 +94,7 @@
     border-color: lightgrey;
     width: 300px;
     height: 300px;
+    object-fit: cover;
     box-shadow: 8px 8px 12px 0px rgba($color: #000000, $alpha: 0.4);
   }
   div {
@@ -95,6 +112,34 @@
     }
 }
 
+// 플레이리스트 CD Medium
+.playlist-cd-medium {
+  display: inline-block;
+  position: relative;
+  z-index: 1;
+  img {
+    border-radius: 100%;
+    border: solid 2px;
+    border-color: lightgrey;
+    width: 160px;
+    height: 160px;
+    object-fit: cover;
+    box-shadow: 4px 4px 6px 0px rgba($color: #000000, $alpha: 0.4);
+  }
+  div {
+    border-radius: 100%;
+    background-color: white;
+    border: solid 2px;
+    border-color: lightgrey;
+    width: 20px;
+    height: 20px;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    box-shadow: 1px 1px 4px 1px rgba($color: #000000, $alpha: 0.4) inset;
+    }
+}
 
 // 프로필 사진
 .profileImg {

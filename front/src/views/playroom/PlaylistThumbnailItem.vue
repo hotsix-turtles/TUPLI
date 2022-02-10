@@ -5,16 +5,15 @@
     :class="{ selected: selected, not_selected: !selected }"
     @click="SET_ROOM_CURRENT_PLAYLIST_ID(parseInt(id))"
   >
-    <v-img
-      :src="src"
-      contain
-    />
+    <playlist-cd-medium :thumbnail="src" />
   </v-avatar>
 </template>
 
 <script>
 import { mapMutations } from 'vuex'
+import PlaylistCdMedium from '../../components/playlist/PlaylistCdMedium.vue'
 export default {
+  components: { PlaylistCdMedium },
   name: 'PlaylistThumbnailItem',
   props: {
     id: {type: String, default: ''},

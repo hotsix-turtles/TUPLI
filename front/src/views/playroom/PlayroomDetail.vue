@@ -173,7 +173,7 @@
 
         <!-- 플레이룸 태그 Wrapper -->
         <div class="playroomTagWrapper">
-          <TagItem
+          <tags
             v-for="roomTag in roomTags"
             :key="roomTag"
             :content="roomTag"
@@ -250,10 +250,10 @@
       <!-- 플레이룸 채팅창 -->
       <v-dialog
         v-model="isChatting"
+        content-class="chat-dialog"
         hide-overlay
         transition="dialog-bottom-transition"
         scrollable
-        class="fixed-bottom"
       >
         <v-card
           height="d-flex flex-column"
@@ -366,7 +366,6 @@ import { mapActions, mapGetters, mapMutations, mapState } from 'vuex';
 import Vue from 'vue'
 import VueYoutube from 'vue-youtube'
 import PlaylistThumbnailItem from './PlaylistThumbnailItem.vue'
-import TagItem from './TagItem.vue'
 import PlaylistVideoItem from './PlaylistVideoItem.vue'
 import ChatItem from './ChatItem.vue'
 import axiosConnector from '../../utils/axios-connector';
@@ -374,6 +373,7 @@ import axiosConnector from '../../utils/axios-connector';
 import NavButton from '../../components/common/NavButton.vue'
 import Stomp from "webstomp-client"
 import SockJS from "sockjs-client"
+import Tags from '../../components/common/Tags.vue';
 
 Vue.use(VueYoutube)
 
@@ -384,7 +384,7 @@ export default {
     PlaylistVideoItem,
     ChatItem,
     NavButton,
-    TagItem
+    Tags
   },
   data() {
     return {
@@ -462,7 +462,14 @@ export default {
       return this.roomContent == this.roomReducedContent
     }
   },
-  created() {
+  async created() {
+    const isValid = await this.validateToken();
+    if (!isValid)
+    {
+      // 토큰 만료시 현재 vuex 정보를 초기화하고 로그인 페이지로 이동
+      localStorage.clear();
+      this.$router.push('/login')
+    }
   },
   mounted() {
     this.$nextTick(async () => {
@@ -491,8 +498,26 @@ export default {
       if (document.hidden) return;
       this.seekTo()
     });
+
+    this.$watch('isChatting', (newVal, oldVal) => {
+      if (newVal && !oldVal) {
+        document.addEventListener("backbutton", this.closeChatting, false);
+        window.addEventListener("popstate", this.closeChatting, false);
+      }
+      if (!newVal && oldVal) {
+        document.removeEventListener("backbutton", this.closeChatting);
+        window.removeEventListener("popstate", this.closeChatting);
+
+      }
+    })
+  },
+  beforeDestroy() {
+    this.releaseChatroom()
   },
   methods: {
+    closeChatting() {
+      this.isChatting = false;
+    },
     async getRoomInfo() {
       // const token = localStorage.getItem('jwt')
 
@@ -546,6 +571,7 @@ export default {
         token ? { Authorization: this.token } : { },
         async () => {
           await this.wsConnector.subscribe(`/sub/chat/room/${this.chatroomId}`, this.onReceiveMessage, token ? { Authorization: token } : undefined)
+          this.SET_USER_START_TIME(new Date())
         },
         () => alert("서버 연결에 실패 하였습니다. 다시 접속해 주십시요.")
       )
@@ -792,9 +818,22 @@ export default {
       await this.getRoomInfo();
       this.heartbeat = 0;
     },
+    async releaseChatroom() {
+      // 이 방에 있었던 시간 (밀리초 단위)
+      this.SET_USER_END_TIME(new Date())
+
+      var time = Math.floor((this.roomUserEndTime.getTime() - this.roomUserStartTime.getTime()) / 1000)
+      console.log(time, '초 경과')
+
+      //await axiosConnector.put('/userInfo', { time })
+
+      await this.wsConnector.disconnect()
+      this.wsConnector = null
+    },
     ...mapMutations('playroom', ['SET_ROOM_AUTHOR', 'SET_ROOM_LIKED', 'SEEK_VIDEO',
       'SET_ROOM_CURRENT_PLAYLIST_ID', 'SET_ROOM_CURRENT_VIDEO_ID', 'SET_ROOM_CURRENT_VIDEO_PLAYTIME',
-      'SET_ROOM_LAST_SYNC_SENDER']),
+      'SET_ROOM_LAST_SYNC_SENDER', 'SET_USER_START_TIME', 'SET_USER_END_TIME']),
+    ...mapActions('account', ['validateToken']),
   },
 }
 </script>
@@ -806,7 +845,7 @@ iframe {
   /*max-width: 650px; /* Also helpful. Optional. */
 }
 
-.v-dialog {
+.chat-dialog {
   position: absolute;
   width: 100%;
   height: calc(100% - 200px);
