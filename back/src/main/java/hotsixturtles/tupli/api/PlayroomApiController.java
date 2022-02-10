@@ -6,14 +6,19 @@ import hotsixturtles.tupli.dto.PlayroomLikesDto;
 import hotsixturtles.tupli.dto.request.RequestPlayroomDto;
 import hotsixturtles.tupli.dto.response.ErrorResponse;
 import hotsixturtles.tupli.dto.response.ResponsePlayroomDto;
+import hotsixturtles.tupli.dto.simple.SimpleBadgeDto;
 import hotsixturtles.tupli.dto.simple.SimplePlaylistCategoryDto;
 import hotsixturtles.tupli.dto.simple.SimplePlayroomCategoryDto;
+import hotsixturtles.tupli.entity.Badge;
 import hotsixturtles.tupli.entity.Playlist;
 import hotsixturtles.tupli.entity.Playroom;
+import hotsixturtles.tupli.entity.UserBadge;
 import hotsixturtles.tupli.entity.likes.PlayroomLikes;
 import hotsixturtles.tupli.entity.youtube.YoutubeVideo;
+import hotsixturtles.tupli.service.BadgeService;
 import hotsixturtles.tupli.service.PlayroomService;
 import hotsixturtles.tupli.service.SearchService;
+import hotsixturtles.tupli.service.UserInfoService;
 import hotsixturtles.tupli.service.token.JwtTokenProvider;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -33,6 +38,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -47,6 +53,10 @@ public class PlayroomApiController {
     private final MessageSource messageSource;
 
     private final SearchService searchService;
+
+    private final BadgeService badgeService;
+
+    private final UserInfoService userInfoService;
 
     /**
      * 플레이룸 리스트 출력
@@ -99,6 +109,17 @@ public class PlayroomApiController {
         Long userSeq = jwtTokenProvider.getUserSeq(token);
 
         PlayroomDto playroomResult = playroomService.addPlayroom(playroomDto, userSeq);
+
+        userInfoService.updatePlayroomMake(userSeq);
+        List<UserBadge> userbadges = badgeService.getBadgeList(userSeq);
+        List<Long> badges = badgeService.getUserBadgeSeq(userbadges);
+        List<Badge> badgeResult = new ArrayList<>();
+
+        badgeResult.addAll(badgeService.checkPlayroomMake(userSeq, badges));
+
+        if(badgeResult.size() == 0) badgeResult = null;
+
+        playroomResult.setBadges(badgeResult);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(playroomResult);
     }
@@ -301,6 +322,40 @@ public class PlayroomApiController {
             return ResponseEntity.status(HttpStatus.OK).body(response);
         }
 
+    }
+
+    @PutMapping("/playroom/out/{playroomId}")
+    public ResponseEntity playroomOut(@PathVariable("playroomId") Long playroomId,
+                                      @RequestBody Long watchTime,
+                                      HttpServletRequest request) {
+
+        // 회원, 비회원(유효하지 않은 토큰) 구분
+        String token = request.getHeader("Authorization");
+        if (token == null || !jwtTokenProvider.validateToken(token)) {
+            // 비회원
+            return ResponseEntity.ok().body(null);
+        } else {
+            Playroom playroom = playroomService.getPlayroom(playroomId);
+            Long userSeq = jwtTokenProvider.getUserSeq(token);
+
+            userInfoService.userInfoUpdateTime(userSeq, watchTime);
+
+            List<UserBadge> userbadges = badgeService.getBadgeList(userSeq);
+            List<Long> badges = badgeService.getUserBadgeSeq(userbadges);
+            List<Badge> badgeResult = new ArrayList<>();
+
+            badgeResult.addAll(badgeService.checkWatchTime(userSeq, badges));
+
+            ConcurrentHashMap<Integer, Integer> videosCategory = playroom.getPlayroomInfo();
+
+            badgeResult.addAll(badgeService.checkPlayroomWatchGenre(userSeq, badges, watchTime, videosCategory));
+
+            if(badgeResult == null || badgeResult.size() == 0) return ResponseEntity.ok().body(null);
+
+            List<SimpleBadgeDto> result = badgeResult.stream().map(x -> new SimpleBadgeDto(x)).collect(Collectors.toList());
+
+            return ResponseEntity.ok().body(result);
+        }
     }
 
 }

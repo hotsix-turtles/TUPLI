@@ -2,25 +2,14 @@ package hotsixturtles.tupli.api;
 
 import hotsixturtles.tupli.dto.PlaylistCommentDto;
 import hotsixturtles.tupli.dto.PlaylistDto;
-import hotsixturtles.tupli.dto.param.SimpleCondition;
 import hotsixturtles.tupli.dto.params.PlaylistSearchCondition;
-import hotsixturtles.tupli.dto.params.PlayroomSearchCondition;
 import hotsixturtles.tupli.dto.request.PlaylistRequest;
 import hotsixturtles.tupli.dto.response.ErrorResponse;
 import hotsixturtles.tupli.dto.response.IdResponse;
 import hotsixturtles.tupli.dto.simple.SimplePlaylistCategoryDto;
-import hotsixturtles.tupli.dto.simple.SimpleYoutubeVideoDto;
-import hotsixturtles.tupli.entity.Playlist;
-import hotsixturtles.tupli.entity.PlaylistComment;
-import hotsixturtles.tupli.entity.Playroom;
-import hotsixturtles.tupli.entity.SearchHistory;
-import hotsixturtles.tupli.entity.likes.BoardLikes;
+import hotsixturtles.tupli.entity.*;
 import hotsixturtles.tupli.entity.likes.PlaylistLikes;
-import hotsixturtles.tupli.repository.PlaylistRepository;
-import hotsixturtles.tupli.service.FlaskService;
-import hotsixturtles.tupli.service.PlaylistCommentService;
-import hotsixturtles.tupli.service.PlaylistService;
-import hotsixturtles.tupli.service.SearchService;
+import hotsixturtles.tupli.service.*;
 import hotsixturtles.tupli.service.list.CategoryListWord;
 import hotsixturtles.tupli.service.token.JwtTokenProvider;
 import io.swagger.annotations.Api;
@@ -59,6 +48,9 @@ public class PlaylistApiController {
     private final PlaylistCommentService playlistCommentService;
     private final SearchService searchService;
 
+    private final UserInfoService userInfoService;
+    private final BadgeService badgeService;
+
     /**
      * 플레이 리스트 추가
      * @param token
@@ -87,7 +79,16 @@ public class PlaylistApiController {
             e.printStackTrace();
         }
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(new IdResponse(playlist.getId()));
+        userInfoService.updatePlaylistMake(userSeq);
+        List<UserBadge> userbadges = badgeService.getBadgeList(userSeq);
+        List<Long> badges = badgeService.getUserBadgeSeq(userbadges);
+        List<Badge> badgeResult = new ArrayList<>();
+
+        badgeResult.addAll(badgeService.checkPlaylistMake(userSeq, badges));
+
+        if(badgeResult.size() == 0) badgeResult = null;
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(new IdResponse(playlist.getId(), badgeResult));
     }
 
     /**
