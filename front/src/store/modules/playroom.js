@@ -14,7 +14,7 @@ const playroom = {
     roomStartTime: new Date(),
     roomEndTime: new Date(),
     roomContent: '',
-    roomTags: [],
+    roomTags: '',
     roomPlaylists: [],
     roomVideos: [],
     roomCurrentPlaylistId: 0,
@@ -30,6 +30,35 @@ const playroom = {
     roomLastSyncSender: 0
   },
   mutations: {
+    RESET_VUEX_DATA: function (state) {
+      state = {
+        roomId: -1,
+        roomTitle: '',
+        roomPublic: false,
+        roomLiked: false,
+        roomAuthorId: -1,
+        roomAuthorProfilePic: '',
+        roomAuthorName: '',
+        roomAuthorFollowerCount: 0,
+        roomStartTime: new Date(),
+        roomEndTime: new Date(),
+        roomContent: '',
+        roomTags: '',
+        roomPlaylists: [],
+        roomVideos: [],
+        roomCurrentPlaylistId: 0,
+        roomCurrentVideoId: 0,
+        roomCurrentVideoPlaytime: 0,
+        roomPlayerState: 0,
+        roomSelectedChatItem: { id: '', type: null },
+        roomChats: [],
+        chatroomId: '',
+        chatBlockedId: [],
+        chatBlockedUid: [],
+        savedFormData: '',
+        roomLastSyncSender: 0
+      };
+    },
     RESET_FORM_DATA: function (state) {
       state.savedFormData = ''
       console.log('RESET_FORM_DATA', state.savedFormData)
@@ -165,11 +194,6 @@ const playroom = {
     },
   },
   getters: {
-    roomPlayTime: ( {roomStartTime, roomEndTime} ) => {
-      const roomStartDate = new Date(roomStartTime);
-      const roomEndDate = new Date(roomEndTime);
-      return `${roomStartDate.getHours()}:${roomStartDate.getMinutes()} - ${roomEndDate.getHours()}:${roomEndDate.getMinutes()}`
-    },
     roomPublicLabel: ( {roomPublic} ) => roomPublic ? '공개' : '비공개',
     roomReducedContent: ( {roomContent} ) => roomContent.split(/\r?\n/).slice(0, 2).join('\n'),
     roomCurrentPlaylistVideos: ( {roomPlaylists, roomVideos, roomCurrentPlaylistId} ) => {

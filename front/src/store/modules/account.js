@@ -10,9 +10,8 @@ const account = {
     introduction: null,
     image: null,
     is_vip: null,
-    // 팔로잉, 팔로워
-    following: null,
-    followers: null,
+    following: '0',
+    followers: '0',
   },
   mutations: {
   },

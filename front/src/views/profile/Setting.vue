@@ -20,135 +20,91 @@
     <div>
       <hr>
 
+      <!-- 좋아요한 게시물 -->
       <div
         class="d-flex justify-space-between setting-bar align-center"
         @click="$router.push({ name: 'Like' })"
       >
-        <p>
-          좋아요한 게시물
-        </p>
-        <v-icon>
-          mdi-chevron-right
-        </v-icon>
+        <p>좋아요한 게시물</p>
+        <v-icon>mdi-chevron-right</v-icon>
       </div>
 
       <hr>
 
+      <!-- 플레이룸 참여 기록 -->
       <div
         class="d-flex justify-space-between setting-bar align-center"
-
-        @click="$router.push({ name: 'Save' })"
-      >
-        <p>
-          저장한 게시물
-        </p>
-        <v-icon>
-          mdi-chevron-right
-        </v-icon>
-      </div>
-
-      <hr>
-
-      <div
-        class="d-flex justify-space-between setting-bar align-center"
-
         @click="$router.push({ name: 'History' })"
       >
-        <p>
-          플레이룸 참여 기록
-        </p>
-        <v-icon>
-          mdi-chevron-right
-        </v-icon>
+        <p>플레이룸 참여 기록</p>
+        <v-icon>mdi-chevron-right</v-icon>
       </div>
 
       <hr>
 
+      <!-- 결제 서비스 -->
       <div
         class="d-flex justify-space-between setting-bar align-center"
-
         @click="$router.push({ name: 'Payment' })"
       >
-        <p>
-          결제 서비스
-        </p>
-        <v-icon>
-          mdi-chevron-right
-        </v-icon>
+        <p>결제 서비스</p>
+        <v-icon>mdi-chevron-right</v-icon>
       </div>
 
       <hr>
 
+      <!-- 알림 설정 -->
       <div
         class="d-flex justify-space-between setting-bar align-center"
-
         @click="$router.push({ name: 'InviteNoticeAlert' })"
       >
-        <p>
-          초대/알림 설정
-        </p>
-        <v-icon>
-          mdi-chevron-right
-        </v-icon>
+        <p>초대/알림 설정</p>
+        <v-icon>mdi-chevron-right</v-icon>
       </div>
 
       <hr>
 
+      <!-- 개인정보 이용약관 -->
       <div
         class="d-flex justify-space-between setting-bar align-center"
-
         @click="$router.push({ name: 'PrivateTerms' })"
       >
-        <p>
-          개인정보 이용약관
-        </p>
-        <v-icon>
-          mdi-chevron-right
-        </v-icon>
+        <p>개인정보 이용약관</p>
+        <v-icon>mdi-chevron-right</v-icon>
       </div>
 
       <hr>
 
+      <!-- 서비스 이용약관 -->
       <div
         class="d-flex justify-space-between setting-bar align-center"
-
         @click="$router.push({ name: 'ServiceTerms' })"
       >
-        <p>
-          서비스 이용약관
-        </p>
-        <v-icon>
-          mdi-chevron-right
-        </v-icon>
+        <p>서비스 이용약관</p>
+        <v-icon>mdi-chevron-right</v-icon>
       </div>
 
       <hr>
 
+      <!-- 비밀번호 변경 -->
       <div
         class="d-flex justify-space-between setting-bar align-center"
-
         @click="$router.push({ name: 'ChangePassword' })"
       >
-        <p>
-          비밀번호 변경
-        </p>
-        <v-icon>
-          mdi-chevron-right
-        </v-icon>
+        <p>비밀번호 변경</p>
+        <v-icon>mdi-chevron-right</v-icon>
       </div>
 
       <hr>
 
+      <!-- 로그아웃 -->
       <div
         class="d-flex justify-space-between setting-bar align-center"
         @click.stop="dialogLogout = true"
       >
-        <p>
-          로그아웃
-        </p>
-        <v-icon>
-          mdi-chevron-right
-        </v-icon>
+        <p>로그아웃</p>
+        <v-icon>mdi-chevron-right</v-icon>
+        <!-- 로그아웃 여부 재확인 dialog -->
         <v-dialog
           v-model="dialogLogout"
           max-width="290"
@@ -187,16 +143,14 @@
 
       <hr>
 
+      <!-- 회원 탈퇴 -->
       <div
         class="d-flex justify-space-between setting-bar align-center"
         @click.stop="dialogDeleteUser = true"
       >
-        <p>
-          회원 탈퇴
-        </p>
-        <v-icon>
-          mdi-chevron-right
-        </v-icon>
+        <p>회원 탈퇴</p>
+        <v-icon>mdi-chevron-right</v-icon>
+        <!-- 회원 탈퇴 여부 재확인 dialog -->
         <v-dialog
           v-model="dialogDeleteUser"
           max-width="290"
@@ -261,11 +215,16 @@ export default {
     logoutUser: function() {
       this.$store.dispatch('logout')
       this.$router.push({ name: 'Home' })
+      swal.fire ({
+        icon: 'info',
+        title: '로그아웃',
+        text: '로그아웃되었습니다.',
+        width: '200px'
+      })
     },
 
     // 회원 탈퇴
     deleteUser: function() {
-      //
       axios({
         method: 'DELETE',
         url: SERVER.URL + '/account/withdraw',
