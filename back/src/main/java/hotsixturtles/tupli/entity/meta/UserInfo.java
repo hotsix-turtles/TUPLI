@@ -51,17 +51,17 @@ public class UserInfo {
 
 
     // 뱃지용 장르별 시간
-    private Long watchTimeTrip; // 여행
-    private Long watchTimeGame; // 게임
-    private Long watchTimeLife; // 일상
-    private Long watchTimeStyle; // 노하우/스타일
-    private Long watchTimeAnimal; // 동물
-    private Long watchTimeEntertainment; // 엔터테인먼트
-    private Long watchTimeMovie; // 영화/드라마
-    private Long watchTimeMusic; // 음악
-    private Long watchTimeEducation; // 교육/시사
-    private Long watchTimeSports; // 스포츠
-    private Long watchTimeEtc; // 기타
+    private Long watchTimeTrip = 0L; // 여행
+    private Long watchTimeGame = 0L; // 게임
+    private Long watchTimeLife = 0L; // 일상
+    private Long watchTimeStyle = 0L; // 노하우/스타일
+    private Long watchTimeAnimal = 0L; // 동물
+    private Long watchTimeEntertainment = 0L; // 엔터테인먼트
+    private Long watchTimeMovie = 0L; // 영화/드라마
+    private Long watchTimeMusic = 0L; // 음악
+    private Long watchTimeEducation = 0L; // 교육/시사
+    private Long watchTimeSports = 0L; // 스포츠
+    private Long watchTimeEtc = 0L; // 기타
 
     // 유저 취향 분석용1
 //    private Long TasteTrip; // 여행
