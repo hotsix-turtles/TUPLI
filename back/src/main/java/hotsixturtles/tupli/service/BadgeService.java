@@ -5,21 +5,22 @@ import hotsixturtles.tupli.entity.UserBadge;
 import hotsixturtles.tupli.entity.likes.UserLikes;
 import hotsixturtles.tupli.entity.meta.UserInfo;
 import hotsixturtles.tupli.repository.*;
+import hotsixturtles.tupli.service.list.CategoryList;
+import hotsixturtles.tupli.service.list.CategorySortList;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.OffsetDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class BadgeService {
 
-
+    private static final Map<String, Integer> categoryMap = new HashMap<>();
     private static final Integer Badge1_increment = 3;
     private static final List<Long> Badge1List = Arrays.asList(10L, 20L, 30L);
     private static final Integer badgeNum = 34; // 전체 뱃지 숫자
@@ -422,5 +423,86 @@ public class BadgeService {
         }
         return result;
     }
+
+    // 장르별 시청 시간 계산
+    public List<Badge> checkPlayroomWatchGenre(Long userSeq, List<Long> badges,
+                                               Long watchTime, ConcurrentHashMap<Integer, Integer> videosCategory){
+        List<Badge> result = new ArrayList<>();
+        int i = 32;
+        int j = 0;
+        UserInfo userinfo = userInfoRepository.findOneByUserSeq(userSeq);
+        int total = 0;
+        for(ConcurrentHashMap.Entry<Integer, Integer> entry : videosCategory.entrySet()) {
+            total += entry.getValue();
+        }
+        for(ConcurrentHashMap.Entry<Integer, Integer> entry : videosCategory.entrySet()) {
+            int category = entry.getKey();
+            int value = entry.getValue();
+            int userTime = 0;
+            int nowTime = (int)((double)watchTime * ((double)value / (double)total));
+            Integer nowCategory = CategorySortList.CATEGORY_SORT_LIST.getOrDefault(category, 11);
+            // 바꿀수 없나...ㅜㅜ
+            switch (nowCategory){
+                case 1:
+                    userTime = userinfo.getWatchTimeTrip().intValue();
+                    userinfo.setWatchTimeTrip(Long.valueOf(userTime + nowTime));
+                    break;
+                case 2:
+                    userTime = userinfo.getWatchTimeGame().intValue();
+                    userinfo.setWatchTimeGame(Long.valueOf(userTime + nowTime));
+                    break;
+                case 3:
+                    userTime = userinfo.getWatchTimeLife().intValue();
+                    userinfo.setWatchTimeLife(Long.valueOf(userTime + nowTime));
+                    break;
+                case 4:
+                    userTime = userinfo.getWatchTimeStyle().intValue();
+                    userinfo.setWatchTimeStyle(Long.valueOf(userTime + nowTime));
+                    break;
+                case 5:
+                    userTime = userinfo.getWatchTimeAnimal().intValue();
+                    userinfo.setWatchTimeAnimal(Long.valueOf(userTime + nowTime));
+                    break;
+                case 6:
+                    userTime = userinfo.getWatchTimeEntertainment().intValue();
+                    userinfo.setWatchTimeEntertainment(Long.valueOf(userTime + nowTime));
+                    break;
+                case 7:
+                    userTime = userinfo.getWatchTimeMovie().intValue();
+                    userinfo.setWatchTimeMovie(Long.valueOf(userTime + nowTime));
+                    break;
+                case 8:
+                    userTime = userinfo.getWatchTimeMusic().intValue();
+                    userinfo.setWatchTimeMusic(Long.valueOf(userTime + nowTime));
+                    break;
+                case 9:
+                    userTime = userinfo.getWatchTimeEducation().intValue();
+                    userinfo.setWatchTimeEducation(Long.valueOf(userTime + nowTime));
+                    break;
+                case 10:
+                    userTime = userinfo.getWatchTimeSports().intValue();
+                    userinfo.setWatchTimeSports(Long.valueOf(userTime + nowTime));
+                    break;
+                case 11:
+                    userTime = userinfo.getWatchTimeEtc().intValue();
+                    userinfo.setWatchTimeEtc(Long.valueOf(userTime + nowTime));
+                    break;
+            }
+            int addTime = nowTime + userTime;
+            for(j = i + ((nowCategory-1) * 3) ; j < i + ((nowCategory-1) * 3) + 3; j++){
+                if(addTime >= Badge12List.get(j - i + ((nowCategory-1) * 3))){
+                    if(!badges.contains(Long.valueOf(i))){
+                        UserBadge userBadge = new UserBadge(null, userSeq, Long.valueOf(i), OffsetDateTime.now());
+                        result.add(badgeRepository.findByBadgeSeq(Long.valueOf(i)));
+                        userBadgeRepository.save(userBadge);
+                    }
+                }
+                else break;
+            }
+        }
+        userInfoRepository.save(userinfo);
+        return result;
+    }
+
 
 }

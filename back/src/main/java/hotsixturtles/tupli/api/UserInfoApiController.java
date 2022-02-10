@@ -73,7 +73,7 @@ public class UserInfoApiController {
         Long userSeq = jwtTokenProvider.getUserSeq(token);
 
         // UserInfo 갱신
-        userInfoService.userInfoUpdate(userSeq, time);
+        userInfoService.userInfoUpdateTime(userSeq, time);
 
         List<UserBadge> userBadges = badgeService.getBadgeList(userSeq);
 

@@ -89,7 +89,7 @@ public class AuthApiController {
         List<Long> badges = badgeService.getUserBadgeSeq(userbadges);
         // jwt 토큰 발급
         List<Badge> badgeResult = new ArrayList<>();
-        badgeResult = badgeService.checkLoginNum(userSeq, badges);
+        badgeResult.addAll(badgeService.checkLoginNum(userSeq, badges));
         badgeResult.addAll(badgeService.checkDaily(userSeq, badges));
 
         if(badgeResult == null || badgeResult.size() == 0) return ResponseEntity.ok(null);

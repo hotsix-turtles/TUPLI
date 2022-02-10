@@ -343,7 +343,7 @@ public class UserApiController {
     
     /**
      * 팔로우 하기
-     * 내 로그인 정보와 유저의 아이디 받아옴. 내 회원id가 그 회원id를 좋아한다고 해야함. 반환되는건 없어도 된다.
+     * 내 로그인 정보와 유저의 아이디 받아옴. 내 회원id가 그 회원id를 좋아한다고 해야함. 반환되는건 뱃지반환
      */
     @PostMapping("/account/follow/{userSeq}")
     @ApiOperation(value = "팔로우 하기", notes = "회원정보가 안맞을 시 404'유효하지 않은 토큰입니다' 반환, " +
@@ -365,10 +365,19 @@ public class UserApiController {
         // 팔로우 안되어있으면 팔로우 실행
         if (userLikes == null) {
             userService.follow(userSeq, otherUserSeq);
-            return ResponseEntity.status(HttpStatus.OK).body("followed");
+
+            List<UserBadge> userbadges = badgeService.getBadgeList(userSeq);
+            List<Long> badges = badgeService.getUserBadgeSeq(userbadges);
+            List<Badge> badgeResult = new ArrayList<>();
+
+            badgeResult.addAll(badgeService.checkFollowees(userSeq, badges));
+
+            if(badgeResult.size() == 0) badgeResult = null;
+
+            return ResponseEntity.status(HttpStatus.OK).body(badgeResult);
         }
         // 이미 팔로우 되어있음
-        return ResponseEntity.status(HttpStatus.OK).body("already followed");
+        return ResponseEntity.status(HttpStatus.OK).body(null);
     }
 
     /**

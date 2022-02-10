@@ -11,6 +11,7 @@ import hotsixturtles.tupli.entity.UserBadge;
 import hotsixturtles.tupli.entity.likes.BoardLikes;
 import hotsixturtles.tupli.service.BadgeService;
 import hotsixturtles.tupli.service.BoardService;
+import hotsixturtles.tupli.service.UserInfoService;
 import hotsixturtles.tupli.service.token.JwtTokenProvider;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -39,6 +40,8 @@ public class BoardApiController {
     private final MessageSource messageSource;
 
     private final BadgeService badgeService;
+
+    private final UserInfoService userInfoService;
 
 
     // 전체 board List 가져오기
@@ -93,6 +96,8 @@ public class BoardApiController {
         Long userSeq = jwtTokenProvider.getUserSeq(token);
 
         Board boardResult = boardService.addBoard(userSeq, board);
+
+        userInfoService.userInfoUpdateBoard(userSeq);
 
         List<UserBadge> userBadges = badgeService.getBadgeList(userSeq);
 

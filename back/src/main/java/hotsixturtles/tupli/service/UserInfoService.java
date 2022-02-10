@@ -1,7 +1,9 @@
 package hotsixturtles.tupli.service;
 
+import hotsixturtles.tupli.entity.User;
 import hotsixturtles.tupli.entity.meta.UserInfo;
 import hotsixturtles.tupli.repository.UserInfoRepository;
+import hotsixturtles.tupli.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,8 +18,10 @@ public class UserInfoService {
 
     private final UserInfoRepository userInfoRepository;
 
+    private final UserRepository userRepository;
+
     @Transactional
-    public void userInfoUpdate(Long userSeq, Long time) {
+    public void userInfoUpdateTime(Long userSeq, Long time) {
         UserInfo userInfo = userInfoRepository.findOneByUserSeq(userSeq);
         if (userInfo == null) {
             userInfo = new UserInfo();
@@ -30,10 +34,6 @@ public class UserInfoService {
     @Transactional
     public void userInfoUpdateBoard(Long userSeq) {
         UserInfo userInfo = userInfoRepository.findOneByUserSeq(userSeq);
-        if (userInfo == null) {
-            userInfo = new UserInfo();
-            userInfo.setUserSeq(userSeq);
-        }
         userInfo.setBoardUpload(userInfo.getBoardUpload() + 1L);
         userInfoRepository.save(userInfo);
     }
@@ -51,6 +51,19 @@ public class UserInfoService {
             userInfo.setDailyLoginYN("Y");
             userInfoRepository.save(userInfo);
         }
+    }
+
+    @Transactional
+    public void updatePlaylistMake(Long userSeq){
+        UserInfo userInfo = userInfoRepository.findOneByUserSeq(userSeq);
+        userInfo.setMakePlaylist(userInfo.getMakePlaylist() + 1L);
+        userInfoRepository.save(userInfo);
+    }
+    @Transactional
+    public void updatePlayroomMake(Long userSeq){
+        UserInfo userInfo = userInfoRepository.findOneByUserSeq(userSeq);
+        userInfo.setMakePlayroom(userInfo.getMakePlayroom() + 1L);
+        userInfoRepository.save(userInfo);
     }
 
 }

@@ -2,6 +2,7 @@ package hotsixturtles.tupli.dto;
 
 import hotsixturtles.tupli.dto.simple.SimpleUserDto;
 import hotsixturtles.tupli.dto.simple.SimpleYoutubeVideoDto;
+import hotsixturtles.tupli.entity.Badge;
 import hotsixturtles.tupli.entity.Playroom;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -35,7 +36,7 @@ public class PlayroomDto {
     private SimpleUserDto user;
     private List<SimpleYoutubeVideoDto> videos;
 
-
+    private List<Badge> badges;
 
 
     public PlayroomDto(Playroom playroom) {
