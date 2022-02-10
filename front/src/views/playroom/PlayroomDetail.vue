@@ -250,10 +250,10 @@
       <!-- 플레이룸 채팅창 -->
       <v-dialog
         v-model="isChatting"
+        content-class="chat-dialog"
         hide-overlay
         transition="dialog-bottom-transition"
         scrollable
-        class="fixed-bottom"
       >
         <v-card
           height="d-flex flex-column"
@@ -837,7 +837,7 @@ iframe {
   /*max-width: 650px; /* Also helpful. Optional. */
 }
 
-.v-dialog {
+.chat-dialog {
   position: absolute;
   width: 100%;
   height: calc(100% - 200px);
