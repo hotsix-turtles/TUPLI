@@ -76,4 +76,7 @@ public class Playlist {
     @OneToMany(mappedBy = "playlist", cascade = {CascadeType.REMOVE})
     private List<PlaylistComment> playlistComments = new ArrayList<>();
 
+    // 한길: playlist 에 좋아요넣기
+    private Integer likesCnt = 0;
+
 }

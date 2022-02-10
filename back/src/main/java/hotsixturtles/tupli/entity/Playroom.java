@@ -74,5 +74,7 @@ public class Playroom {
     // 기타 : DTO 외 내부 추천 및 뱃지용
     private Integer userCount;
 
+    // 한길 : playroom 에 좋아요 넣기
+    private Integer likesCnt = 0;
 
 }
