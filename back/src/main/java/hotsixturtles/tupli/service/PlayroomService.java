@@ -23,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -81,6 +82,7 @@ public class PlayroomService {
         // 플레이리스트 비디오 분리하고 저장 + ID만 저장
         ConcurrentHashMap<Long, List<Long>> playlists = new ConcurrentHashMap<>();
         ConcurrentHashMap<Integer, Integer> playroomInfo = new ConcurrentHashMap<Integer, Integer>();
+        List<YoutubeVideo> youtubeVideoList = new ArrayList<>();
         for (Map.Entry<Long, List<String>> entry : playroomDto.getPlaylists().entrySet()) {
             // 플레이리스트 ID만 저장
 //            playlists.add(entry.getKey());
@@ -101,7 +103,9 @@ public class PlayroomService {
                 video.setPlayroom(playroom);
                 video.setInit(existVideo);
                 youtubeVideoRepository.save(video);
-                playroomPlList.add(youtubeVideoRepository.findFirstByVideoIdOrderByIdDesc(videoUrl).getId());
+                YoutubeVideo nowVideo = youtubeVideoRepository.findFirstByVideoIdOrderByIdDesc(videoUrl);
+                playroomPlList.add(nowVideo.getId());
+                youtubeVideoList.add(nowVideo);
 
                 // 플레이룸 구성 비디오 정보로 메타 정보 구축
                 Integer categoryId = existVideo.getCategoryId();
@@ -113,6 +117,10 @@ public class PlayroomService {
         }
         playroom.setPlayroomInfo(playroomInfo);
         playroom.setPlaylists(playlists);
+
+        List<SimpleYoutubeVideoDto> youtubeVideoDtoList = youtubeVideoList
+                .stream().map(x -> new SimpleYoutubeVideoDto(x)).collect(Collectors.toList());
+        playroomDto.setVideos(youtubeVideoDtoList);
 
         // 카테고리 정보
         Map<Integer, String> categoryList = new HashMap<>();
@@ -133,12 +141,6 @@ public class PlayroomService {
                 playroom.setImage(image);
             }
 
-            // 기존에 저장, 좋아요 해놓은것과 상관없이 별도로 제작
-            YoutubeVideo video = new YoutubeVideo();
-            video.setInit(videoDto);
-            video.setPlayroom(playroom);  // 연결
-            youtubeVideoRepository.save(video);
-
             // Playroominfo에 따라 갈림
             Integer categoryId = videoDto.getCategoryId();
             Integer count = playroominfo.getOrDefault(categoryId, 0);
@@ -155,6 +157,7 @@ public class PlayroomService {
             categorysString = categorysString + category + ", ";
         }
 
+        playroom.setPlayroomCate(categorysString);
         playroomRepository.save(playroom);
 
         // 플레이룸 개설 알림 보내기 (초청 유저)
@@ -230,6 +233,11 @@ public class PlayroomService {
             playroomLikes.setPlayroom(playroomRepository.findById(playroomId).orElse(null));
             playroomLikes.setUser(userRepository.findByUserSeq(userSeq));
             playroomLikesRepository.save(playroomLikes);
+
+            // 한길 : playroom 에 좋아요 눌렸을 때 +1 하기
+            Playroom playroom = playroomRepository.getById(playroomId);
+            playroom.setLikesCnt(playroom.getLikesCnt()+1);
+            playroomRepository.save(playroom);
         } else {
             // 익셉션 발생
         }
@@ -241,6 +249,11 @@ public class PlayroomService {
         PlayroomLikes existPlayroomLikes = playroomLikesRepository.findExist(userSeq, playroomId);
         if(existPlayroomLikes != null) {
             playroomLikesRepository.delete(existPlayroomLikes);
+
+            // 한길 : playroom 에 좋아요 빠졌을 때 -1 하기
+            Playroom playroom = playroomRepository.getById(playroomId);
+            playroom.setLikesCnt(playroom.getLikesCnt()-1);
+            playroomRepository.save(playroom);
         } else {
             // 익셉션 발생
         }
