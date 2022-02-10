@@ -24,7 +24,7 @@ public class PlaylistDto {
 
     // 유저 정보
     private Long userId;
-    private String userName;
+    private String nickName;
     private String userProfileImg;
     private Integer userFollowersCnt;
 
@@ -47,7 +47,7 @@ public class PlaylistDto {
 
         // 유저 정보
         this.userId = playlist.getUser().getUserSeq();
-        this.userName = playlist.getUser().getUsername();
+        this.nickName = playlist.getUser().getNickname();
         this.userProfileImg = playlist.getUser().getProfileImage();
         this.userFollowersCnt = playlist.getUser().getTo_user().size();
 
