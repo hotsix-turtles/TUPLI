@@ -218,7 +218,7 @@
             </v-icon>
             <span class="ml-1">전체 선택</span>
           </v-btn>
-          <v-btn
+          <!-- <v-btn
             small
             elevation="0"
             color="white"
@@ -226,7 +226,7 @@
             @click="playThisVideo"
           >
             <v-icon>mdi-play-circle</v-icon>
-          </v-btn>
+          </v-btn> -->
         </div>
 
         <!-- 현재 플레이리스트 비디오 목록 -->
@@ -521,6 +521,8 @@ export default {
       'roomAuthorFollowerCount',
       'roomStartTime',
       'roomEndTime',
+      'roomUserStartTime',
+      'roomUserEndTime',
       'roomInviteIds',
       'roomContent',
       'roomTags',
@@ -743,6 +745,7 @@ export default {
       {
         this.selectedItem.push(id)
       }
+      if (this.roomAuthorId == this.userInfo.userSeq) this.playThisVideo()
     },
     onVideoReady() {
     },
