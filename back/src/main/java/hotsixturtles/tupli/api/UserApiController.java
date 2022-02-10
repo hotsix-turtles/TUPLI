@@ -5,6 +5,7 @@ import hotsixturtles.tupli.dto.UserProfileDto;
 import hotsixturtles.tupli.dto.response.ErrorResponse;
 import hotsixturtles.tupli.dto.simple.SimpleUpdateProfileDto;
 import hotsixturtles.tupli.dto.simple.SimpleUserDto;
+import hotsixturtles.tupli.entity.Badge;
 import hotsixturtles.tupli.entity.Board;
 import hotsixturtles.tupli.entity.User;
 import hotsixturtles.tupli.entity.UserBadge;
@@ -45,6 +46,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -202,7 +204,7 @@ public class UserApiController {
      * @param userInfo {email, password}
      * @return
      */
-    @PostMapping("/account/login")
+    @PostMapping("/account/`login")
     @ApiOperation(value = "로그인", notes = "실패 시 404'존재하지 않은 유저입니다' 또는 404'잘못된 비밀번호입니다' 반환, 성공 시 token 반환")
     public ResponseEntity<?> login(@ApiParam(value = "email, password를 받습니다.") @RequestBody Map<String, String> userInfo) {
         User user = userRepository.findByEmail(userInfo.get("email"));
@@ -218,18 +220,24 @@ public class UserApiController {
 
         UserInfo nowUserInfo = userInfoRepository.findOneByUserSeq(user.getUserSeq());
         nowUserInfo.setLoginCount(nowUserInfo.getLoginCount() + 1L);
+
+        List<UserBadge> userbadges = badgeService.getBadgeList(user.getUserSeq());
+        List<Long> badges = badgeService.getUserBadgeSeq(userbadges);
+        List<Badge> badgeResult = new ArrayList<>();
+        badgeResult = badgeService.checkLoginNum(user.getUserSeq(), badges);
+
         if(nowUserInfo.getDailyLoginYN().equals("N")) {
             nowUserInfo.setDailyLoginYN("Y");
             nowUserInfo.setDailyCheck(nowUserInfo.getDailyCheck() + 1L);
-            List<UserBadge> userbadges = badgeService.getBadgeList(user.getUserSeq());
-            List<Long> badges = badgeService.getUserBadgeSeq(userbadges);
-            badgeService.checkDaily(26, user.getUserSeq(), badges);
+            badgeResult.addAll(badgeService.checkDaily(user.getUserSeq(), badges));
         }
         userInfoRepository.save(nowUserInfo);
 
         String token = jwtTokenProvider.createToken(user.getUsername(), user.getUserSeq());
 
-        return ResponseEntity.ok(new LoginUserResponse(token));
+        if(badgeResult == null || badgeResult.size() == 0) return ResponseEntity.ok(new LoginUserResponse(token, null));
+
+        return ResponseEntity.ok(new LoginUserResponse(token, badgeResult));
     }
 
     /**
@@ -280,15 +288,16 @@ public class UserApiController {
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
     public class LoginUserResponse {
         private String token;
-        public LoginUserResponse(String accessToken) {
+        private List<Badge> badges;
+        public LoginUserResponse(String accessToken, List<Badge> badges) {
             this.token = accessToken;
+            this.badges = badges;
         }
     }
 
     /**
      * 프로필 내용 변경
      * @param file
-     * @param email
      * @param nickname
      * @param request
      * @return SimpleUpdateProfileDto {content : introduction, nickname, image }
