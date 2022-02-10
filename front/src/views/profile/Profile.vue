@@ -1,6 +1,7 @@
 <template>
   <v-app>
     <v-container>
+      <!-- 설정 아이콘 -->
       <div
         class="d-flex justify-end mt-7 mr-5"
       >
@@ -10,7 +11,9 @@
           mdi-cog
         </v-icon>
       </div>
+      <!-- 유저 정보 -->
       <div>
+        <!-- 유저 정보 : 프로필 사진, 닉네임, 자기소개 -->
         <div class="d-flex flex-column align-center">
           <h3 class="text-center pt-3 pb-1">
             {{ nickname }}
@@ -31,6 +34,7 @@
             </p>
           </div>
         </div>
+        <!-- 팔로우/팔로잉 -->
         <div class="d-flex justify-center pt-3">
           <div
             class="d-flex mx-3"
@@ -39,7 +43,7 @@
             <p class="mr-2">
               팔로잉
             </p>
-            <p>123</p>
+            <p>{{ following }}</p>
           </div>
           <div
             class="d-flex mx-3"
@@ -48,9 +52,10 @@
             <p class="mr-2">
               팔로워
             </p>
-            <p>456</p>
+            <p>{{ followers }}</p>
           </div>
         </div>
+        <!-- 프로필 편집 버튼 -->
         <div class="d-flex justify-center">
           <v-btn
             class="text-center pt-1"
@@ -64,20 +69,9 @@
           </v-btn>
         </div>
       </div>
-      <div class="d-flex justify-center">
-        <v-btn
-          class="text-center pt-1"
-          outlined
-          color="#5B5C9D"
-          rounded
-          small
-          @click="logout"
-        >
-          임시로그아웃버튼
-        </v-btn>
-      </div>
     </v-container>
 
+    <!-- 유저 활동, 취향 탭 -->
     <div class="d-flex justify-space-around mt-5">
       <v-tabs
         v-model="activeTab"
@@ -85,9 +79,7 @@
         grow
         color="#5B5C9D"
       >
-        <v-tab>
-          활동
-        </v-tab>
+        <v-tab>활동</v-tab>
         <v-tab>취향</v-tab>
         <v-tab-item>
           <profile-playlist />
@@ -109,34 +101,12 @@ import SERVER from '@/api/server'
 import { mapState } from 'vuex'
 
 export default {
-  components: { ProfileTaste, ProfilePlaylist },
+  components: { ProfilePlaylist, ProfileTaste, },
   computed: {
     ...mapState(['authToken', 'nickname', 'introduction', 'following', 'followers'])
   },
   methods: {
-    buyPremium: function() {
-      // 실제 적용시에는, 이미 프리미엄 유저인지 확인하는 것 필요
-      axios({
-        method: 'GET',  // 주소얻어오는거라 GET
-        url: SERVER.URL + SERVER.ROUTES.accounts.kakaoPay,
-        headers: {Authorization: this.authToken},
-      })
-        .then((res) => {
-          window.location.href = res.data
-        })
-        .catch (() => {
-          swal.fire ({
-            icon: 'error',
-            title: '결제 실패',
-            text: '서버가 혼잡합니다. 다시 시도해 주세요.'
-          })
-        })
-    },
-    // 임시 로그아웃 버튼 in profile
-    logout: function() {
-      this.$store.dispatch('logout')
-      this.$router.push({ name: 'Login'})
-    }
+
   },
 
 
