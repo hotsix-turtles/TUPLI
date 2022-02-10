@@ -1,14 +1,14 @@
 <template>
   <v-card
-    class="playroom mx-auto overflow-hidden"
-    height="100vh"
-    max-width="640"
+    class="playroom mx-auto overflow-hidden mb-10"
+    height="100%"
   >
     <!-- 하단 네비게이션 (플레이리스트 조작) -->
     <v-bottom-navigation
       absolute
       background-color="#5B5C9D"
       height="65px"
+      class="fixed-bottom"
       :input-value="addedPlaylists.length > 0 || selectedPlaylists.length > 0"
     >
       <!-- 선택된 동영상 개수 뱃지 -->
@@ -34,8 +34,6 @@
     <v-sheet
       id="scroll-threshold-example"
       class="overflow-y-auto"
-      :class="{ 'pb-16': selectedPlaylists.length > 0 }"
-      max-height="100%"
     >
       <back :page-name="pageName" />
       <search-bar
