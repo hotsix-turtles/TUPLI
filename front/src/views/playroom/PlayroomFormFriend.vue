@@ -9,6 +9,7 @@
       absolute
       background-color="#5B5C9D"
       height="65px"
+      class="fixed-bottom"
       :input-value="addedPlaylists.length > 0 || selectedPlaylists.length > 0"
     >
       <!-- 선택된 친구 명수 뱃지 -->

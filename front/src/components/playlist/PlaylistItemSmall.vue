@@ -38,7 +38,7 @@
       <playlist-video-item-small
         v-for="(video, idx) in playlist.videos"
         :key="idx"
-        :playlist-id="playlist.playlistId"
+        :playlist-id="playlist.id"
         :playlist-selected="selected"
         :video="video"
         :readonly="videoReadonly"
@@ -78,7 +78,7 @@ export default {
   },
   created() {
     this.selected = Boolean(this.selectedPlaylists && this.selectedPlaylists
-      .find(selectedPlaylist => selectedPlaylist.playlistId == this.playlist.playlistId))
+      .find(selectedPlaylist => selectedPlaylist.id == this.playlist.id))
     console.log(this.playlist)
   },
   methods: {
