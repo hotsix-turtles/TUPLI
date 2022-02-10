@@ -141,6 +141,35 @@
     }
 }
 
+// 플레이리스트 CD Small
+.playlist-cd-small {
+  display: inline-block;
+  position: relative;
+  z-index: 1;
+  img {
+    border-radius: 100%;
+    border: solid 1.5px;
+    border-color: lightgrey;
+    width: 110px;
+    height: 110px;
+    object-fit: cover;
+    box-shadow: 3px 3px 4px 0px rgba($color: #000000, $alpha: 0.4);
+  }
+  div {
+    border-radius: 100%;
+    background-color: white;
+    border: solid 1.5px;
+    border-color: lightgrey;
+    width: 14px;
+    height: 14px;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    box-shadow: 1px 1px 2px 1px rgba($color: #000000, $alpha: 0.4) inset;
+    }
+}
+
 // 프로필 사진
 .profileImg {
   border-radius: 100%;

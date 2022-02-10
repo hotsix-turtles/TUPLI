@@ -18,7 +18,7 @@
 
 <script>
 export default {
-  name: 'VideoSearch',
+  name: 'SearchBar',
   props: {
     label: { type: String, default: '' },
     routerPage: { type: String, default: '' },

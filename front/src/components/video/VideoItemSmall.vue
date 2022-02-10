@@ -15,7 +15,7 @@
         <div class="video-thumbnail">
           <img
             :src="video.thumbnail"
-            style="width: 35vw; height: 100px;"
+            style="width: 35vw; height: 100px; object-fit: cover;"
             class=""
             @click="watchingVideo(video)"
           >

@@ -13,8 +13,15 @@ const account = {
     // 팔로잉, 팔로워
     following: null,
     followers: null,
+
+    // [검색]
+    searchedAccounts: [],
   },
   mutations: {
+    // [검색]
+    SEARCH_ACCOUNTS: function (state, accounts) {
+      state.searchedAccounts = accounts
+    },
   },
   actions: {
     async validateToken() {
@@ -24,7 +31,19 @@ const account = {
       } catch(err) {
         return false;
       }
-    }
+    },
+    // [검색]
+    searchAccounts: function ({ commit }, params) {
+      console.log('searchAccounts params', params)
+      axiosConnector.get(`/account/search`, {
+        params
+      }).then((res) => {
+        console.log(res)
+        commit('SEARCH_ACCOUNTS', res.data)
+      }).catch((err) => {
+        console.log(err)
+      })
+    },
   },
   modules: {
   }

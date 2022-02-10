@@ -1,4 +1,5 @@
 import Vue from 'vue'
+import axiosConnector from '../../utils/axios-connector';
 
 const playroom = {
   namespaced: true,
@@ -27,7 +28,10 @@ const playroom = {
     chatBlockedId: [],
     chatBlockedUid: [],
     savedFormData: '',
-    roomLastSyncSender: 0
+    roomLastSyncSender: 0,
+
+    // [검색]
+    searchedPlayrooms: [],
   },
   mutations: {
     RESET_FORM_DATA: function (state) {
@@ -103,7 +107,15 @@ const playroom = {
     },
     RECEIVE_MESSAGE: ( { roomChats }, payload ) => {
       roomChats.push(payload);
-    }
+    },
+    // [검색]
+    SEARCH_PLAYROOMS: function (state, playrooms) {
+      // playrooms.forEach((playroom) => {
+      //   playroom.createdAt = timeConverter(playroom.createdAt)
+      // })
+      state.searchedPlayrooms = playrooms
+      console.log(playrooms)
+    },
   },
   actions: {
     setRoomInfo: (({state, commit}, {data}) => {
@@ -162,6 +174,18 @@ const playroom = {
     saveFormData: function ({ commit }, formData) {
       console.log('saveFormData', formData)
       commit('SAVE_FORM_DATA', formData)
+    },
+    // [검색]
+    searchPlayrooms: function ({ commit }, params) {
+      console.log('searchPlayrooms params', params)
+      axiosConnector.get(`/playroom/search`, {
+        params
+      }).then((res) => {
+        console.log('searchPlayroom', res)
+        commit('SEARCH_PLAYROOMS', res.data)
+      }).catch((err) => {
+        console.log(err)
+      })
     },
   },
   getters: {
@@ -262,7 +286,7 @@ const playroom = {
       //   this.SET_ROOM_CURRENT_VIDEO_ID(this.roomCurrentVideoId + 1)
       //   this.SET_ROOM_CURRENT_VIDEO_PLAYTIME(0)
       // }
-    }
+    },
   }
 };
 

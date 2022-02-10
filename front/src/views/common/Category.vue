@@ -5,6 +5,7 @@
       v-model="tab"
       background-color="transparent"
       grow
+      color="#5B5C9D"
     >
       <v-tab
         v-for="item in items"

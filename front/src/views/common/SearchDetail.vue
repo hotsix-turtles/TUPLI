@@ -14,6 +14,7 @@
         v-model="tab"
         background-color="transparent"
         grow
+        color="#5B5C9D"
       >
         <!-- 탭 -->
         <v-tab
@@ -28,18 +29,29 @@
           <!-- 플리 정렬 필터 -->
           <div
             class="text-right clickable"
-            @click="onClickModal"
           >
-            <span>
-              {{ selected }}
+            <span
+              :key="rerenderKey"
+              @click="onClickModal"
+            >
+              {{ convertSelect[playlistOrder] }}
             </span>
-            <v-icon>mdi-menu-down</v-icon>
+            <v-icon @click="onClickModal">
+              mdi-menu-down
+            </v-icon>
           </div>
           <modal
             :items="playlistSelectList"
             :modal-name="'정렬 필터 변경'"
             :modal-type="'order'"
             @on-select="onSelect"
+          />
+          <!-- 검색한 플레이리스트 -->
+          <playlist-list-item-small
+            :playlists="searchedPlaylists"
+            :playlist-readonly="true"
+            :video-readonly="true"
+            :likeable="true"
           />
         </v-tab-item>
 
@@ -48,12 +60,16 @@
           <!-- 플레이룸 정렬 필터 -->
           <div
             class="text-right clickable"
-            @click="onClickModal"
           >
-            <span>
-              {{ selected }}
+            <span
+              :key="rerenderKey"
+              @click="onClickModal"
+            >
+              {{ convertSelect[playroomOrder] }}
             </span>
-            <v-icon>mdi-menu-down</v-icon>
+            <v-icon @click="onClickModal">
+              mdi-menu-down
+            </v-icon>
           </div>
           <modal
             :items="playroomSelectList"
@@ -61,6 +77,8 @@
             :modal-type="'order'"
             @on-select="onSelect"
           />
+          {{ searchedPlayrooms }}
+          <playroom-list-item-small :playroom="searchedPlayrooms" />
         </v-tab-item>
 
         <!-- 계정 검색 -->
@@ -70,8 +88,8 @@
             class="text-right clickable"
             @click="onClickModal"
           >
-            <span>
-              {{ selected }}
+            <span :key="rerenderKey">
+              {{ convertSelect[accountOrder] }}
             </span>
             <v-icon>mdi-menu-down</v-icon>
           </div>
@@ -81,6 +99,7 @@
             :modal-type="'order'"
             @on-select="onSelect"
           />
+          {{ searchedAccounts }}
         </v-tab-item>
 
         <!-- 영상 검색 -->
@@ -90,8 +109,8 @@
             class="text-right clickable"
             @click="onClickModal"
           >
-            <span>
-              {{ selected }}
+            <span :key="rerenderKey">
+              {{ convertSelect[videoOrder] }}
             </span>
             <v-icon>mdi-menu-down</v-icon>
           </div>
@@ -131,6 +150,8 @@ import SearchBar from '@/components/common/SearchBar.vue'
 import VideoListItemSmall from '../../components/video/VideoListItemSmall.vue'
 import AddButtonBottom from '../../components/playlist/AddButtonBottom.vue'
 import Modal from '../../components/common/Modal.vue'
+import PlaylistListItemSmall from '../../components/playlist/PlaylistListItemSmall.vue'
+import PlayroomListItemSmall from '../../components/playroom/PlayroomListItemSmall.vue'
 
 export default {
   name: 'SearchDetail',
@@ -140,7 +161,9 @@ export default {
     VideoListItemSmall,
     InfiniteLoading,
     AddButtonBottom,
-    Modal
+    Modal,
+    PlaylistListItemSmall,
+    PlayroomListItemSmall,
   },
   data: function () {
     return {
@@ -150,34 +173,69 @@ export default {
         '플리', '플레이룸', '계정', '영상',
       ],
       tabName: '플리',
+      rerenderKey: new Date(),
+      // 전체 검색어
       query: '',
 
+      // 플레이리스트
       playlistQuery: '',
-      playlistOrder: '',
+      playlistOrder: 'relevance',
       playlistSelectList: {
         '관련순': 'relevance',
         '최근순': 'date',
-        '조회순': 'viewCount',
+        '인기순': 'likesCnt',
       },
 
+      // 플레이룸
       playroomQuery: '',
-      accountQuery: '',
+      playroomOrder: 'relevance',
+      playroomSelectList: {
+        '관련순': 'relevance',
+        '최근순': 'date',
+        '시청자순': 'participantsCnt',
+      },
 
-      // 영상 검색
+      // 계정
+      accountQuery: '',
+      accountOrder: 'relevance',
+      accountSelectList: {
+        '관련순': 'relevance',
+        '팔로워순': 'followersCnt',
+      },
+
+      // 영상
       videoQuery: '',
-      videoOrder: '',
+      videoOrder: 'relevance',
       videoSelectList: {
         '관련순': 'relevance',
         '최근순': 'date',
         '조회순': 'viewCount',
       },
       infiniteId: +new Date(),
+
+      // 정렬 표시용
+      convertSelect: {
+        'relevance': '관련순',
+        'date': '최근순',
+        'viewCount': '조회순',
+        'followersCnt': '팔로워순',
+        'participantsCnt': '시청자순',
+        'likesCnt': '인기순',
+      }
     }
   },
   computed: {
+    ...mapState('playlist', {
+      searchedPlaylists: state => state.searchedPlaylists,
+    }),
+    ...mapState('playroom', {
+      searchedPlayrooms: state => state.searchedPlayrooms,
+    }),
+    ...mapState('account', {
+      searchedAccounts: state => state.searchedAccounts,
+    }),
     ...mapState('video', {
       searchedVideos: state => state.searchedVideos,
-      selectedVideos: state => state.selectedVideos,
       rerenderKey: state => state.rerenderKey,
       nextPageToken: state => state.nextPageToken,
     }),
@@ -189,9 +247,20 @@ export default {
     if (this.searchedVideos) {
       this.resetVideoSearchState()
     }
-    this.videoOrder = this.videoSelectList[Object.keys(this.videoSelectList)[0]]
   },
   methods: {
+    ...mapActions('playlist', [
+      'searchPlaylists',
+      'resetPlaylistSearchState',
+    ]),
+    ...mapActions('playroom', [
+      'searchPlayrooms',
+      'resetPlayroomSearchState',
+    ]),
+    ...mapActions('account', [
+      'searchAccounts',
+      'resetAccountSearchState',
+    ]),
     ...mapActions('video', [
       'searchVideos',
       'searchVideosByScroll',
@@ -206,13 +275,31 @@ export default {
       this.query = query
       if (this.tabName === '플리') {
         this.playlistQuery = query
-        // searchPlaylists(query)
+        const keyword = this.playlistQuery
+        const order = this.playlistOrder
+        const params = {
+          keyword,
+          order,
+        }
+        this.searchPlaylists(params)
       } else if (this.tabName === '플레이룸') {
         this.playroomQuery = query
-        // searchPlayrooms(query)
+        const keyword = this.playroomQuery
+        const order = this.playroomOrder
+        const params = {
+          keyword,
+          order,
+        }
+        this.searchPlayrooms(params)
       } else if (this.tabName === '계정') {
         this.accountQuery = query
-        // searchAccounts(query)
+        const keyword = this.accountQuery
+        const order = this.accountOrder
+        const params = {
+          keyword,
+          order,
+        }
+        this.searchAccounts(params)
       } else if (this.tabName === '영상') {
         this.videoQuery = query
         const order = this.videoOrder
@@ -227,23 +314,38 @@ export default {
     },
     // 탭 변경 + 해당 탭 해당 검색어로 입력한 적 없을시
     onChangeTab: function(tabName) {
-      console.log('onChangeTab', tabName)
-      console.log('this.videoQuery', this.videoQuery)
-      console.log('this.query', this.query)
       this.tabName = tabName
       if (this.tabName === '플리' && this.playlistQuery !== this.query) {
         this.playlistQuery = this.query
-        // searchPlaylists(query)
+        const keyword = this.playlistQuery
+        const order = this.playlistOrder
+        const params = {
+          keyword,
+          order,
+        }
+        this.searchPlaylists(params)
       } else if (this.tabName === '플레이룸' && this.playroomQuery !== this.query) {
         this.playroomQuery = this.query
-        // searchPlayrooms(query)
+        const keyword = this.playroomQuery
+        const order = this.playroomOrder
+        const params = {
+          keyword,
+          order,
+        }
+        this.searchPlayrooms(params)
       } else if (this.tabName === '계정' && this.accountQuery !== this.query) {
         this.accountQuery = this.query
-        // searchAccounts(query)
+        const keyword = this.accountQuery
+        const order = this.accountOrder
+        const params = {
+          keyword,
+          order,
+        }
+        this.searchAccounts(params)
       } else if (this.tabName === '영상' && this.videoQuery !== this.query) {
         this.videoQuery = this.query
         const query = this.videoQuery
-        const order = this.videoSelectList[this.videoOrder]
+        const order = this.videoOrder
         const params = {
           query,
           order,
@@ -256,26 +358,59 @@ export default {
     },
     // 영상 정렬 필터 선택 + 해당 정렬 새로 선택한 거일때
     onSelect: function (order) {
-      if (this.tabName === '플리' && this.playlistQuery && this.playlistOrder !== order) {
+      if (this.tabName === '플리') {
+        const temp = this.playlistOrder
         this.playlistOrder = order
-        // searchPlaylists(query)
-      } else if (this.tabName === '플레이룸' && this.playroomQuery && this.playroomOrder !== order) {
-        this.playroomOrder = order
-        // searchPlayrooms(query)
-      } else if (this.tabName === '계정' && this.accountQuery && this.accountOrder !== order) {
-        this.accountOrder = order
-        // searchAccounts(query)
-      } else if (this.tabName === '영상' && this.videoQuery && this.videoOrder !== order) {
-        this.videoOrder = order
-        const query = this.videoQuery
-        const params = {
-          query,
-          order,
+        console.log('temp, this.playlistOrder', temp, this.playlistOrder)
+        if (this.playlistQuery && temp !== order) {
+          console.log('실행됨')
+          const keyword = this.playlistQuery
+          const params = {
+            keyword,
+            order,
+          }
+          this.searchPlaylists(params)
         }
-        this.resetVideoSearchState()
-        this.infiniteId += 1;
-        this.searchVideos(params)
+      } else if (this.tabName === '플레이룸') {
+        const temp = this.playroomOrder
+        this.playroomOrder = order
+        if (this.playroomQuery && temp !== order) {
+          console.log('실행됨')
+          const keyword = this.playroomQuery
+          const params = {
+            keyword,
+            order,
+          }
+          this.searchPlayrooms(params)
+        }
+      } else if (this.tabName === '계정') {
+        const temp = this.accountOrder
+        this.accountOrder = order
+        if (this.accountQuery && temp !== order) {
+          console.log('실행됨')
+          const keyword = this.accountQuery
+          const params = {
+            keyword,
+            order,
+          }
+          this.searchAccounts(params)
+        }
+      } else if (this.tabName === '영상') {
+        const temp = this.videoOrder
+        this.videoOrder = order
+        if (this.videoQuery && temp !== order) {
+          console.log('실행됨')
+          const query = this.videoQuery
+          const params = {
+            query,
+            order,
+          }
+          this.resetVideoSearchState()
+          this.infiniteId += 1;
+          this.searchVideos(params)
+        }
       }
+      this.rerenderKey++
     },
   },
 }
