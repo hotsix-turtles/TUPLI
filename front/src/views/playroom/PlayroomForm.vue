@@ -535,7 +535,7 @@ export default {
       // TODO: 원래 axiosConnector에서 알아서 갱신하고 보내야하지만...
       const token = localStorage.getItem('jwt')
 
-      this.formData = this.formData.tags.join();
+      this.formData.tags = this.formData.tags.join();
       this.formData.playlists =
         this.addedPlaylists.reduce((prevPlaylists, curPlaylist) => {
           if (curPlaylist.videos)
