@@ -178,7 +178,7 @@
             :key="roomTag"
             :content="roomTag"
           /> -->
-          <tags :tags="roomTags.split(',')" />
+          <tags :tags="roomTags ? roomTags.split(',') : []" />
         </div>
       </div>
       <!-- 플레이룸 정보 Wrapper 끝 -->
