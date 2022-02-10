@@ -357,6 +357,90 @@
           </v-card-actions>
         </v-card>
       </v-dialog>
+
+      <!--
+        방장 전환시 팝업
+      -->
+      <v-dialog
+        v-model="isAuthorChangedInfo"
+        persistent
+        width="300"
+      >
+        <v-card
+          color="#5B5C9D"
+          dark
+          height="100%"
+          class="py-1"
+        >
+          <v-card-text>
+            방장 전환 중...
+            <v-progress-linear
+              indeterminate
+              color="white"
+              class="mb-0"
+            ></v-progress-linear>
+          </v-card-text>
+        </v-card>
+      </v-dialog>
+
+      <!--
+        미운영중 접속시 팝업
+        하영님 팝업으로 교체 예정
+      -->
+      <v-dialog
+        v-model="isOperationTimeError"
+        persistent
+        max-width="290"
+      >
+        <v-card>
+          <v-card-title class="text-h5">
+            오류
+          </v-card-title>
+
+          <v-card-text>
+            현재 운영중이 아닌 플레이룸입니다.<br>
+            (하영님 팝업으로 교체 예정)
+          </v-card-text>
+
+          <v-card-actions>
+            <v-btn
+              color="green darken-1"
+              text
+              @click="$router.go(-1)"
+            >
+              확인
+            </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+      <v-dialog
+        v-model="isNotInvitedError"
+        persistent
+        max-width="290"
+      >
+        <v-card>
+          <v-card-title class="text-h5">
+            오류
+          </v-card-title>
+
+          <v-card-text>
+            비공개 플레이룸입니다.<br>
+            (하영님 팝업으로 교체 예정)
+          </v-card-text>
+
+          <v-card-actions>
+            <v-spacer></v-spacer>
+
+            <v-btn
+              color="green darken-1"
+              text
+              @click="$router.go(-1)"
+            >
+              확인
+            </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
     </v-sheet>
   </v-card>
 </template>
@@ -406,7 +490,11 @@ export default {
       userInfo: {
         userSeq: null
       },
-      heartbeat: 0
+      heartbeat: 0,
+      isOperationTimeError: false,
+      isNotInvitedError: false,
+      isAuthorChangedInfo: false,
+      roomPlaytime: null
     }
   },
   metaInfo () {
@@ -499,15 +587,15 @@ export default {
     });
 
     this.$watch('isChatting', (newVal, oldVal) => {
-      if (newVal && !oldVal) {
-        document.addEventListener("backbutton", this.closeChatting, false);
-        window.addEventListener("popstate", this.closeChatting, false);
-      }
-      if (!newVal && oldVal) {
-        document.removeEventListener("backbutton", this.closeChatting);
-        window.removeEventListener("popstate", this.closeChatting);
-
-      }
+      // TODO: 채팅방에서 모바일 뒤로가기버튼 누르면 채팅방만 꺼지게 하고 싶었지만... 실-패
+      // if (newVal && !oldVal) {
+      //   document.addEventListener("backbutton", this.closeChatting, false);
+      //   window.addEventListener("popstate", this.closeChatting, false);
+      // }
+      // if (!newVal && oldVal) {
+      //   document.removeEventListener("backbutton", this.closeChatting);
+      //   window.removeEventListener("popstate", this.closeChatting);
+      // }
     })
 
     this.$watch('roomStartTime', (newVal, oldVal) => {
@@ -569,14 +657,37 @@ export default {
       setInterval(this.checkHeartbeat, 1000);
     },
     checkPermission() {
-      // 공개방이면 그냥 OK
-      if (this.roomPublic) return;
-      // 비공개방이지만 내가 초대된 유저면 OK
-      if (!this.roomPublic && this.roomInviteIds.find(inviteId => inviteId == this.userInfo.userSeq)) return;
-      // 방 운영시간 내이면 OK
-      if (this.roomStartTime <= Date.now() && this.roomEndTime >= Date.now()) return;
-      // TODO: 에러 페이지로 라우팅
-      this.$router.push('/404')
+      // 방 운영시간 외이면
+      if (this.roomStartTime >= Date.now() || this.roomEndTime <= Date.now())
+        this.showErrorOperationTime();
+
+      // 비공개방이고 미초대 유저면
+      if (!this.roomPublic && !this.roomInviteIds.find(inviteId => inviteId == this.userInfo.userSeq)) {
+        this.showErrorNotInvited();
+      }
+    },
+    showErrorOperationTime() {
+      if (this.isOperationTimeError) return;
+      this.isOperationTimeError = true;
+      // setTimeout(() => {
+      //   this.isOperationTimeError = false;
+      //   this.$router.go(-1);
+      // }, 3000)
+    },
+    showErrorNotInvited() {
+      if (this.isNotInvitedError) return;
+      this.isNotInvitedError = true;
+      // setTimeout(() => {
+      //   this.isNotInvitedError = false;
+      //   this.$router.go(-1);
+      // }, 3000)
+    },
+    showInfoAuthorChanged() {
+      if (this.isAuthorChangedInfo) return;
+      this.isAuthorChangedInfo = true;
+      setTimeout(() => {
+        this.isAuthorChangedInfo = false;
+      }, 3000)
     },
     loadFirstVideo() {
       if (this.roomFirstVideo)
@@ -655,8 +766,9 @@ export default {
         }
         else if (currentSyncSender != syncSender)
         {
+          this.showInfoAuthorChanged()
           await this.getRoomInfo()
-          this.SET_ROOM_LAST_SYNC_SENDER(syncSender)
+          await this.SET_ROOM_LAST_SYNC_SENDER(syncSender)
         }
 
         if (this.userInfo.userSeq == this.roomAuthorId) return;
@@ -823,6 +935,8 @@ export default {
       this.errorOnSend = false;
     },
     checkHeartbeat() {
+      this.checkPermission();
+
       if (this.heartbeat > 30)
       {
         // 방 접속자 정보가 있다면 (ID리스트)
@@ -832,7 +946,11 @@ export default {
         // 그런거 없으니까 일단은.. 무작정 도전!
         if (this.userInfo.userSeq)
           if ((parseInt(this.userInfo.userSeq) + Date.now()) % 10 == (parseInt(this.roomId) + parseInt(this.roomAuthorId)) % 10)
+          {
+            this.showInfoAuthorChanged()
             this.requestRoomAuthor()
+          }
+
       }
 
       if (this.userInfo.userSeq && this.userInfo.userSeq == this.roomAuthorId) return;
