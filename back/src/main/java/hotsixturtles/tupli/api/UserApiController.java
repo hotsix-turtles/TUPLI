@@ -204,7 +204,7 @@ public class UserApiController {
      * @param userInfo {email, password}
      * @return
      */
-    @PostMapping("/account/`login")
+    @PostMapping("/account/login")
     @ApiOperation(value = "로그인", notes = "실패 시 404'존재하지 않은 유저입니다' 또는 404'잘못된 비밀번호입니다' 반환, 성공 시 token 반환")
     public ResponseEntity<?> login(@ApiParam(value = "email, password를 받습니다.") @RequestBody Map<String, String> userInfo) {
         User user = userRepository.findByEmail(userInfo.get("email"));

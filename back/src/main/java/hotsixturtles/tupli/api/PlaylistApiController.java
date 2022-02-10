@@ -221,21 +221,19 @@ public class PlaylistApiController {
 
     /**
      * 플레이리스트 단순 검색
-     * @param keyword 제목 // 검색에 필요한 기준 추가가능 (parameter 추가)
+     * @param condition type(최신순, 관련순,  + 제목 // 검색에 필요한 기준 추가가능 (parameter 추가)
      * @param pageable : 예시 => {sort=roomTitle,desc ...} size, page 값 따로 넘길 수 있음
      * @return
      * 반환 코드 : 200, 404
      */
     @GetMapping("/playlist/search")
     public ResponseEntity searchPlaylistSimple(@RequestParam String keyword,
-                                               @PageableDefault(size = 1000, sort ="id",  direction = Sort.Direction.ASC) Pageable pageable) {
-
-//        List<Playlist> playlists = playlistService.searchPlaylistSimple(condition);
-        SearchHistory searchHistory = new SearchHistory(null, "플레이리스트",keyword.trim(),0);
-        searchService.addScoreNum(searchHistory);
+                                               @PageableDefault(size = 1000, sort ="id",  direction = Sort.Direction.DESC) Pageable pageable) {
         PlaylistSearchCondition playlistSearchCondition = new PlaylistSearchCondition();
         playlistSearchCondition.setKeyword(keyword);
-        List<Playlist> playlists = searchService.searchPlaylist(playlistSearchCondition, pageable);
+        List<Playlist> playlists = playlistService.searchPlaylistSimple(playlistSearchCondition, pageable);
+        SearchHistory searchHistory = new SearchHistory(null, "플레이리스트",playlistSearchCondition.getKeyword().trim(),0);
+        searchService.addScoreNum(searchHistory);
         List<PlaylistDto> response = playlists.stream().map(x -> new PlaylistDto(x)).collect(Collectors.toList());
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
