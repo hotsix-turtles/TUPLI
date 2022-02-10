@@ -28,9 +28,14 @@ public class PlayroomDto {
     private OffsetDateTime startTime;
     private OffsetDateTime endTime;
 
+    private Integer userCount;
+    private Integer likesCnt;
+
     // 연결
     private SimpleUserDto user;
     private List<SimpleYoutubeVideoDto> videos;
+
+
 
 
     public PlayroomDto(Playroom playroom) {
@@ -43,6 +48,8 @@ public class PlayroomDto {
         this.inviteIds = inviteIds;
         this.startTime = playroom.getStartTime();
         this.endTime = playroom.getEndTime();
+        this.userCount = playroom.getUserCount();
+        this.likesCnt = playroom.getLikesCnt();
 
         // 연결
         this.user = new SimpleUserDto(playroom.getUser());
