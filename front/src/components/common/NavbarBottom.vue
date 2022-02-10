@@ -34,6 +34,7 @@
         <div class="my-5">
           <v-btn
             rounded
+            @click="goBoardForm"
           >
             게시글
           </v-btn>
@@ -153,10 +154,10 @@ export default {
       this.$router.push({ name: 'PlayroomForm' })
       this.toggle()
     },
-    // goBoardForm: function() {
-    //   this.$router.push({ name: 'BoardForm' })
-    //   this.toggle()
-    // },
+    goBoardForm: function() {
+      this.$router.push({ name: 'BoardForm' })
+      this.toggle()
+    },
     changeRouter: function (pageName) {
       this.$router.push({ name: pageName })
       this.selectedPage = pageName

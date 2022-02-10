@@ -10,6 +10,7 @@ import router from '../router/index.js'
 import video from './modules/video.js'
 import playlist from './modules/playlist.js'
 import common from './modules/common.js'
+import board from './modules/board.js'
 import mainContent from './modules/mainContent.js'
 
 import axios from 'axios'
@@ -164,6 +165,7 @@ export default new Vuex.Store({
     video: video,
     playlist: playlist,
     common: common,
+    board: board,
     mainContent: mainContent,
   },
 })
