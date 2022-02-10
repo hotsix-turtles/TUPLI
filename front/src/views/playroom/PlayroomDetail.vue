@@ -147,7 +147,7 @@
         <!-- 플레이룸 운영 시간(?) Wrapper -->
         <div class="playroomPlaytimeWrapper">
           <p class="playtime">
-            {{ roomPlayTime }}
+            {{ roomPlaytime }}
           </p>
         </div>
 
@@ -450,7 +450,6 @@ export default {
       'chatBlockedUid',
     ]),
     ...mapGetters('playroom', [
-      'roomPlayTime',
       'roomPublicLabel',
       'roomReducedContent',
       'roomCurrentPlaylistVideos',
@@ -510,11 +509,36 @@ export default {
 
       }
     })
+
+    this.$watch('roomStartTime', (newVal, oldVal) => {
+      this.loadRoomPlaytime();
+    });
+
+    this.$watch('roomEndTime', (newVal, oldVal) => {
+      this.loadRoomPlaytime();
+    });
   },
   beforeDestroy() {
     this.releaseChatroom()
   },
   methods: {
+    loadRoomPlaytime() {
+      const roomStartTime = this.roomStartTime
+      const roomEndTime = this.roomEndTime
+      const timezoneOffset = new Date().getTimezoneOffset() * 60 * 1000;
+
+      const roomStartDate = new Date(roomStartTime - timezoneOffset);
+      const roomEndDate = new Date(roomEndTime - timezoneOffset);
+
+      if (roomStartDate.getDate() == roomEndDate.getDate())
+        this.roomPlaytime = `${roomStartDate.toISOString().substr(11, 5)} - ${roomEndDate.toISOString().substr(11, 5)}`
+      else if (roomStartDate.getMonth() == roomEndDate.getMonth())
+        this.roomPlaytime = `${roomStartDate.getDate()}일 ${roomStartDate.toISOString().substr(11, 5)} - ${roomEndDate.getDate()}일 ${roomEndDate.toISOString().substr(11, 5)}`
+      else if (roomStartDate.getFullYear() == roomEndDate.getFullYear())
+        this.roomPlaytime = `${roomStartDate.getMonth()}월 ${roomStartDate.getDate()}일 ${roomStartDate.toISOString().substr(11, 5)} - ${roomEndDate.getMonth()}월 ${roomEndDate.getDate()}일 ${roomEndDate.toISOString().substr(11, 5)}`
+
+      this.roomPlaytime = this.roomPlaytime ? this.roomPlaytime : null;
+    },
     closeChatting() {
       this.isChatting = false;
     },
@@ -537,6 +561,7 @@ export default {
       await this.checkPermission();
       await this.loadFirstVideo();
       await this.loadLikeState();
+      await this.loadRoomPlaytime();
       await this.initChatRoom();
       clearInterval(this.sendSync);
       clearInterval(this.checkHeartbeat)

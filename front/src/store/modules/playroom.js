@@ -165,11 +165,6 @@ const playroom = {
     },
   },
   getters: {
-    roomPlayTime: ( {roomStartTime, roomEndTime} ) => {
-      const roomStartDate = new Date(roomStartTime);
-      const roomEndDate = new Date(roomEndTime);
-      return `${roomStartDate.getHours()}:${roomStartDate.getMinutes()} - ${roomEndDate.getHours()}:${roomEndDate.getMinutes()}`
-    },
     roomPublicLabel: ( {roomPublic} ) => roomPublic ? '공개' : '비공개',
     roomReducedContent: ( {roomContent} ) => roomContent.split(/\r?\n/).slice(0, 2).join('\n'),
     roomCurrentPlaylistVideos: ( {roomPlaylists, roomVideos, roomCurrentPlaylistId} ) => {
