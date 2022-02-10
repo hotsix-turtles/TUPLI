@@ -12,6 +12,7 @@ import Signup3 from '../views/accounts/Signup3.vue'
 //profile
 import EditProfile from '../views/profile/EditProfile.vue'
 import Follow from '../views/profile/Follow.vue'
+import PersonFollow from '../views/profile/PersonFollow.vue'
 import Profile from '../views/profile/Profile.vue'
 import Setting from '../views/profile/Setting.vue'
 //setting
@@ -23,22 +24,29 @@ import Payment from '../views/profile/setting/Payment.vue'
 import PrivateTerms from '../views/profile/setting/PrivateTerms.vue'
 import Save from '../views/profile/setting/Save.vue'
 import ServiceTerms from '../views/profile/setting/ServiceTerms.vue'
-//
+// playlist
 import PlaylistForm from '@/views/playlist/PlaylistForm'
 import PlaylistFormVideo from '@/views/playlist/PlaylistFormVideo'
 import PlaylistDetail from '@/views/playlist/PlaylistDetail'
+import PlaylistComment from '@/views/playlist/PlaylistComment'
+// category
 import Category from '@/views/common/Category'
+// search
 import Search from '@/views/common/Search'
+import SearchDetail from '@/views/common/SearchDetail'
+// video
+import VideoSearch from '../views/video/VideoSearch.vue'
+import VideoWatch from '../views/video/VideoWatch.vue'
+
 import PlayroomForm from '../views/playroom/PlayroomForm.vue'
 import PlayroomFormPlaylist from '../views/playroom/PlayroomFormPlaylist.vue'
 import PlayroomDetail from '../views/playroom/PlayroomDetail.vue'
-import VideoSearch from '../views/video/VideoSearch.vue'
-import VideoWatch from '../views/video/VideoWatch.vue'
-import video from '@/store/index.js'
+
 import AuthHandler from '../views/handler/AuthHandler.vue'
 import KakaoPaySuccess from '../views/handler/kakaoPay/KakaoPaySuccess.vue'
 import KakaoPayCancel from '../views/handler/kakaoPay/KakaoPayCancel.vue'
 import KakaoPayFail from '../views/handler/kakaoPay/KakaoPayFail.vue'
+import NotFound from '../views/handler/NotFound.vue'
 
 
 
@@ -48,10 +56,15 @@ Vue.use(VueMeta)
 const routes = [
   // 홈
   {
-    path: '/home',
+    path: '/',
     name: 'Home',
     component: Home
   },
+  // {
+  //   path: '/home',
+  //   name: 'Home',
+  //   component: Home
+  // },
   {
     path: '/notice',
     name: 'Notice',
@@ -81,6 +94,11 @@ const routes = [
     name: 'PlaylistDetail',
     component: PlaylistDetail
   },
+  {
+    path: '/playlist/:playlistId/comment', // router.push({ name: 'user', params: { userId: '123' } })
+    name: 'PlaylistComment',
+    component: PlaylistComment
+  },
 
   // 둘러보기
   {
@@ -93,6 +111,11 @@ const routes = [
     path: '/search',
     name: 'Search',
     component: Search
+  },
+  {
+    path: '/search/detail',
+    name: 'SearchDetail',
+    component: SearchDetail
   },
   // 동영상
   {
@@ -144,6 +167,12 @@ const routes = [
     name: 'Follow',
     component: Follow
   },
+  {
+    path: '/personfollow',
+    name: 'PersonFollow',
+    component: PersonFollow
+  },
+
   {
     path: '/profile',
     name: 'Profile',
@@ -197,30 +226,6 @@ const routes = [
     component: ServiceTerms
   },
 
-  //handler
-  //카카오
-  {
-    path: '/kakaoPay/success',
-    name: 'KakaoPaySuccess',
-    component: KakaoPaySuccess
-  },
-  {
-    path: '/kakaoPay/cancel',
-    name: 'KakaoPayCancel',
-    component: KakaoPayCancel
-  },
-  {
-    path: '/kakaoPay/fail',
-    name: 'KakaoPayFail',
-    component: KakaoPayFail
-  },
-
-
-
-
-
-
-
 
   //playroom
   {
@@ -256,7 +261,16 @@ const routes = [
     name: 'KakaoPayFail',
     component: KakaoPayFail
   },
-
+  // 올바르지 못한 주소 404 일괄 처리
+  {
+    path: "/404",
+    name: "NotFound",
+    component: NotFound,
+  },
+  {
+    path: "*",
+    redirect: "/404",
+  },
 ]
 
 const router = new VueRouter({

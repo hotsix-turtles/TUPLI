@@ -13,7 +13,7 @@
       <div>
         <div class="d-flex flex-column align-center">
           <h3 class="text-center pt-3 pb-1">
-            김춘식
+            {{ nickname }}
           </h3>
           <img
             class="py-3"
@@ -27,7 +27,7 @@
               자기소개
             </h5>
             <p class="mb-0">
-              자기소개입니다아ㅏ
+              {{ introduction }}
             </p>
           </div>
         </div>
@@ -39,7 +39,7 @@
             <p class="mr-2">
               팔로잉
             </p>
-            <p>325</p>
+            <p>123</p>
           </div>
           <div
             class="d-flex mx-3"
@@ -48,7 +48,7 @@
             <p class="mr-2">
               팔로워
             </p>
-            <p>152</p>
+            <p>456</p>
           </div>
         </div>
         <div class="d-flex justify-center">
@@ -101,25 +101,26 @@
 </template>
 
 <script>
-import ProfilePlaylist from '../../components/profile/ProfilePlaylist.vue'
-import ProfileTaste from '../../components/profile/ProfileTaste.vue'
+import ProfilePlaylist from '../../components/profile/timeline/ProfilePlaylist.vue'
+import ProfileTaste from '../../components/profile/timeline/ProfileTaste.vue'
 
-import axiosConnector from '../../utils/axios-connector.js'
+import axios from 'axios'
+import SERVER from '@/api/server'
+import { mapState } from 'vuex'
 
 export default {
   components: { ProfileTaste, ProfilePlaylist },
-
+  computed: {
+    ...mapState(['authToken', 'nickname', 'introduction', 'following', 'followers'])
+  },
   methods: {
-
-
     buyPremium: function() {
-      axiosConnector.get('/kakaoPay/')
       // 실제 적용시에는, 이미 프리미엄 유저인지 확인하는 것 필요
-      // axios({
-      //   method: 'GET',
-      //   url: SERVER.URL + SERVER.ROUTES.accounts.kakaoPay,
-      //   headers: {Authorization: this.token},
-      // })
+      axios({
+        method: 'GET',  // 주소얻어오는거라 GET
+        url: SERVER.URL + SERVER.ROUTES.accounts.kakaoPay,
+        headers: {Authorization: this.authToken},
+      })
         .then((res) => {
           window.location.href = res.data
         })

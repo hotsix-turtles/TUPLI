@@ -117,7 +117,6 @@
 
 <script>
 import { mapActions } from 'vuex'
-import SERVER from '@/api/server.js'
 
 export default {
   name: 'Login',

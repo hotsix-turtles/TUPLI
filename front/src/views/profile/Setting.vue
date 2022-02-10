@@ -240,6 +240,10 @@
 </template>
 
 <script>
+import axios from 'axios'
+import SERVER from '@/api/server'
+import { mapState } from 'vuex'
+import swal from 'sweetalert2'
 
 export default {
   name: 'Setting',
@@ -249,15 +253,43 @@ export default {
       dialogDeleteUser: null,
     }
   },
+  computed: {
+    ...mapState(['authToken'])
+  },
   methods: {
     // 로그아웃
     logoutUser: function() {
+      this.$store.dispatch('logout')
       this.$router.push({ name: 'Home' })
     },
 
     // 회원 탈퇴
     deleteUser: function() {
-      this.$router.push({ name: 'Home' })
+      //
+      axios({
+        method: 'DELETE',
+        url: SERVER.URL + '/account/withdraw',
+        headers: {Authorization: this.authToken}
+      })
+        .then(() => {
+          this.$store.commit('DELETE_TOKEN')
+          this.$router.push({ name: 'Home' })
+          // 여기까지 함께 해주셔서 감사합니다 같은 무언가
+          swal.fire ({
+            icon: 'info',
+            title: '탈퇴 성공',
+            text: '지금까지 튜플리와 함께해주셔서 감사합니다.',
+            width: '200px'
+          })
+        })
+        .catch (() => {
+          dialogDeleteUser = false
+          swal.fire ({
+            icon: 'error',
+            title: '탈퇴 실패',
+            text: '서버가 혼잡합니다. 다시 시도해 주세요.'
+          })
+        })
     },
   },
 
