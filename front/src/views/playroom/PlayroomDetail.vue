@@ -561,6 +561,8 @@ export default {
   },
   mounted() {
     this.$nextTick(async () => {
+      await this.RESET_VUEX_DATA();
+
       this.player = this.$refs.youtube.player;
       await this.getRoomInfo();
     });
@@ -974,7 +976,7 @@ export default {
       await this.wsConnector.disconnect()
       this.wsConnector = null
     },
-    ...mapMutations('playroom', ['SET_ROOM_AUTHOR', 'SET_ROOM_LIKED', 'SEEK_VIDEO',
+    ...mapMutations('playroom', ['RESET_VUEX_DATA', 'SET_ROOM_AUTHOR', 'SET_ROOM_LIKED', 'SEEK_VIDEO',
       'SET_ROOM_CURRENT_PLAYLIST_ID', 'SET_ROOM_CURRENT_VIDEO_ID', 'SET_ROOM_CURRENT_VIDEO_PLAYTIME',
       'SET_ROOM_LAST_SYNC_SENDER', 'SET_USER_START_TIME', 'SET_USER_END_TIME']),
     ...mapActions('account', ['validateToken']),

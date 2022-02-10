@@ -14,7 +14,7 @@ const playroom = {
     roomStartTime: new Date(),
     roomEndTime: new Date(),
     roomContent: '',
-    roomTags: [],
+    roomTags: '',
     roomPlaylists: [],
     roomVideos: [],
     roomCurrentPlaylistId: 0,
@@ -30,6 +30,35 @@ const playroom = {
     roomLastSyncSender: 0
   },
   mutations: {
+    RESET_VUEX_DATA: function (state) {
+      state = {
+        roomId: -1,
+        roomTitle: '',
+        roomPublic: false,
+        roomLiked: false,
+        roomAuthorId: -1,
+        roomAuthorProfilePic: '',
+        roomAuthorName: '',
+        roomAuthorFollowerCount: 0,
+        roomStartTime: new Date(),
+        roomEndTime: new Date(),
+        roomContent: '',
+        roomTags: '',
+        roomPlaylists: [],
+        roomVideos: [],
+        roomCurrentPlaylistId: 0,
+        roomCurrentVideoId: 0,
+        roomCurrentVideoPlaytime: 0,
+        roomPlayerState: 0,
+        roomSelectedChatItem: { id: '', type: null },
+        roomChats: [],
+        chatroomId: '',
+        chatBlockedId: [],
+        chatBlockedUid: [],
+        savedFormData: '',
+        roomLastSyncSender: 0
+      };
+    },
     RESET_FORM_DATA: function (state) {
       state.savedFormData = ''
       console.log('RESET_FORM_DATA', state.savedFormData)
