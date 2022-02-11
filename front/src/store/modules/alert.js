@@ -31,15 +31,17 @@ const alert = {
         .limitToLast(20)
         .on('value', (snap) => {
           let res = snap.val()
-          const tmp = {}
-          tmp.from = res.from
-          tmp.fromId = res.fromId
-          tmp.img = res.image
-          tmp.to = res.to
-          tmp.toId = res.toId
-          tmp.type = res.type
-          tmp.isRead = false
-          commit('SET_REALTIME_ALARM', tmp);
+          if (res != null) {
+            const tmp = {}
+            tmp.from = res.from
+            tmp.fromId = res.fromId
+            tmp.img = res.image
+            tmp.to = res.to
+            tmp.toId = res.toId
+            tmp.type = res.type
+            tmp.isRead = false
+            commit('SET_REALTIME_ALARM', tmp);
+          }
         });
     },
   }

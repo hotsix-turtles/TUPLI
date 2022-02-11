@@ -112,20 +112,20 @@ export default {
     updateProfile: function(){
       const formData = new FormData()
       formData.append('image', this.credentials.newImage)
-      formData.append('nickname', this.credentials.newNickname)
-      formData.append('introduction', this.credentials.newIntroduction)
+      // 이대로면 DB에서 내용물 읽을 수 없어지지만, 어떠한 환경에서도 UTF-8이 보장된다.
+      // 물론 서버에서 처리하면 서버와 DB에서도 읽을 수 있다.
+      formData.append('nickname', encodeURIComponent(this.credentials.newNickname))
+      formData.append('introduction', encodeURIComponent(this.credentials.newIntroduction))
       axios({
         method: 'PUT',
         headers: {Authorization: this.authToken},
         url: SERVER.URL + '/profile',
         data: formData        
       })
-        .then((response) => {
+        .then((res) => {
           this.$router.push({ name: 'Profile' })
-          // 필요하면 자체 갱신
-          // this.nickname = response.data.email
           // state 갱신
-          this.$store.commit('UPDATE_PROFILE', formData)
+          this.$store.commit('UPDATE_PROFILE', res.data)
         })
         .catch((err) => console.log(err.response.data))
     },
