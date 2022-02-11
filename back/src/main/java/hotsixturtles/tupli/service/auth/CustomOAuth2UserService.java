@@ -2,6 +2,7 @@ package hotsixturtles.tupli.service.auth;
 
 import hotsixturtles.tupli.entity.User;
 import hotsixturtles.tupli.entity.UserBadge;
+import hotsixturtles.tupli.entity.UserSetting;
 import hotsixturtles.tupli.entity.auth.ProviderType;
 import hotsixturtles.tupli.entity.auth.RoleType;
 import hotsixturtles.tupli.entity.auth.UserPrincipal;
@@ -12,6 +13,7 @@ import hotsixturtles.tupli.info.OAuth2UserInfoFactory;
 import hotsixturtles.tupli.repository.UserInfoRepository;
 import hotsixturtles.tupli.repository.UserRepository;
 
+import hotsixturtles.tupli.repository.UserSettingRepository;
 import hotsixturtles.tupli.service.BadgeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
@@ -30,8 +32,8 @@ import java.util.List;
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
     private final UserRepository userRepository;
-
     private final UserInfoRepository userInfoRepository;
+    private final UserSettingRepository userSettingRepository;
 
     private final BadgeService badgeService;
 
@@ -83,6 +85,9 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             UserInfo nowUserInfo = new UserInfo();
             nowUserInfo.setUserSeq(savedUser.getUserSeq());
             userInfoRepository.save(nowUserInfo);
+            UserSetting userSetting = new UserSetting();
+            userSetting.setUser(savedUser);
+            userSettingRepository.save(userSetting);
         }
 
         return UserPrincipal.create(savedUser, user.getAttributes());
