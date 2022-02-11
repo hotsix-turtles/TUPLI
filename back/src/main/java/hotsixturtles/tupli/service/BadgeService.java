@@ -83,7 +83,7 @@ public class BadgeService {
     public List<Long> getUserBadgeSeq(List<UserBadge> userBadges){
         List<Long> badges = new ArrayList<Long>();
 
-        int len = userBadges.size();
+        int len = userBadges == null ? 0 : userBadges.size();
         int i = 0;
         for(i = 0 ; i < len; i++){
             badges.add(userBadges.get(i).getBadgeSeq());
@@ -128,7 +128,7 @@ public class BadgeService {
         List<Long> badges = new ArrayList<Long>();
         List<UserBadge> updateBadgeList = new ArrayList<>();
 
-        int len = userBadges.size();
+        int len = userBadges == null ? 0 : userBadges.size();
         int i = 0;
         for(i = 0 ; i < len; i++){
             badges.add(userBadges.get(i).getBadgeSeq());

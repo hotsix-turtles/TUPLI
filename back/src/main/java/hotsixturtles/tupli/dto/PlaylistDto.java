@@ -49,10 +49,11 @@ public class PlaylistDto {
         this.userId = playlist.getUser().getUserSeq();
         this.nickName = playlist.getUser().getNickname();
         this.userProfileImg = playlist.getUser().getProfileImage();
-        this.userFollowersCnt = playlist.getUser().getTo_user().size();
+
+        this.userFollowersCnt = playlist.getUser().getTo_user() == null ? 0 : playlist.getUser().getTo_user().size();
 
         // 연결
-        this.likesCnt = playlist.getPlaylistLikes().size();
+        this.likesCnt = playlist.getPlaylistLikes() == null ? 0 :playlist.getPlaylistLikes().size();
         this.playlistLikes = playlist.getPlaylistLikes()
                 .stream().map(x-> new SimpleUserDto(x.getUser())).collect(Collectors.toList());
         this.videos = playlist.getYoutubeVideos()

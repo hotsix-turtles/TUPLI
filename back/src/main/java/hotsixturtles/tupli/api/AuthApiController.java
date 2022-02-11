@@ -4,6 +4,7 @@ import hotsixturtles.tupli.config.auth.AppProperties;
 import hotsixturtles.tupli.dto.auth.AuthReqModel;
 import hotsixturtles.tupli.dto.response.ApiResponse;
 import hotsixturtles.tupli.dto.response.ErrorResponse;
+import hotsixturtles.tupli.dto.simple.SimpleBadgeDto;
 import hotsixturtles.tupli.entity.Badge;
 import hotsixturtles.tupli.entity.UserBadge;
 import hotsixturtles.tupli.entity.auth.UserPrincipal;
@@ -28,6 +29,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/accounts/auth")
@@ -91,8 +93,8 @@ public class AuthApiController {
         badgeResult.addAll(badgeService.checkDaily(userSeq, badges));
 
         if(badgeResult == null || badgeResult.size() == 0) return ResponseEntity.ok(null);
-
-        return ResponseEntity.ok(badgeResult);
+        List<SimpleBadgeDto> badgeDtoResult = badgeResult.stream().map(b -> new SimpleBadgeDto(b)).collect(Collectors.toList());
+        return ResponseEntity.ok(badgeDtoResult);
 
     }
 

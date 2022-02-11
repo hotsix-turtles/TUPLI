@@ -9,8 +9,9 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import hotsixturtles.tupli.dto.param.SimpleCondition;
 import hotsixturtles.tupli.dto.params.PlaylistSearchCondition;
 import hotsixturtles.tupli.dto.request.PlaylistRequest;
+import hotsixturtles.tupli.dto.simple.SimpleHomeInfoDto;
 import hotsixturtles.tupli.dto.simple.SimpleYoutubeVideoDto;
-import hotsixturtles.tupli.entity.Category;
+import hotsixturtles.tupli.entity.HomeInfo;
 import hotsixturtles.tupli.entity.Playlist;
 import hotsixturtles.tupli.entity.User;
 import hotsixturtles.tupli.entity.likes.PlaylistLikes;
@@ -20,7 +21,6 @@ import hotsixturtles.tupli.repository.*;
 import hotsixturtles.tupli.repository.likes.PlaylistLikesRepository;
 import hotsixturtles.tupli.service.list.CategoryList;
 import hotsixturtles.tupli.service.list.TasteScore;
-import io.swagger.models.auth.In;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
@@ -47,6 +47,7 @@ public class PlaylistService {
     private final PlaylistLikesRepository playlistLikesRepository;
     private final YoutubeVideoRepository youtubeVideoRepository;
     private final PlaylistRepositoryCustom playlistRepositoryCustom;
+    private final HomeInfoRepository homeInfoRepository;
 
     // 심플 querydsl
     private final JPAQueryFactory jpaQueryFactory;
@@ -121,7 +122,12 @@ public class PlaylistService {
         userRepository.save(user);
 
         // 최종 저장
-        playlistRepository.save(playlist);
+        Playlist nowPlaylist = playlistRepository.save(playlist);
+
+        HomeInfo homeInfo = new HomeInfo();
+        homeInfo.setType("playlist");
+        homeInfo.setInfoId(nowPlaylist.getId());
+        homeInfoRepository.save(homeInfo);
 
         return playlist;
     }
@@ -215,7 +221,9 @@ public class PlaylistService {
     // 단일 Playlist id로 delete
     @Transactional
     public void deletePlaylist(Long playlistId) {
+
         playlistRepository.deleteById(playlistId);
+        homeInfoRepository.deleteByInfoId(playlistId);
     }
 
     // 사용자가 해당 플레이리스트 좋아요 했는지.

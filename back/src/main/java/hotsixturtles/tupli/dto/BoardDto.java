@@ -38,7 +38,7 @@ public class BoardDto {
         this.user = new SimpleUserDto(board.getUser());
 
         // 변수
-        this.likes_count = board.getBoardLikes().size();
+        this.likes_count = board.getBoardLikes() == null ? 0 : board.getBoardLikes().size();
 
     }
 
@@ -54,7 +54,7 @@ public class BoardDto {
         this.user = new SimpleUserDto(board.getUser());
 
         // 변수
-        this.likes_count = board.getBoardLikes().size();
+        this.likes_count = board.getBoardLikes() == null ? 0 : board.getBoardLikes().size();
 
         this.badges = simpleBadgeDtoList;
     }

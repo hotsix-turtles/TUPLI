@@ -3,10 +3,13 @@ package hotsixturtles.tupli.api;
 import hotsixturtles.tupli.dto.BoardDto;
 import hotsixturtles.tupli.dto.PlaylistDto;
 import hotsixturtles.tupli.dto.PlayroomDto;
+import hotsixturtles.tupli.dto.simple.SimpleHomeInfoDto;
 import hotsixturtles.tupli.entity.Board;
+import hotsixturtles.tupli.entity.HomeInfo;
 import hotsixturtles.tupli.entity.Playlist;
 import hotsixturtles.tupli.entity.Playroom;
 import hotsixturtles.tupli.service.BoardService;
+import hotsixturtles.tupli.service.HomeInfoService;
 import hotsixturtles.tupli.service.PlaylistService;
 import hotsixturtles.tupli.service.PlayroomService;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +33,7 @@ public class HomeApiController {
     private final BoardService boardService;
     private final PlaylistService playlistService;
     private final PlayroomService playroomService;
+    private final HomeInfoService homeInfoService;
 
     // 이 부분은 하영님이 명세 작성해주신대여 그거 나오면 좀 달라질듯
     @GetMapping("/home/board")
@@ -60,6 +64,19 @@ public class HomeApiController {
         return ResponseEntity.ok().body(result);
     }
 
+    /**
+     * 메인 페이지 검색 ( playroom, playlist, board 상관없이 최신순으로 가져오기 )
+     * @param pageable
+     * @return
+     * 반환 코드 : 200, 204, 404
+     */
+    @GetMapping("/home/all")
+    public ResponseEntity<?> getAllList(@PageableDefault(page = 0, size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable){
+        List<Object> homeInfos = homeInfoService.getHomeInfoList(pageable);
+        if(homeInfos.size() == 0) return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+
+        return ResponseEntity.ok().body(homeInfos);
+    }
 
 
 }
