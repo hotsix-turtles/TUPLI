@@ -28,6 +28,7 @@ public class SimpleUserDto {
     private String introduction;
     private String authKey;
     private String is_vip;
+    private Integer followerCnt;
 
     public SimpleUserDto(User user) {
         this.userSeq = user.getUserSeq();
@@ -49,6 +50,7 @@ public class SimpleUserDto {
         this.introduction = user.getIntroduction();
         this.authKey = user.getAuthKey();
         this.is_vip = user.getIs_vip();
+        this.followerCnt = user.getTo_user() == null ? 0 : user.getTo_user().size();
     }
 
 }
