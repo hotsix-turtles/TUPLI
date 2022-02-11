@@ -4,16 +4,19 @@ import Vuex from 'vuex'
 Vue.use(Vuex)
 
 import account from './modules/account.js'
+import alert from './modules/alert.js'
 import playroom from './modules/playroom.js'
 import router from '../router/index.js'
 import video from './modules/video.js'
 import playlist from './modules/playlist.js'
+import common from './modules/common.js'
+import board from './modules/board.js'
+import mainContent from './modules/mainContent.js'
 
 import axios from 'axios'
 import SERVER from '@/api/server'
 import createPersistedState from "vuex-persistedstate";
-import firebase from 'firebase/compat/app';
-import 'firebase/compat/database';
+import axiosConnector from '@/utils/axios-connector.js'
 
 export default new Vuex.Store({
   // TODO: createPersistedState 사용시 사용 모듈 한정 필요 (playroom, playlist등엔 사용 x)
@@ -27,14 +30,6 @@ export default new Vuex.Store({
     authToken: null,
     isLogin: false,
     // userInfo: null
-    // 실시간 알람
-    realtimeAlarmList: null,
-    realtimeBoolean:false  // 플레이룸 등 특정 상황에서 비활성화
-  },
-  getters: {
-    getRealtimeAlarmList: function(state) {
-      return state.realtimeAlarmList;
-    }
   },
   mutations: {
     // 로그인
@@ -54,6 +49,9 @@ export default new Vuex.Store({
       state.introduction = null
       state.image = null
       state.is_vip = null
+      state.following = null
+      state.followers = null
+      state.taste = null
     },
     // 유저 정보 갱신
     GET_USER_INFO(state, res) {
@@ -69,6 +67,7 @@ export default new Vuex.Store({
       state.is_vip = res.is_vip
       state.following = res.to_user
       state.followers = res.from_user
+      state.taste = res.taste
     },
     // 프로필 변경
     UPDATE_PROFILE(state, res) {
@@ -81,10 +80,7 @@ export default new Vuex.Store({
         image = state.image
       }
     },
-    // 가져온 알람 갱신
-    SET_REALTIME_ALARM(state, res) {
-      state.realtimeAlarmList = res;
-    },
+
   },
   actions: {
     // 로그인
@@ -129,18 +125,44 @@ export default new Vuex.Store({
       commit('DELETE_TOKEN')
       // router.push({ name: 'Login' })
     },
+    // jwt 토큰 유효 여부 + 자동 로그아웃
+    checkLogin({commit}, state) {
+      console.log('자동로그아웃 chk', localStorage.getItem('jwt'))
+      if (localStorage.getItem('jwt') === null || localStorage.getItem('jwt') === undefined) {
+        // 토큰 없음
+        commit('DELETE_TOKEN')
+      }
+      else {
+        axios({
+          method: 'GET',
+          url: SERVER.URL + '/account/tokenvalidate',
+          headers: {Authorization: localStorage.getItem('jwt')}
+        })
+          .then(
+            // 딱히 하는거 없음
+            console.log('토큰 유효함')
+          )
+          .catch(() => {
+            // 토큰 유효기간 종료 >> 일단 자동 로그 아웃 이거 명시 해야되나...
+            commit('DELETE_TOKEN')
+            window.location.reload();
+          })
+      }
+      // commit('LOGIN')
+    },
     // 회원가입
     signup: function (context, credentials) {
-      axios({
-        method: 'POST',
-        url: SERVER.URL + '/account/signup',
-        data: {
-          email: credentials.email,
-          password: credentials.password,
-          // username: credentials.username,
-          nickname: credentials.nickname,
-        }
-      })
+      axiosConnector.post('/account/signup', { email: credentials.email, password: credentials.password, nickname: credentials.nickname })
+      // axios({
+      //   method: 'POST',
+      //   url: SERVER.URL + '/account/signup',
+      //   data: {
+      //     email: credentials.email,
+      //     password: credentials.password,
+      //     // username: credentials.username,
+      //     nickname: credentials.nickname,
+      //   }
+      // })
         .then((res) => {
           // 회원가입시 자동 로그인까지 하고 signup 3으로 보내기 (강민구)
           this.dispatch('loginHere', credentials)
@@ -187,7 +209,11 @@ export default new Vuex.Store({
   modules: {
     playroom: playroom,
     account: account,
+    alert: alert,
     video: video,
     playlist: playlist,
+    common: common,
+    board: board,
+    mainContent: mainContent,
   },
 })
