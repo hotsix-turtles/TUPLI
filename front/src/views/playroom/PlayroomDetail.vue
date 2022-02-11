@@ -1,24 +1,21 @@
 <template>
   <v-card
-    class="playroom mx-auto overflow-hidden mb-10"
+    class="mx-auto mb-10 overflow-hidden"
     height="100%"
   >
     <!-- 하단 네비게이션 (플레이리스트 조작) -->
     <v-bottom-navigation
       absolute
+      class="fixed-bottom"
       background-color="#5B5C9D"
       height="60px"
-      class="fixed-bottom"
-      :input-value="selectedItem.length > 0"
+      :input-value="selectedVideoItem.length > 0"
     >
       <!-- 선택된 동영상 개수 뱃지 -->
       <v-badge
-        :content="selectedItem.length"
+        :content="selectedVideoItem.length"
         color="#EAEAEA"
-        offset-x="20"
-        offset-y="20"
         overlap
-        class="videoCounter"
       />
 
       <!-- 영상보기 버튼 -->
@@ -132,7 +129,7 @@
               class="rounded-circle"
               style="width: 100%; height: auto;"
               @click="$router.push(`/profile/${roomAuthorId}`)"
-            />
+            >
           </div>
 
           <!-- 플레이룸 작성자 이름 -->
@@ -267,8 +264,8 @@
             </v-btn>
           </v-card-title>
           <v-card-text
-            class="my-1"
             ref="chat_messages"
+            class="my-1"
           >
             <ChatItem
               v-for="chat in roomChats"
@@ -282,20 +279,20 @@
               :blocked-message="chat.blockedMessage"
             />
           </v-card-text>
-          <v-spacer></v-spacer>
+          <v-spacer />
           <v-card-actions
             class="mx-1 mb-0 align-item-bottom"
           >
             <!-- 채팅 입력창 -->
             <v-row>
               <v-text-field
+                ref="chat_input"
                 v-model="message"
                 label="메시지를 입력하세요"
                 solo
                 dense
                 :disabled="!canChat"
                 :error="errorOnSend"
-                ref="chat_input"
                 @keydown.enter="sendChat"
                 @click:append-outer="sendMessage"
               >
@@ -376,7 +373,7 @@
               indeterminate
               color="white"
               class="mb-0"
-            ></v-progress-linear>
+            />
           </v-card-text>
         </v-card>
       </v-dialog>
@@ -427,7 +424,7 @@
           </v-card-text>
 
           <v-card-actions>
-            <v-spacer></v-spacer>
+            <v-spacer />
 
             <v-btn
               color="green darken-1"
@@ -475,7 +472,7 @@ export default {
       playerVars: {
         mute: 1
       },
-      selectedItem: [],
+      selectedVideoItem: [],
       isChatting: false,
       lastPlaytime: 0,
       wsConnector: null,
@@ -738,12 +735,12 @@ export default {
     onPlaylistVideoSelected({ id, selected }) {
       if (selected)
       {
-        const idx = this.selectedItem.findIndex(el => el == id)
-        this.selectedItem.splice(idx, 1)
+        const idx = this.selectedVideoItem.findIndex(el => el == id)
+        this.selectedVideoItem.splice(idx, 1)
       }
       else
       {
-        this.selectedItem.push(id)
+        this.selectedVideoItem.push(id)
       }
       if (this.roomAuthorId == this.userInfo.userSeq) this.playThisVideo()
     },
@@ -823,12 +820,12 @@ export default {
       }
     },
     selectAllVideo() {
-      this.selectedItem = (this.selectedItem.length == this.roomCurrentPlaylistVideos.length) ?
+      this.selectedVideoItem = (this.selectedVideoItem.length == this.roomCurrentPlaylistVideos.length) ?
         [] :
         this.roomCurrentPlaylistVideos.map(v => parseInt(v.id));
     },
     isSelectedVideo(id) {
-      return this.selectedItem.findIndex(el => el == id) > -1
+      return this.selectedVideoItem.findIndex(el => el == id) > -1
     },
     loadNextVideo() {
       if (this.roomNextVideo)
@@ -853,14 +850,14 @@ export default {
       //setTimeout(this.player.playVideo, 1000)
     },
     playThisVideo() {
-      if (this.selectedItem.length != 1) {
+      if (this.selectedVideoItem.length != 1) {
         alert('바로 재생할 영상을 1개만 선택해주세요')
         return;
       }
-      console.log(this.selectedItem)
-      this.SET_ROOM_CURRENT_VIDEO_ID(this.selectedItem[0])
+      console.log(this.selectedVideoItem)
+      this.SET_ROOM_CURRENT_VIDEO_ID(this.selectedVideoItem[0])
       this.SET_ROOM_CURRENT_VIDEO_PLAYTIME(0)
-      this.selectedItem = []
+      this.selectedVideoItem = []
       this.seekTo()
     },
     async loadLikeState() {
@@ -1130,9 +1127,5 @@ iframe {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-}
-
-.videoCounter {
-  color: black;
 }
 </style>
