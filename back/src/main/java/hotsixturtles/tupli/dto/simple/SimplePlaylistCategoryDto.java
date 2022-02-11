@@ -39,7 +39,7 @@ public class SimplePlaylistCategoryDto {
 
         // 추가 변수
        this.nickname = playlist.getUser().getNickname();
-       this.likesCnt = playlist.getPlaylistLikes().size();
+       this.likesCnt = playlist.getPlaylistLikes() == null ? 0 : playlist.getPlaylistLikes().size();
        this.isLiked = false;
    }
 
@@ -55,7 +55,7 @@ public class SimplePlaylistCategoryDto {
 
         // 추가 변수
         this.nickname = playlist.getUser().getNickname();
-        this.likesCnt = playlist.getPlaylistLikes().size();
+        this.likesCnt = playlist.getPlaylistLikes() == null ? 0 : playlist.getPlaylistLikes().size();
         this.isLiked = isLiked;
     }
 }

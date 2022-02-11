@@ -78,4 +78,7 @@ public class Playroom {
     // 한길 : playroom 에 좋아요 넣기
     private Integer likesCnt = 0;
 
+    // Playroom 최고 시청자 수
+    private Integer userCountMax = 0;
+
 }

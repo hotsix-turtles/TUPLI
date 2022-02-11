@@ -4,6 +4,7 @@ import hotsixturtles.tupli.dto.UserDto;
 import hotsixturtles.tupli.dto.UserProfileDto;
 import hotsixturtles.tupli.dto.UserSettingDto;
 import hotsixturtles.tupli.dto.response.ErrorResponse;
+import hotsixturtles.tupli.dto.simple.SimpleBadgeDto;
 import hotsixturtles.tupli.dto.simple.SimpleUpdateProfileDto;
 import hotsixturtles.tupli.dto.simple.SimpleUserDto;
 import hotsixturtles.tupli.entity.*;
@@ -46,6 +47,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RestController
@@ -241,8 +243,8 @@ public class UserApiController {
         String token = jwtTokenProvider.createToken(user.getUsername(), user.getUserSeq());
 
         if(badgeResult == null || badgeResult.size() == 0) return ResponseEntity.ok(new LoginUserResponse(token, null));
-
-        return ResponseEntity.ok(new LoginUserResponse(token, badgeResult));
+        List<SimpleBadgeDto> badgeDtoResult = badgeResult.stream().map(b -> new SimpleBadgeDto(b)).collect(Collectors.toList());
+        return ResponseEntity.ok(new LoginUserResponse(token, badgeDtoResult));
     }
 
     /**
@@ -348,8 +350,8 @@ public class UserApiController {
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
     public class LoginUserResponse {
         private String token;
-        private List<Badge> badges;
-        public LoginUserResponse(String accessToken, List<Badge> badges) {
+        private List<SimpleBadgeDto> badges;
+        public LoginUserResponse(String accessToken, List<SimpleBadgeDto> badges) {
             this.token = accessToken;
             this.badges = badges;
         }
@@ -433,8 +435,8 @@ public class UserApiController {
             badgeResult.addAll(badgeService.checkFollowees(userSeq, badges));
 
             if(badgeResult.size() == 0) badgeResult = null;
-
-            return ResponseEntity.status(HttpStatus.OK).body(badgeResult);
+            List<SimpleBadgeDto> badgeDtoResult = badgeResult.stream().map(b -> new SimpleBadgeDto(b)).collect(Collectors.toList());
+            return ResponseEntity.status(HttpStatus.OK).body(badgeDtoResult);
         }
         // 이미 팔로우 되어있음
         return ResponseEntity.status(HttpStatus.OK).body(null);

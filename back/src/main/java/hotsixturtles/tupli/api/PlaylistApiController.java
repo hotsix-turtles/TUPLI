@@ -6,6 +6,7 @@ import hotsixturtles.tupli.dto.params.PlaylistSearchCondition;
 import hotsixturtles.tupli.dto.request.PlaylistRequest;
 import hotsixturtles.tupli.dto.response.ErrorResponse;
 import hotsixturtles.tupli.dto.response.IdResponse;
+import hotsixturtles.tupli.dto.simple.SimpleBadgeDto;
 import hotsixturtles.tupli.dto.simple.SimplePlaylistCategoryDto;
 import hotsixturtles.tupli.entity.*;
 import hotsixturtles.tupli.entity.likes.PlaylistLikes;
@@ -88,7 +89,9 @@ public class PlaylistApiController {
 
         if(badgeResult.size() == 0) badgeResult = null;
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(new IdResponse(playlist.getId(), badgeResult));
+        List<SimpleBadgeDto> badgeDtoResult = badgeResult.stream().map(b -> new SimpleBadgeDto(b)).collect(Collectors.toList());
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(new IdResponse(playlist.getId(), badgeDtoResult));
     }
 
     /**
