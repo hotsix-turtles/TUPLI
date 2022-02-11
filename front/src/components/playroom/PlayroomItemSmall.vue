@@ -72,17 +72,16 @@
     </v-expansion-panel-header>
     <!-- 펼치기 했을 때 나오는 플레이리스트 정보 -->
     <v-expansion-panel-content
-      style="overflow:scroll;  height: 50vh;"
+      style="overflow:scroll;  height: 30vh;"
       class="px-0"
     >
       <div
-        v-for="(playlist, idx) in playroom.playlists"
+        v-for="(playlist, idx) in playroom.playlistsInfo"
         :key="idx"
       >
-        {{ playlist }}
-        <!-- <playroom-playlist-item-small
+        <playroom-playlist-item-small
           :playlist="playlist"
-        /> 나중에 백에서 데이터 주면 추가 변경 -->
+        />
       </div>
     </v-expansion-panel-content>
   </v-expansion-panel>
@@ -91,12 +90,11 @@
 <script>
 import { mapActions, mapState } from 'vuex'
 import Tags from '../common/Tags.vue'
-// import PlayroomPlaylistItemSmall from './PlayroomPlaylistItemSmall.vue'
+import PlayroomPlaylistItemSmall from './PlayroomPlaylistItemSmall.vue'
 
 export default {
   name: 'PlayroomItemSmall',
-  components: { Tags },
-  // components: { PlayroomPlaylistItemSmall },
+  components: { Tags, PlayroomPlaylistItemSmall },
   props: {
     playroom: { type: Object, default() { {} } },
   },

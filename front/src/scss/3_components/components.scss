@@ -45,7 +45,15 @@
 .fixed-top {
   display: inline-block;
   position: fixed !important;
-  z-index: 6;
+  z-index: 3;
+  top: 0 !important;
+  width: 100% !important;
+}
+
+.fixed-black-background {
+  display: inline-block;
+  position: fixed !important;
+  z-index: 4;
   top: 0 !important;
   width: 100% !important;
 }
@@ -243,7 +251,7 @@
 .tag {
   color: #3a3939;
   background-color: #d8d8ee;
-  border-radius: 10%;
+  border-radius: 15%;
   font-size: 12px;
   padding: 3px 3px 3px 3px;
 }
@@ -256,4 +264,12 @@
   margin: 2px;
   padding: 2px 5px 1px 5px;
   font-size: 12px;
+}
+
+
+// 무조건 가운데 정렬
+.center {
+  position: absolute;
+  left: 50%;
+  transform: translate(-50%, 0%);
 }

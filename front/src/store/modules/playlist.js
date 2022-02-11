@@ -20,6 +20,9 @@ const playlist = {
     // [검색]
     searchedPlaylists: [],
 
+    // [둘러보기]
+    categoryPlaylists: [],
+
     // [플레이룸]
     selectedPlaylists: [],
     addedPlaylists: [],
@@ -40,6 +43,7 @@ const playlist = {
       state.savedFormData = formData
       state.isSaved = true
     },
+
     // [플레이리스트 디테일]
     GET_PLAYLIST_DETAIL: function (state, playlistDetail) {
       playlistDetail.tags = playlistDetail.tags.split(',')
@@ -68,14 +72,23 @@ const playlist = {
     GET_PLAYLIST_COMMENTS: function (state, playlistComments) {
       state.playlistComments = playlistComments
     },
+
     // [검색]
     SEARCH_PLAYLISTS: function (state, playlists) {
       playlists.forEach((playlist) => {
         playlist.createdAt = timeConverter(playlist.createdAt)
       })
       state.searchedPlaylists = playlists
-      console.log(playlists)
     },
+
+    // [둘러보기]
+    GET_CATEGORY_PLAYLISTS: function (state, playlists) {
+      playlists.forEach((playlist) => {
+        playlist.createdAt = timeConverter(playlist.createdAt)
+      })
+      state.categoryPlaylists = playlists
+    },
+
     // [플레이룸]
     ADD_PLAYLISTS: function (state) {
       state.addedPlaylists = []
@@ -169,6 +182,7 @@ const playlist = {
           console.log(err)
         })
     },
+
     // [플레이리스트 수정]
     updatePlaylist: function ({ commit }, { formData, id } ) {
       console.log('updatePlaylist', formData)
@@ -183,6 +197,7 @@ const playlist = {
           console.log(err)
         })
     },
+
     // [플레이리스트 디테일]
     getPlaylistDetail: function ({ commit, dispatch }, playlistId) {
       axios({
@@ -252,6 +267,7 @@ const playlist = {
           console.log(err)
         })
     },
+
     // [검색]
     searchPlaylists: function ({ commit }, params) {
       console.log('searchPlaylists params', params)
@@ -264,6 +280,20 @@ const playlist = {
         console.log(err)
       })
     },
+
+    // [둘러보기]
+    getCategoryPlaylists: function ({ commit }, categoryName) {
+
+      axiosConnector.get(`/playlist/category/${categoryName}`,
+      ).then((res) => {
+        console.log(`/playlist/category/${categoryName}`, categoryName)
+        commit('GET_CATEGORY_PLAYLISTS', res.data)
+      })
+        .catch((err) => {
+          console.log(err)
+        })
+    },
+
     // [플레이룸]
     // 플레이리스트 리스트에 추가
     addPlaylists: function ({ commit }) {

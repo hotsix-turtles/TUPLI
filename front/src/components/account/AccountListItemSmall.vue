@@ -20,9 +20,9 @@
           <div class="color-dark-gray">
             {{ account.email }}
           </div>
-        <!-- <div class="color-dark-gray">
-          {{ account.followersCnt }}
-        </div> -->
+          <div class="color-dark-gray">
+            팔로워 {{ account.followerCnt }}명
+          </div>
         </div>
       </div>
       <hr class="hr">

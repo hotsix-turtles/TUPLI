@@ -19,17 +19,19 @@
             :tags="playlist.tags.split(',').splice(0,3)"
           />
           <!-- 닉네임 -->
-          <div>{{ playlist.nickname }}</div>
-          <!-- 임시 닉네임
-          <div>춘식이</div> -->
+          <div class="color-dark-gray">
+            {{ playlist.nickname }}
+          </div>
         </div>
         <!-- 좋아요 -->
         <div class="d-flex-column text-center">
           <div
-            v-if="isLikedData"
+            v-if="playlist.isLiked"
             @click="onClickUnlike"
           >
-            <v-icon>mdi-cards-heart</v-icon>
+            <v-icon color="#5B5C9D">
+              mdi-cards-heart
+            </v-icon>
           </div>
           <div
             v-else
@@ -38,7 +40,7 @@
             <v-icon>mdi-cards-heart-outline</v-icon>
           </div>
           <div class="font-4">
-            {{ likesCntData }}
+            {{ playlist.likesCnt }}
           </div>
         </div>
       </div>
@@ -59,18 +61,13 @@ export default {
   },
   data() {
     return {
-      isLikedData: false,
-      likesCntData: 0,
     }
   },
   computed: {
     ...mapState('playlist', {
-      isLiked: state => state.isLiked,
     }),
   },
   created() {
-    this.isLikedData = this.playlist.isLiked
-    this.likesCntData = this.playlist.likesCnt
   },
   methods: {
     ...mapActions('playlist', [
@@ -78,13 +75,13 @@ export default {
       'unlikePlaylist',
     ]),
     onClickLike: function () {
-      this.isLikedData = true
-      this.likesCntData++
+      this.playlist.isLiked = true
+      this.playlist.likesCnt++
       this.likePlaylist(this.playlist.id)
     },
     onClickUnlike: function () {
-      this.isLikedData = false
-      this.likesCntData--
+      this.playlist.isLiked = false
+      this.playlist.likesCnt--
       this.unlikePlaylist(this.playlist.id)
     },
   },

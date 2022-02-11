@@ -1,58 +1,53 @@
 <template>
-  <v-card
-    height="13vh"
-    class="d-flex"
-    outlined
-    tile
-  >
-    <div
-      class="d-flex justify-space-between container"
-      width="100%"
-      @click="clickVideo"
+  <div class="d-flex my-2">
+    <playlist-cd-small
+      :thumbnail="playlist.videos[0].thumbnail"
+      :playlist-id="playlist.id"
+    />
+    <v-list-item-content
+      class="ml-4"
     >
-      <div class="d-flex">
-        <div class="video-thumbnail">
-          <img
-            :src="video.thumbnail"
-            style="width: 35vw; height: 100px;"
-            class=""
-            @click="watchingVideo(video)"
+      <v-list-item-title
+        class="semi-bold"
+        @click="$router.push({ name: 'PlaylistDetail', params: { playlistId: playlist.id } })"
+      >
+        {{ playlist.title }}
+      </v-list-item-title>
+      <!-- 나중에 nickname으로 변경 -->
+      <v-list-item-subtitle>{{ playlist.title }}</v-list-item-subtitle>
+      <div class="text-center d-flex align-center">
+        <div class="mr-1">
+          <v-icon
+            small
+            color="#bbb9b9"
           >
-          <span class="duration">
-            {{ video.duration }}
-          </span>
+            mdi-heart
+          </v-icon>
         </div>
-        <div class="d-flex-column ml-2">
-          <div
-            class="h6"
-          >
-            <div class="font-3 line-height-s">
-              {{ video.title }}
-            </div>
-          </div>
-          <div class="font-4 color-dark-gray">
-            <span>{{ video.channelTitle }}</span>
-          </div>
+        <div style="color: #bbb9b9;">
+          {{ playlist.likesCnt }}
         </div>
       </div>
-      <div class="">
-        <v-icon>mdi-dots-vertical</v-icon>
-      </div>
-    </div>
-  </v-card>
+      <!-- <tags
+        v-if="playlist.tags"
+        class="mt-2"
+        :tags="playlist.tags.split(',').slice(0, 3)"
+      /> -->
+    </v-list-item-content>
+  </div>
 </template>
 
 <script>
 import Vue from 'vue'
 import { mapActions, mapState } from 'vuex'
+import PlaylistCdSmall from '../playlist/PlaylistCdSmall.vue'
+// import Tags from '../common/Tags.vue'
 
 export default {
   name: 'PlayroomPlaylistItemSmall',
+  components: { PlaylistCdSmall },
   props: {
-    playlistId: { type: Number, default: 0 },
-    playlistSelected: { type: Boolean, default: false },
-    video: { type: Object, default() {} },
-    readonly: { type: Boolean, defautl: false }
+    playlist: { type: Object, default() {} },
   },
   data() {
     return {
