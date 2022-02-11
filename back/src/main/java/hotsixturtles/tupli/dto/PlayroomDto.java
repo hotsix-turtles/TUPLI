@@ -33,6 +33,7 @@ public class PlayroomDto {
 
     private Integer userCount;
     private Integer likesCnt;
+    private Integer userCountMax;
 
     // 연결
     private SimpleUserDto user;
@@ -55,7 +56,7 @@ public class PlayroomDto {
         this.endTime = playroom.getEndTime();
         this.userCount = playroom.getUserCount();
         this.likesCnt = playroom.getLikesCnt();
-
+        this.userCountMax = playroom.getUserCountMax();
         // 연결
         this.user = new SimpleUserDto(playroom.getUser());
         this.videos = playroom.getVideos()
@@ -75,6 +76,7 @@ public class PlayroomDto {
         this.endTime = playroom.getEndTime();
         this.userCount = playroom.getUserCount();
         this.likesCnt = playroom.getLikesCnt();
+        this.userCountMax = playroom.getUserCountMax();
 
         // 연결
         this.user = new SimpleUserDto(playroom.getUser());
