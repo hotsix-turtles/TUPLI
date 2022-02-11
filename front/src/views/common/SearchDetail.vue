@@ -1,5 +1,6 @@
 <template>
   <div>
+    <!-- 뒤로가기/검색바 -->
     <div class="d-flex">
       <v-icon
         class="ml-2"
@@ -9,6 +10,7 @@
       </v-icon>
       <search-bar
         :label="'검색어를 입력해주세요'"
+        :is-detail="true"
         @input-change="search"
       />
     </div>
@@ -86,7 +88,6 @@
             :modal-type="'order'"
             @on-select="onSelect"
           />
-          <!-- {{ searchedPlayrooms[0] }} -->
           <playroom-list-item-small :playrooms="searchedPlayrooms" />
         </v-tab-item>
 

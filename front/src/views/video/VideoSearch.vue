@@ -1,11 +1,19 @@
 <template>
   <div>
-    <back-only />
-    <!-- 검색바 -->
-    <search-bar
-      :label="'새로운 영상을 검색해주세요.'"
-      @input-change="onEnterSearch"
-    />
+    <!-- 뒤로가기/검색바 -->
+    <div class="d-flex fixed-top light-background">
+      <v-icon
+        class="ml-2"
+        @click="$router.go(-1)"
+      >
+        mdi-arrow-left
+      </v-icon>
+      <search-bar
+        :label="'검색어를 입력해주세요'"
+        :is-detail="true"
+        @input-change="onEnterSearch"
+      />
+    </div><br><br><br>
     <div class="container">
       <!-- 정렬 필터 -->
       <div
@@ -48,7 +56,6 @@
 import { mapActions, mapState } from 'vuex'
 import InfiniteLoading from "vue-infinite-loading"
 
-import BackOnly from '@/components/common/BackOnly.vue'
 import SearchBar from '@/components/common/SearchBar.vue'
 import VideoListItemSmall from '../../components/video/VideoListItemSmall.vue'
 import AddButtonBottom from '../../components/playlist/AddButtonBottom.vue'
@@ -58,7 +65,6 @@ export default {
   name: 'VideoSearch',
   components: {
     SearchBar,
-    BackOnly,
     VideoListItemSmall,
     InfiniteLoading,
     AddButtonBottom,
