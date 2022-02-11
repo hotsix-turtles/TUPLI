@@ -39,7 +39,7 @@ public class PlayroomDto {
     private List<SimpleYoutubeVideoDto> videos;
 
     // 특수변수
-    private List<SimpleUserDto> guest;
+//    private List<SimpleUserDto> guest;  // 참여자 정보 다 보내는 버전
     private List<SimpleBadgeDto> badges;
 
 
@@ -63,27 +63,28 @@ public class PlayroomDto {
     }
 
 
-    public PlayroomDto(Playroom playroom, List<User> guests) {
-        this.id = playroom.getId();
-        this.title = playroom.getTitle();
-        this.content = playroom.getContent();
-        this.isPublic = playroom.getIsPublic();
-        this.tags = playroom.getTags();
-        this.playlists = playroom.getPlaylists();
-        this.inviteIds = inviteIds;
-        this.startTime = playroom.getStartTime();
-        this.endTime = playroom.getEndTime();
-        this.userCount = playroom.getUserCount();
-        this.likesCnt = playroom.getLikesCnt();
-
-        // 연결
-        this.user = new SimpleUserDto(playroom.getUser());
-        this.videos = playroom.getVideos()
-                .stream().map(x -> new SimpleYoutubeVideoDto(x)).collect(Collectors.toList());
-
-        // 참여자 확인
-        this.guest = guests.stream().map(x -> new SimpleUserDto(x)).collect(Collectors.toList());
-
-    }
+//    // 참여자 정보까지 다 받아가는 버전
+//    public PlayroomDto(Playroom playroom, List<User> guests) {
+//        this.id = playroom.getId();
+//        this.title = playroom.getTitle();
+//        this.content = playroom.getContent();
+//        this.isPublic = playroom.getIsPublic();
+//        this.tags = playroom.getTags();
+//        this.playlists = playroom.getPlaylists();
+//        this.inviteIds = inviteIds;
+//        this.startTime = playroom.getStartTime();
+//        this.endTime = playroom.getEndTime();
+//        this.userCount = playroom.getUserCount();
+//        this.likesCnt = playroom.getLikesCnt();
+//
+//        // 연결
+//        this.user = new SimpleUserDto(playroom.getUser());
+//        this.videos = playroom.getVideos()
+//                .stream().map(x -> new SimpleYoutubeVideoDto(x)).collect(Collectors.toList());
+//
+//        // 참여자 확인
+//        this.guest = guests.stream().map(x -> new SimpleUserDto(x)).collect(Collectors.toList());
+//
+//    }
 
 }
