@@ -18,8 +18,6 @@ public class UserInfoService {
 
     private final UserInfoRepository userInfoRepository;
 
-    private final UserRepository userRepository;
-
     @Transactional
     public void userInfoUpdateTime(Long userSeq, Long time) {
         UserInfo userInfo = userInfoRepository.findOneByUserSeq(userSeq);

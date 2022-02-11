@@ -8,6 +8,9 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+/**
+ * 매일 0시(서버시간 기준) 출석체크 가능 상태로 변함
+ */
 @Component
 @RequiredArgsConstructor
 public class DailyCheckScheduler {

@@ -254,21 +254,6 @@ public class PlaylistApiController {
                                            @PageableDefault(size = 50, sort ="id",  direction = Sort.Direction.DESC) Pageable pageable,
                                            HttpServletRequest request) {
         // 카테고리 분류
-//        Map<String, String> categorys = new HashMap<>();
-//        categorys.put("trip", "여행");
-//        categorys.put("game", "게임");
-//        categorys.put("life", "일상");
-//        categorys.put("style", "노하우/스타일");
-//        categorys.put("animal", "동물");
-//        categorys.put("entertainment", "엔터테인먼트");
-//        categorys.put("movie", "영화/드라마");
-//        categorys.put("music", "음악");
-//        categorys.put("education", "교육/시사");
-//        categorys.put("sports", "스포츠");
-//        categorys.put("etc", "기타");
-//        categorys.put("all", "");  // 전체검색
-//        categorys.put("hot", "지금핫한");
-//        String category = categorys.getOrDefault(categoryKeyword, "일상");
         String category = CategoryListWord.CATEGORY_LIST_WORD.getOrDefault(categoryKeyword, "일상");
 
         // 회원, 비회원(유효하지 않은 토큰) 구분

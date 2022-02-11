@@ -44,8 +44,6 @@ public class BoardApiController {
     private final UserInfoService userInfoService;
 
 
-    // 전체 board List 가져오기
-
     /**
      * 전체 게시글 list 가져오기
      * @return List<BoardDto>
@@ -76,13 +74,12 @@ public class BoardApiController {
     }
 
     /**
-     *
+     * 게시글 추가하기
      * @param token
      * @param board : {title, content}
      * @return null
      * 반환 코드 : 201, 403, 404
      */
-
     @PostMapping("/board")
     public ResponseEntity<?> addBoard(@RequestHeader(value = "Authorization") String token,
                                       @RequestBody Board board){
@@ -114,7 +111,7 @@ public class BoardApiController {
     }
 
     /**
-     *
+     * 게시글 갱신하기
      * @param token
      * @param boardId
      * @param board
@@ -138,7 +135,7 @@ public class BoardApiController {
     }
 
     /**
-     *
+     * 게시글 지우기
      * @param token
      * @param boardId
      * @return null

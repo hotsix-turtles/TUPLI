@@ -31,9 +31,7 @@ public class HomeApiController {
     private final PlaylistService playlistService;
     private final PlayroomService playroomService;
 
-    // 좋아요 이런 순이면 어짜피 고쳐야함...
-
-
+    // 이 부분은 하영님이 명세 작성해주신대여 그거 나오면 좀 달라질듯
     @GetMapping("/home/board")
     public ResponseEntity<?> getHomeBoardList(@PageableDefault(size = 10, sort ="id",  direction = Sort.Direction.DESC) Pageable pageable){
         List<Board> boardList= boardService.getHomeBoardList(pageable);
@@ -52,6 +50,7 @@ public class HomeApiController {
             return ResponseEntity.ok().body(result);
 
     }
+
     @GetMapping("/home/playroom")
     public ResponseEntity<?> getHomePlayroomList(@PageableDefault(size = 10, sort ="id",  direction = Sort.Direction.DESC) Pageable pageable){
         List<Playroom> playrooms = playroomService.getHomePlayrooms(pageable);

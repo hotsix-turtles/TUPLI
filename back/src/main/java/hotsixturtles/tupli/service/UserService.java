@@ -38,7 +38,6 @@ public class UserService {
         user.encodePassword(passwordEncoder);
 
         userRepository.save(user);
-//        UserInfo userInfo = new UserInfo(null, user.getUserSeq(), null, 0L, 0L, 0L, 1L, "Y");
         UserInfo userInfo = new UserInfo();
         userInfo.setUserSeq(user.getUserSeq());
         userInfoRepository.save(userInfo);
@@ -131,7 +130,6 @@ public class UserService {
     @Transactional
     public void follow(Long userSeq, Long otherUserSeq) {
         UserLikes existUserLikes = userLikesRepository.findExist(userSeq, otherUserSeq);
-        System.out.println("existUserLikes== " + existUserLikes);
         if(existUserLikes == null) {
             UserLikes userLikes = new UserLikes();
             userLikes.setFromUser(userRepository.findById(userSeq).orElse(null));
@@ -169,7 +167,6 @@ public class UserService {
     @Transactional
     public void dislike(Long userSeq, Long otherUserSeq) {
         UserDislikes existUserDislikes = userDislikesRepository.findExist(userSeq, otherUserSeq);
-        System.out.println("existUserDislikes== " + existUserDislikes);
         if(existUserDislikes == null) {
             UserDislikes userDislikes = new UserDislikes();
             userDislikes.setFromUser(userRepository.findById(userSeq).orElse(null));

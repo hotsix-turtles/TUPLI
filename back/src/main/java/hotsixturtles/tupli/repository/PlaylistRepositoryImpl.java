@@ -66,7 +66,6 @@ public class PlaylistRepositoryImpl implements PlaylistRepositoryCustom{
 
     @Override
     public List<Playlist> categorizedByPageSimplePlaylist(String category, Pageable pageable) {
-        System.out.println("MMM = " + category);
         JPAQuery<Playlist> query = jpaQueryFactory
                 .selectFrom(playlist)
                 .where(
@@ -74,7 +73,6 @@ public class PlaylistRepositoryImpl implements PlaylistRepositoryCustom{
                 )
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize());
-        System.out.println("query = " + query);
 
         for (Sort.Order o : pageable.getSort()) {
             PathBuilder pathBuilder = new PathBuilder(playlist.getType(), playlist.getMetadata());

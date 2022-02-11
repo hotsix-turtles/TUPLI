@@ -38,8 +38,7 @@ public class KakaoPayService {
 
     public String kakaoPayReady() {
 
-        System.out.println("KakaoAK " + ADMIN_KEY);
-//        log.info("KakaoAK " + ADMIN_KEY);
+        log.info("KakaoAK {}", ADMIN_KEY);
 
         RestTemplate restTemplate = new RestTemplate();
 
@@ -110,7 +109,7 @@ public class KakaoPayService {
              kakaoPayApprovalVO = restTemplate.postForObject(new URI(HOST + "/v1/payment/approve"), body, KakaoPayApprovalVO.class);
              userService.rankUpPremium(token);
 
-            System.out.println("kakaoPayApprovalVO = " + kakaoPayApprovalVO);
+            log.info("kakaoPayApprovalVO = {}", kakaoPayApprovalVO);
 
             return kakaoPayApprovalVO;
 

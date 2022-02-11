@@ -32,13 +32,13 @@ public class Playroom {
     private Boolean isPublic;
     private String tags;
 
-//    @Type(type = "json")
-//    @Column(columnDefinition = "json")
-//    private List<Long> playlists;  // request에서 번호만 추출해서 저장
-
     @Type(type = "json")
     @Column(columnDefinition = "json")
     private ConcurrentHashMap<Long, List<Long>> playlists;
+
+    @Type(type = "json")
+    @Column(columnDefinition = "json")
+    private List<Long> guests = new ArrayList<>();
 
     private OffsetDateTime startTime;
 
@@ -70,6 +70,7 @@ public class Playroom {
 
     @OneToMany(mappedBy = "playroom", cascade = {CascadeType.ALL})
     private List<YoutubeVideo> videos = new ArrayList<>();
+
 
     // 기타 : DTO 외 내부 추천 및 뱃지용
     private Integer userCount = 0;
