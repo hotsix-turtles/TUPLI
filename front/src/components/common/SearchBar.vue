@@ -12,6 +12,7 @@
       @keypress.enter="onInputKeyword"
       @click="goTo(routerPage)"
     />
+    <!-- 모바일 이동 버튼용으로 처리 필요 -->
   </div>
 </template>
 

@@ -1,9 +1,10 @@
 <template>
   <v-card
-    class="playroom mx-auto overflow-hidden mb-10"
-    height="100%"
+    class="playroom mx-auto overflow-hidden"
+    height="100vh"
+    max-width="640"
   >
-    <!-- 하단 네비게이션 (플레이리스트 조작) -->
+    <!-- 하단 네비게이션 (친구 조작) -->
     <v-bottom-navigation
       absolute
       background-color="#5B5C9D"
@@ -11,7 +12,7 @@
       class="fixed-bottom"
       :input-value="addedPlaylists.length > 0 || selectedPlaylists.length > 0"
     >
-      <!-- 선택된 동영상 개수 뱃지 -->
+      <!-- 선택된 친구 명수 뱃지 -->
       <v-badge
         :content="selectedPlaylists.length"
         color="#EAEAEA"
@@ -30,14 +31,16 @@
       />
     </v-bottom-navigation>
 
-    <!-- 플레이룸 페이지 -->
+    <!-- 친구추가 페이지 -->
     <v-sheet
       id="scroll-threshold-example"
       class="overflow-y-auto"
+      :class="{ 'pb-16': selectedPlaylists.length > 0 }"
+      max-height="100%"
     >
       <back :page-name="pageName" />
       <search-bar
-        :label="'새로운 플레이리스트를 검색해주세요'"
+        :label="'추가할 친구를 검색해주세요'"
       />
 
       <!-- 탭 -->
@@ -80,14 +83,14 @@ import NavButton from '../../components/common/NavButton.vue'
 import axiosConnector from '../../utils/axios-connector';
 
 export default {
-  name: 'PlayroomFormPlaylist',
+  name: 'PlayroomFormFriend',
   components: { SearchBar, NavButton, PlaylistListItemSmall, Back },
   data() {
     return {
-      pageName: "플레이리스트 추가하기",
+      pageName: "친구 추가하기",
       tab: null,
       items: [
-        '내 플레이리스트', '저장한 플레이리스트',
+        '팔로우한 친구', '맞팔로우한 친구',
       ],
     }
   },

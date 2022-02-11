@@ -14,7 +14,7 @@ const playroom = {
     roomStartTime: new Date(),
     roomEndTime: new Date(),
     roomContent: '',
-    roomTags: [],
+    roomTags: '',
     roomPlaylists: [],
     roomVideos: [],
     roomCurrentPlaylistId: 0,
@@ -30,6 +30,35 @@ const playroom = {
     roomLastSyncSender: 0
   },
   mutations: {
+    RESET_VUEX_DATA: function (state) {
+      state = {
+        roomId: -1,
+        roomTitle: '',
+        roomPublic: false,
+        roomLiked: false,
+        roomAuthorId: -1,
+        roomAuthorProfilePic: '',
+        roomAuthorName: '',
+        roomAuthorFollowerCount: 0,
+        roomStartTime: new Date(),
+        roomEndTime: new Date(),
+        roomContent: '',
+        roomTags: '',
+        roomPlaylists: [],
+        roomVideos: [],
+        roomCurrentPlaylistId: 0,
+        roomCurrentVideoId: 0,
+        roomCurrentVideoPlaytime: 0,
+        roomPlayerState: 0,
+        roomSelectedChatItem: { id: '', type: null },
+        roomChats: [],
+        chatroomId: '',
+        chatBlockedId: [],
+        chatBlockedUid: [],
+        savedFormData: '',
+        roomLastSyncSender: 0
+      };
+    },
     RESET_FORM_DATA: function (state) {
       state.savedFormData = ''
       console.log('RESET_FORM_DATA', state.savedFormData)
@@ -48,6 +77,8 @@ const playroom = {
       state.roomAuthorProfilePic = value.profileImage ? value.profileImage : state.roomAuthorProfilePic;
       state.roomAuthorFollowerCount = value.follower != undefined ? parseInt(value.follower) : state.roomAuthorFollowerCount
     },
+    SET_USER_START_TIME: ( state, value ) => state.userStartTime = value ? new Date(value * 1000) : new Date(),
+    SET_USER_END_TIME: ( state, value ) => state.userEndTime = value ? new Date(value * 1000) : new Date(),
     SET_ROOM_START_TIME: ( state, value ) => state.roomStartTime = value ? new Date(value * 1000) : new Date(),
     SET_ROOM_END_TIME: ( state, value ) => state.roomEndTime = value ? new Date(value * 1000) : new Date(),
     SET_ROOM_CONTENT: ( state, value ) => state.roomContent = value ? value : state.roomContent,
@@ -163,11 +194,6 @@ const playroom = {
     },
   },
   getters: {
-    roomPlayTime: ( {roomStartTime, roomEndTime} ) => {
-      const roomStartDate = new Date(roomStartTime);
-      const roomEndDate = new Date(roomEndTime);
-      return `${roomStartDate.getHours()}:${roomStartDate.getMinutes()} - ${roomEndDate.getHours()}:${roomEndDate.getMinutes()}`
-    },
     roomPublicLabel: ( {roomPublic} ) => roomPublic ? '공개' : '비공개',
     roomReducedContent: ( {roomContent} ) => roomContent.split(/\r?\n/).slice(0, 2).join('\n'),
     roomCurrentPlaylistVideos: ( {roomPlaylists, roomVideos, roomCurrentPlaylistId} ) => {

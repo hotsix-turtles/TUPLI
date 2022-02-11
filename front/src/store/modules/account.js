@@ -1,3 +1,5 @@
+import axiosConnector from '../../utils/axios-connector'
+
 const account = {
   namespaced: true,
   state: {
@@ -8,13 +10,21 @@ const account = {
     introduction: null,
     image: null,
     is_vip: null,
-    // 팔로잉, 팔로워
-    following: null,
-    followers: null,
+    following: [],
+    followers: [],
+    taste: null,
   },
   mutations: {
   },
   actions: {
+    async validateToken() {
+      try {
+        const { status } = await axiosConnector.get('/account/tokenvalidate');
+        return (status == 200);
+      } catch(err) {
+        return false;
+      }
+    }
   },
   modules: {
   }
