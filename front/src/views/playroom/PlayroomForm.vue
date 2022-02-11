@@ -518,7 +518,15 @@ export default {
       }
     },
   },
-  created: function () {
+  async created() {
+    const isValid = await this.validateToken();
+    if (!isValid)
+    {
+      // 토큰 만료시 현재 vuex 정보를 초기화하고 로그인 페이지로 이동
+      localStorage.clear();
+      this.$router.push('/login')
+    }
+
     if (this.savedFormData) {
       console.log('restoreData', this.savedFormData)
       this.formData = this.savedFormData
@@ -535,7 +543,7 @@ export default {
       // TODO: 원래 axiosConnector에서 알아서 갱신하고 보내야하지만...
       const token = localStorage.getItem('jwt')
 
-      this.formData = this.formData.tags.join();
+      this.formData.tags = this.formData.tags.join();
       this.formData.playlists =
         this.addedPlaylists.reduce((prevPlaylists, curPlaylist) => {
           if (curPlaylist.videos)
@@ -599,7 +607,8 @@ export default {
     },
     ...mapMutations('playroom', ['RESET_FORM_DATA']),
     ...mapActions('playroom', ['saveFormData']),
-    ...mapActions('playlist', ['selectAllPlaylistVideo', 'deselectAllPlaylistVideo', 'resetAddedPlaylists'])
+    ...mapActions('playlist', ['selectAllPlaylistVideo', 'deselectAllPlaylistVideo', 'resetAddedPlaylists']),
+    ...mapActions('account', ['validateToken'])
   },
 }
 </script>

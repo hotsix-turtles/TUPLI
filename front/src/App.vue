@@ -19,6 +19,7 @@ export default {
   components: { NavbarBottom },
   created() {
     this.getRealtimeAlarm();
+    this.$store.dispatch('checkLogin')  // 시점 조절 필요
   },
   methods: {
     ...mapActions(['getRealtimeAlarm']),

@@ -37,10 +37,14 @@ import SearchDetail from '@/views/common/SearchDetail'
 // video
 import VideoSearch from '../views/video/VideoSearch.vue'
 import VideoWatch from '../views/video/VideoWatch.vue'
-
+// playroom
 import PlayroomForm from '../views/playroom/PlayroomForm.vue'
 import PlayroomFormPlaylist from '../views/playroom/PlayroomFormPlaylist.vue'
 import PlayroomDetail from '../views/playroom/PlayroomDetail.vue'
+//board
+import BoardForm from '../views/board/BoardForm.vue'
+import BoardSelectPlayroom from '../views/board/BoardSelectPlayroom.vue'
+import BoardSelectPlaylist from '../views/board/BoardSelectPlaylist.vue'
 
 import AuthHandler from '../views/handler/AuthHandler.vue'
 import KakaoPaySuccess from '../views/handler/kakaoPay/KakaoPaySuccess.vue'
@@ -60,6 +64,11 @@ const routes = [
     name: 'Home',
     component: Home
   },
+  // {
+  //   path: '/home',
+  //   name: 'Home',
+  //   component: Home
+  // },
   {
     path: '/notice',
     name: 'Notice',
@@ -242,6 +251,23 @@ const routes = [
     path: '/playroom/:id',
     name: 'PlayroomDetail',
     component: PlayroomDetail
+  },
+
+  // board
+  {
+    path: '/board',
+    name: 'BoardForm',
+    component: BoardForm
+  },
+  {
+    path: '/board/playlist',
+    name: 'BoardSelectPlaylist',
+    component: BoardSelectPlaylist
+  },
+  {
+    path: '/board/playroom',
+    name: 'BoardSelectPlayroom',
+    component: BoardSelectPlayroom
   },
 
   //handler

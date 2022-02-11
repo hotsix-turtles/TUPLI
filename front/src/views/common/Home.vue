@@ -21,7 +21,7 @@
           class="deep-purple--text font-weight-bold mb-0"
           bold
         >
-          라이언
+          {{ nickname }}
         </p>
         <p class="mb-0">
           님이 좋아하는&nbsp;
@@ -33,19 +33,25 @@
     </div>
 
     <div>
-      <playroom-item />
+      <main-list />
     </div>
   </v-app>
 </template>
 
 <script>
-import PlayroomItem from '@/components/home/PlayroomItem'
+import MainList from '@/components/home/MainList'
+
+import { mapState } from 'vuex'
 
 export default {
   name: 'Home',
 
   components: {
-    PlayroomItem,
+    MainList,
+  },
+
+  computed: {
+    ...mapState(['authToken', 'nickname'])
   },
 
   methods: {

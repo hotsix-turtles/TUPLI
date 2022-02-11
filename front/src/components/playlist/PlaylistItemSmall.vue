@@ -93,7 +93,7 @@ export default {
   },
   created() {
     this.selected = Boolean(this.selectedPlaylists && this.selectedPlaylists
-      .find(selectedPlaylist => selectedPlaylist.playlistId == this.playlist.playlistId))
+      .find(selectedPlaylist => selectedPlaylist.id == this.playlist.id))
     console.log(this.playlist)
   },
   methods: {
