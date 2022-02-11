@@ -2,6 +2,7 @@ package hotsixturtles.tupli.api;
 
 import hotsixturtles.tupli.dto.CommentDto;
 import hotsixturtles.tupli.dto.response.ErrorResponse;
+import hotsixturtles.tupli.dto.simple.SimpleCommentDto;
 import hotsixturtles.tupli.entity.Comment;
 import hotsixturtles.tupli.service.CommentService;
 import hotsixturtles.tupli.service.token.JwtTokenProvider;
@@ -28,7 +29,7 @@ public class CommentApiController {
     private final CommentService commentService;
 
     /**
-     *
+     * 게시글의 덧글 리스트 출력
      * @param boardId
      * @return List<comment>
      * 반환 코드 : 200, 204, 404
@@ -49,7 +50,7 @@ public class CommentApiController {
     }
 
     /**
-     *
+     * 게시글 추가하기
      * @param token
      * @param boardId
      * @param comment
@@ -70,11 +71,11 @@ public class CommentApiController {
 
         Comment commentResult = commentService.addComment(userSeq, boardId, comment);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(null);
+        return ResponseEntity.status(HttpStatus.CREATED).body(new SimpleCommentDto(commentResult));
     }
 
     /**
-     *
+     * 게시글 댓글 갱신하기
      * @param token
      * @param boardId
      * @param comment : {content}
@@ -103,7 +104,7 @@ public class CommentApiController {
     }
 
     /**
-     *
+     * 게시글 댓글 지우기
      * @param token
      * @param boardId
      * @param comment

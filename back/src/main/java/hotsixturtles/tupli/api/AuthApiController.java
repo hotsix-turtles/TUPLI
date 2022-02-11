@@ -44,8 +44,6 @@ public class AuthApiController {
 
     @PostMapping("/login")
     public ApiResponse login(
-            HttpServletRequest request,
-            HttpServletResponse response,
             @RequestBody AuthReqModel authReqModel
     ) {
         Authentication authentication = authenticationManager.authenticate(

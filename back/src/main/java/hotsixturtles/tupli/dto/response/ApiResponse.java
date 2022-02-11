@@ -6,6 +6,10 @@ import lombok.RequiredArgsConstructor;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * OAUTH 반환에 사용
+ * @param <T>
+ */
 @Getter
 @RequiredArgsConstructor
 public class ApiResponse<T> {

@@ -10,6 +10,7 @@ import hotsixturtles.tupli.entity.Playroom;
 import hotsixturtles.tupli.entity.youtube.YoutubeVideo;
 import hotsixturtles.tupli.service.SearchService;
 import hotsixturtles.tupli.service.YoutubeVideoService;
+import hotsixturtles.tupli.service.list.CategoryListWord;
 import hotsixturtles.tupli.service.token.JwtTokenProvider;
 import io.swagger.annotations.Api;
 import lombok.RequiredArgsConstructor;
@@ -199,6 +200,7 @@ public class YoutubeVideoApiController {
      * @param token
      * @param urls
      * @return
+     * 반환 코드 : 200, 403
      */
     @GetMapping("/profile/video/isLikes")
     public ResponseEntity getSearchResultInfo(@RequestHeader(value = "Authorization") String token,
@@ -263,26 +265,19 @@ public class YoutubeVideoApiController {
         return ResponseEntity.ok().body(result);
     }
 
+    /**
+     * 프론트단에서 처리시 사용 안할 것 같음 (민구)
+     * @param categoryKeyword
+     * @param pageable
+     * @param request
+     * @return
+     */
     @GetMapping("/videos/category/{categoryKeyword}")
     public ResponseEntity categoryVideos(@PathVariable("categoryKeyword") String categoryKeyword,
                                            @PageableDefault(size = 50, sort ="id",  direction = Sort.Direction.ASC) Pageable pageable,
                                            HttpServletRequest request) {
         // 카테고리 분류
-        Map<String, String> categories = new HashMap<>();
-        categories.put("trip", "여행");
-        categories.put("game", "게임");
-        categories.put("life", "일상");
-        categories.put("style", "노하우/스타일");
-        categories.put("animal", "동물");
-        categories.put("entertainment", "엔터테인먼트");
-        categories.put("movie", "영화/드라마");
-        categories.put("music", "음악");
-        categories.put("education", "교육/시사");
-        categories.put("sports", "스포츠");
-        categories.put("etc", "기타");
-        categories.put("all", "");  // 전체검색
-        categories.put("hot", "지금핫한");
-        String category = categories.getOrDefault(categoryKeyword, "일상");
+        String category = CategoryListWord.CATEGORY_LIST_WORD.getOrDefault(categoryKeyword, "일상");
 
         // 회원, 비회원(유효하지 않은 토큰) 구분
         String token = request.getHeader("Authorization");

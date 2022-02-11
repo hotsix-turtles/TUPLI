@@ -161,19 +161,13 @@ public class NotificationService {
         notiRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
-                System.out.println(snapshot);
 
                 exFindData: for (DataSnapshot data : snapshot.getChildren()) {
                     for (DataSnapshot value : data.getChildren()) {
                         if (value.getKey().equals("isRead")  && value.getValue().equals("false")) {
                             DatabaseReference updateRef = notiRef.child(data.getKey()).child("isRead");
                             updateRef.setValueAsync(true);
-                            System.out.println("updateRef = " + updateRef);
-                            System.out.println("예이!");
                         }
-                        System.out.println("value = " + value);
-                        System.out.println("valuekey = " + value.getValue());
-
                     }
                 }
             }

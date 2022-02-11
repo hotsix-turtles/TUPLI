@@ -40,9 +40,9 @@ public class UserInfo {
 
     private Long boardUpload = 0L;
 
-    private Long loginCount = 0L;
+    private Long loginCount = 1L;
 
-    private Long dailyCheck = 0L;
+    private Long dailyCheck = 1L;
 
     @Column(name = "DAILY_LOGIN_YN", length = 1)
 //    @NotNull
@@ -68,20 +68,8 @@ public class UserInfo {
     // 만든 플레이룸 수
     private Long makePlayroom = 0L;
 
-    // 유저 취향 분석용1
-//    private Long TasteTrip; // 여행
-//    private Long TasteGame; // 게임
-//    private Long TasteLife; // 일상
-//    private Long TasteStyle; // 노하우/스타일
-//    private Long TasteAnimal; // 동물
-//    private Long TasteEntertainment; // 엔터테인먼트
-//    private Long TasteMovie; // 영화/드라마
-//    private Long TasteMusic; // 음악
-//    private Long TasteEducation; // 교육/시사
-//    private Long TasteSports; // 스포츠
-//    private Long TasteEtc; // 기타
 
-    // 유저 취향 분석용2
+    // 유저 취향 분석용
     @Type(type = "json")
     @Column(columnDefinition = "json")
     private ConcurrentHashMap<String, Integer> TasteInfo = new ConcurrentHashMap<>();

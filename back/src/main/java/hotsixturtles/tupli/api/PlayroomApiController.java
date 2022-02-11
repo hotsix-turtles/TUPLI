@@ -1,16 +1,13 @@
 package hotsixturtles.tupli.api;
 
-import hotsixturtles.tupli.dto.PlaylistDto;
+import hotsixturtles.tupli.dto.BoardDto;
 import hotsixturtles.tupli.dto.PlayroomDto;
 import hotsixturtles.tupli.dto.PlayroomLikesDto;
 import hotsixturtles.tupli.dto.request.RequestPlayroomDto;
 import hotsixturtles.tupli.dto.response.ErrorResponse;
-import hotsixturtles.tupli.dto.response.ResponsePlayroomDto;
 import hotsixturtles.tupli.dto.simple.SimpleBadgeDto;
-import hotsixturtles.tupli.dto.simple.SimplePlaylistCategoryDto;
 import hotsixturtles.tupli.dto.simple.SimplePlayroomCategoryDto;
 import hotsixturtles.tupli.entity.Badge;
-import hotsixturtles.tupli.entity.Playlist;
 import hotsixturtles.tupli.entity.Playroom;
 import hotsixturtles.tupli.entity.UserBadge;
 import hotsixturtles.tupli.entity.likes.PlayroomLikes;
@@ -19,6 +16,7 @@ import hotsixturtles.tupli.service.BadgeService;
 import hotsixturtles.tupli.service.PlayroomService;
 import hotsixturtles.tupli.service.SearchService;
 import hotsixturtles.tupli.service.UserInfoService;
+import hotsixturtles.tupli.service.list.CategoryListWord;
 import hotsixturtles.tupli.service.token.JwtTokenProvider;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -117,13 +115,25 @@ public class PlayroomApiController {
 
         badgeResult.addAll(badgeService.checkPlayroomMake(userSeq, badges));
 
-        if(badgeResult.size() == 0) badgeResult = null;
+        if(badgeResult.size() == 0) {
+            badgeResult = null;
+            return ResponseEntity.status(HttpStatus.CREATED).body(playroomResult);
+        }
 
-        playroomResult.setBadges(badgeResult);
+        List<SimpleBadgeDto> bResult = badgeResult.stream().map(b -> new SimpleBadgeDto(b)).collect(Collectors.toList());
+
+        playroomResult.setBadges(bResult);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(playroomResult);
     }
 
+    /**
+     * 플레이룸 방장 변경
+     * @param token
+     * @param playroomId
+     * @return null
+     * 반환 코드 : 200, 404
+     */
     @PutMapping("/playroom/{playroomId}/user")
     public ResponseEntity changePlayroomUser(@RequestHeader(value = "Authorization") String token,
                                              @PathVariable("playroomId") Long playroomId) {
@@ -141,7 +151,7 @@ public class PlayroomApiController {
     }
 
     /**
-     *
+     * 플레이룸 단일 변경
      * @param token
      * @param playroomId
      * @param playroomDto  : {roomTitle, roomContent} // 다른 값도 추가 가능
@@ -171,7 +181,7 @@ public class PlayroomApiController {
     }
 
     /**
-     *
+     * 플레이룸 삭제
      * @param token
      * @param playroomId
      * @return
@@ -202,7 +212,7 @@ public class PlayroomApiController {
      * 사용자가 좋아요한 플레이룸
      * @param token
      * @return
-     * * 반환코드 : 200, 403, 404
+     * 반환코드 : 200, 403, 404
      */
     @GetMapping("/playroom/likes")
     public ResponseEntity<?> getPlayroomLiked(@RequestHeader(value = "Authorization") String token)
@@ -221,6 +231,13 @@ public class PlayroomApiController {
         return ResponseEntity.ok().body(result);
     }
 
+    /**
+     * 플레이룸 좋아요 확인
+     * @param token
+     * @param playroomId
+     * @return PlayroomLikesDto
+     * 반환코드 : 200, 403, 404
+     */
     @GetMapping("/playroom/{playroomId}/like")
     @ApiOperation(value = "플레이룸 좋아요 확인", notes = "유저 정보가 일치하지 않으면 404, '유효하지 않은 토큰입니다' 반환," +
             "정상 등록 시 200, null 반환")
@@ -238,6 +255,13 @@ public class PlayroomApiController {
         return ResponseEntity.status(HttpStatus.OK).body(new PlayroomLikesDto(playroomLikes));
     }
 
+    /**
+     * 플레이룸에 좋아요 등록
+     * @param token
+     * @param playroomId
+     * @return
+     * 반환 코드 : 200, 403, 404
+     */
     @PostMapping("/playroom/{playroomId}/like")
     @ApiOperation(value = "플레이룸에 좋아요 등록", notes = "유저 정보가 일치하지 않으면 404, '유효하지 않은 토큰입니다' 반환," +
             "정상 등록 시 200, null 반환")
@@ -278,26 +302,19 @@ public class PlayroomApiController {
 
 
     // user count로 order by default가 나을듯 << 현재 count null이라 id로 해놓음
+    /**
+     * category별 플레이룸 검색
+     * @param categoryKeyword
+     * @param pageable
+     * @param request
+     * @return
+     */
     @GetMapping("/playroom/category/{categoryKeyword}")
     public ResponseEntity categoryPlayroom(@PathVariable("categoryKeyword") String categoryKeyword,
                                            @PageableDefault(size = 50, sort ="id",  direction = Sort.Direction.DESC) Pageable pageable,
                                            HttpServletRequest request) {
         // 카테고리 분류
-        Map<String, String> categories = new HashMap<>();
-        categories.put("trip", "여행");
-        categories.put("game", "게임");
-        categories.put("life", "일상");
-        categories.put("style", "노하우/스타일");
-        categories.put("animal", "동물");
-        categories.put("entertainment", "엔터테인먼트");
-        categories.put("movie", "영화/드라마");
-        categories.put("music", "음악");
-        categories.put("education", "교육/시사");
-        categories.put("sports", "스포츠");
-        categories.put("etc", "기타");
-        categories.put("all", "");  // 전체검색
-        categories.put("hot", "지금핫한");
-        String category = categories.getOrDefault(categoryKeyword, "일상");
+        String category = CategoryListWord.CATEGORY_LIST_WORD.getOrDefault(categoryKeyword, "일상");
 
         // 회원, 비회원(유효하지 않은 토큰) 구분
         String token = request.getHeader("Authorization");
@@ -324,6 +341,13 @@ public class PlayroomApiController {
 
     }
 
+    /**
+     * 플레이룸 나감!
+     * @param playroomId
+     * @param watchTime
+     * @param request
+     * @return
+     */
     @PutMapping("/playroom/out/{playroomId}")
     public ResponseEntity playroomOut(@PathVariable("playroomId") Long playroomId,
                                       @RequestBody Long watchTime,

@@ -24,8 +24,6 @@ public class SearchService {
 
     private final PlayroomRepositoryImpl searchPlayroomRepository;
 
-    private final PlayroomRepository playroomRepository;
-
     private final BoardRepositoryImpl boardRepository;
 
     private final YoutubeVideoRepositoryImpl searchYoutubeVideoRepository;
@@ -33,8 +31,6 @@ public class SearchService {
     private final SearchHistoryRepository searchHistoryRepository;
 
     private final PlaylistRepositoryImpl searchPlaylistRepository;
-
-    private final PlaylistRepository playlistRepository;
 
     private final CategoryRepository categoryRepository;
 
@@ -61,7 +57,6 @@ public class SearchService {
         return searchHistoryRepository.findTop10ByOrderByScoreDesc();
     }
 
-    // $$ 고도화 시 스케줄러 이용 시간 비교해서 오래된건 초기화 시켜줘야할듯
     @Transactional
     public void addScoreNum(SearchHistory searchHistory){
         List<SearchHistory> searchHistoryList = searchHistoryRepository.findByKeyword(searchHistory.getKeyword().trim());
@@ -82,8 +77,7 @@ public class SearchService {
 
     // 카테고리 분류 플레이리스트 (나중에 이동)
     public List<Playlist> categoryPlaylist(String category, Pageable pageable) {
-        if (category == "지금핫한") {
-            // 현재 비교방식 애매함
+        if (category.equals("지금핫한")) {
             return searchPlaylistRepository.listByHomePlaylist(pageable);
         }
 
@@ -93,8 +87,7 @@ public class SearchService {
     // 카테고리 분류 플레이룸 (나중에 이동)
     // 태그만 들어있는 테이블이 필요할듯.... 대충 만들었습니다.. ( Tag 엔티티 )
     public List<Playroom> categoryPlayroom(String category, Pageable pageable) {
-        // $$$ 다훈씨것도 지워드릴까 하다가 일단 냅뒀습니다! (민구)
-        if (category == "지금핫한" || category == "") {
+        if (category.equals("지금핫한")) {
             return searchPlayroomRepository.listByHomePlayroom(pageable);
         }
         return searchPlayroomRepository.categorizedByPageSimplePlayroom(category, pageable);
@@ -102,7 +95,7 @@ public class SearchService {
 
     // 카테고리 분류 비디오 (나중에 이동)
     public List<YoutubeVideo> categoryVideos(String category, Pageable pageable) {
-        if (category == "지금핫한" || category == "") {
+        if (category.equals("지금핫한")) {
             return searchYoutubeVideoRepository.searchNoConditionByPageVideo(pageable);
         }
         List<Category> categorylist =  categoryRepository.findAllBySort(category);

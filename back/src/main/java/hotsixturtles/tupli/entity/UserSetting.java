@@ -20,16 +20,18 @@ public class UserSetting {
     @JoinColumn(name = "user_id")
     private User user;
 
-    private String inviteDomain; // (모든사람,팔로워,맞팔로워)
+    private String inviteDomain = "모든사람"; // (모든사람,팔로워,맞팔로워)
 
-    private Boolean inviteSetting;
+    private Boolean inviteSetting = false;
 
-    private Boolean AlarmTypeFollow;
+    private Boolean AlarmTypeFollow = false;
 
-    private Boolean AlarmTypeInvite;
+    private Boolean AlarmTypeInvite = false;
 
-    private Boolean AlarmTypePlayroomMake;
+    private Boolean AlarmTypePlayroomMake = false;
 
-    private Boolean AlarmTypeRecommend;
+    private Boolean AlarmTypeRecommend = false;
+
+    private Boolean AlarmBadge = false;
 
 }

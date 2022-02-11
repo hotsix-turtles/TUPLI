@@ -16,10 +16,7 @@ import hotsixturtles.tupli.entity.likes.UserLikes;
 import hotsixturtles.tupli.entity.meta.UserInfo;
 import hotsixturtles.tupli.repository.UserInfoRepository;
 import hotsixturtles.tupli.repository.UserRepository;
-import hotsixturtles.tupli.service.BadgeService;
-import hotsixturtles.tupli.service.FileService;
-import hotsixturtles.tupli.service.UserInfoService;
-import hotsixturtles.tupli.service.UserService;
+import hotsixturtles.tupli.service.*;
 import hotsixturtles.tupli.service.token.JwtTokenProvider;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -49,6 +46,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 @Slf4j
 @RestController
@@ -60,10 +58,10 @@ public class UserApiController {
     private final UserInfoRepository userInfoRepository;
 
     private final UserService userService;
-    private final UserInfoService userInfoService;
     private final BadgeService badgeService;
     private final FileService fileService;
     private final PasswordEncoder passwordEncoder;
+    private final MailSendService mailSendService;
 
     private final MessageSource messageSource;
 
@@ -152,6 +150,13 @@ public class UserApiController {
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
     }
 
+    /**
+     * 비밀번호 변경
+     * @param token
+     * @param request
+     * @param bindingResult
+     * @return
+     */
     @PutMapping("/account/password")
     public ResponseEntity passwordChange(@RequestHeader(value = "Authorization") String token,
                                          @Validated @RequestBody passwordChangeRequest request,
@@ -241,7 +246,7 @@ public class UserApiController {
     }
 
     /**
-     * $$$ 나중에 로그인 쪽으로 포함될 임시 함수
+     * 로그인 성공 시 유저정보 받아감.
      * @param token
      * @return
      */
@@ -271,6 +276,19 @@ public class UserApiController {
         }
         return ResponseEntity.ok().body(null);
     }
+
+    /**
+     * 임시비밀번호 발송
+     * @param userSeq
+     * @return
+     */
+    @PutMapping("/account/passwordFind/{userSeq}")
+    public ResponseEntity passwordFind(@PathVariable("userSeq") Long userSeq) {
+        // 임시 비밀번호
+        mailSendService.sendTmpPassword(userSeq);
+        return ResponseEntity.ok().body(null);
+    }
+
 
     /**
      * 타인 프로필 정보 간단히 긁어오기 함수

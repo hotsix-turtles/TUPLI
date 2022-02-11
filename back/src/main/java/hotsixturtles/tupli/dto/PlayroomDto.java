@@ -1,9 +1,11 @@
 package hotsixturtles.tupli.dto;
 
+import hotsixturtles.tupli.dto.simple.SimpleBadgeDto;
 import hotsixturtles.tupli.dto.simple.SimpleUserDto;
 import hotsixturtles.tupli.dto.simple.SimpleYoutubeVideoDto;
 import hotsixturtles.tupli.entity.Badge;
 import hotsixturtles.tupli.entity.Playroom;
+import hotsixturtles.tupli.entity.User;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -36,7 +38,9 @@ public class PlayroomDto {
     private SimpleUserDto user;
     private List<SimpleYoutubeVideoDto> videos;
 
-    private List<Badge> badges;
+    // 특수변수
+    private List<SimpleUserDto> guest;
+    private List<SimpleBadgeDto> badges;
 
 
     public PlayroomDto(Playroom playroom) {
@@ -56,6 +60,30 @@ public class PlayroomDto {
         this.user = new SimpleUserDto(playroom.getUser());
         this.videos = playroom.getVideos()
                 .stream().map(x -> new SimpleYoutubeVideoDto(x)).collect(Collectors.toList());
+    }
+
+
+    public PlayroomDto(Playroom playroom, List<User> guests) {
+        this.id = playroom.getId();
+        this.title = playroom.getTitle();
+        this.content = playroom.getContent();
+        this.isPublic = playroom.getIsPublic();
+        this.tags = playroom.getTags();
+        this.playlists = playroom.getPlaylists();
+        this.inviteIds = inviteIds;
+        this.startTime = playroom.getStartTime();
+        this.endTime = playroom.getEndTime();
+        this.userCount = playroom.getUserCount();
+        this.likesCnt = playroom.getLikesCnt();
+
+        // 연결
+        this.user = new SimpleUserDto(playroom.getUser());
+        this.videos = playroom.getVideos()
+                .stream().map(x -> new SimpleYoutubeVideoDto(x)).collect(Collectors.toList());
+
+        // 참여자 확인
+        this.guest = guests.stream().map(x -> new SimpleUserDto(x)).collect(Collectors.toList());
+
     }
 
 }

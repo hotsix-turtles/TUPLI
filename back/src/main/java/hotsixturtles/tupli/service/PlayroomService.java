@@ -53,7 +53,6 @@ public class PlayroomService {
 
         // Paging 조건 정해서 추가
         Playroom playroom = playroomRepository.findById(playroomId).orElse(null);
-        System.out.println(playroom.getPlaylists());
         return playroom;
 //        return playroomRepository.findById(playroomId).orElse(null);
     }

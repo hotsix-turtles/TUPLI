@@ -44,10 +44,6 @@ public class KakaoApiController {
                                           HttpServletRequest request) {
         // 나중에 변조시 필요 일단 보관(ex - headers: {Authorization : 'JWT xasldkjaklsd'})
         // String token = request.getHeader("Authorization").replaceFirst("JWT ", "");
-
-        System.out.println("pg_token = " + pg_token);
-        System.out.println("token = " + token);
-
         if (!jwtTokenProvider.validateToken(token)) {
             return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)

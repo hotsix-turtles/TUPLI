@@ -47,49 +47,9 @@ public class PlaylistService {
     private final PlaylistLikesRepository playlistLikesRepository;
     private final YoutubeVideoRepository youtubeVideoRepository;
     private final PlaylistRepositoryCustom playlistRepositoryCustom;
-//    private final CategoryRepository categoryRepository;
 
     // 심플 querydsl
     private final JPAQueryFactory jpaQueryFactory;
-
-    // private static한 내부 카테고리 정리
-//    private static final Map<Integer, String> categoryList = createCategoryList();
-//    private static Map<Integer, String> createCategoryList() {
-//        Map<Integer, String> result = new HashMap<>();
-//        result.put(1, "영화/드라마");
-//        result.put(2, "기타");
-//        result.put(10, "음악");
-//        result.put(15, "동물");
-//        result.put(17, "스포츠");
-//        result.put(18, "영화/드라마");
-//        result.put(19, "여행");
-//        result.put(20, "게임");
-//        result.put(21, "일상");
-//        result.put(22, "일상");
-//        result.put(23, "엔터테인먼트");
-//        result.put(24, "엔터테인먼트");
-//        result.put(25, "교육/시사");
-//        result.put(26, "노하우/스타일");
-//        result.put(27, "교육/시사");
-//        result.put(28, "교육/시사");
-//        result.put(29, "기타");
-//        result.put(30, "영화/드라마");
-//        result.put(31, "영화/드라마");
-//        result.put(32, "기타");
-//        result.put(33, "음악");
-//        result.put(34, "엔터테인먼트");
-//        result.put(35, "엔터테인먼트");
-//        result.put(36, "영화/드라마");
-//        result.put(37, "기타");
-//        result.put(38, "기타");
-//        result.put(39, "기타");
-//        result.put(40, "기타");
-//        result.put(41, "기타");
-//        result.put(42, "기타");
-//        result.put(43, "기타");
-//        result.put(44, "기타");
-//        return Collections.unmodifiableMap(result);
-//    }
 
 
     // 단일 Playlist 추가
@@ -114,7 +74,6 @@ public class PlaylistService {
         Set<String> categorys = new HashSet<>();
 
         // Video 정보
-        //List<YoutubeVideo> youtubeVideos = new ArrayList<>();
         ConcurrentHashMap<Integer, Integer> playlistInfo = new ConcurrentHashMap<Integer, Integer>();
         String image = null;
         for (SimpleYoutubeVideoDto videoDto : playlistRequest.getVideos()) {
@@ -128,7 +87,6 @@ public class PlaylistService {
             YoutubeVideo video = new YoutubeVideo();
             video.setInit(videoDto);
             video.setPlaylist(playlist);  // 연결
-            //youtubeVideos.add(video);
             youtubeVideoRepository.save(video);
 
             // Playlistinfo에 따라 갈림
@@ -138,7 +96,6 @@ public class PlaylistService {
 
             // 카테고리에 따른 분류 (구현 두 종류)
             String category = CategoryList.CATEGORY_LIST.getOrDefault(categoryId, "기타");
-//            String category = categoryList.getOrDefault(categoryId, "기타");
             categorys.add(category);
 
             // 취향 반영
@@ -153,7 +110,6 @@ public class PlaylistService {
         }
         playlist.setPlaylistCate(categorysString);
         playlist.setPlaylistInfo(playlistInfo);
-        //playlist.setYoutubeVideos(youtubeVideos);
 
         // 유저 정보 저장
         userInfo.setTasteInfo(tasteInfo);
@@ -313,7 +269,7 @@ public class PlaylistService {
     public List<Playlist> searchPlaylistSimple(PlaylistSearchCondition condition, String order, Pageable pageable) {
         // QueryProjection(select에 Q타입 담기) 쓰고 싶으면 다음 기회에!
         // QPlaylist.playlist를 -> playlist로 static import 했습니다.(강민구)
-        // $$$$ NumberExpression 사용금지!
+        // NumberExpression 사용금지!
         // 이유 반환이 Tuple인데 변환하려면 전용 생성자 필요해서 DTO가 더러워짐, 다른 방법 아시는 분 말씀해주심 감사!
                 
         // 기본값 : 관련도 순 (이름순, 작성자, 내용 순 + 나중에 이름 정해졌을때 조건 변경 필요 )
@@ -369,35 +325,6 @@ public class PlaylistService {
             List<Playlist> result = query.fetch();
             return result;
         }
-
-//            return list1;
-//        }
-        // 다른 타입 : 최신순
-//        else if(condition.getType() == "최신순"){
-//            return jpaQueryFactory
-//                    .select(playlist)
-//                    .distinct()
-//                    .from(playlist)
-//                    .where(titleContains(condition.getKeyword())
-//                            .or(usernameContains(condition.getKeyword()))
-//                            .or(descriptionContains(condition.getKeyword())))
-//                    .orderBy(playlist.createdAt.asc())
-//
-//
-//                    .fetch();
-//        }
-//        // 좋아요 순
-//        else{
-//            return jpaQueryFactory
-//                    .select(playlist)
-//                    .distinct()
-//                    .from(playlist)
-//                    .where(titleContains(condition.getKeyword())
-//                            .or(usernameContains(condition.getKeyword()))
-//                            .or(descriptionContains(condition.getKeyword())))
-//                    .orderBy(playlist.likesCnt.desc())
-//                    .fetch();
-//        }
     }
 
     //인피니티 스크롤 대비 연습용 (현재 미사용)
