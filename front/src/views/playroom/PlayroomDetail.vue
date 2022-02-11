@@ -132,7 +132,7 @@
               class="rounded-circle"
               style="width: 100%; height: auto;"
               @click="$router.push(`/profile/${roomAuthorId}`)"
-            />
+            >
           </div>
 
           <!-- 플레이룸 작성자 이름 -->
@@ -267,8 +267,8 @@
             </v-btn>
           </v-card-title>
           <v-card-text
-            class="my-1"
             ref="chat_messages"
+            class="my-1"
           >
             <ChatItem
               v-for="chat in roomChats"
@@ -282,20 +282,20 @@
               :blocked-message="chat.blockedMessage"
             />
           </v-card-text>
-          <v-spacer></v-spacer>
+          <v-spacer />
           <v-card-actions
             class="mx-1 mb-0 align-item-bottom"
           >
             <!-- 채팅 입력창 -->
             <v-row>
               <v-text-field
+                ref="chat_input"
                 v-model="message"
                 label="메시지를 입력하세요"
                 solo
                 dense
                 :disabled="!canChat"
                 :error="errorOnSend"
-                ref="chat_input"
                 @keydown.enter="sendChat"
                 @click:append-outer="sendMessage"
               >
@@ -376,7 +376,7 @@
               indeterminate
               color="white"
               class="mb-0"
-            ></v-progress-linear>
+            />
           </v-card-text>
         </v-card>
       </v-dialog>
@@ -427,7 +427,7 @@
           </v-card-text>
 
           <v-card-actions>
-            <v-spacer></v-spacer>
+            <v-spacer />
 
             <v-btn
               color="green darken-1"
@@ -988,7 +988,8 @@ export default {
       var time = Math.floor((this.roomUserEndTime.getTime() - this.roomUserStartTime.getTime()) / 1000)
       console.log(time, '초 경과')
 
-      //await axiosConnector.put('/userInfo', { time })
+      // 새로운 뱃지 취득시 이거 응답으로 받습니다...
+      await axiosConnector.put(`/playroom/out/${this.roomId}`, { watchTime:time })
 
       await this.wsConnector.disconnect()
       this.wsConnector = null

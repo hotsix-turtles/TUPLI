@@ -219,7 +219,7 @@ export default {
         icon: 'info',
         title: '로그아웃',
         text: '로그아웃되었습니다.',
-        width: '200px'
+        // width: '200px'
       })
     },
 
