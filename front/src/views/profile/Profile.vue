@@ -43,7 +43,7 @@
             <p class="mr-2">
               팔로잉
             </p>
-            <p>{{ following }}</p>
+            <p>{{ following.length }}</p>
           </div>
           <div
             class="d-flex mx-3"
@@ -52,7 +52,7 @@
             <p class="mr-2">
               팔로워
             </p>
-            <p>{{ followers }}</p>
+            <p>{{ followers.length }}</p>
           </div>
         </div>
         <!-- 프로필 편집 버튼 -->
