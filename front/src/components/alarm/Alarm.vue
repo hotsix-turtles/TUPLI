@@ -25,7 +25,7 @@ export default {
     realtime: {
       immediate: true,
       handler(val) {
-        console.log('env 작동 chk', val)
+        console.log('실시간 알림 input', val)
         // this.newAlarms = val;
         if ((val.toId == this.userId) && (val.isRead == false) && (this.realtimeBoolean == false) ) {this.realtimeNoti(val)}
       }
