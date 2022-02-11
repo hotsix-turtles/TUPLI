@@ -34,17 +34,38 @@
         <v-list-item-content
           class="ml-3"
         >
-          <v-list-item-title @click="$router.push({ name: 'PlaylistDetail', params: { playlistId: playlist.id } })">
+          <v-list-item-title
+            class="semi-bold"
+            @click="$router.push({ name: 'PlaylistDetail', params: { playlistId: playlist.id } })"
+          >
             {{ playlist.title }}
           </v-list-item-title>
+          <!-- 나중에 nickname으로 변경 -->
           <v-list-item-subtitle>{{ playlist.title }}</v-list-item-subtitle>
+          <div class="text-center d-flex align-center">
+            <div class="mr-1">
+              <v-icon
+                small
+                color="#bbb9b9"
+              >
+                mdi-heart
+              </v-icon>
+            </div>
+            <div style="color: #bbb9b9;">
+              {{ playlist.likesCnt }}
+            </div>
+          </div>
+          <tags
+            class="mt-2"
+            :tags="playlist.tags.split(',').slice(0, 3)"
+          />
         </v-list-item-content>
       </v-list-item>
     </v-expansion-panel-header>
     <!-- 펼치기 했을 때 나오는 영상 정보 -->
     <v-expansion-panel-content
       :color="color"
-      style="overflow:scroll;  height: 50vh;"
+      style="overflow:scroll;  height: 40vh;"
       class="px-0"
     >
       <div
@@ -64,12 +85,13 @@
 
 <script>
 import { mapActions, mapState } from 'vuex'
+import Tags from '../common/Tags.vue'
 import PlaylistCdSmall from './PlaylistCdSmall.vue'
 import PlaylistVideoItemSmall from './PlaylistVideoItemSmall.vue'
 
 export default {
   name: 'PlaylistItemSmall',
-  components: { PlaylistVideoItemSmall, PlaylistCdSmall },
+  components: { PlaylistVideoItemSmall, PlaylistCdSmall, Tags },
   props: {
     playlist: { type: Object, default() { {} } },
     readonly: { type: Boolean, default: false },

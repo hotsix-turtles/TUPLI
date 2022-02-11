@@ -16,7 +16,7 @@ export default {
   name: 'PlayroomListItemSmall',
   components: { PlayroomItemSmall },
   props: {
-    playlists: { type: Array, default() { [] } },
+    playrooms: { type: Array, default() { [] } },
   },
 }
 </script>

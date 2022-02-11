@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import axiosConnector from '../../utils/axios-connector';
+import { playtimeConverter } from '../../utils/utils'
 
 const playroom = {
   namespaced: true,
@@ -139,9 +140,16 @@ const playroom = {
     },
     // [검색]
     SEARCH_PLAYROOMS: function (state, playrooms) {
-      // playrooms.forEach((playroom) => {
-      //   playroom.createdAt = timeConverter(playroom.createdAt)
-      // })
+      let today = new Date()
+      playrooms.forEach((playroom) => {
+        if (playroom.startTime <= today && playroom.endTime >= today) {
+          playroom.onPlay = true
+        } else {
+          playroom.onPlay = false
+        }
+        playroom.startTime = playtimeConverter(playroom.startTime)
+        playroom.endTime = playtimeConverter(playroom.endTime)
+      })
       state.searchedPlayrooms = playrooms
       console.log(playrooms)
     },

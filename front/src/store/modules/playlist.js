@@ -231,7 +231,7 @@ const playlist = {
     unlikePlaylist: function ({ commit }, playlistId) {
       axiosConnector.delete(`/playlist/${playlistId}/like`,
       ).then((res) => {
-        console.log('playlist.js 189 likePlaylist', res)
+        console.log('playlist.js 189 unlikePlaylist', res)
         commit('UNLIKE_PLAYLIST')
       })
         .catch((err) => {

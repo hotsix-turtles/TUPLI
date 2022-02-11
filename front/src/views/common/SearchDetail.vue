@@ -1,10 +1,17 @@
 <template>
   <div>
-    <back-only />
-    <search-bar
-      :label="'검색어를 입력해주세요'"
-      @input-change="search"
-    />
+    <div class="d-flex">
+      <v-icon
+        class="ml-2"
+        @click="$router.go(-1)"
+      >
+        mdi-arrow-left
+      </v-icon>
+      <search-bar
+        :label="'검색어를 입력해주세요'"
+        @input-change="search"
+      />
+    </div>
     <!-- 하단 리스트에 추가하기 버튼 -->
     <add-button-bottom />
 
@@ -28,7 +35,9 @@
         <v-tab-item>
           <!-- 플리 정렬 필터 -->
           <div
-            class="text-right clickable"
+            class="text-right clickable mt-1 mb-2"
+            mt-1
+            mb-3
           >
             <span
               :key="rerenderKey"
@@ -59,10 +68,10 @@
         <v-tab-item>
           <!-- 플레이룸 정렬 필터 -->
           <div
-            class="text-right clickable"
+            class="text-right clickable mt-1 mb-2"
           >
             <span
-              :key="rerenderKey"
+              :key="rerenderKey + 1"
               @click="onClickModal"
             >
               {{ convertSelect[playroomOrder] }}
@@ -77,18 +86,20 @@
             :modal-type="'order'"
             @on-select="onSelect"
           />
-          {{ searchedPlayrooms }}
-          <playroom-list-item-small :playroom="searchedPlayrooms" />
+          <!-- {{ searchedPlayrooms[0] }} -->
+          <playroom-list-item-small :playrooms="searchedPlayrooms" />
         </v-tab-item>
 
         <!-- 계정 검색 -->
         <v-tab-item>
           <!-- 계정 정렬 필터 -->
           <div
-            class="text-right clickable"
+            class="text-right clickable mt-1 mb-2"
+            mt-1
+            mb-3
             @click="onClickModal"
           >
-            <span :key="rerenderKey">
+            <span :key="rerenderKey + 2">
               {{ convertSelect[accountOrder] }}
             </span>
             <v-icon>mdi-menu-down</v-icon>
@@ -99,17 +110,20 @@
             :modal-type="'order'"
             @on-select="onSelect"
           />
-          {{ searchedAccounts }}
+          <account-list-item-small :accounts="searchedAccounts" />
+          <!-- {{ searchedAccounts }} -->
         </v-tab-item>
 
         <!-- 영상 검색 -->
         <v-tab-item>
           <!-- 영상 정렬 필터 -->
           <div
-            class="text-right clickable"
+            class="text-right clickable mt-1 mb-2"
+            mt-1
+            mb-3
             @click="onClickModal"
           >
-            <span :key="rerenderKey">
+            <span :key="rerenderKey + 3">
               {{ convertSelect[videoOrder] }}
             </span>
             <v-icon>mdi-menu-down</v-icon>
@@ -145,25 +159,25 @@
 import { mapActions, mapState } from 'vuex'
 import InfiniteLoading from "vue-infinite-loading"
 
-import BackOnly from '@/components/common/BackOnly.vue'
 import SearchBar from '@/components/common/SearchBar.vue'
 import VideoListItemSmall from '../../components/video/VideoListItemSmall.vue'
 import AddButtonBottom from '../../components/playlist/AddButtonBottom.vue'
 import Modal from '../../components/common/Modal.vue'
 import PlaylistListItemSmall from '../../components/playlist/PlaylistListItemSmall.vue'
 import PlayroomListItemSmall from '../../components/playroom/PlayroomListItemSmall.vue'
+import AccountListItemSmall from '../../components/account/AccountListItemSmall.vue'
 
 export default {
   name: 'SearchDetail',
   components: {
     SearchBar,
-    BackOnly,
     VideoListItemSmall,
     InfiniteLoading,
     AddButtonBottom,
     Modal,
     PlaylistListItemSmall,
     PlayroomListItemSmall,
+    AccountListItemSmall,
   },
   data: function () {
     return {
@@ -173,7 +187,7 @@ export default {
         '플리', '플레이룸', '계정', '영상',
       ],
       tabName: '플리',
-      rerenderKey: new Date(),
+      rerenderKey: 0,
       // 전체 검색어
       query: '',
 

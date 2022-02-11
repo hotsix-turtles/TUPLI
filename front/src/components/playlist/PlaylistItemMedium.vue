@@ -14,7 +14,10 @@
       <div class="d-flex justify-space-between">
         <div class="d-flex-column">
           <!-- 태그 -->
-          <tags :tags="playlist.tags.split(',')" />
+          <tags
+            v-if="playlist.tags"
+            :tags="playlist.tags.split(',').splice(0,3)"
+          />
           <!-- 닉네임 -->
           <div>{{ playlist.nickname }}</div>
           <!-- 임시 닉네임

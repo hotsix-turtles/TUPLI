@@ -94,6 +94,7 @@ export default new Vuex.Store({
         }
       })
         .then((res) => {
+          console.log('로그인', res)
           commit('TOKEN', res.data.token)
           dispatch('getUserInfo', res.data.token)
           router.push({ name: 'Home' })
@@ -195,9 +196,6 @@ export default new Vuex.Store({
     playlist: playlist,
     common: common,
     board: board,
-<<<<<<< HEAD
-=======
     mainContent: mainContent,
->>>>>>> 7ada2335ac142236e33d00a4898807f60852f91f
   },
 })

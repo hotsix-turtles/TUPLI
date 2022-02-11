@@ -25,7 +25,7 @@
           <div
             class="h6"
           >
-            <div class="font-3 line-height-s">
+            <div class="font-3 semi-bold line-height-s">
               {{ video.title }}
             </div>
           </div>

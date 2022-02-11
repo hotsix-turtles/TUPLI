@@ -59,6 +59,7 @@
   position: relative;
 }
 
+// 영상 길이
 .duration {
   position: absolute;
   bottom: 3px;
@@ -68,6 +69,18 @@
   border-radius: 5px;
   font-size: 12px;
   padding: 1px;
+}
+
+// // 현재 플레이 여부
+.on-play {
+  position: absolute;
+  top: 3px;
+  left: 5px;
+  background-color: red;
+  color: white;
+  border-radius: 5px;
+  font-size: 10px;
+  padding: 2px 2px 2px 2px;
 }
 
 .shadow-s {
@@ -228,10 +241,11 @@
 
 //태그
 .tag {
-  color: $color-main;
-  background-color: $color-sub;
+  color: #3a3939;
+  background-color: #d8d8ee;
   border-radius: 10%;
-  padding: 1px 1px 1px 1px;
+  font-size: 12px;
+  padding: 3px 3px 3px 3px;
 }
 
 // 메인 태그

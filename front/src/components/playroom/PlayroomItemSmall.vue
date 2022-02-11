@@ -4,75 +4,99 @@
     elevation="0"
     aria-expanded="false"
   >
-    <!-- 플레이리스트 정보
+    <!-- 플레이룸 정보 -->
     <v-expansion-panel-header
-      :color="color"
       class="pl-0 py-3"
     >
       <div
         class="d-flex justify-space-between"
         width="100%"
-        @click="selectVideo"
       >
         <div class="d-flex">
           <div class="video-thumbnail">
             <img
-              :src="video.thumbnail"
+              :src="playroom.videos[0].thumbnail"
               style="width: 35vw; height: 100px; object-fit: cover;"
               class=""
-              @click="watchingVideo(video)"
+              @click="$router.push({ name: 'PlayroomDetail', params: { id: playroom.id } })"
             >
-            <span class="duration">{{ video.duration }}</span>
+            <!-- <div
+              v-if="playroom.onPlay"
+              class="on-play"
+            > 나중에 이걸로 변경-->
+            <div
+              class="on-play"
+            >
+              ON PLAY
+            </div>
+            <span class="duration d-flex">
+              <div>
+                <v-icon
+                  x-small
+                  color="white"
+                  class="mr-1"
+                >
+                  mdi-account-multiple
+                </v-icon>
+              </div>
+              <div>132</div>
+            <!-- {{ playroom.userCount }} 나중에 바꿀 부분 -->
+            </span>
           </div>
           <div class="d-flex-column ml-2">
-            <div
-              class="h6"
-            >
-              <div class="font-3 line-height-s">
-                {{ video.title }}
-              </div>
+            <v-list-item-title class="semi-bold">
+              {{ playroom.title }}
+            </v-list-item-title>
+            <v-list-item-subtitle class="color-dark-gray mt-1">
+              {{ playroom.title }}
+            </v-list-item-subtitle>
+            <!-- <div class="color-dark-gray">
+              <span>{{ playroom.user.nickname }}</span>
+            </div> 나중 -->
+            <div class="font-4 color-dark-gray mt-1 mb-2">
+              <span>
+                <span class="semi-bold">
+                  PLAY TIME
+                </span>
+                {{ playroom.startTime }} ~ {{ playroom.endTime }}
+              </span>
             </div>
-            <div class="font-4 color-dark-gray">
-              <span>{{ video.channelTitle }}</span>
-            </div>
+            <tags
+              v-if="playroom.tags"
+              :tags="playroom.tags.split(',').slice(0, 3)"
+              class="mt-3"
+            />
           </div>
-        </div>
-        <div class="">
-          <v-icon>mdi-dots-vertical</v-icon>
         </div>
       </div>
     </v-expansion-panel-header>
-    펼치기 했을 때 나오는 영상 정보
+    <!-- 펼치기 했을 때 나오는 플레이리스트 정보 -->
     <v-expansion-panel-content
-      :color="color"
       style="overflow:scroll;  height: 50vh;"
       class="px-0"
     >
       <div
-        v-for="(video, idx) in playlist.videos"
+        v-for="(playlist, idx) in playroom.playlists"
         :key="idx"
       >
-        <playlist-video-item-small
-
-
-          :playlist-id="playlist.playlistId"
-          :playlist-selected="selected"
-          :video="video"
-          :readonly="videoReadonly"
-        />
+        {{ playlist }}
+        <!-- <playroom-playlist-item-small
+          :playlist="playlist"
+        /> 나중에 백에서 데이터 주면 추가 변경 -->
       </div>
-    </v-expansion-panel-content> -->
+    </v-expansion-panel-content>
   </v-expansion-panel>
 </template>
 
 <script>
-// import { mapActions, mapState } from 'vuex'
-// import PlaylistCdSmall from './PlaylistCdSmall.vue'
-// import PlaylistVideoItemSmall from './PlaylistVideoItemSmall.vue'
+import { mapActions, mapState } from 'vuex'
+import Tags from '../common/Tags.vue'
+// import PlayroomPlaylistItemSmall from './PlayroomPlaylistItemSmall.vue'
 
 export default {
   name: 'PlayroomItemSmall',
-  // components: { PlaylistVideoItemSmall, PlaylistCdSmall },
+  components: { Tags },
+  // components: { PlayroomPlaylistItemSmall },
   props: {
     playroom: { type: Object, default() { {} } },
   },
@@ -80,42 +104,12 @@ export default {
     return {
     }
   },
-  // computed: {
-  //   color() {
-  //     return !this.readonly && this.selected ? "#dde" : "white"
-  //   },
-  //   ...mapState('playlist', ['addedPlaylists', 'selectedPlaylists']),
-  // },
-  // created() {
-  //   this.selected = Boolean(this.selectedPlaylists && this.selectedPlaylists
-  //     .find(selectedPlaylist => selectedPlaylist.playlistId == this.playlist.playlistId))
-  //   console.log(this.playlist)
-
-
-  //   const el = document.querySelectorAll(".v-expansion-panel-header__icon")
-  //   el.style.transform= " translate(0,10px)"
-
-  //   console.log(el)
-
-
-  // },
-  // methods: {
-  //   clickPlaylist() {
-  //     if (this.readonly) return;
-  //     if (this.selected) {
-  //       this.deselectPlaylist(this.playlist)
-  //       this.selected = false;
-  //     } else {
-  //       this.selectPlaylist(this.playlist)
-  //       this.selected = true;
-  //     }
-  //   },
-  //   ...mapActions('playlist', [
-  //     'watchingVideo',
-  //     'selectPlaylist',
-  //     'deselectPlaylist',
-  //   ]),
-  // }
+  computed: {
+  },
+  methods: {
+    ...mapActions('playroom', [
+    ]),
+  }
 }
 </script>
 

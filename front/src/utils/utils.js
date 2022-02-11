@@ -10,6 +10,14 @@ function timeConverter(UNIX_timestamp){
   return time;
 }
 
+function playtimeConverter(UNIX_timestamp){
+  var a = new Date(UNIX_timestamp * 1000);
+  var hour = a.getHours();
+  var min = a.getMinutes();
+  var time = hour + ':' + min ;
+  return time;
+}
+
 
 function HMS(input, type){
   let index = input.indexOf(type);
@@ -43,4 +51,4 @@ function DurationChange(input){
   return H  + M + ':' + S ;
 }
 
-export { timeConverter, DurationChange }
+export { timeConverter, playtimeConverter, DurationChange }
