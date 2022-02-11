@@ -258,4 +258,23 @@ public class PlayroomService {
             // 익셉션 발생
         }
     }
+
+    @Transactional
+    public void addGuest(Long userSeq, Playroom playroom) {
+        List<Long> guests = playroom.getGuests();
+        guests.add(userSeq);
+        playroom.setGuests(guests);
+        playroomRepository.save(playroom);
+    }
+
+    @Transactional
+    public void deleteGuest(Long userSeq, Long playroomId) {
+        Playroom playroom = playroomRepository.findById(playroomId).orElse(null);
+        if (playroom != null) {
+            List<Long> guests = playroom.getGuests();
+            guests.remove(userSeq);
+            playroom.setGuests(guests);
+            playroomRepository.save(playroom);
+        }
+    }
 }

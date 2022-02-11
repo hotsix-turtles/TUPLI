@@ -6,8 +6,10 @@ import hotsixturtles.tupli.dto.PlayroomLikesDto;
 import hotsixturtles.tupli.dto.request.RequestPlayroomDto;
 import hotsixturtles.tupli.dto.response.ErrorResponse;
 import hotsixturtles.tupli.dto.simple.SimpleBadgeDto;
+import hotsixturtles.tupli.dto.simple.SimplePlaylistCategoryDto;
 import hotsixturtles.tupli.dto.simple.SimplePlayroomCategoryDto;
 import hotsixturtles.tupli.entity.Badge;
+import hotsixturtles.tupli.entity.Playlist;
 import hotsixturtles.tupli.entity.Playroom;
 import hotsixturtles.tupli.entity.UserBadge;
 import hotsixturtles.tupli.entity.likes.PlayroomLikes;
@@ -77,15 +79,32 @@ public class PlayroomApiController {
      * @return
      * 반환 코드: 200, 404
      */
-
     @GetMapping("/playroom/{playroomId}")
-    public ResponseEntity<?> getPlayroom(@PathVariable("playroomId") Long playroomId){
+    public ResponseEntity<?> getPlayroom(@PathVariable("playroomId") Long playroomId,
+                                         HttpServletRequest request){
 
-        Playroom playroom = playroomService.getPlayroom(playroomId);
-        if(playroom == null){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        // 회원, 비회원(유효하지 않은 토큰) 구분
+        String token = request.getHeader("Authorization");
+        if (token == null || !jwtTokenProvider.validateToken(token)) {
+            Playroom playroom = playroomService.getPlayroom(playroomId);
+            if (playroom == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+            }
+            return ResponseEntity.status(HttpStatus.OK).body(new PlayroomDto(playroom));
+        } else {
+            Long userSeq = jwtTokenProvider.getUserSeq(token);
+            Playroom playroom = playroomService.getPlayroom(playroomId);
+            if (playroom == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+            }
+            if (playroom.getGuests().contains(userSeq)) {
+                return ResponseEntity
+                        .status(HttpStatus.BAD_REQUEST)
+                        .body(new ErrorResponse(messageSource.getMessage("error.same.room", null, LocaleContextHolder.getLocale())));
+            }
+            playroomService.addGuest(userSeq, playroom);
+            return ResponseEntity.status(HttpStatus.OK).body(new PlayroomDto(playroom));
         }
-        return ResponseEntity.status(HttpStatus.OK).body(new PlayroomDto(playroom));
     }
 
     /**
@@ -343,6 +362,7 @@ public class PlayroomApiController {
 
     /**
      * 플레이룸 나감!
+     * 회원일 경우, 나갈때 배지 갱신 및 참여자 목록에서 본인 삭제
      * @param playroomId
      * @param watchTime
      * @param request
@@ -361,6 +381,9 @@ public class PlayroomApiController {
         } else {
             Playroom playroom = playroomService.getPlayroom(playroomId);
             Long userSeq = jwtTokenProvider.getUserSeq(token);
+
+            // 참여자 삭제
+            playroomService.deleteGuest(userSeq, playroomId);
 
             userInfoService.userInfoUpdateTime(userSeq, watchTime);
 
