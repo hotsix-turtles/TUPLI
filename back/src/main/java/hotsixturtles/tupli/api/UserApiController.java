@@ -2,13 +2,11 @@ package hotsixturtles.tupli.api;
 
 import hotsixturtles.tupli.dto.UserDto;
 import hotsixturtles.tupli.dto.UserProfileDto;
+import hotsixturtles.tupli.dto.UserSettingDto;
 import hotsixturtles.tupli.dto.response.ErrorResponse;
 import hotsixturtles.tupli.dto.simple.SimpleUpdateProfileDto;
 import hotsixturtles.tupli.dto.simple.SimpleUserDto;
-import hotsixturtles.tupli.entity.Badge;
-import hotsixturtles.tupli.entity.Board;
-import hotsixturtles.tupli.entity.User;
-import hotsixturtles.tupli.entity.UserBadge;
+import hotsixturtles.tupli.entity.*;
 import hotsixturtles.tupli.entity.auth.ProviderType;
 import hotsixturtles.tupli.entity.auth.RoleType;
 import hotsixturtles.tupli.entity.likes.UserDislikes;
@@ -16,6 +14,7 @@ import hotsixturtles.tupli.entity.likes.UserLikes;
 import hotsixturtles.tupli.entity.meta.UserInfo;
 import hotsixturtles.tupli.repository.UserInfoRepository;
 import hotsixturtles.tupli.repository.UserRepository;
+import hotsixturtles.tupli.repository.UserSettingRepository;
 import hotsixturtles.tupli.service.*;
 import hotsixturtles.tupli.service.token.JwtTokenProvider;
 import io.swagger.annotations.Api;
@@ -58,6 +57,7 @@ public class UserApiController {
     private final UserInfoRepository userInfoRepository;
 
     private final UserService userService;
+    private final UserSettingService userSettingService;
     private final BadgeService badgeService;
     private final FileService fileService;
     private final PasswordEncoder passwordEncoder;
@@ -258,6 +258,48 @@ public class UserApiController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
+    }
+
+    /**
+     * 사용자 설정 가져가기
+     * @param token
+     * @return
+     */
+    @GetMapping("/account/setting")
+    public ResponseEntity getSetting(@RequestHeader(value = "Authorization") String token) {
+        // 인증 및 대상
+        if (!jwtTokenProvider.validateToken(token)) {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(new ErrorResponse(messageSource.getMessage("error.valid.jwt", null, LocaleContextHolder.getLocale())));
+        }
+        Long userSeq = jwtTokenProvider.getUserSeq(token);
+
+        UserSetting userSetting = userSettingService.getSetting(userSeq);
+
+        return ResponseEntity.ok().body(new UserSettingDto(userSetting));
+    }
+
+    /**
+     * 사용자 설정 변경
+     * @param token
+     * @param userSettingDto
+     * @return
+     */
+    @PutMapping("/account/setting")
+    public ResponseEntity changeSetting(@RequestHeader(value = "Authorization") String token,
+                                        UserSettingDto userSettingDto) {
+        // 인증 및 대상
+        if (!jwtTokenProvider.validateToken(token)) {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(new ErrorResponse(messageSource.getMessage("error.valid.jwt", null, LocaleContextHolder.getLocale())));
+        }
+        Long userSeq = jwtTokenProvider.getUserSeq(token);
+
+        userSettingService.changeSetting(userSeq, userSettingDto);
+
+        return ResponseEntity.ok().body(null);
     }
 
 
