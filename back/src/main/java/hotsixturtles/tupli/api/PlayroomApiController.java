@@ -108,32 +108,6 @@ public class PlayroomApiController {
     }
 
     /**
-     * 회원일 경우, 나갈때 배지 갱신 및 참여자 목록에서 본인 삭제
-     * @param token
-     * @return
-     */
-    @PutMapping("/playroom/out/{playroomId}")
-    public ResponseEntity outPlayroom(@PathVariable("playroomId") Long playroomId,
-                                      @RequestHeader(value = "Authorization") String token,
-                                      @RequestBody Integer watchTime) {
-        if (jwtTokenProvider.validateToken(token)) {
-            return ResponseEntity
-                    .status(HttpStatus.BAD_REQUEST)
-                    .body(new ErrorResponse(messageSource.getMessage("error.valid.jwt", null, LocaleContextHolder.getLocale())));
-        }
-        Long userSeq = jwtTokenProvider.getUserSeq(token);
-
-        // 참여자 삭제
-        playroomService.deleteGuest(userSeq, playroomId);
-
-        System.out.println("MMM 그 방에 있었던 시간 = " + watchTime);
-        return ResponseEntity.ok().body(null);
-    }
-
-
-
-
-    /**
      * 플레이룸 추가
      * @param token
      * @param playroomDto : {roomTitle, roomContent, roomPublic,roominviteIds,
@@ -388,6 +362,7 @@ public class PlayroomApiController {
 
     /**
      * 플레이룸 나감!
+     * 회원일 경우, 나갈때 배지 갱신 및 참여자 목록에서 본인 삭제
      * @param playroomId
      * @param watchTime
      * @param request
@@ -406,6 +381,9 @@ public class PlayroomApiController {
         } else {
             Playroom playroom = playroomService.getPlayroom(playroomId);
             Long userSeq = jwtTokenProvider.getUserSeq(token);
+
+            // 참여자 삭제
+            playroomService.deleteGuest(userSeq, playroomId);
 
             userInfoService.userInfoUpdateTime(userSeq, watchTime);
 
