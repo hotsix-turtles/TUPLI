@@ -21,6 +21,8 @@ public class CategoryListWord {
         result.put("education", "교육/시사");
         result.put("sports", "스포츠");
         result.put("etc", "기타");
+        result.put("all", "");
+        result.put("hot", "지금핫한");
         return Collections.unmodifiableMap(result);
     }
 

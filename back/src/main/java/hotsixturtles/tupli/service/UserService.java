@@ -1,6 +1,7 @@
 package hotsixturtles.tupli.service;
 
 import hotsixturtles.tupli.entity.User;
+import hotsixturtles.tupli.entity.UserSetting;
 import hotsixturtles.tupli.entity.likes.UserDislikes;
 import hotsixturtles.tupli.entity.likes.UserLikes;
 import hotsixturtles.tupli.entity.meta.UserInfo;
@@ -25,6 +26,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final UserInfoRepository userInfoRepository;
     private final UserLikesRepository userLikesRepository;
+    private final UserSettingRepository userSettingRepository;
     private final UserBadgeRepository userBadgeRepository;
     private final UserDislikesRepository userDislikesRepository;
     private final NotificationService notificationService;
@@ -41,6 +43,9 @@ public class UserService {
         UserInfo userInfo = new UserInfo();
         userInfo.setUserSeq(user.getUserSeq());
         userInfoRepository.save(userInfo);
+        UserSetting userSetting = new UserSetting();
+        userSetting.setUser(user);
+        userSettingRepository.save(userSetting);
         return user.getUserSeq();
     }
 
