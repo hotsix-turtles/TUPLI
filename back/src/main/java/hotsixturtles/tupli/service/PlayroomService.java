@@ -2,15 +2,9 @@ package hotsixturtles.tupli.service;
 
 import hotsixturtles.tupli.dto.PlayroomDto;
 import hotsixturtles.tupli.dto.request.RequestPlayroomDto;
-import hotsixturtles.tupli.dto.response.ResponsePlayroomDto;
-import hotsixturtles.tupli.dto.simple.SimpleUserDto;
+import hotsixturtles.tupli.dto.simple.SimpleHomeInfoDto;
 import hotsixturtles.tupli.dto.simple.SimpleYoutubeVideoDto;
-import hotsixturtles.tupli.entity.Category;
-import hotsixturtles.tupli.entity.Playlist;
-import hotsixturtles.tupli.entity.Playroom;
-import hotsixturtles.tupli.entity.User;
-import hotsixturtles.tupli.entity.likes.BoardLikes;
-import hotsixturtles.tupli.entity.likes.PlaylistLikes;
+import hotsixturtles.tupli.entity.*;
 import hotsixturtles.tupli.entity.likes.PlayroomLikes;
 import hotsixturtles.tupli.entity.likes.UserLikes;
 import hotsixturtles.tupli.entity.youtube.YoutubeVideo;
@@ -37,6 +31,7 @@ public class PlayroomService {
     private final PlayroomRepositoryCustom playroomRepositoryCustom;
     private final PlayroomLikesRepository playroomLikesRepository;
     private final CategoryRepository categoryRepository;
+    private final HomeInfoRepository homeInfoRepository;
 
     public List<Playroom> getPlayroomList(){
 
@@ -157,7 +152,7 @@ public class PlayroomService {
         }
 
         playroom.setPlayroomCate(categorysString);
-        playroomRepository.save(playroom);
+        Playroom nowPlayroom = playroomRepository.save(playroom);
 
         // 플레이룸 개설 알림 보내기 (초청 유저)
         for (Long inviteId : playroomDto.getInviteIds()) {
@@ -172,6 +167,11 @@ public class PlayroomService {
             }
 
         }
+
+        HomeInfo homeInfo = new HomeInfo();
+        homeInfo.setType("playroom");
+        homeInfo.setInfoId(nowPlayroom.getId());
+        homeInfoRepository.save(homeInfo);
 
         return new PlayroomDto(playroom);
     }
@@ -208,6 +208,7 @@ public class PlayroomService {
         }
 
         playroomRepository.deleteById(playroomId);
+        homeInfoRepository.deleteByInfoId(playroomId);
         return playroom;
     }
 

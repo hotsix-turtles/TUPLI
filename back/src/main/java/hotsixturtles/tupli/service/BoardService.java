@@ -1,6 +1,8 @@
 package hotsixturtles.tupli.service;
 
+import hotsixturtles.tupli.dto.simple.SimpleHomeInfoDto;
 import hotsixturtles.tupli.entity.Board;
+import hotsixturtles.tupli.entity.HomeInfo;
 import hotsixturtles.tupli.entity.likes.BoardLikes;
 import hotsixturtles.tupli.repository.*;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +26,8 @@ public class BoardService {
     private final BoardLikesRepository boardLikesRepository;
 
     private final BoardRepositoryCustom boardRepositoryCustom;
+
+    private final HomeInfoRepository homeInfoRepository;
 
     //    @Transactional
 //    public Board boardPost(Long id, String title, String content) {
@@ -55,7 +59,14 @@ public class BoardService {
     public Board addBoard(Long userSeq, Board board){
 
         board.setUser(userRepository.findByUserSeq(userSeq));
-        boardRepository.save(board);
+        Board nowBoard = boardRepository.save(board);
+
+        HomeInfo homeInfo = new HomeInfo();
+        homeInfo.setType("board");
+        homeInfo.setInfoId(nowBoard.getId());
+
+        homeInfoRepository.save(homeInfo);
+
         return board;
     }
 
@@ -74,7 +85,9 @@ public class BoardService {
 
     @Transactional
     public void deleteBoard(Long boardId){
+
         boardRepository.deleteById(boardId);
+        homeInfoRepository.deleteByInfoId(boardId);
     }
 
     public BoardLikes getBoardLike(Long userSeq, Long boardId){
