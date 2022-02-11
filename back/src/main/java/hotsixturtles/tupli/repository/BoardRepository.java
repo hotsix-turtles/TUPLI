@@ -11,4 +11,5 @@ public interface BoardRepository extends JpaRepository<Board, Long> {
     @Query("select b from Board b join BoardLikes bl on b.id = bl.board.id " +
             "where bl.user.userSeq = :userSeq")
     List<Board> findLikedBoards(@Param("userSeq") Long userSeq);
+
 }

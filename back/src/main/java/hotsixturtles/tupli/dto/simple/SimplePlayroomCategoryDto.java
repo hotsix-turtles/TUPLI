@@ -43,7 +43,8 @@ public class SimplePlayroomCategoryDto {
 
         // 추가 변수
        this.nickname = playroom.getUser().getNickname();
-       this.likesCnt = playroom.getPlayroomLikes().size();
+
+       this.likesCnt = playroom.getPlayroomLikes() == null ? 0 : playroom.getPlayroomLikes().size();
        this.isLiked = false;
    }
 
@@ -61,7 +62,7 @@ public class SimplePlayroomCategoryDto {
 
         // 추가 변수
         this.nickname = playroom.getUser().getNickname();
-        this.likesCnt = playroom.getPlayroomLikes().size();
+        this.likesCnt = playroom.getPlayroomLikes() == null ? 0 : playroom.getPlayroomLikes().size();
         this.isLiked = isLiked;
     }
 }

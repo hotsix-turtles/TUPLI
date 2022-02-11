@@ -18,5 +18,4 @@ public interface PlayroomRepository extends JpaRepository<Playroom, Long> {
     @Query("select p from Playroom p join PlayroomLikes pr on p.id = pr.playroom.id " +
             "where pr.user.userSeq = :userSeq")
     List<Playroom> findLikedPlayrooms(@Param("userSeq") Long userSeq);
-
 }

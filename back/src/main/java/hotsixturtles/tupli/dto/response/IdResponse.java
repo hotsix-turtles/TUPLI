@@ -1,5 +1,6 @@
 package hotsixturtles.tupli.dto.response;
 
+import hotsixturtles.tupli.dto.simple.SimpleBadgeDto;
 import hotsixturtles.tupli.entity.Badge;
 import lombok.Data;
 
@@ -12,9 +13,9 @@ import java.util.List;
 public class IdResponse {
 
     private Long id;
-    private List<Badge> badgeResult;
+    private List<SimpleBadgeDto> badgeResult;
 
-    public IdResponse(Long id, List<Badge> badgeResult) {
+    public IdResponse(Long id, List<SimpleBadgeDto> badgeResult) {
         this.id = id;
         this.badgeResult = badgeResult;
     }

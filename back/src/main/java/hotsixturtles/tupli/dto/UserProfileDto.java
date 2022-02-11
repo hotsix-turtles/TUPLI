@@ -66,6 +66,6 @@ public class UserProfileDto {
         this.to_user = user.getTo_user().stream().map(u-> new SimpleUserDto(u.getToUser())).collect(toList());
 
         // 추가 변수
-        this.boards_count = user.getBoards().size();
+        this.boards_count = user.getBoards() == null ? 0 : user.getBoards().size();
     }
 }
