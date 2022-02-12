@@ -1,12 +1,10 @@
 package hotsixturtles.tupli.service;
 
+import com.querydsl.jpa.impl.JPAQueryFactory;
 import hotsixturtles.tupli.dto.request.BoardRequestDto;
 import hotsixturtles.tupli.dto.request.PlaylistRequest;
 import hotsixturtles.tupli.dto.simple.SimpleHomeInfoDto;
-import hotsixturtles.tupli.entity.Board;
-import hotsixturtles.tupli.entity.HomeInfo;
-import hotsixturtles.tupli.entity.Playlist;
-import hotsixturtles.tupli.entity.Playroom;
+import hotsixturtles.tupli.entity.*;
 import hotsixturtles.tupli.entity.likes.BoardLikes;
 import hotsixturtles.tupli.repository.*;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +13,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+
+import static hotsixturtles.tupli.entity.QBoard.*;
+import static hotsixturtles.tupli.entity.QPlaylist.playlist;
 
 @Service
 @Transactional(readOnly = true)
@@ -28,6 +29,9 @@ public class BoardService {
     private final BoardLikesRepository boardLikesRepository;
     private final BoardRepositoryCustom boardRepositoryCustom;
     private final HomeInfoRepository homeInfoRepository;
+
+    // 심플 querydsl
+    private final JPAQueryFactory jpaQueryFactory;
 
     //    @Transactional
 //    public Board boardPost(Long id, String title, String content) {
@@ -139,5 +143,14 @@ public class BoardService {
         }
     }
 
-
+    public List<Board> getMyBoard(Long userSeq, Pageable pageable) {
+        return jpaQueryFactory
+                .select(board)
+                .from(board)
+                .where(board.user.userSeq.eq(userSeq))
+                .orderBy(board.id.desc())
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+    }
 }

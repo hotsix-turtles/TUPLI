@@ -1,11 +1,13 @@
 package hotsixturtles.tupli.api;
 
+import hotsixturtles.tupli.dto.PlayroomDto;
 import hotsixturtles.tupli.dto.request.BoardRequestDto;
 import hotsixturtles.tupli.dto.response.BoardResponseDto;
 import hotsixturtles.tupli.dto.response.ErrorResponse;
 import hotsixturtles.tupli.dto.simple.SimpleBadgeDto;
 import hotsixturtles.tupli.entity.Badge;
 import hotsixturtles.tupli.entity.Board;
+import hotsixturtles.tupli.entity.Playroom;
 import hotsixturtles.tupli.entity.UserBadge;
 import hotsixturtles.tupli.entity.likes.BoardLikes;
 import hotsixturtles.tupli.service.BadgeService;
@@ -19,6 +21,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -42,6 +47,28 @@ public class BoardApiController {
 
     private final UserInfoService userInfoService;
 
+
+    /**
+     * 내가 작성한 게시글들
+     * @param token
+     * @param pageable
+     * @return
+     */
+    @GetMapping("/board/my")
+    public ResponseEntity getMyBoard(@RequestHeader(value = "Authorization") String token,
+                                        @PageableDefault(size = 50, sort ="id",  direction = Sort.Direction.DESC) Pageable pageable){
+        // 유저 정보
+        if (!jwtTokenProvider.validateToken(token)) {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(new ErrorResponse(messageSource.getMessage("error.valid.jwt", null, LocaleContextHolder.getLocale())));
+        }
+        Long userSeq = jwtTokenProvider.getUserSeq(token);
+
+        List<Board> boards = boardService.getMyBoard(userSeq, pageable);
+        List<BoardResponseDto> result = boards.stream().map(x -> new BoardResponseDto(x)).collect(Collectors.toList());
+        return ResponseEntity.status(HttpStatus.OK).body(result);
+    }
 
     /**
      * 전체 게시글 list 가져오기
