@@ -42,6 +42,7 @@
           :tab-type="'video'"
           :tabs="tastes"
         />
+        <video-item-big :videos="categoryVideos[videoTab]" />
         <!-- <video-list-item-small
           :key="rerenderKey"
           :videos="searchedVideos"
@@ -76,7 +77,6 @@ export default {
     Tabs,
     // VideoListItemSmall,
     // InfiniteLoading,
-    // AddButtonBottom,
   },
   data: function () {
     return {
@@ -84,7 +84,8 @@ export default {
       items: [
         '플리', '플레이룸', '영상',
       ],
-      tastes: ['영화/드라마', '노하우/스타일', '일상', '동물'],
+      categoryTypes: ['여행', '게임', '일상', '노하우/스타일', '동물', '엔터테인먼트', '영화/드라마', '음악', '교육/시사', '스포츠', '기타'],
+      tastes: [],
 
       category: '',
       playlistCategory: '',
@@ -99,35 +100,49 @@ export default {
     ...mapState('playroom', {
       categoryPlayrooms: state => state.categoryPlayrooms,
     }),
-    // ...mapState('video', {
-    //   // searchedVideos: state => state.searchedVideos,
-    //   rerenderKey: state => state.rerenderKey,
-    //   nextPageToken: state => state.nextPageToken,
-    // }),
+    ...mapState('video', {
+      videoTab: state => state.videoTab,
+      categoryVideos: state => state.categoryVideos,
+      // rerenderKey: state => state.rerenderKey,
+      // nextPageToken: state => state.nextPageToken,
+    }),
   },
   created: function () {
     // 유저 취향 기반으로 탭 셋팅
     axiosConnector.get(`/account/userInfo`,
     ).then((res) => {
-      const userTastes = res.data.taste
-      for (let userTaste of userTastes) {
-        this.tastes.unshift(userTaste)
+      this.tastes = res.data.taste.slice()
+      let i = 0
+      while (this.tastes.length < 5) {
+        if (!this.tastes.includes(this.categoryTypes[i])) {
+          this.tastes.push(this.categoryTypes[i])
+        }
+        i++
+        console.log('this.tastes', this.tastes)
       }
-      this.tastes.splice(4, userTastes.length)
-      console.log(this.tastes)
     })
       .catch((err) => {
         console.log(err)
       })
+    this.resetVideoCategoryState()
+    // for (let category of this.categoryTypes) {
+    //   if (!this.tastes.includes(category)) {
+    //     this.tastes.push(category)
+    //   }
+    //   if (this.tastes.length === 5) {
+    //     break
+    //   }
+    // }
   },
   methods: {
     ...mapActions('playlist', [
       'getCategoryPlaylists',
     ]),
     ...mapActions('video', [
-      'searchVideos',
-      'searchVideosByScroll',
-      'resetVideoSearchState',
+      'resetVideoCategoryState',
+      // 'searchVideos',
+      // 'searchVideosByScroll',
+      // 'resetVideoSearchState',
     ]),
     // onChangeCategory: function(category) {
     //   console.log('category', category)

@@ -11,7 +11,7 @@ np/* eslint-disable vue/require-default-prop */
       <!-- 만들기 버튼 (플레이리스트/플레이룸/게시글) -->
       <div
         v-if="isClickedMakeBtn"
-        class="d-flex-column text-center makeBtns"
+        class="d-flex-column text-center makeBtns animate__animated animate__slideInUp"
       >
         <div class="my-5">
           <v-btn
@@ -169,11 +169,10 @@ export default {
 <style scoped>
   /* 만들기 버튼 일반 문서 흐름에서 제거 */
   .makeBtns {
-    z-index: 10;
+    z-index: 8;
     position: fixed;
     bottom: 6vh;
-    left: 50%;
-    transform: translate(-50%, 0%);
+    width: 100% !important;
   }
 
   .makeBtn {

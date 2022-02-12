@@ -36,7 +36,7 @@
 }
 
 .fixed-bottom-navbar {
-  z-index: 5 !important;
+  z-index: 9 !important;
   position: fixed !important;
   bottom: 0 !important;
   width: 100% !important;
@@ -53,7 +53,7 @@
 .fixed-black-background {
   display: inline-block;
   position: fixed !important;
-  z-index: 4;
+  z-index: 7;
   top: 0 !important;
   width: 100% !important;
 }
@@ -115,6 +115,7 @@
   padding: 2px;
 }
 
+// 그림자
 .shadow-s {
   box-shadow: 4px 4px 3px #000;
 }
@@ -297,3 +298,44 @@
   left: 50%;
   transform: translate(-50%, 0%);
 }
+
+// 1줄 ... 표시
+.txt-1 {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 1; /* 라인수 */
+  -webkit-box-orient: vertical;
+  word-wrap:break-word;
+}
+
+// 2줄 ... 표시
+.txt-2 {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2; /* 라인수 */
+  -webkit-box-orient: vertical;
+  word-wrap:break-word;
+}
+
+// 3줄 ... 표시
+.txt-3 {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 3; /* 라인수 */
+  -webkit-box-orient: vertical;
+  word-wrap:break-word;
+}
+
+// 4줄 ... 표시
+.txt-4 {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 4; /* 라인수 */
+  -webkit-box-orient: vertical;
+  word-wrap:break-word;
+}
+
