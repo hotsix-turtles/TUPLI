@@ -111,15 +111,18 @@ public class YoutubeVideoService {
     public YoutubeVideoLikesSavedDto getSearchResultInfo(Long userSeq, List<String> urls) {
         List<Boolean> is_userSaved = new ArrayList<>();
         List<Boolean> is_userLikes = new ArrayList<>();
+        List<Integer> is_LikesCount = new ArrayList<>();
 
         for (String url : urls) {
             is_userSaved.add(youtubeVideoSavesRepository.isUserSaved(userSeq, url));
             is_userLikes.add(youtubeVideoLikesRepository.isUserLikes(userSeq, url));
+            is_LikesCount.add(youtubeVideoLikesRepository.isUserLikesCnt(url));
         }
 
         YoutubeVideoLikesSavedDto dto = new YoutubeVideoLikesSavedDto();
         dto.setIsSavedList(is_userSaved);
         dto.setIsLikesList(is_userLikes);
+        dto.setIsLikesCnt(is_LikesCount);
 
         return dto;
     }
