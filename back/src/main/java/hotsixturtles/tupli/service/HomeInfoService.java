@@ -52,6 +52,29 @@ public class HomeInfoService {
 
     }
 
+    @Transactional
+    public List<Object> getActivites(Long userSeq, Pageable pageable){
+        Page<HomeInfo> homeInfoPage = homeInfoRepository.findByUserSeq(userSeq, pageable);
+
+        List<HomeInfo> result = homeInfoPage.getContent();
+
+        List<Object> infoResult = new ArrayList<>();
+        for(HomeInfo nowHomeInfo : result){
+            String type = nowHomeInfo.getType();
+            if(type.equals("playlist")){
+                infoResult.add(new SimpleHomePlaylistDto(playlistRepository.findById(nowHomeInfo.getInfoId()).orElse(null)));
+            }
+            else if(type.equals("playroom")){
+                infoResult.add(new SimpleHomePlayroomDto(playroomRepository.findById(nowHomeInfo.getInfoId()).orElse(null)));
+            }
+            else{
+                infoResult.add(new SimpleHomeBoardDto(boardRepository.findById(nowHomeInfo.getInfoId()).orElse(null)));
+            }
+        }
+
+        return infoResult;
+
+    }
 
 
 }

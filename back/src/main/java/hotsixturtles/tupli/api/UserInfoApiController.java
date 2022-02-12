@@ -1,13 +1,20 @@
 package hotsixturtles.tupli.api;
 
 
+import hotsixturtles.tupli.dto.UserProfileDto;
 import hotsixturtles.tupli.dto.response.ErrorResponse;
 import hotsixturtles.tupli.dto.simple.SimpleBadgeDto;
+import hotsixturtles.tupli.dto.simple.SimpleUserInfoDto;
 import hotsixturtles.tupli.entity.Badge;
+import hotsixturtles.tupli.entity.Playroom;
+import hotsixturtles.tupli.entity.User;
 import hotsixturtles.tupli.entity.UserBadge;
 import hotsixturtles.tupli.entity.meta.UserInfo;
 import hotsixturtles.tupli.repository.UserInfoRepository;
+import hotsixturtles.tupli.repository.UserRepository;
 import hotsixturtles.tupli.service.BadgeService;
+import hotsixturtles.tupli.service.HomeInfoService;
+import hotsixturtles.tupli.service.PlayroomService;
 import hotsixturtles.tupli.service.UserInfoService;
 import hotsixturtles.tupli.service.token.JwtTokenProvider;
 import io.swagger.annotations.Api;
@@ -16,6 +23,9 @@ import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -29,10 +39,13 @@ import java.util.stream.Collectors;
 public class UserInfoApiController {
 
     private final UserInfoRepository userInfoRepository;
+    private final UserRepository userRepository;
 
     private final JwtTokenProvider jwtTokenProvider;
     private final UserInfoService userInfoService;
     private final BadgeService badgeService;
+    private final HomeInfoService homeInfoService;
+    private final PlayroomService playroomService;
 
     private final MessageSource messageSource;
 
@@ -44,13 +57,21 @@ public class UserInfoApiController {
      */
     @GetMapping("/userinfo/{userSeq}")
     @ApiOperation(value = "유저의 프로필 정보 확인", notes = "uid 저장된 정보가 없을 시 204 반환, 성공 시 200[userInfo 값] 반환")
-    public ResponseEntity findUserInfo(@ApiParam(value = "path 로 uid 전달받는다.") @PathVariable("userSeq") Long userSeq) {
+    public ResponseEntity findUserInfo(@ApiParam(value = "path 로 uid 전달받는다.") @PathVariable("userSeq") Long userSeq,
+                                       @PageableDefault(size = 30, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable ) {
 
         UserInfo userInfo = userInfoRepository.findOneByUserSeq(userSeq);
+
         if(userInfo == null) {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
         }
-        return ResponseEntity.ok().body(userInfo);
+
+        User user = userRepository.findByUserSeq(userSeq);
+        List<Object> activities = homeInfoService.getActivites(userSeq, pageable);
+        List<Playroom> playrooms = playroomService.getWatchingPlayroom(userSeq);
+        UserProfileDto result = new UserProfileDto(user, userInfo, playrooms, activities);
+
+        return ResponseEntity.ok().body(result);
     }
 
     /**

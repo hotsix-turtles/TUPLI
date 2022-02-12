@@ -1,5 +1,7 @@
 package hotsixturtles.tupli.service;
 
+import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.types.dsl.NumberPath;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import hotsixturtles.tupli.dto.PlayroomDto;
 import hotsixturtles.tupli.dto.request.RequestPlayroomDto;
@@ -22,6 +24,8 @@ import java.util.stream.Collectors;
 
 import static hotsixturtles.tupli.entity.QPlaylist.playlist;
 import static hotsixturtles.tupli.entity.QPlayroom.*;
+import static hotsixturtles.tupli.entity.QUser.user;
+import static org.springframework.util.StringUtils.hasText;
 
 @Service
 @RequiredArgsConstructor
@@ -178,6 +182,7 @@ public class PlayroomService {
         HomeInfo homeInfo = new HomeInfo();
         homeInfo.setType("playroom");
         homeInfo.setInfoId(nowPlayroom.getId());
+        homeInfo.setUserSeq(userSeq);
         homeInfoRepository.save(homeInfo);
 
         return new PlayroomDto(playroom);
@@ -295,4 +300,19 @@ public class PlayroomService {
                 .limit(pageable.getPageSize())
                 .fetch();
     }
+
+    // 해당 유저가 현재 시청하고있는 playroom list 가져오기 (최신 순 상위 10개)
+    // json column contains 해결을 못하겠어요 ㅜㅜ 최적화 너무 필요!!! $$$
+    public List<Playroom> getWatchingPlayroom(Long userSeq){
+        List<Playroom> playrooms = playroomRepository.findAll();
+        List<Playroom> result = new ArrayList<>();
+        for(Playroom playroom : playrooms){
+            if(playroom.getGuests().contains(userSeq)) {
+                result.add(playroom);
+                if(result.size() == 10) break;
+            }
+        }
+        return result;
+    }
+
 }
