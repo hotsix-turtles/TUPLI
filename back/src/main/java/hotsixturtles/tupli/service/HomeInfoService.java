@@ -1,8 +1,8 @@
 package hotsixturtles.tupli.service;
 
-import hotsixturtles.tupli.dto.PlaylistDto;
-import hotsixturtles.tupli.dto.response.ResponsePlayroomDto;
-import hotsixturtles.tupli.dto.simple.SimpleBoardDto;
+import hotsixturtles.tupli.dto.simple.home.SimpleHomeBoardDto;
+import hotsixturtles.tupli.dto.simple.home.SimpleHomePlaylistDto;
+import hotsixturtles.tupli.dto.simple.home.SimpleHomePlayroomDto;
 import hotsixturtles.tupli.entity.HomeInfo;
 import hotsixturtles.tupli.repository.BoardRepository;
 import hotsixturtles.tupli.repository.HomeInfoRepository;
@@ -38,13 +38,13 @@ public class HomeInfoService {
         for(HomeInfo nowHomeInfo : result){
            String type = nowHomeInfo.getType();
            if(type.equals("playlist")){
-               infoResult.add(new PlaylistDto(playlistRepository.findById(nowHomeInfo.getInfoId()).orElse(null)));
+               infoResult.add(new SimpleHomePlaylistDto(playlistRepository.findById(nowHomeInfo.getInfoId()).orElse(null)));
            }
            else if(type.equals("playroom")){
-               infoResult.add(new ResponsePlayroomDto(playroomRepository.findById(nowHomeInfo.getInfoId()).orElse(null)));
+               infoResult.add(new SimpleHomePlayroomDto(playroomRepository.findById(nowHomeInfo.getInfoId()).orElse(null)));
            }
            else{
-               infoResult.add(new SimpleBoardDto(boardRepository.findById(nowHomeInfo.getInfoId()).orElse(null)));
+               infoResult.add(new SimpleHomeBoardDto(boardRepository.findById(nowHomeInfo.getInfoId()).orElse(null)));
            }
         }
 
