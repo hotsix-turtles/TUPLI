@@ -204,7 +204,7 @@ public class YoutubeVideoApiController {
      * @return
      * 반환 코드 : 200, 403
      */
-    @GetMapping("/profile/video/isLikes")
+    @PutMapping("/profile/video/isLikes")
     public ResponseEntity getSearchResultInfo(@RequestHeader(value = "Authorization") String token,
                                               @RequestBody UrlRequest urlRequest) {
         // 유저 정보
@@ -222,6 +222,7 @@ public class YoutubeVideoApiController {
         return ResponseEntity.ok().body(result);
     }
 
+    // 특수한 Library 없으면 @RequestBody List<String> urls로 못 받고 별도의 DTO 필요
     @Data
     static class UrlRequest {
         List<String> urls;
