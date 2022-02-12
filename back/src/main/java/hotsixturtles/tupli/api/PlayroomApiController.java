@@ -310,7 +310,7 @@ public class PlayroomApiController {
                             getMessage("error.valid.jwt", null, LocaleContextHolder.getLocale())));
         }
         Long userSeq = jwtTokenProvider.getUserSeq(token);
-        playroomService.addPlaylistLike(userSeq, playroomId);
+        playroomService.addPlayroomLike(userSeq, playroomId);
         return ResponseEntity.status(HttpStatus.OK).body(null);
     }
 

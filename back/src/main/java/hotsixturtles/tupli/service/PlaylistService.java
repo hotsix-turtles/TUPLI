@@ -21,6 +21,7 @@ import hotsixturtles.tupli.repository.*;
 import hotsixturtles.tupli.repository.likes.PlaylistLikesRepository;
 import hotsixturtles.tupli.service.list.CategoryList;
 import hotsixturtles.tupli.service.list.TasteScore;
+import hotsixturtles.tupli.utils.TasteUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
@@ -241,8 +242,10 @@ public class PlaylistService {
     public void addPlaylistLike(Long userSeq, Long id) {
         PlaylistLikes playlistLikes = playlistLikesRepository.findExist(userSeq, id);
         if(playlistLikes == null) {
+            User user = userRepository.findByUserSeq(userSeq);
+
             playlistLikes = new PlaylistLikes();
-            playlistLikes.setUser(userRepository.findByUserSeq(userSeq));
+            playlistLikes.setUser(user);
             playlistLikes.setPlaylist(playlistRepository.findById(id).orElse(null));
             playlistLikesRepository.save(playlistLikes);
 
@@ -250,6 +253,25 @@ public class PlaylistService {
             Playlist playlist = playlistRepository.getById(id);
             playlist.setLikesCnt(playlist.getLikesCnt()+1);
             playlistRepository.save(playlist);
+
+            // 취향분석
+            // 유저 취향 가져오기
+            UserInfo userInfo = userInfoRepository.findOneByUserSeq(userSeq);
+            ConcurrentHashMap<String, Integer> tasteInfo = userInfo.getTasteInfo();
+            for (YoutubeVideo youtubeVideo : playlist.getYoutubeVideos()) {
+                // 카테고리에 따른 분류
+                String category = CategoryList.CATEGORY_LIST.getOrDefault(youtubeVideo.getCategoryId(), "기타");
+                // 취향 반영
+                Integer tasteScore = tasteInfo.getOrDefault(category, 0);
+                tasteInfo.put(category, tasteScore + TasteScore.SCORE_PLAYLIST_LIKE);
+            }
+            // 유저 정보 저장
+            userInfo.setTasteInfo(tasteInfo);
+            userInfoRepository.save(userInfo);
+            // 유저 취향 분석 후 저장
+            List<String> userTaste = TasteUtil.getTaste(tasteInfo);
+            user.setTaste(userTaste);
+            userRepository.save(user);
 
         } else {
             // exception 발생

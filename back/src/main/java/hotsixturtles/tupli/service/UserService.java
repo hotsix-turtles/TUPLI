@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 
 
 @Service
@@ -223,6 +224,26 @@ public class UserService {
 
     public int getFollowersCount(Long userSeq){
         return userLikesRepository.findFollowersCount(userSeq);
+    }
+
+    public List<String> getProfileTaste(Long userSeq) {
+        User user = userRepository.findByUserSeq(userSeq);
+        if (user != null) {
+            return user.getTaste();
+        } else {
+            throw new IllegalStateException("해당 유저 없음");
+        }
+    }
+
+
+    public ConcurrentHashMap<String, Integer> getProfileTasteInfo(Long userSeq) {
+        UserInfo userInfo = userInfoRepository.findOneByUserSeq(userSeq);
+        if (userInfo != null) {
+             return userInfo.getTasteInfo();
+        } else {
+            throw new IllegalStateException("해당 유저 없음");
+        }
+
     }
 }
 
