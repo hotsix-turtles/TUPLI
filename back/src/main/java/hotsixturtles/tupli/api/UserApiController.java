@@ -42,6 +42,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.IOException;
+import java.net.URLDecoder;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -373,6 +374,11 @@ public class UserApiController {
                                            @RequestPart(value = "introduction", required = false) String introduction,
                                             @RequestPart(value = "nickname", required = false) String nickname,
                                            HttpServletRequest request) throws IOException {
+
+        //utf-8 내용 적용해서 DB에 넣기
+        introduction = URLDecoder.decode(introduction, "UTF-8");
+        nickname = URLDecoder.decode(nickname, "UTF-8");
+        
         // jwt 유효 확인 + 정보 빼기
         String token = request.getHeader("Authorization");
         if(!jwtTokenProvider.validateToken(token)) {
