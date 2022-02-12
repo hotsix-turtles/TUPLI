@@ -27,6 +27,7 @@
         <div class="d-flex-column text-center">
           <div
             v-if="playlist.isLiked"
+            class="animate__animated animate__heartBeat"
             @click="onClickUnlike"
           >
             <v-icon color="#5B5C9D">
