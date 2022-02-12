@@ -1,4 +1,4 @@
-package hotsixturtles.tupli.api.auth;
+package hotsixturtles.tupli.api.dev;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
