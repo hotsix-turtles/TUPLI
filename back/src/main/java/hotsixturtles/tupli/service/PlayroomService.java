@@ -1,5 +1,6 @@
 package hotsixturtles.tupli.service;
 
+import com.querydsl.jpa.impl.JPAQueryFactory;
 import hotsixturtles.tupli.dto.PlayroomDto;
 import hotsixturtles.tupli.dto.request.RequestPlayroomDto;
 import hotsixturtles.tupli.dto.simple.SimpleHomeInfoDto;
@@ -19,6 +20,9 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
+import static hotsixturtles.tupli.entity.QPlaylist.playlist;
+import static hotsixturtles.tupli.entity.QPlayroom.*;
+
 @Service
 @RequiredArgsConstructor
 public class PlayroomService {
@@ -32,6 +36,9 @@ public class PlayroomService {
     private final PlayroomLikesRepository playroomLikesRepository;
     private final CategoryRepository categoryRepository;
     private final HomeInfoRepository homeInfoRepository;
+
+    // 심플 querydsl
+    private final JPAQueryFactory jpaQueryFactory;
 
     public List<Playroom> getPlayroomList(){
 
@@ -276,5 +283,16 @@ public class PlayroomService {
             playroom.setGuests(guests);
             playroomRepository.save(playroom);
         }
+    }
+
+    public List<Playroom> getMyPlayroom(Long userSeq, Pageable pageable) {
+        return jpaQueryFactory
+                .select(playroom)
+                .from(playroom)
+                .where(playroom.user.userSeq.eq(userSeq))
+                .orderBy(playroom.id.desc())
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
     }
 }

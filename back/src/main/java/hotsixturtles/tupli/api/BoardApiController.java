@@ -1,7 +1,8 @@
 package hotsixturtles.tupli.api;
 
-import hotsixturtles.tupli.dto.BoardDto;
 import hotsixturtles.tupli.dto.PlayroomDto;
+import hotsixturtles.tupli.dto.request.BoardRequestDto;
+import hotsixturtles.tupli.dto.response.BoardResponseDto;
 import hotsixturtles.tupli.dto.response.ErrorResponse;
 import hotsixturtles.tupli.dto.simple.SimpleBadgeDto;
 import hotsixturtles.tupli.entity.Badge;
@@ -20,6 +21,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -45,18 +49,40 @@ public class BoardApiController {
 
 
     /**
+     * 내가 작성한 게시글들
+     * @param token
+     * @param pageable
+     * @return
+     */
+    @GetMapping("/board/my")
+    public ResponseEntity getMyBoard(@RequestHeader(value = "Authorization") String token,
+                                        @PageableDefault(size = 50, sort ="id",  direction = Sort.Direction.DESC) Pageable pageable){
+        // 유저 정보
+        if (!jwtTokenProvider.validateToken(token)) {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(new ErrorResponse(messageSource.getMessage("error.valid.jwt", null, LocaleContextHolder.getLocale())));
+        }
+        Long userSeq = jwtTokenProvider.getUserSeq(token);
+
+        List<Board> boards = boardService.getMyBoard(userSeq, pageable);
+        List<BoardResponseDto> result = boards.stream().map(x -> new BoardResponseDto(x)).collect(Collectors.toList());
+        return ResponseEntity.status(HttpStatus.OK).body(result);
+    }
+
+    /**
      * 전체 게시글 list 가져오기
      * @return List<BoardDto>
      * 반환 코드 : 200, 204, 404
      */
     @GetMapping("/board/list")
-    public ResponseEntity<List<BoardDto>> getBoardList(){
+    public ResponseEntity<List<BoardResponseDto>> getBoardList(){
         List<Board> boardList = boardService.getBoardList();
         if (boardList.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
         }
 
-        List<BoardDto> result = boardList.stream().map(b -> new BoardDto(b)).collect(Collectors.toList());
+        List<BoardResponseDto> result = boardList.stream().map(b -> new BoardResponseDto(b)).collect(Collectors.toList());
         return ResponseEntity.status(HttpStatus.OK).body(result);
     }
 
@@ -70,7 +96,7 @@ public class BoardApiController {
     public ResponseEntity<?> getBoard(@PathVariable("boardId") Long boardId){
 
         Board board = boardService.getBoard(boardId);
-        return ResponseEntity.status(HttpStatus.OK).body(new BoardDto(board));
+        return ResponseEntity.status(HttpStatus.OK).body(new BoardResponseDto(board));
     }
 
     /**
@@ -82,7 +108,7 @@ public class BoardApiController {
      */
     @PostMapping("/board")
     public ResponseEntity<?> addBoard(@RequestHeader(value = "Authorization") String token,
-                                      @RequestBody Board board){
+                                      @RequestBody BoardRequestDto board){
 
         if (!jwtTokenProvider.validateToken(token)) {
             return ResponseEntity
@@ -103,11 +129,11 @@ public class BoardApiController {
         // 배지갱신
         List<Badge> badgeResult = badgeService.checkBoardUpload(userSeq, badges);
 
-        if(badgeResult == null || badgeResult.size() == 0) return ResponseEntity.ok().body(new BoardDto(boardResult, null));
+        if(badgeResult == null || badgeResult.size() == 0) return ResponseEntity.ok().body(new BoardResponseDto(boardResult, null));
         List<SimpleBadgeDto> result = badgeResult.stream().map(b -> new SimpleBadgeDto(b)).collect(Collectors.toList());
         
         // 뱃지 확인
-        return ResponseEntity.status(HttpStatus.CREATED).body(new BoardDto(boardResult, result));
+        return ResponseEntity.status(HttpStatus.CREATED).body(new BoardResponseDto(boardResult, result));
     }
 
     /**
@@ -247,7 +273,7 @@ public class BoardApiController {
 
         List<Board> boards = boardService.getLikedBoards(userSeq);
 
-        List<BoardDto> result = boards.stream().map(b -> new BoardDto(b)).collect(Collectors.toList());
+        List<BoardResponseDto> result = boards.stream().map(b -> new BoardResponseDto(b)).collect(Collectors.toList());
 
         return ResponseEntity.ok().body(result);
     }

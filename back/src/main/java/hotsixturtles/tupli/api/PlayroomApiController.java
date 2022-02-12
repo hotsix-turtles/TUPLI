@@ -1,15 +1,12 @@
 package hotsixturtles.tupli.api;
 
-import hotsixturtles.tupli.dto.BoardDto;
 import hotsixturtles.tupli.dto.PlayroomDto;
 import hotsixturtles.tupli.dto.PlayroomLikesDto;
 import hotsixturtles.tupli.dto.request.RequestPlayroomDto;
 import hotsixturtles.tupli.dto.response.ErrorResponse;
 import hotsixturtles.tupli.dto.simple.SimpleBadgeDto;
-import hotsixturtles.tupli.dto.simple.SimplePlaylistCategoryDto;
 import hotsixturtles.tupli.dto.simple.SimplePlayroomCategoryDto;
 import hotsixturtles.tupli.entity.Badge;
-import hotsixturtles.tupli.entity.Playlist;
 import hotsixturtles.tupli.entity.Playroom;
 import hotsixturtles.tupli.entity.UserBadge;
 import hotsixturtles.tupli.entity.likes.PlayroomLikes;
@@ -35,9 +32,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
@@ -59,7 +54,29 @@ public class PlayroomApiController {
     private final UserInfoService userInfoService;
 
     /**
-     * 플레이룸 리스트 출력
+     * 내가 작성한 플레이룸들
+     * @param token
+     * @param pageable
+     * @return
+     */
+    @GetMapping("/playroom/my")
+    public ResponseEntity getMyPlayroom(@RequestHeader(value = "Authorization") String token,
+                                      @PageableDefault(size = 50, sort ="id",  direction = Sort.Direction.DESC) Pageable pageable){
+        // 유저 정보
+        if (!jwtTokenProvider.validateToken(token)) {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(new ErrorResponse(messageSource.getMessage("error.valid.jwt", null, LocaleContextHolder.getLocale())));
+        }
+        Long userSeq = jwtTokenProvider.getUserSeq(token);
+
+        List<Playroom> playrooms = playroomService.getMyPlayroom(userSeq, pageable);
+        List<PlayroomDto> result = playrooms.stream().map(x -> new PlayroomDto(x)).collect(Collectors.toList());
+        return ResponseEntity.status(HttpStatus.OK).body(result);
+    }
+
+    /**
+     * 플레이룸 리스트 출력 (전체)
      * @return
      * 반환 코드 : 200, 404
      */
