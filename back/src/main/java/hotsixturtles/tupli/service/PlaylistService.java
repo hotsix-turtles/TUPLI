@@ -52,6 +52,10 @@ public class PlaylistService {
     // 심플 querydsl
     private final JPAQueryFactory jpaQueryFactory;
 
+    // 전체 DB 플레이리스트 다 가져오기
+    public List<Playlist> getPlaylistList() {
+        return playlistRepository.findAll();
+    }
 
     // 단일 Playlist 추가
     @Transactional
@@ -384,4 +388,14 @@ public class PlaylistService {
         return hasText(keyword) ? playlist.tags.contains(keyword) : null;
     }
 
+    public List<Playlist> getMyPlaylist(Long userSeq, Pageable pageable) {
+        return jpaQueryFactory
+                .select(playlist)
+                .from(playlist)
+                .where(playlist.user.userSeq.eq(userSeq))
+                .orderBy(playlist.createdAt.desc())
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+    }
 }

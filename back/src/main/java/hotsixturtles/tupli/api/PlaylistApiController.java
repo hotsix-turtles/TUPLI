@@ -2,6 +2,7 @@ package hotsixturtles.tupli.api;
 
 import hotsixturtles.tupli.dto.PlaylistCommentDto;
 import hotsixturtles.tupli.dto.PlaylistDto;
+import hotsixturtles.tupli.dto.PlayroomDto;
 import hotsixturtles.tupli.dto.params.PlaylistSearchCondition;
 import hotsixturtles.tupli.dto.request.PlaylistRequest;
 import hotsixturtles.tupli.dto.response.ErrorResponse;
@@ -106,6 +107,45 @@ public class PlaylistApiController {
         Playlist playlist = playlistService.getPlaylist(id);
         return ResponseEntity.status(HttpStatus.OK).body(new PlaylistDto(playlist));
     }
+
+    /**
+     * 내가 작성한 플레이리스트들
+     * @param token
+     * @param pageable
+     * @return
+     */
+    @GetMapping("/playlist/my")
+    public ResponseEntity getMyPlaylist(@RequestHeader(value = "Authorization") String token,
+                                      @PageableDefault(size = 50, sort ="id",  direction = Sort.Direction.DESC) Pageable pageable){
+        // 유저 정보
+        if (!jwtTokenProvider.validateToken(token)) {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(new ErrorResponse(messageSource.getMessage("error.valid.jwt", null, LocaleContextHolder.getLocale())));
+        }
+        Long userSeq = jwtTokenProvider.getUserSeq(token);
+
+        List<Playlist> playlists = playlistService.getMyPlaylist(userSeq, pageable);
+        List<PlaylistDto> result = playlists.stream().map(x -> new PlaylistDto(x)).collect(Collectors.toList());
+        return ResponseEntity.status(HttpStatus.OK).body(result);
+    }
+
+    /**
+     * 플레이리스트 리스트 출력 (전체)
+     * @return
+     * 반환 코드 : 200, 404
+     */
+    @GetMapping("/playlist/list")
+    public ResponseEntity<?> getPlaylistList(){
+
+        List<Playlist> Playlist = playlistService.getPlaylistList();
+
+        List<PlaylistDto> result = Playlist.stream().map(x -> new PlaylistDto(x)).collect(Collectors.toList());
+
+        return ResponseEntity.status(HttpStatus.OK).body(result);
+    }
+
+
 
     /**
      * 플레이리스트 단일 UPDATE

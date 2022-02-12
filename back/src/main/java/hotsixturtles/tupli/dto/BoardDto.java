@@ -14,6 +14,9 @@ public class BoardDto {
     private Long id;
     private String title;
     private String content;
+    private String type; // playroom, playlist, null
+    private String typeId; // 대상 type Id
+
     private OffsetDateTime created;
     private OffsetDateTime updated;
 
