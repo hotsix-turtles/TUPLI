@@ -9,4 +9,6 @@ public interface HomeInfoRepository extends JpaRepository<HomeInfo, Long> {
 
     Page<HomeInfo> findAll(Pageable pageable);
     void deleteByInfoId(Long infoId);
+
+    Page<HomeInfo> findByUserSeq(Long userSeq, Pageable pageable);
 }
