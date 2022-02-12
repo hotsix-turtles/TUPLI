@@ -131,6 +131,7 @@ public class PlaylistService {
         HomeInfo homeInfo = new HomeInfo();
         homeInfo.setType("playlist");
         homeInfo.setInfoId(nowPlaylist.getId());
+        homeInfo.setUserSeq(userSeq);
         homeInfoRepository.save(homeInfo);
 
         return playlist;

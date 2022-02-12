@@ -88,7 +88,7 @@ public class BoardService {
         HomeInfo homeInfo = new HomeInfo();
         homeInfo.setType("board");
         homeInfo.setInfoId(nowBoard.getId());
-
+        homeInfo.setUserSeq(userSeq);
         homeInfoRepository.save(homeInfo);
         return board;
 
