@@ -27,4 +27,7 @@ public interface YoutubeVideoLikesRepository extends JpaRepository<YoutubeVideoL
     @Query("select count(l.id) > 0 from YoutubeVideoLikes l where l.youtubeVideo.videoId = :url and l.user.userSeq = :userSeq")
     boolean isUserLikes (@Param("userSeq") Long userSeq, @Param("url") String url);
 
+    // 해당 영상이 튜플리 내부에서 얼마나 좋아요 되었는지 여부
+    @Query("select count(l.id) > 0 from YoutubeVideoLikes l where l.youtubeVideo.videoId = :url")
+    Integer isUserLikesCnt(@Param("url") String url);
 }
