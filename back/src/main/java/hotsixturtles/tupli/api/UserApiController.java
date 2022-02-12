@@ -48,6 +48,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -151,6 +152,30 @@ public class UserApiController {
 
         SecurityContextHolder.clearContext();
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+    }
+
+    /**
+     * 해당 유저의 취향(행동 분석결과) 상위 5개 정리해놓은것 가져가기
+     * @param userSeq
+     * @return
+     */
+    @GetMapping("/profile/taste/{userSeq}")
+    public ResponseEntity profileTaste(@PathVariable("userSeq") Long userSeq) {
+        // 해당 유저의 취향 가져가기
+        List<String> taste = userService.getProfileTaste(userSeq);
+        return ResponseEntity.ok().body(taste);
+    }
+
+    /**
+     * 해당 유저의 취향정보 통째로 가져가기
+     * @param userSeq
+     * @return
+     */
+    @GetMapping("/profile/tasteInfo/{userSeq}")
+    public ResponseEntity profileTasteInfo(@PathVariable("userSeq") Long userSeq) {
+        // 해당 유저의 취향 가져가기
+        ConcurrentHashMap<String, Integer> tasteInfo = userService.getProfileTasteInfo(userSeq);
+        return ResponseEntity.ok().body(tasteInfo);
     }
 
     /**
