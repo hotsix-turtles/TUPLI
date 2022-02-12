@@ -13,8 +13,12 @@ const account = {
     following: [],
     followers: [],
     taste: null,
+
+    // [검색]
+    searchedAccounts: [],
+
     // 사용자 설정
-    alarmSetting: true,  // 알림 여부      
+    alarmSetting: true,  // 알림 여부
     alarmOnRealtime: true,  // 실시간 알림 받기
     alarmOnInvite: true, // 초대 받기
     inviteDomain: 'everyone', //초대 가능한 사람
@@ -22,6 +26,10 @@ const account = {
     alarmOnBadge: true,  // 뱃지 알림 받을지
   },
   mutations: {
+    // [검색]
+    SEARCH_ACCOUNTS: function (state, accounts) {
+      state.searchedAccounts = accounts
+    },
   },
   actions: {
     async validateToken() {
@@ -31,7 +39,19 @@ const account = {
       } catch(err) {
         return false;
       }
-    }
+    },
+    // [검색]
+    searchAccounts: function ({ commit }, params) {
+      console.log('searchAccounts params', params)
+      axiosConnector.get(`/account/search`, {
+        params
+      }).then((res) => {
+        console.log(res)
+        commit('SEARCH_ACCOUNTS', res.data)
+      }).catch((err) => {
+        console.log(err)
+      })
+    },
   },
   modules: {
   }

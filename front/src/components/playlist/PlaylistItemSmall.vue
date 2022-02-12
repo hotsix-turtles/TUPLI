@@ -1,10 +1,13 @@
 <template>
   <v-expansion-panel
+    id="panelHeader"
     elevation="0"
+    aria-expanded="false"
   >
+    <!-- 플레이리스트 정보 -->
     <v-expansion-panel-header
       :color="color"
-      class="pl-0"
+      class="pl-0 py-3"
     >
       <v-list-item two-line>
         <v-btn
@@ -18,47 +21,81 @@
             {{ selected ? 'mdi-check' : 'mdi-plus' }}
           </v-icon>
         </v-btn>
-        <playlist-cd-medium
+        <playlist-cd-small
+          v-if="!readonly"
           :thumbnail="playlist.videos[0].thumbnail"
           @click="watchingVideo(playlist)"
         />
+        <playlist-cd-small
+          v-else
+          :thumbnail="playlist.videos[0].thumbnail"
+          :playlist-id="playlist.id"
+        />
         <v-list-item-content
-          class="ml-2"
+          class="ml-3"
         >
-          <v-list-item-title>
-            <p>{{ playlist.title }}</p>
+          <v-list-item-title
+            class="semi-bold"
+            @click="$router.push({ name: 'PlaylistDetail', params: { playlistId: playlist.id } })"
+          >
+            {{ playlist.title }}
           </v-list-item-title>
+          <!-- 나중에 nickname으로 변경 -->
           <v-list-item-subtitle>{{ playlist.title }}</v-list-item-subtitle>
+          <div class="text-center d-flex align-center">
+            <div class="mr-1">
+              <v-icon
+                small
+                color="#bbb9b9"
+              >
+                mdi-heart
+              </v-icon>
+            </div>
+            <div style="color: #bbb9b9;">
+              {{ playlist.likesCnt }}
+            </div>
+          </div>
+          <tags
+            class="mt-2"
+            :tags="playlist.tags.split(',').slice(0, 3)"
+          />
         </v-list-item-content>
       </v-list-item>
     </v-expansion-panel-header>
+    <!-- 펼치기 했을 때 나오는 영상 정보 -->
     <v-expansion-panel-content
       :color="color"
+      style="overflow:scroll;  height: 40vh;"
+      class="px-0"
     >
-      <playlist-video-item-small
+      <div
         v-for="(video, idx) in playlist.videos"
         :key="idx"
-        :playlist-id="playlist.id"
-        :playlist-selected="selected"
-        :video="video"
-        :readonly="videoReadonly"
-      />
+      >
+        <playlist-video-item-small
+          :playlist-id="playlist.playlistId"
+          :playlist-selected="selected"
+          :video="video"
+          :readonly="videoReadonly"
+        />
+      </div>
     </v-expansion-panel-content>
   </v-expansion-panel>
 </template>
 
 <script>
 import { mapActions, mapState } from 'vuex'
-import PlaylistCdMedium from './PlaylistCdMedium.vue'
+import Tags from '../common/Tags.vue'
+import PlaylistCdSmall from './PlaylistCdSmall.vue'
 import PlaylistVideoItemSmall from './PlaylistVideoItemSmall.vue'
 
 export default {
   name: 'PlaylistItemSmall',
-  components: { PlaylistVideoItemSmall, PlaylistCdMedium },
+  components: { PlaylistVideoItemSmall, PlaylistCdSmall, Tags },
   props: {
     playlist: { type: Object, default() { {} } },
     readonly: { type: Boolean, default: false },
-    videoReadonly: { type: Boolean, default: false }
+    videoReadonly: { type: Boolean, default: false },
   },
   data() {
     return {
@@ -96,11 +133,10 @@ export default {
       'watchingVideo',
       'selectPlaylist',
       'deselectPlaylist',
-    ])
+    ]),
   }
 }
 </script>
 
-<style>
-
+<style scoped>
 </style>

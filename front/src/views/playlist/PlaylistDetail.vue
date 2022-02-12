@@ -127,11 +127,13 @@ export default {
     // }),
     ...mapState({
       userId: state => state.userId,
+      taste: state => state.taste,
     })
     // 좋아요 여부 받아와서 isLiked에 저장
   },
   created: function() {
     this.getPlaylistDetail(this.$route.params.playlistId)
+    console.log('취향 반영됐나', this.taste)
   },
   methods: {
     ...mapActions('playlist', [

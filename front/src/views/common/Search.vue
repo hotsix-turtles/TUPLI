@@ -4,21 +4,24 @@
       :label="'검색어를 입력해주세요'"
       :router-page="'SearchDetail'"
     />
-    <div class="container">
-      <p>실시간 검색어 트렌드</p>
+    <div class="mx-5 my-2">
+      <p class="font-1 bold color-main mb-5">
+        실시간 검색어 트렌드
+      </p>
       <div
         v-for="(keyword, idx) in keywords"
         :key="idx"
       >
-        <div class="font-4">
-          {{ keyword.keywordType }}
+        <div class="font-4 color-dark-gray ml-1">
+          {{ keyword.type }}
         </div>
         <div class="font-2">
-          {{ idx + 1 }} {{ keyword.keyword }}
+          <span class="color-main bold ml-1 mr-2">{{ idx + 1 }}</span>
+          <span>{{ keyword.keyword }}</span>
         </div>
         <hr
           v-if="idx !== 9"
-          class="mt-3"
+          class="my-2"
         >
       </div>
     </div>
@@ -34,54 +37,14 @@ export default {
   components: { SearchBar },
   data: function () {
     return {
-      keywords: [
-        {
-          keywordType: '플레이리스트',
-          keyword: '춘식이',
-        },
-        {
-          keywordType: '플레이룸',
-          keyword: '먹방',
-        },
-        {
-          keywordType: '플레이리스트',
-          keyword: '춘식이',
-        },
-        {
-          keywordType: '플레이룸',
-          keyword: '먹방',
-        },
-        {
-          keywordType: '플레이리스트',
-          keyword: '춘식이',
-        },
-        {
-          keywordType: '플레이룸',
-          keyword: '먹방',
-        },
-        {
-          keywordType: '플레이리스트',
-          keyword: '춘식이',
-        },
-        {
-          keywordType: '플레이룸',
-          keyword: '먹방',
-        },
-        {
-          keywordType: '플레이리스트',
-          keyword: '춘식이',
-        },
-        {
-          keywordType: '플레이룸',
-          keyword: '먹방',
-        },
-      ]
+      keywords: [],
     }
   },
   created: function () {
     axiosConnector.get(`/search/realtime`
     ).then((res) => {
       console.log('실검', res)
+      this.keywords = res.data
     }).catch((err) => {
       console.log(err)
     })

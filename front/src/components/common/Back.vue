@@ -1,12 +1,14 @@
 /* eslint-disable vue/require-default-prop */
 <template>
-  <div class="">
-    <v-icon @click="goBack">
-      mdi-arrow-left
-    </v-icon>
-    <span class="font-1">
+  <div class="d-flex mx-3 my-3">
+    <div>
+      <v-icon @click="goBack">
+        mdi-arrow-left
+      </v-icon>
+    </div>
+    <div class="font-2 semi-bold center">
       {{ pageName }}
-    </span>
+    </div>
   </div>
 </template>
 
@@ -28,3 +30,6 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+</style>

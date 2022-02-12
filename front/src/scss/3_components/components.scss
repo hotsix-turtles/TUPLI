@@ -45,7 +45,15 @@
 .fixed-top {
   display: inline-block;
   position: fixed !important;
-  z-index: 6;
+  z-index: 3;
+  top: 0 !important;
+  width: 100% !important;
+}
+
+.fixed-black-background {
+  display: inline-block;
+  position: fixed !important;
+  z-index: 4;
   top: 0 !important;
   width: 100% !important;
 }
@@ -59,6 +67,7 @@
   position: relative;
 }
 
+// 영상 길이
 .duration {
   position: absolute;
   bottom: 3px;
@@ -68,6 +77,18 @@
   border-radius: 5px;
   font-size: 12px;
   padding: 1px;
+}
+
+// // 현재 플레이 여부
+.on-play {
+  position: absolute;
+  top: 3px;
+  left: 5px;
+  background-color: red;
+  color: white;
+  border-radius: 5px;
+  font-size: 10px;
+  padding: 2px 2px 2px 2px;
 }
 
 .shadow-s {
@@ -187,6 +208,35 @@
     }
 }
 
+// 플레이리스트 CD Small
+.playlist-cd-small {
+  display: inline-block;
+  position: relative;
+  z-index: 1;
+  img {
+    border-radius: 100%;
+    border: solid 1.5px;
+    border-color: lightgrey;
+    width: 110px;
+    height: 110px;
+    object-fit: cover;
+    box-shadow: 3px 3px 4px 0px rgba($color: #000000, $alpha: 0.4);
+  }
+  div {
+    border-radius: 100%;
+    background-color: white;
+    border: solid 1.5px;
+    border-color: lightgrey;
+    width: 14px;
+    height: 14px;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    box-shadow: 1px 1px 2px 1px rgba($color: #000000, $alpha: 0.4) inset;
+    }
+}
+
 // 프로필 사진
 .profileImg {
   border-radius: 100%;
@@ -199,10 +249,11 @@
 
 //태그
 .tag {
-  color: $color-main;
-  background-color: $color-sub;
-  border-radius: 10%;
-  padding: 1px 1px 1px 1px;
+  color: #3a3939;
+  background-color: #d8d8ee;
+  border-radius: 15%;
+  font-size: 12px;
+  padding: 3px 3px 3px 3px;
 }
 
 // 메인 태그
@@ -213,4 +264,12 @@
   margin: 2px;
   padding: 2px 5px 1px 5px;
   font-size: 12px;
+}
+
+
+// 무조건 가운데 정렬
+.center {
+  position: absolute;
+  left: 50%;
+  transform: translate(-50%, 0%);
 }
