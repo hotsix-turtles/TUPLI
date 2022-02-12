@@ -8,6 +8,7 @@ import java.util.List;
 public class YoutubeVideoLikesSavedDto {
 
     List<Boolean> isLikesList;
+    List<Integer> isLikesCnt;
     List<Boolean> isSavedList;
 
 }

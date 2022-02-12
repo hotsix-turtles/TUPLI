@@ -204,7 +204,7 @@ public class YoutubeVideoApiController {
      */
     @GetMapping("/profile/video/isLikes")
     public ResponseEntity getSearchResultInfo(@RequestHeader(value = "Authorization") String token,
-                                              @RequestPart(value = "urls") List<String> urls) {
+                                              @RequestBody List<String> urls) {
         // 유저 정보
         if (!jwtTokenProvider.validateToken(token)) {
             return ResponseEntity

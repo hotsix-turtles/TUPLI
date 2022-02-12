@@ -184,8 +184,8 @@ public class NotificationService {
      * JUNIT5에서 동작하지 않고 포스트맨에서 동작하는 성질때문에 이렇게 설정함
      */
     public void notiTest() {
-        Long to_userSeq = 122L;
-        Long from_userSeq = 37L;
+        Long to_userSeq = 146L;
+        Long from_userSeq = 65L;
         User fromUser = userRepository.findByUserSeq(from_userSeq);
         User toUser = userRepository.findByUserSeq(to_userSeq);
 
