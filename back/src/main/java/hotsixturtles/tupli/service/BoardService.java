@@ -1,12 +1,12 @@
 package hotsixturtles.tupli.service;
 
+import hotsixturtles.tupli.dto.simple.SimpleHomeInfoDto;
 import hotsixturtles.tupli.entity.Board;
+import hotsixturtles.tupli.entity.HomeInfo;
 import hotsixturtles.tupli.entity.likes.BoardLikes;
-import hotsixturtles.tupli.repository.BoardLikesRepository;
-import hotsixturtles.tupli.repository.BoardRepository;
-import hotsixturtles.tupli.repository.CommentRepository;
-import hotsixturtles.tupli.repository.UserRepository;
+import hotsixturtles.tupli.repository.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,6 +25,10 @@ public class BoardService {
 
     private final BoardLikesRepository boardLikesRepository;
 
+    private final BoardRepositoryCustom boardRepositoryCustom;
+
+    private final HomeInfoRepository homeInfoRepository;
+
     //    @Transactional
 //    public Board boardPost(Long id, String title, String content) {
 //        Board board = new Board();
@@ -38,16 +42,31 @@ public class BoardService {
         return boardRepository.findAll();
     }
 
-    public Board getBoard(Long boardId){
+    public List<Board> getHomeBoardList(Pageable pageable){
+        return boardRepositoryCustom.listByHomeBoard(pageable);
+    }
+
+    public Board getBoard(Long boardId) {
         Board board = boardRepository.findById(boardId).orElse(null);
         return board;
+    }
+
+    public List<Board> getLikedBoards(Long userSeq){
+        return boardRepository.findLikedBoards(userSeq);
     }
 
     @Transactional
     public Board addBoard(Long userSeq, Board board){
 
         board.setUser(userRepository.findByUserSeq(userSeq));
-        boardRepository.save(board);
+        Board nowBoard = boardRepository.save(board);
+
+        HomeInfo homeInfo = new HomeInfo();
+        homeInfo.setType("board");
+        homeInfo.setInfoId(nowBoard.getId());
+
+        homeInfoRepository.save(homeInfo);
+
         return board;
     }
 
@@ -66,7 +85,9 @@ public class BoardService {
 
     @Transactional
     public void deleteBoard(Long boardId){
+
         boardRepository.deleteById(boardId);
+        homeInfoRepository.deleteByInfoId(boardId);
     }
 
     public BoardLikes getBoardLike(Long userSeq, Long boardId){
@@ -91,9 +112,7 @@ public class BoardService {
     public void deleteBoardLike(Long userSeq, Long boardId) {
 
         BoardLikes existBoardLikes = boardLikesRepository.findExist(userSeq, boardId);
-        System.out.println("existBoardLikes = " + existBoardLikes);
         if(existBoardLikes != null) {
-            System.out.println("나는 살아있다");
             boardLikesRepository.delete(existBoardLikes);
         } else {
             // 익셉션 발생

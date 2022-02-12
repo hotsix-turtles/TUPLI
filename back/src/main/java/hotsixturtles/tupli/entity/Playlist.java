@@ -56,6 +56,8 @@ public class Playlist {
     @Column(columnDefinition = "json")
     private ConcurrentHashMap<Integer, Integer> playlistInfo;  // 유튜브 Tag + Custom Tag 리스트 등의 메타정보 조합
 
+    private String playlistCate;
+
     // 연결
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
@@ -64,7 +66,13 @@ public class Playlist {
     @OneToMany(mappedBy = "playlist")
     private List<PlaylistLikes> playlistLikes = new ArrayList<>();
 
-    @OneToMany(mappedBy = "playlist")  // 단방향 설정
+    @OneToMany(mappedBy = "playlist")//,  cascade = CascadeType.ALL)
     private List<YoutubeVideo> youtubeVideos = new ArrayList<>();
+
+    @OneToMany(mappedBy = "playlist", cascade = {CascadeType.REMOVE})
+    private List<PlaylistComment> playlistComments = new ArrayList<>();
+
+    // 한길: playlist 에 좋아요넣기
+    private Integer likesCnt = 0;
 
 }

@@ -8,7 +8,7 @@ import lombok.Data;
 @Data
 public class SimpleCondition {
 
-    private String type;
+    private String type; // 최신순, 관련순, 좋아요순
     private String keyword;
 
 }

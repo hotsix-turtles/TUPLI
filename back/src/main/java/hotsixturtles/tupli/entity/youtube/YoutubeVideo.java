@@ -21,18 +21,18 @@ public class YoutubeVideo {
 
     private String videoId;  // url로 쓰임. 예시 : oODreucZqmM, https://www.youtube.com/watch?v= 주소와 조합하면 영상이 됨
     private String title;  // 영상 제목
-    private String date;  // ?
+    private String date;  // ? 업로드 날짜인듯 싶어용..
     private String thumbnail;  // 썸네일 주소, 풀 주소가 들어온다.
     private String channelTitle;  // 영상 올린 채널
     private String duration;  // 영상길이
     private Integer categoryId;  // 유튜브 기준 카테고리 분류
 
     // 플레이리스트 생성시에는 연결. (단순한 저장, 좋아요시에는 연결 없음)
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name="playlist_id")
     private Playlist playlist;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name="playroom_id")
     private Playroom playroom;
 

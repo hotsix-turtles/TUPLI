@@ -12,6 +12,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
+/**
+ * Firebase 서비스시 기본 키 세팅
+ */
 @Service
 public class FirebaseInitialize {
     @PostConstruct

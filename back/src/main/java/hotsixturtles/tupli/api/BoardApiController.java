@@ -1,10 +1,17 @@
 package hotsixturtles.tupli.api;
 
 import hotsixturtles.tupli.dto.BoardDto;
+import hotsixturtles.tupli.dto.PlayroomDto;
 import hotsixturtles.tupli.dto.response.ErrorResponse;
+import hotsixturtles.tupli.dto.simple.SimpleBadgeDto;
+import hotsixturtles.tupli.entity.Badge;
 import hotsixturtles.tupli.entity.Board;
+import hotsixturtles.tupli.entity.Playroom;
+import hotsixturtles.tupli.entity.UserBadge;
 import hotsixturtles.tupli.entity.likes.BoardLikes;
+import hotsixturtles.tupli.service.BadgeService;
 import hotsixturtles.tupli.service.BoardService;
+import hotsixturtles.tupli.service.UserInfoService;
 import hotsixturtles.tupli.service.token.JwtTokenProvider;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -32,8 +39,10 @@ public class BoardApiController {
 
     private final MessageSource messageSource;
 
+    private final BadgeService badgeService;
 
-    // 전체 board List 가져오기
+    private final UserInfoService userInfoService;
+
 
     /**
      * 전체 게시글 list 가져오기
@@ -65,13 +74,12 @@ public class BoardApiController {
     }
 
     /**
-     *
+     * 게시글 추가하기
      * @param token
      * @param board : {title, content}
      * @return null
      * 반환 코드 : 201, 403, 404
      */
-
     @PostMapping("/board")
     public ResponseEntity<?> addBoard(@RequestHeader(value = "Authorization") String token,
                                       @RequestBody Board board){
@@ -86,11 +94,24 @@ public class BoardApiController {
 
         Board boardResult = boardService.addBoard(userSeq, board);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(new BoardDto(boardResult));
+        userInfoService.userInfoUpdateBoard(userSeq);
+
+        List<UserBadge> userBadges = badgeService.getBadgeList(userSeq);
+
+        List<Long> badges = badgeService.getUserBadgeSeq(userBadges);
+
+        // 배지갱신
+        List<Badge> badgeResult = badgeService.checkBoardUpload(userSeq, badges);
+
+        if(badgeResult == null || badgeResult.size() == 0) return ResponseEntity.ok().body(new BoardDto(boardResult, null));
+        List<SimpleBadgeDto> result = badgeResult.stream().map(b -> new SimpleBadgeDto(b)).collect(Collectors.toList());
+        
+        // 뱃지 확인
+        return ResponseEntity.status(HttpStatus.CREATED).body(new BoardDto(boardResult, result));
     }
 
     /**
-     *
+     * 게시글 갱신하기
      * @param token
      * @param boardId
      * @param board
@@ -114,7 +135,7 @@ public class BoardApiController {
     }
 
     /**
-     *
+     * 게시글 지우기
      * @param token
      * @param boardId
      * @return null
@@ -206,6 +227,29 @@ public class BoardApiController {
         // 좋아요를 누른 사람 , 어떤 게시글에 좋아요를 눌렀는지 저장 , 현재 그 게시글의 총 좋아요 수를 return
         boardService.deleteBoardLike(userSeq, boardId);
         return ResponseEntity.status(HttpStatus.OK).body(null);
+    }
+
+    /**
+     * 사용자가 좋아요한 게시글
+     * @param token
+     * @return
+     * * 반환코드 : 200, 403, 404
+     */
+    @GetMapping("/board/likes")
+    public ResponseEntity<?> getPlayroomLiked(@RequestHeader(value = "Authorization") String token)
+    {
+        if (!jwtTokenProvider.validateToken(token)) {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(new ErrorResponse(messageSource.getMessage("error.valid.jwt", null, LocaleContextHolder.getLocale())));
+        }
+        Long userSeq = jwtTokenProvider.getUserSeq(token);
+
+        List<Board> boards = boardService.getLikedBoards(userSeq);
+
+        List<BoardDto> result = boards.stream().map(b -> new BoardDto(b)).collect(Collectors.toList());
+
+        return ResponseEntity.ok().body(result);
     }
 
 }

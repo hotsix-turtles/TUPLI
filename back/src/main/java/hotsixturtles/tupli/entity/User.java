@@ -1,6 +1,7 @@
 package hotsixturtles.tupli.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.vladmihalcea.hibernate.type.json.JsonType;
 import hotsixturtles.tupli.entity.auth.ProviderType;
 import hotsixturtles.tupli.entity.auth.RoleType;
 import hotsixturtles.tupli.entity.likes.BoardLikes;
@@ -8,6 +9,8 @@ import hotsixturtles.tupli.entity.likes.PlayroomLikes;
 import hotsixturtles.tupli.entity.likes.UserDislikes;
 import hotsixturtles.tupli.entity.likes.UserLikes;
 import lombok.*;
+import org.hibernate.annotations.Type;
+import org.hibernate.annotations.TypeDef;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -19,6 +22,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -29,13 +33,14 @@ import java.util.stream.Collectors;
 @Getter @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@TypeDef(name = "json", typeClass = JsonType.class)
 public class User implements UserDetails {
 
     // OAUTH 관련 column
     @JsonIgnore
     @Id
     @Column(name = "USER_SEQ")
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue
     private Long userSeq;
 
     @Column(name = "USER_ID", length = 64, unique = true)
@@ -99,6 +104,13 @@ public class User implements UserDetails {
 
     private String authKey;
 
+    // 유저 취향(넷)
+    @Type(type = "json")
+    @Column(columnDefinition = "json")
+//    private List<String> taste = new ArrayList<>();
+    private List<String> taste = Arrays.asList("영화/드라마", "동물", "노하우/스타일", "일상");
+
+
     // 연결
     @OneToMany(mappedBy = "user")
     private List<Board> boards = new ArrayList<>();
@@ -124,6 +136,8 @@ public class User implements UserDetails {
     @OneToMany(mappedBy = "user")
     private List<PlayroomLikes> playroomLikes = new ArrayList<>();
 
+    @OneToOne(mappedBy = "user")
+    private UserSetting userSetting;
 
 
     /**

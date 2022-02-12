@@ -1,6 +1,7 @@
 package hotsixturtles.tupli.service;
 
 import hotsixturtles.tupli.entity.User;
+import hotsixturtles.tupli.entity.UserSetting;
 import hotsixturtles.tupli.entity.likes.UserDislikes;
 import hotsixturtles.tupli.entity.likes.UserLikes;
 import hotsixturtles.tupli.entity.meta.UserInfo;
@@ -19,13 +20,16 @@ import java.util.List;
 @Transactional(readOnly = true)  // 기본적으로 트랜잭션 안에서만 데이터 변경하게 설정(그만큼 최적화 되어 읽는게 빨라짐)
 @RequiredArgsConstructor
 public class UserService {
-    private final UserRepository userRepository;
+
     private final PasswordEncoder passwordEncoder;
 
+    private final UserRepository userRepository;
     private final UserInfoRepository userInfoRepository;
     private final UserLikesRepository userLikesRepository;
+    private final UserSettingRepository userSettingRepository;
     private final UserBadgeRepository userBadgeRepository;
     private final UserDislikesRepository userDislikesRepository;
+    private final NotificationService notificationService;
 
     private final JwtTokenProvider jwtTokenProvider;
 
@@ -36,8 +40,12 @@ public class UserService {
         user.encodePassword(passwordEncoder);
 
         userRepository.save(user);
-        UserInfo userInfo = new UserInfo(null, user.getUserSeq(), null, 0L, 0L, 0L, 1L, "Y");
+        UserInfo userInfo = new UserInfo();
+        userInfo.setUserSeq(user.getUserSeq());
         userInfoRepository.save(userInfo);
+        UserSetting userSetting = new UserSetting();
+        userSetting.setUser(user);
+        userSettingRepository.save(userSetting);
         return user.getUserSeq();
     }
 
@@ -127,12 +135,14 @@ public class UserService {
     @Transactional
     public void follow(Long userSeq, Long otherUserSeq) {
         UserLikes existUserLikes = userLikesRepository.findExist(userSeq, otherUserSeq);
-        System.out.println("existUserLikes== " + existUserLikes);
         if(existUserLikes == null) {
             UserLikes userLikes = new UserLikes();
             userLikes.setFromUser(userRepository.findById(userSeq).orElse(null));
             userLikes.setToUser(userRepository.findById(otherUserSeq).orElse(null));
             userLikesRepository.save(userLikes);
+
+            // 팔로우 알림 보내기
+            notificationService.notiFollow(userSeq, otherUserSeq);
         }
         else {
             // 이미 팔로우 되어있음.
@@ -162,7 +172,6 @@ public class UserService {
     @Transactional
     public void dislike(Long userSeq, Long otherUserSeq) {
         UserDislikes existUserDislikes = userDislikesRepository.findExist(userSeq, otherUserSeq);
-        System.out.println("existUserDislikes== " + existUserDislikes);
         if(existUserDislikes == null) {
             UserDislikes userDislikes = new UserDislikes();
             userDislikes.setFromUser(userRepository.findById(userSeq).orElse(null));
@@ -201,6 +210,19 @@ public class UserService {
         User user = jwtTokenProvider.getUser(token);
         user.setIs_vip("Y");
         userRepository.save(user);
+    }
+
+    @Transactional
+    public void changePassword(User user, String passwordChange) {
+        user.setPassword(passwordChange);
+        user.encodePassword(passwordEncoder);
+
+        userRepository.save(user);
+
+    }
+
+    public int getFollowersCount(Long userSeq){
+        return userLikesRepository.findFollowersCount(userSeq);
     }
 }
 

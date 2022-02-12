@@ -23,7 +23,6 @@ public class WebsocketConfig implements WebSocketMessageBrokerConfigurer {
      */
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
-        // 2022.01.07 한길:: 잠시 주석하고, send를 이용한 전송 이용
         config.enableSimpleBroker("/sub");  // 메시지를 구독하는 요청의 prefix는 /sub로 시작
         config.setApplicationDestinationPrefixes("/pub");  // 메시지를 발행하는 요청의 prefix는 /pub로 시작
     }
