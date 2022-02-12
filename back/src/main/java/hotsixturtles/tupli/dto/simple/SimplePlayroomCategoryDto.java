@@ -23,9 +23,12 @@ public class SimplePlayroomCategoryDto {
     private OffsetDateTime startTime;
     private OffsetDateTime endTime;
     private List<SimpleYoutubeVideoDto> videos;
+    private Integer userCount;
 
     // 추가 변수
+    private Long userId;
     private String nickname;
+    private String profileImg;
     private Integer likesCnt;
     private Boolean isLiked;
 
@@ -40,9 +43,12 @@ public class SimplePlayroomCategoryDto {
         this.image = playroom.getImage();
         this.startTime = playroom.getStartTime();
         this.endTime = playroom.getEndTime();
+        this.userCount = playroom.getUserCount();
 
         // 추가 변수
+       this.userId = playroom.getUser().getUserSeq();
        this.nickname = playroom.getUser().getNickname();
+       this.profileImg = playroom.getUser().getProfileImage();
 
        this.likesCnt = playroom.getPlayroomLikes() == null ? 0 : playroom.getPlayroomLikes().size();
        this.isLiked = false;
@@ -59,9 +65,12 @@ public class SimplePlayroomCategoryDto {
         this.image = playroom.getImage();
         this.startTime = playroom.getStartTime();
         this.endTime = playroom.getEndTime();
+        this.userCount = playroom.getUserCount();
 
         // 추가 변수
+        this.userId = playroom.getUser().getUserSeq();
         this.nickname = playroom.getUser().getNickname();
+        this.profileImg = playroom.getUser().getProfileImage();
         this.likesCnt = playroom.getPlayroomLikes() == null ? 0 : playroom.getPlayroomLikes().size();
         this.isLiked = isLiked;
     }
