@@ -10,9 +10,16 @@ const account = {
     introduction: null,
     image: null,
     is_vip: null,
-    // 팔로잉, 팔로워
-    following: null,
-    followers: null,
+    following: [],
+    followers: [],
+    taste: null,
+    // 사용자 설정
+    alarmSetting: true,  // 알림 여부      
+    alarmOnRealtime: true,  // 실시간 알림 받기
+    alarmOnInvite: true, // 초대 받기
+    inviteDomain: 'everyone', //초대 가능한 사람
+    alarmOnPlayroomMake: true,  // 플레이룸 생성시 팔로워에게 알람 보낼지 여부
+    alarmOnBadge: true,  // 뱃지 알림 받을지
   },
   mutations: {
   },

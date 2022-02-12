@@ -25,7 +25,7 @@ export default {
     realtime: {
       immediate: true,
       handler(val) {
-        console.log('env 작동 chk', val)
+        console.log('실시간 알림', val)
         // this.newAlarms = val;
         if ((val.toId == this.userId) && (val.isRead == false) && (this.realtimeBoolean == false) ) {this.realtimeNoti(val)}
       }
@@ -41,7 +41,7 @@ export default {
       // 여러 번 읽기 방지(백)
       axios({
         method: 'GET',
-        url: SERVER.URL + '/notiReset',
+        url: SERVER.URL + '/noti/reset',
       })
 
       // XX님이 팔로우하셨습니다.
