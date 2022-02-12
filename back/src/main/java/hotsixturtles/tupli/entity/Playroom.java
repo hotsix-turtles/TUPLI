@@ -34,14 +34,18 @@ public class Playroom {
 
     @Type(type = "json")
     @Column(columnDefinition = "json")
-    private List<Long> playlists;  // request에서 번호만 추출해서 저장
+    private ConcurrentHashMap<Long, List<Long>> playlists;
+
+    @Type(type = "json")
+    @Column(columnDefinition = "json")
+    private List<Long> guests = new ArrayList<>();
 
     private OffsetDateTime startTime;
 
-    @PrePersist
-    private void beforeSaving() {
-        startTime = OffsetDateTime.now();
-    }
+//    @PrePersist
+//    private void beforeSaving() {
+//        startTime = OffsetDateTime.now();
+//    }
 
     private OffsetDateTime endTime;
 
@@ -50,6 +54,10 @@ public class Playroom {
     @Type(type = "json")
     @Column(columnDefinition = "json")
     private ConcurrentHashMap<Integer, Integer> playroomInfo;
+
+    private String playroomCate;
+
+    private String image;
 
 
     // 연결
@@ -60,11 +68,17 @@ public class Playroom {
     @OneToMany(mappedBy = "playroom")
     private List<PlayroomLikes> playroomLikes = new ArrayList<>();
 
-    @OneToMany(mappedBy = "playroom", cascade = {CascadeType.REMOVE})
+    @OneToMany(mappedBy = "playroom", cascade = {CascadeType.ALL})
     private List<YoutubeVideo> videos = new ArrayList<>();
 
-    // 기타 : DTO 외 내부 추천 및 뱃지용
-    private Integer userCount;
 
+    // 기타 : DTO 외 내부 추천 및 뱃지용
+    private Integer userCount = 0;
+
+    // 한길 : playroom 에 좋아요 넣기
+    private Integer likesCnt = 0;
+
+    // Playroom 최고 시청자 수
+    private Integer userCountMax = 0;
 
 }

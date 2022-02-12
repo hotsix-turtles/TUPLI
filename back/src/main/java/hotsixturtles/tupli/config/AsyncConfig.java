@@ -10,6 +10,7 @@ import java.util.concurrent.Executor;
 
 /**
  * SimpleAsyncTaskExecutor 보다 조금 자세한 설정이 가능해짐
+ * Flask 비동기 신청
  */
 @Configuration
 @EnableAsync

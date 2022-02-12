@@ -14,7 +14,7 @@ public class UserBadge {
 
     @Id
     @Column(name = "USER_BADGE_SEQ")
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue
     private Long userBadgeSeq;
 
     private Long userSeq;

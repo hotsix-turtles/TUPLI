@@ -1,19 +1,17 @@
 package hotsixturtles.tupli.api;
 
-import hotsixturtles.tupli.dto.BoardDto;
+import hotsixturtles.tupli.dto.PlaylistCommentDto;
 import hotsixturtles.tupli.dto.PlaylistDto;
-import hotsixturtles.tupli.dto.param.SimpleCondition;
+import hotsixturtles.tupli.dto.params.PlaylistSearchCondition;
 import hotsixturtles.tupli.dto.request.PlaylistRequest;
 import hotsixturtles.tupli.dto.response.ErrorResponse;
 import hotsixturtles.tupli.dto.response.IdResponse;
-import hotsixturtles.tupli.dto.simple.SimpleYoutubeVideoDto;
-import hotsixturtles.tupli.entity.Board;
-import hotsixturtles.tupli.entity.Playlist;
-import hotsixturtles.tupli.entity.likes.BoardLikes;
+import hotsixturtles.tupli.dto.simple.SimpleBadgeDto;
+import hotsixturtles.tupli.dto.simple.SimplePlaylistCategoryDto;
+import hotsixturtles.tupli.entity.*;
 import hotsixturtles.tupli.entity.likes.PlaylistLikes;
-import hotsixturtles.tupli.repository.PlaylistRepository;
-import hotsixturtles.tupli.service.FlaskService;
-import hotsixturtles.tupli.service.PlaylistService;
+import hotsixturtles.tupli.service.*;
+import hotsixturtles.tupli.service.list.CategoryListWord;
 import hotsixturtles.tupli.service.token.JwtTokenProvider;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -30,7 +28,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Nullable;
+import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -44,6 +46,11 @@ public class PlaylistApiController {
 
     private final PlaylistService playlistService;
     private final FlaskService flaskService;
+    private final PlaylistCommentService playlistCommentService;
+    private final SearchService searchService;
+
+    private final UserInfoService userInfoService;
+    private final BadgeService badgeService;
 
     /**
      * 플레이 리스트 추가
@@ -73,7 +80,18 @@ public class PlaylistApiController {
             e.printStackTrace();
         }
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(new IdResponse(playlist.getId()));
+        userInfoService.updatePlaylistMake(userSeq);
+        List<UserBadge> userbadges = badgeService.getBadgeList(userSeq);
+        List<Long> badges = badgeService.getUserBadgeSeq(userbadges);
+        List<Badge> badgeResult = new ArrayList<>();
+
+        badgeResult.addAll(badgeService.checkPlaylistMake(userSeq, badges));
+
+        if(badgeResult.size() == 0) badgeResult = null;
+
+        List<SimpleBadgeDto> badgeDtoResult = badgeResult.stream().map(b -> new SimpleBadgeDto(b)).collect(Collectors.toList());
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(new IdResponse(playlist.getId(), badgeDtoResult));
     }
 
     /**
@@ -208,18 +226,186 @@ public class PlaylistApiController {
 
     /**
      * 플레이리스트 단순 검색
-     * @param condition Simplcondition : [type: {관련순(default), 최신순(), keyword}]
+     * @param keyword type(최신순, 관련순,  + 제목 // 검색에 필요한 기준 추가가능 (parameter 추가)
+     * @param pageable : 예시 => {sort=roomTitle,desc ...} size, page 값 따로 넘길 수 있음
      * @return
+     * 반환 코드 : 200, 404
      */
     @GetMapping("/playlist/search")
-    public ResponseEntity searchPlaylistSimple(SimpleCondition condition) {
-
-        List<Playlist> playlists = playlistService.searchPlaylistSimple(condition);
-
+    public ResponseEntity searchPlaylistSimple(@RequestParam(value = "keyword") String keyword,
+                                               @RequestParam(value = "order") String order,
+                                               @PageableDefault(size = 1000) Pageable pageable) {
+        PlaylistSearchCondition playlistSearchCondition = new PlaylistSearchCondition();
+        playlistSearchCondition.setKeyword(keyword);
+        List<Playlist> playlists = playlistService.searchPlaylistSimple(playlistSearchCondition, order, pageable);
+        SearchHistory searchHistory = new SearchHistory(null, "플레이리스트",playlistSearchCondition.getKeyword().trim(),0);
+        searchService.addScoreNum(searchHistory);
         List<PlaylistDto> response = playlists.stream().map(x -> new PlaylistDto(x)).collect(Collectors.toList());
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
+    /**
+     * 카테고리 분류별 반환 (회원, 비회원 구분 있음)
+     * @param categoryKeyword
+     * @param pageable
+     * @param request
+     * @return
+     */
+    @GetMapping("/playlist/category/{categoryKeyword}")
+    public ResponseEntity categoryPlaylist(@PathVariable("categoryKeyword") String categoryKeyword,
+                                           @PageableDefault(size = 50, sort ="id",  direction = Sort.Direction.DESC) Pageable pageable,
+                                           HttpServletRequest request) {
+        // 카테고리 분류
+        String category = CategoryListWord.CATEGORY_LIST_WORD.getOrDefault(categoryKeyword, "일상");
+
+        // 회원, 비회원(유효하지 않은 토큰) 구분
+        String token = request.getHeader("Authorization");
+        if (token == null || !jwtTokenProvider.validateToken(token)) {
+            List<Playlist> playlists = searchService.categoryPlaylist(category, pageable);
+            List<SimplePlaylistCategoryDto> response = playlists.stream().map(x -> new SimplePlaylistCategoryDto(x)).collect(Collectors.toList());
+
+            return ResponseEntity.status(HttpStatus.OK).body(response);
+        } else {
+            Long userSeq = jwtTokenProvider.getUserSeq(token);
+            List<Playlist> playlists = searchService.categoryPlaylist(category, pageable);
+            List<SimplePlaylistCategoryDto> response = new ArrayList<>();
+            for (Playlist playlist : playlists) {
+                Boolean isLiked = false;
+                if (playlistService.getPlaylistLike(userSeq, playlist.getId()) != null) {
+                    isLiked = true;
+                }
+                SimplePlaylistCategoryDto res = new SimplePlaylistCategoryDto(playlist, isLiked);
+                response.add(res);
+            }
+            return ResponseEntity.status(HttpStatus.OK).body(response);
+        }
+
+    }
+
+    /**
+     * playlist 댓글 리스트 가져오기
+     * @param playlistId
+     * @return List<comment>
+     * 반환 코드 : 200, 204, 404
+     */
+    @GetMapping("/playlist/{playlistId}/comment")
+    public ResponseEntity<List<PlaylistCommentDto>> getCommentList(@PathVariable("playlistId") Long playlistId)
+    {
+
+        List<PlaylistComment> commentList = playlistCommentService.getCommentList(playlistId);
+
+        if (commentList.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+        }
+
+        List<PlaylistCommentDto> result = commentList.stream().map(b -> new PlaylistCommentDto(b)).collect(Collectors.toList());
+
+        return ResponseEntity.ok().body(result);
+    }
+
+    /**
+     * playlist 댓글 등록
+     * @param token
+     * @param playlistId
+     * @param playlistComment : {content}
+     * @return null
+     *반환 코드 : 201, 403, 404
+     */
+    @PostMapping("/playlist/{playlistId}/comment")
+    public ResponseEntity<?> addComment(@RequestHeader(value = "Authorization") String token,
+                                        @PathVariable("playlistId") Long playlistId,
+                                        @RequestBody PlaylistComment playlistComment){
+        if (!jwtTokenProvider.validateToken(token)) {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(new ErrorResponse(messageSource.getMessage("error.valid.jwt", null, LocaleContextHolder.getLocale())));
+        }
+
+        Long userSeq = jwtTokenProvider.getUserSeq(token);
+
+        PlaylistComment commentResult = playlistCommentService.addComment(userSeq, playlistId, playlistComment);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(null);
+    }
+
+    /**
+     * playlist 댓글 수정
+     * @param token
+     * @param commentId
+     * @param playlistComment : {content}
+     * @return null
+     * 반환 코드 : 200, 401, 403, 404
+     */
+    @PutMapping("/playlist/{commentId}/comment")
+    public ResponseEntity<?> updateComment(@RequestHeader(value = "Authorization") String token,
+                                           @PathVariable("commentId") Long commentId,
+                                           @RequestBody PlaylistComment playlistComment){
+
+        if (!jwtTokenProvider.validateToken(token)) {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(new ErrorResponse(messageSource.getMessage("error.valid.jwt", null, LocaleContextHolder.getLocale())));
+        }
+
+        Long userSeq = jwtTokenProvider.getUserSeq(token);
+
+        PlaylistComment commentSaved = playlistCommentService.updateComment(userSeq, commentId, playlistComment);
+
+        if(commentSaved == null){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(null);
+    }
+
+    /**
+     * playlist 댓글 삭제
+     * @param token
+     * @param commentId
+     * @return null
+     * 반환 코드 : 200, 401, 403, 404
+     */
+    @DeleteMapping("/playlist/comment/{commentId}")
+    public ResponseEntity<?> deleteComment(@RequestHeader(value = "Authorization") String token,
+                                           @PathVariable("commentId") Long commentId){
+
+        if (!jwtTokenProvider.validateToken(token)) {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(new ErrorResponse(messageSource.getMessage("error.valid.jwt", null, LocaleContextHolder.getLocale())));
+        }
+        Long userSeq = jwtTokenProvider.getUserSeq(token);
+
+        Long result = playlistCommentService.deleteComment(commentId, userSeq);
+
+        if(result == -1L){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(null);
+    }
+
+
+    /**
+     * 사용자가 좋아요 누른 플레이리스트
+     * @param token
+     * @return
+     * 반환 코드 : 200, 403, 404
+     */
+    @GetMapping("/playlist/likes")
+    public ResponseEntity<?> getPlaylistLiked(@RequestHeader(value = "Authorization") String token)
+    {
+        if (!jwtTokenProvider.validateToken(token)) {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(new ErrorResponse(messageSource.getMessage("error.valid.jwt", null, LocaleContextHolder.getLocale())));
+        }
+        Long userSeq = jwtTokenProvider.getUserSeq(token);
+
+        List<Playlist> playlists = playlistService.getLikedPlaylists(userSeq);
+
+        List<PlaylistDto> result = playlists.stream().map(b -> new PlaylistDto(b)).collect(Collectors.toList());
+
+        return ResponseEntity.ok().body(result);
+    }
 
 }

@@ -16,7 +16,7 @@ export default {
       this.getUserInfo(token)
       this.getSetting(token)
     }
-    this.$router.push('/home')
+    this.$router.push('/')
   },
   methods: {
     ...mapActions(['getUserInfo', 'getSetting']),

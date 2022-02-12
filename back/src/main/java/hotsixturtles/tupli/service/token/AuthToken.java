@@ -6,6 +6,7 @@ import io.jsonwebtoken.*;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.http.auth.AUTH;
 
 import java.security.Key;
 import java.util.Date;
@@ -52,7 +53,6 @@ public class AuthToken {
         claims.put("user_seq", userSeq);
         claims.put("username", username);
         claims.put("user_id", id); // user_id를 저장(명명방식에 과거 프로젝트 장고 흔적). 정보는 key / value 쌍으로 저장된다.
-//        claims.put("username", username);  // sub에서 이미 저장했지만, 일단 추가(과거 프로젝트 장고 흔적)
         claims.put(AUTHORITIES_KEY, role);
 
         Date now = new Date();

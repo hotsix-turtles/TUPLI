@@ -7,15 +7,20 @@ import com.querydsl.core.types.dsl.PathBuilder;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import hotsixturtles.tupli.dto.param.SimpleCondition;
+import hotsixturtles.tupli.dto.params.PlaylistSearchCondition;
 import hotsixturtles.tupli.dto.request.PlaylistRequest;
+import hotsixturtles.tupli.dto.simple.SimpleHomeInfoDto;
 import hotsixturtles.tupli.dto.simple.SimpleYoutubeVideoDto;
+import hotsixturtles.tupli.entity.HomeInfo;
 import hotsixturtles.tupli.entity.Playlist;
+import hotsixturtles.tupli.entity.User;
 import hotsixturtles.tupli.entity.likes.PlaylistLikes;
+import hotsixturtles.tupli.entity.meta.UserInfo;
 import hotsixturtles.tupli.entity.youtube.YoutubeVideo;
-import hotsixturtles.tupli.repository.PlaylistRepository;
-import hotsixturtles.tupli.repository.UserRepository;
-import hotsixturtles.tupli.repository.YoutubeVideoRepository;
+import hotsixturtles.tupli.repository.*;
 import hotsixturtles.tupli.repository.likes.PlaylistLikesRepository;
+import hotsixturtles.tupli.service.list.CategoryList;
+import hotsixturtles.tupli.service.list.TasteScore;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
@@ -23,8 +28,9 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 import static hotsixturtles.tupli.entity.QPlaylist.*;
 import static org.springframework.util.StringUtils.hasText;
@@ -36,9 +42,12 @@ import static org.springframework.util.StringUtils.hasText;
 public class PlaylistService {
 
     private final UserRepository userRepository;
+    private final UserInfoRepository userInfoRepository;
     private final PlaylistRepository playlistRepository;
     private final PlaylistLikesRepository playlistLikesRepository;
     private final YoutubeVideoRepository youtubeVideoRepository;
+    private final PlaylistRepositoryCustom playlistRepositoryCustom;
+    private final HomeInfoRepository homeInfoRepository;
 
     // 심플 querydsl
     private final JPAQueryFactory jpaQueryFactory;
@@ -55,11 +64,26 @@ public class PlaylistService {
         playlist.setIsPublic(playlistRequest.getIsPublic());
         
         // 연결
-        playlist.setUser(userRepository.findByUserSeq(userSeq));
+        User user = userRepository.findByUserSeq(userSeq);
+        playlist.setUser(user);
+
+        // 유저 취향 가져오기
+        UserInfo userInfo = userInfoRepository.findOneByUserSeq(userSeq);
+        ConcurrentHashMap<String, Integer> tasteInfo = userInfo.getTasteInfo();
+
+        // 카테고리 정보 담을 Set
+        Set<String> categorys = new HashSet<>();
 
         // Video 정보
         ConcurrentHashMap<Integer, Integer> playlistInfo = new ConcurrentHashMap<Integer, Integer>();
+        String image = null;
         for (SimpleYoutubeVideoDto videoDto : playlistRequest.getVideos()) {
+            // 첫 영상 이미지만 저장 (미리보기용)
+            if (image == null) {
+                image = videoDto.getThumbnail();
+                playlist.setImage(image);
+            }
+
             // 기존에 저장, 좋아요 해놓은것과 상관없이 별도로 제작
             YoutubeVideo video = new YoutubeVideo();
             video.setInit(videoDto);
@@ -70,12 +94,57 @@ public class PlaylistService {
             Integer categoryId = videoDto.getCategoryId();
             Integer count = playlistInfo.getOrDefault(categoryId, 0);
             playlistInfo.put(categoryId, count+1);
+
+            // 카테고리에 따른 분류 (구현 두 종류)
+            String category = CategoryList.CATEGORY_LIST.getOrDefault(categoryId, "기타");
+            categorys.add(category);
+
+            // 취향 반영
+            Integer tasteScore = tasteInfo.getOrDefault(category, 0);
+            tasteInfo.put(category, tasteScore + TasteScore.SCORE_PLAYLIST_MAKE);
         }
+
+        // 검색을 위한 Stringify
+        String categorysString = "";
+        for (String category : categorys) {
+            categorysString = categorysString + category + ", ";
+        }
+        playlist.setPlaylistCate(categorysString);
         playlist.setPlaylistInfo(playlistInfo);
 
-        playlistRepository.save(playlist);
+        // 유저 정보 저장
+        userInfo.setTasteInfo(tasteInfo);
+        userInfoRepository.save(userInfo);
+
+        // 유저 취향 분석 후 저장
+        List<String> userTaste = getTaste(tasteInfo);
+        user.setTaste(userTaste);
+        userRepository.save(user);
+
+        // 최종 저장
+        Playlist nowPlaylist = playlistRepository.save(playlist);
+
+        HomeInfo homeInfo = new HomeInfo();
+        homeInfo.setType("playlist");
+        homeInfo.setInfoId(nowPlaylist.getId());
+        homeInfoRepository.save(homeInfo);
 
         return playlist;
+    }
+
+    private List<String> getTaste(ConcurrentHashMap<String, Integer> tasteInfo) {
+        List<String> userTaste = new ArrayList<>();
+        // 유저 정보 분석, MAP을 Value DESC로 나열. 최대 넷.
+        Map<String, Integer> topFour =
+                tasteInfo.entrySet().stream()
+                        .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
+                        .limit(4)
+                        .collect(Collectors.toMap(
+                                Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
+        for (String category : topFour.keySet()) {
+            userTaste.add(category);
+        }
+        return userTaste;
     }
 
     // 단일 Playlist id로 검색
@@ -83,6 +152,9 @@ public class PlaylistService {
         return playlistRepository.findById(playlistId).orElse(null);
     }
 
+    public List<Playlist> getHomePlaylists(Pageable pageable){
+        return playlistRepositoryCustom.listByHomePlaylist(pageable);
+    }
     // 단일 Playlist id로 update
     @Transactional
     public void updatePlaylist(Long playlistId, PlaylistRequest playlistRequest) {
@@ -102,9 +174,19 @@ public class PlaylistService {
                 youtubeVideoRepository.delete(youtubeVideo);
             }
 
+            // 카테고리 정보 담을 Set
+            Set<String> categorys = new HashSet<>();
+
             // Video 정보
             ConcurrentHashMap<Integer, Integer> playlistInfo = new ConcurrentHashMap<Integer, Integer>();
+            String image = null;
             for (SimpleYoutubeVideoDto videoDto : playlistRequest.getVideos()) {
+                // 첫 영상 이미지만 저장 (미리보기용)
+                if (image == null) {
+                    image = videoDto.getThumbnail();
+                    playlistUpdate.setImage(image);
+                }
+
                 // 기존에 저장, 좋아요 해놓은것과 상관없이 별도로 제작
                 YoutubeVideo video = new YoutubeVideo();
                 video.setInit(videoDto);
@@ -115,7 +197,19 @@ public class PlaylistService {
                 Integer categoryId = videoDto.getCategoryId();
                 Integer count = playlistInfo.getOrDefault(categoryId, 0);
                 playlistInfo.put(categoryId, count+1);
+
+                // 카테고리에 따른 분류 (구현 두 종류)
+                String category = CategoryList.CATEGORY_LIST.getOrDefault(categoryId, "기타");
+//            String category = categoryList.getOrDefault(categoryId, "기타");
+                categorys.add(category);
             }
+
+            // 검색을 위한 Stringify
+            String categorysString = "";
+            for (String category : categorys) {
+                categorysString = categorysString + category + ", ";
+            }
+            playlistUpdate.setPlaylistCate(categorysString);
             playlistUpdate.setPlaylistInfo(playlistInfo);
 
             playlistRepository.save(playlistUpdate);
@@ -127,7 +221,9 @@ public class PlaylistService {
     // 단일 Playlist id로 delete
     @Transactional
     public void deletePlaylist(Long playlistId) {
+
         playlistRepository.deleteById(playlistId);
+        homeInfoRepository.deleteByInfoId(playlistId);
     }
 
     // 사용자가 해당 플레이리스트 좋아요 했는지.
@@ -144,6 +240,12 @@ public class PlaylistService {
             playlistLikes.setUser(userRepository.findByUserSeq(userSeq));
             playlistLikes.setPlaylist(playlistRepository.findById(id).orElse(null));
             playlistLikesRepository.save(playlistLikes);
+
+            // 한길 : playlist 에 좋아요 넣으면 +1 하기
+            Playlist playlist = playlistRepository.getById(id);
+            playlist.setLikesCnt(playlist.getLikesCnt()+1);
+            playlistRepository.save(playlist);
+
         } else {
             // exception 발생
         }
@@ -155,58 +257,81 @@ public class PlaylistService {
         PlaylistLikes playlistLikes = playlistLikesRepository.findExist(userSeq, id);
         if(playlistLikes != null) {
             playlistLikesRepository.delete(playlistLikes);
+
+            // 한길 : playlist 에 좋아요 취소하면 -1 하기
+            Playlist playlist = playlistRepository.getById(id);
+            playlist.setLikesCnt(playlist.getLikesCnt()-1);
+            playlistRepository.save(playlist);
+
         } else {
             // exception 발생
         }
+    }
 
+    // 사용자가 좋아하는 플레이리스트 리스트 가져오기
+    public List<Playlist> getLikedPlaylists(Long userSeq) {
+        return playlistRepository.findLikedPlaylists(userSeq);
     }
 
     // Querydsl 버전 (굳이 querydsl로 작성할 이유 하나도 없는 쿼리)
-    public List<Playlist> searchPlaylistSimple(SimpleCondition condition) {
+    public List<Playlist> searchPlaylistSimple(PlaylistSearchCondition condition, String order, Pageable pageable) {
         // QueryProjection(select에 Q타입 담기) 쓰고 싶으면 다음 기회에!
         // QPlaylist.playlist를 -> playlist로 static import 했습니다.(강민구)
-        // $$$$ NumberExpression 사용금지!
+        // NumberExpression 사용금지!
         // 이유 반환이 Tuple인데 변환하려면 전용 생성자 필요해서 DTO가 더러워짐, 다른 방법 아시는 분 말씀해주심 감사!
                 
         // 기본값 : 관련도 순 (이름순, 작성자, 내용 순 + 나중에 이름 정해졌을때 조건 변경 필요 )
-        if (condition.getType() == null | condition.getType() == "관련도순타입명설정필요" ) {
-
-            List<Playlist> list1 = jpaQueryFactory
+        if(order.equals("relevance")) {
+            JPAQuery<Playlist> query = jpaQueryFactory
                     .select(playlist)
+                    .distinct()
                     .from(playlist)
-                    .where(titleContains(condition.getKeyword()))
-                    .orderBy(playlist.id.desc())
-                    .fetch();
-            List<Playlist> list2 = jpaQueryFactory
-                    .select(playlist)
-                    .from(playlist)
-                    .where(usernameContains(condition.getKeyword()))
-                    .orderBy(playlist.id.desc())
-                    .fetch();
-            List<Playlist> list3 = jpaQueryFactory
-                    .select(playlist)
-                    .from(playlist)
-                    .where(descriptionContains(condition.getKeyword()))
-                    .orderBy(playlist.id.desc())
-                    .fetch();
-
-            // 중복 항목 제거하고 합치기.
-            list2.removeAll(list1);
-            list1.addAll(list2);
-            list3.removeAll(list1);
-            list1.addAll(list3);
-
-            return list1;
-        }
-        // 다른 타입 : 최신순
-        else {
-            return jpaQueryFactory
-                    .selectFrom(playlist)
                     .where(titleContains(condition.getKeyword())
+                            .or(tagContains(condition.getKeyword()))
                             .or(usernameContains(condition.getKeyword()))
                             .or(descriptionContains(condition.getKeyword())))
-                    .orderBy(playlist.id.desc())
-                    .fetch();
+                    .orderBy(playlist.title.asc()
+                            , playlist.user.username.asc()
+                            , playlist.tags.asc()
+                            , playlist.content.asc()
+                    )
+                    .offset(pageable.getOffset())
+                    .limit(pageable.getPageSize());
+
+            List<Playlist> result = query.fetch();
+            return result;
+        }
+        else if(order.equals("date")){
+            JPAQuery<Playlist> query = jpaQueryFactory
+                    .select(playlist)
+                    .distinct()
+                    .from(playlist)
+                    .where(titleContains(condition.getKeyword())
+                            .or(tagContains(condition.getKeyword()))
+                            .or(usernameContains(condition.getKeyword()))
+                            .or(descriptionContains(condition.getKeyword())))
+                    .orderBy(playlist.createdAt.desc())
+                    .offset(pageable.getOffset())
+                    .limit(pageable.getPageSize());
+
+            List<Playlist> result = query.fetch();
+            return result;
+        }
+        else{
+            JPAQuery<Playlist> query = jpaQueryFactory
+                    .select(playlist)
+                    .distinct()
+                    .from(playlist)
+                    .where(titleContains(condition.getKeyword())
+                            .or(tagContains(condition.getKeyword()))
+                            .or(usernameContains(condition.getKeyword()))
+                            .or(descriptionContains(condition.getKeyword())))
+                    .orderBy(playlist.likesCnt.desc())
+                    .offset(pageable.getOffset())
+                    .limit(pageable.getPageSize());
+
+            List<Playlist> result = query.fetch();
+            return result;
         }
     }
 
@@ -254,6 +379,9 @@ public class PlaylistService {
     }
     private BooleanExpression descriptionContains(String keyword) {
         return hasText(keyword) ? playlist.content.contains(keyword) : null;
+    }
+    private BooleanExpression tagContains(String keyword) {
+        return hasText(keyword) ? playlist.tags.contains(keyword) : null;
     }
 
 }
