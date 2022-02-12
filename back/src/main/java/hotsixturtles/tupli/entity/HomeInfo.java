@@ -27,6 +27,8 @@ public class HomeInfo {
     @Column(name = "created_at")
     private OffsetDateTime createdAt;
 
+    private Long userSeq;
+
     @PrePersist
     private void beforeSaving() {
         createdAt = OffsetDateTime.now();
