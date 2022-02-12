@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <div class="">
     <!-- 탭 -->
     <v-tabs
       v-model="tab"
@@ -12,7 +12,6 @@
         :key="item"
       >
         <span>{{ item }}</span>
-        <!-- <span @click="onChangeTab">{{ item }}</span> -->
       </v-tab>
       <!-- 플리 탭 -->
       <v-tab-item>
@@ -20,10 +19,11 @@
           :tab-type="'playlist'"
           :tabs="tastes"
         />
-        <playlist-list-item-medium
-          :key="rerenderPlaylistKey"
-          :playlists="categoryPlaylists"
-        />
+        <div class="container">
+          <playlist-list-item-medium
+            :playlists="categoryPlaylists"
+          />
+        </div>
         <!-- {{ playlists }} -->
       </v-tab-item>
       <!-- 플레이룸 탭 -->
@@ -31,6 +31,9 @@
         <tabs
           :tab-type="'playroom'"
           :tabs="tastes"
+        />
+        <playroom-list-item-big
+          :playrooms="categoryPlayrooms"
         />
       </v-tab-item>
       <!-- 영상 탭 -->
@@ -60,6 +63,7 @@
 <script>
 import { mapActions, mapState } from 'vuex'
 import PlaylistListItemMedium from '../../components/playlist/PlaylistListItemMedium.vue';
+import PlayroomListItemBig from '../../components/playroom/PlayroomListItemBig.vue';
 import Tabs from '../../components/common/Tabs.vue';
 import axiosConnector from '../../utils/axios-connector';
 // import InfiniteLoading from "vue-infinite-loading"
@@ -68,6 +72,7 @@ export default {
   name: 'Category',
   components: {
     PlaylistListItemMedium,
+    PlayroomListItemBig,
     Tabs,
     // VideoListItemSmall,
     // InfiniteLoading,
@@ -91,6 +96,9 @@ export default {
     ...mapState('playlist', {
       categoryPlaylists: state => state.categoryPlaylists,
     }),
+    ...mapState('playroom', {
+      categoryPlayrooms: state => state.categoryPlayrooms,
+    }),
     // ...mapState('video', {
     //   // searchedVideos: state => state.searchedVideos,
     //   rerenderKey: state => state.rerenderKey,
@@ -111,8 +119,6 @@ export default {
       .catch((err) => {
         console.log(err)
       })
-    this.getCategoryPlaylists('all')
-    this.rerenderPlaylistKey++
   },
   methods: {
     ...mapActions('playlist', [

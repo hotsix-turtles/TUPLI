@@ -67,7 +67,7 @@
   position: relative;
 }
 
-// 영상 길이
+// 시청자수/영상길이
 .duration {
   position: absolute;
   bottom: 3px;
@@ -89,6 +89,30 @@
   border-radius: 5px;
   font-size: 10px;
   padding: 2px 2px 2px 2px;
+}
+
+// 큰 영상용 시청자수/영상길이
+.duration-big {
+  position: absolute;
+  bottom: 13px;
+  right: 5px;
+  background-color: rgba($color: #000000, $alpha: 0.6);
+  color: white;
+  border-radius: 5px;
+  font-size: 16px;
+  padding: 2px 0px 0px 2px;
+}
+
+// 큰 영상용 현재 플레이 여부
+.on-play-big {
+  position: absolute;
+  top: 7px;
+  left: 5px;
+  background-color: red;
+  color: white;
+  border-radius: 5px;
+  font-size: 13px;
+  padding: 2px;
 }
 
 .shadow-s {

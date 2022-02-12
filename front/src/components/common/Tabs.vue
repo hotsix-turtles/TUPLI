@@ -1,5 +1,5 @@
 <template>
-  <div class="mt-3 d-flex-column">
+  <div class="mt-3 mx-3 d-flex-column">
     <div class="d-flex justify-space-between">
       <v-btn
         height="7vh"
@@ -103,25 +103,44 @@ export default {
       }
     }
   },
+  created: function () {
+    // 페이지 처음엔 플레이리스트 전체 카테고리 가져옴
+    if (this.tabType === 'playlist') {
+      this.getCategoryPlaylists('all')
+    } else if (this.tabType === 'playroom') {
+      this.getCategoryPlayrooms('all')
+    } else if (this.tabType === 'video') {
+      this.getAllCategoryVideos()
+    }
+  },
   methods: {
     ...mapActions('playlist', [
       'getCategoryPlaylists',
     ]),
+    ...mapActions('playroom', [
+      'getCategoryPlayrooms',
+    ]),
+    ...mapActions('video', [
+      'getAllCategoryVideos',
+      'getHotCategoryVideos',
+      'getCategoryVideos',
+    ]),
     onClick: function(tabName) {
-      const categoryName = this.tabsMatch[tabName]
       this.tab = tabName
       if (this.tabType === 'playlist') {
+        const categoryName = this.tabsMatch[tabName]
         this.getCategoryPlaylists(categoryName)
       } else if (this.tabType === 'playroom') {
+        const categoryName = this.tabsMatch[tabName]
         this.getCategoryPlayrooms(categoryName)
       } else if (this.tabType === 'video') {
         if (tabName === '전체') {
-          // getAllVideos()
+          this.getAllCategoryVideos()
         } else if (tabName === '지금 핫한') {
-          // getHotVideos()
+          this.getHotCategoryVideos()
         } else {
           const categoryId = this.tabsMatchVideo.tabName
-          // getVideoCategory(categoryName)
+          this.getCategoryVideos(categoryName)
         }
       }
     }
@@ -132,3 +151,5 @@ export default {
 <style>
 
 </style>
+
+

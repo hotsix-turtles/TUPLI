@@ -5,6 +5,7 @@ import { DurationChange } from '../../utils/utils';
 const video = {
   namespaced: true,
   state: {
+    // [검색]
     addedVideos: [], // 생성용으로 추가한 영상
     selectedVideos: [], // 생성용으로 추가하기 위해 선택한 영상
     searchedVideos: [], // 검색한 영상
@@ -16,8 +17,26 @@ const video = {
     order: '', // 정렬 필터
     likedVideos: [], // 좋아한 영상
     order: 'relevance', // 정렬 타입
+
+    // [둘러보기]
+    categoryVideos: {
+      '전체': [],
+      '지금 핫한': [],
+      '여행': [],
+      '게임': [],
+      '일상': [],
+      '노하우/스타일': [],
+      '동물': [],
+      '엔터테인먼트': [],
+      '영화/드라마': [],
+      '음악': [],
+      '교육/시사': [],
+      '스포츠': [],
+      '기타': [],
+    }
   },
   mutations: {
+    // [검색]
     // Video Search State 초기화
     RESET_VIDEO_SEARCH_STATE: function (state) {
       state.searchedVideos = []
@@ -71,6 +90,7 @@ const video = {
         state.rerenderKey = addInfos[0].id
       })
     },
+    // 무한스크롤 검색
     SEARCH_VIDEOS_BY_SCROLL: function (state, searchedVideos) {
       state.searchedVideoIds = []
       for (let searchedVideo of searchedVideos) {
@@ -142,6 +162,7 @@ const video = {
     }
   },
   actions: {
+    // [검색]
     // Video 검색 데이터 초기화
     resetVideoSearchState: function ({ state, commit }) {
       commit('RESET_VIDEO_SEARCH_STATE')
@@ -232,17 +253,14 @@ const video = {
             maxResults: 5, // 반환할 영상 개수
             pageToken: state.nextPageToken,
           }
-          // console.log(params)
           axios({
             method: 'get',
             url: SEARCH_API_URL,
             params,
           })
             .then((res) => {
-              // console.log(res)
               commit('NEXT_PAGE_TOKEN', res.data.nextPageToken)
               commit('SEARCH_VIDEOS_BY_SCROLL', res.data.items)
-              // console.log('248 NEXT_PAGE_TOKEN', res.data.nextPageToken)
             })
             .then(() => {
               dispatch('searchVideosAddInfo')
