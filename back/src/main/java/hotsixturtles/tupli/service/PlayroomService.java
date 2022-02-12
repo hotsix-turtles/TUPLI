@@ -10,9 +10,13 @@ import hotsixturtles.tupli.dto.simple.SimpleYoutubeVideoDto;
 import hotsixturtles.tupli.entity.*;
 import hotsixturtles.tupli.entity.likes.PlayroomLikes;
 import hotsixturtles.tupli.entity.likes.UserLikes;
+import hotsixturtles.tupli.entity.meta.UserInfo;
 import hotsixturtles.tupli.entity.youtube.YoutubeVideo;
 import hotsixturtles.tupli.repository.*;
 import hotsixturtles.tupli.repository.likes.PlayroomLikesRepository;
+import hotsixturtles.tupli.service.list.CategoryList;
+import hotsixturtles.tupli.service.list.TasteScore;
+import hotsixturtles.tupli.utils.TasteUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -33,6 +37,7 @@ public class PlayroomService {
 
     private final UserRepository userRepository;
     private final UserService userService;
+    private final UserInfoRepository userInfoRepository;
     private final PlayroomRepository playroomRepository;
     private final YoutubeVideoRepository youtubeVideoRepository;
     private final NotificationService notificationService;
@@ -77,6 +82,10 @@ public class PlayroomService {
         User maker = userRepository.findByUserSeq(userSeq);
         playroom.setUser(maker);
 
+        // 유저 취향 가져오기
+        UserInfo userInfo = userInfoRepository.findOneByUserSeq(userSeq);
+        ConcurrentHashMap<String, Integer> tasteInfo = userInfo.getTasteInfo();
+
         playroom.setTitle(playroomDto.getTitle());
         playroom.setContent(playroomDto.getContent());
         playroom.setIsPublic(playroomDto.getIsPublic());
@@ -116,6 +125,13 @@ public class PlayroomService {
                 Integer categoryId = existVideo.getCategoryId();
                 Integer count = playroomInfo.getOrDefault(categoryId, 0);
                 playroomInfo.put(categoryId, count+1);
+
+                // 카테고리에 따른 분류
+                String category = CategoryList.CATEGORY_LIST.getOrDefault(categoryId, "기타");
+
+                // 취향 반영
+                Integer tasteScore = tasteInfo.getOrDefault(category, 0);
+                tasteInfo.put(category, tasteScore + TasteScore.SCORE_PLAYROOM_MAKE);
             }
             playlists.put(entry.getKey(), playroomPlList);
 
@@ -179,6 +195,15 @@ public class PlayroomService {
 
         }
 
+        // 유저 정보 저장
+        userInfo.setTasteInfo(tasteInfo);
+        userInfoRepository.save(userInfo);
+
+        // 유저 취향 분석 후 저장
+        List<String> userTaste = TasteUtil.getTaste(tasteInfo);
+        maker.setTaste(userTaste);
+        userRepository.save(maker);
+
         HomeInfo homeInfo = new HomeInfo();
         homeInfo.setType("playroom");
         homeInfo.setInfoId(nowPlayroom.getId());
@@ -238,18 +263,40 @@ public class PlayroomService {
     }
 
     @Transactional
-    public void addPlaylistLike(Long userSeq, Long playroomId){
+    public void addPlayroomLike(Long userSeq, Long playroomId){
         PlayroomLikes playroomlike = playroomLikesRepository.findExist(userSeq, playroomId);
         if(playroomlike == null) {
+            User user = userRepository.findByUserSeq(userSeq);
+
             PlayroomLikes playroomLikes = new PlayroomLikes();
             playroomLikes.setPlayroom(playroomRepository.findById(playroomId).orElse(null));
-            playroomLikes.setUser(userRepository.findByUserSeq(userSeq));
+            playroomLikes.setUser(user);
             playroomLikesRepository.save(playroomLikes);
 
             // 한길 : playroom 에 좋아요 눌렸을 때 +1 하기
             Playroom playroom = playroomRepository.getById(playroomId);
             playroom.setLikesCnt(playroom.getLikesCnt()+1);
             playroomRepository.save(playroom);
+
+            // 취향분석
+            // 유저 취향 가져오기
+            UserInfo userInfo = userInfoRepository.findOneByUserSeq(userSeq);
+            ConcurrentHashMap<String, Integer> tasteInfo = userInfo.getTasteInfo();
+            for (YoutubeVideo youtubeVideo : playroom.getVideos()) {
+                // 카테고리에 따른 분류
+                String category = CategoryList.CATEGORY_LIST.getOrDefault(youtubeVideo.getCategoryId(), "기타");
+                // 취향 반영
+                Integer tasteScore = tasteInfo.getOrDefault(category, 0);
+                tasteInfo.put(category, tasteScore + TasteScore.SCORE_PLAYROOM_LIKE);
+            }
+            // 유저 정보 저장
+            userInfo.setTasteInfo(tasteInfo);
+            userInfoRepository.save(userInfo);
+            // 유저 취향 분석 후 저장
+            List<String> userTaste = TasteUtil.getTaste(tasteInfo);
+            user.setTaste(userTaste);
+            userRepository.save(user);
+
         } else {
             // 익셉션 발생
         }
@@ -271,12 +318,33 @@ public class PlayroomService {
         }
     }
 
+    // 회원 입장시 발생
     @Transactional
     public void addGuest(Long userSeq, Playroom playroom) {
         List<Long> guests = playroom.getGuests();
         guests.add(userSeq);
         playroom.setGuests(guests);
         playroomRepository.save(playroom);
+
+        // 취향분석
+        User user = userRepository.findByUserSeq(userSeq);
+        // 유저 취향 가져오기
+        UserInfo userInfo = userInfoRepository.findOneByUserSeq(userSeq);
+        ConcurrentHashMap<String, Integer> tasteInfo = userInfo.getTasteInfo();
+        for (YoutubeVideo youtubeVideo : playroom.getVideos()) {
+            // 카테고리에 따른 분류
+            String category = CategoryList.CATEGORY_LIST.getOrDefault(youtubeVideo.getCategoryId(), "기타");
+            // 취향 반영
+            Integer tasteScore = tasteInfo.getOrDefault(category, 0);
+            tasteInfo.put(category, tasteScore + TasteScore.SCORE_PLAYROOM_VISIT);
+        }
+        // 유저 정보 저장
+        userInfo.setTasteInfo(tasteInfo);
+        userInfoRepository.save(userInfo);
+        // 유저 취향 분석 후 저장
+        List<String> userTaste = TasteUtil.getTaste(tasteInfo);
+        user.setTaste(userTaste);
+        userRepository.save(user);
     }
 
     @Transactional
