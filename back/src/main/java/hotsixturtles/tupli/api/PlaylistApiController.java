@@ -88,7 +88,7 @@ public class PlaylistApiController {
 
         badgeResult.addAll(badgeService.checkPlaylistMake(userSeq, badges));
 
-        if(badgeResult.size() == 0) badgeResult = null;
+        if(badgeResult.size() == 0) return ResponseEntity.status(HttpStatus.CREATED).body(new IdResponse(playlist.getId(), null));
 
         List<SimpleBadgeDto> badgeDtoResult = badgeResult.stream().map(b -> new SimpleBadgeDto(b)).collect(Collectors.toList());
 
