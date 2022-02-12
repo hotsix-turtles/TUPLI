@@ -11,10 +11,7 @@ import video from './modules/video.js'
 import playlist from './modules/playlist.js'
 import common from './modules/common.js'
 import board from './modules/board.js'
-<<<<<<< HEAD
-=======
 import mainContent from './modules/mainContent.js'
->>>>>>> 9e7e30162e4201a35c1023ea5b16cc6064219682
 
 import axios from 'axios'
 import SERVER from '@/api/server'
@@ -68,13 +65,13 @@ export default new Vuex.Store({
         state.profileImage = null
       }
       state.is_vip = res.is_vip
-      
+
       if (res.to_user != null) { // 서버 오류시 프로필의 following.length 망가지는 것 방지
         state.following = res.to_user
       }
       if(res.from_user != null) { // 서버 오류시 프로필의 followers.length 망가지는 것 방지
         state.followers = res.from_user
-      }      
+      }
       state.taste = res.taste
     },
     // 유저 설정만 갱신
