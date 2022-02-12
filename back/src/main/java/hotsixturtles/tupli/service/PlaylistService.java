@@ -142,7 +142,7 @@ public class PlaylistService {
         Map<String, Integer> topFour =
                 tasteInfo.entrySet().stream()
                         .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
-                        .limit(4)
+                        .limit(5)
                         .collect(Collectors.toMap(
                                 Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
         for (String category : topFour.keySet()) {
