@@ -9,7 +9,7 @@
     <!-- 하얀색 모달 목록 -->
     <div
       v-if="showModal"
-      class="fixed-bottom light-background px-5 py-5"
+      class="fixed-bottom light-background px-5 py-5 animate__animated animate__slideInUp"
     >
       <div class="d-flex justify-space-between">
         <div class="font-2 bold mb-3">

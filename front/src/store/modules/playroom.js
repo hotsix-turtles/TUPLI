@@ -33,6 +33,9 @@ const playroom = {
 
     // [검색]
     searchedPlayrooms: [],
+
+    // [둘러보기]
+    categoryPlayrooms: [],
   },
   mutations: {
     RESET_VUEX_DATA: function (state) {
@@ -151,7 +154,21 @@ const playroom = {
         playroom.endTime = playtimeConverter(playroom.endTime)
       })
       state.searchedPlayrooms = playrooms
-      console.log(playrooms)
+    },
+    // [둘러보기]
+    GET_CATEGORY_PLAYROOMS: function (state, playrooms) {
+      let today = new Date()
+      playrooms.forEach((playroom) => {
+        if (playroom.startTime <= today && playroom.endTime >= today) {
+          playroom.onPlay = true
+        } else {
+          playroom.onPlay = false
+        }
+        playroom.startTime = playtimeConverter(playroom.startTime)
+        playroom.endTime = playtimeConverter(playroom.endTime)
+      })
+      state.categoryPlayrooms = playrooms
+      console.log(state.categoryPlayrooms)
     },
   },
   actions: {
@@ -223,6 +240,40 @@ const playroom = {
       }).catch((err) => {
         console.log(err)
       })
+    },
+    // [둘러보기]
+    getCategoryPlayrooms: function ({ commit }, categoryName) {
+      console.log('playroom.js 245 getCategoryPlayrooms')
+      axiosConnector.get(`/playroom/category/${categoryName}`,
+      ).then((res) => {
+        console.log(res)
+        console.log(`/playroom/category/${categoryName}`, categoryName)
+        commit('GET_CATEGORY_PLAYROOMS', res.data)
+      })
+        .catch((err) => {
+          console.log(err)
+        })
+    },
+    // [좋아요]
+    // 플레이룸 좋아요
+    likePlayroom: function ({}, playroomId) {
+      axiosConnector.post(`/playroom/${playroomId}/like`,
+      ).then((res) => {
+        console.log('playroom.js 259 likePlayroom', res)
+      })
+        .catch((err) => {
+          console.log(err)
+        })
+    },
+    // 플레이룸 좋아요 취소
+    unlikePlayroom: function ({}, playroomId) {
+      axiosConnector.delete(`/playroom/${playroomId}/like`,
+      ).then((res) => {
+        console.log('playroom.js 259 unlikePlayroom', res)
+      })
+        .catch((err) => {
+          console.log(err)
+        })
     },
   },
   getters: {

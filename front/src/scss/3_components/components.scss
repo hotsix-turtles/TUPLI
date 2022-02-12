@@ -36,7 +36,7 @@
 }
 
 .fixed-bottom-navbar {
-  z-index: 5 !important;
+  z-index: 9 !important;
   position: fixed !important;
   bottom: 0 !important;
   width: 100% !important;
@@ -53,7 +53,7 @@
 .fixed-black-background {
   display: inline-block;
   position: fixed !important;
-  z-index: 4;
+  z-index: 7;
   top: 0 !important;
   width: 100% !important;
 }
@@ -67,7 +67,7 @@
   position: relative;
 }
 
-// 영상 길이
+// 시청자수/영상길이
 .duration {
   position: absolute;
   bottom: 3px;
@@ -91,6 +91,31 @@
   padding: 2px 2px 2px 2px;
 }
 
+// 큰 영상용 시청자수/영상길이
+.duration-big {
+  position: absolute;
+  bottom: 13px;
+  right: 5px;
+  background-color: rgba($color: #000000, $alpha: 0.6);
+  color: white;
+  border-radius: 5px;
+  font-size: 16px;
+  padding: 2px 0px 0px 2px;
+}
+
+// 큰 영상용 현재 플레이 여부
+.on-play-big {
+  position: absolute;
+  top: 7px;
+  left: 5px;
+  background-color: red;
+  color: white;
+  border-radius: 5px;
+  font-size: 13px;
+  padding: 2px;
+}
+
+// 그림자
 .shadow-s {
   box-shadow: 4px 4px 3px #000;
 }
@@ -273,3 +298,44 @@
   left: 50%;
   transform: translate(-50%, 0%);
 }
+
+// 1줄 ... 표시
+.txt-1 {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 1; /* 라인수 */
+  -webkit-box-orient: vertical;
+  word-wrap:break-word;
+}
+
+// 2줄 ... 표시
+.txt-2 {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2; /* 라인수 */
+  -webkit-box-orient: vertical;
+  word-wrap:break-word;
+}
+
+// 3줄 ... 표시
+.txt-3 {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 3; /* 라인수 */
+  -webkit-box-orient: vertical;
+  word-wrap:break-word;
+}
+
+// 4줄 ... 표시
+.txt-4 {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 4; /* 라인수 */
+  -webkit-box-orient: vertical;
+  word-wrap:break-word;
+}
+

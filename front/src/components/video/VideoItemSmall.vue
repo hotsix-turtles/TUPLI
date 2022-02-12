@@ -21,21 +21,19 @@
           >
           <span class="duration">{{ video.duration }}</span>
         </div>
-        <div class="d-flex-column ml-2">
+        <div class="d-flex-column mx-2">
           <div
             class="h6"
           >
-            <div class="font-3 semi-bold line-height-s">
+            <div class="font-3 semi-bold line-height-s txt-3">
               {{ video.title }}
             </div>
           </div>
           <div class="font-4 color-dark-gray">
-            <span>{{ video.channelTitle }}</span>
+            <div>{{ video.channelTitle }}</div>
+            <div>{{ video.date.slice(0, 10) }}</div>
           </div>
         </div>
-      </div>
-      <div class="">
-        <v-icon>mdi-dots-vertical</v-icon>
       </div>
     </div>
   </v-card>

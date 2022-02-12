@@ -251,7 +251,6 @@ export default {
     }),
     ...mapState('video', {
       searchedVideos: state => state.searchedVideos,
-      rerenderKey: state => state.rerenderKey,
       nextPageToken: state => state.nextPageToken,
     }),
     ...mapState('common', {

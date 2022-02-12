@@ -4,9 +4,9 @@
     v-if="selectedVideos.length"
     absolute
     background-color="#5B5C9D"
-    height="50px"
+    height="60px"
     :input-value="selectedVideos.length > 0"
-    class="fixed-bottom"
+    class="fixed-bottom animate__animated animate__slideInUp"
   >
     <v-badge
       :content="selectedVideos.length"
