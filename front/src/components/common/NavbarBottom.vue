@@ -85,8 +85,8 @@
         <div
           v-if="isLogin"
           class="clickable profile"
-          :class="{ 'border-colored': selectedPage === 'Profile' }"
-          @click="changeRouter('Profile')"
+          :class="{ 'border-colored': selectedPage === 'MyProfile' }"
+          @click="changeRouter('MyProfile')"
         >
           {{ profileImage }}
         </div>

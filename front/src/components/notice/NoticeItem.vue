@@ -5,6 +5,7 @@
       <div
         class="d-flex justify-center align-center notice-img"
         style="background-color: yellow; border-radius: 100%;"
+        @click="setProfile"
       >
         <img
           src="@/assets/tupli_logo2_dark.png"
@@ -40,7 +41,10 @@
             15분
           </p>
         </div>
-        <v-btn class="ml-4">
+        <v-btn
+          class="ml-4"
+          @click="clickFollow"
+        >
           팔로우
         </v-btn>
       </div>
@@ -132,17 +136,9 @@ export default {
     setProfile: function() {
       this.$router.push({ name: 'Profile' })
     },
-    // 알림 타입 구분
-    noticeTypeCheck: function() {
-      if (notice.type === 'follow') {
-        this.noticeType = '팔로우'
-      }
-      else if (notice.type === 'playroomMake') {
+    // 팔로우
+    clickFollow: function() {
 
-      }
-      else {
-
-      }
     }
   },
 }
