@@ -1,16 +1,12 @@
 package hotsixturtles.tupli.api;
 
-import hotsixturtles.tupli.dto.BoardDto;
-import hotsixturtles.tupli.dto.PlaylistDto;
 import hotsixturtles.tupli.dto.PlayroomDto;
 import hotsixturtles.tupli.dto.PlayroomLikesDto;
 import hotsixturtles.tupli.dto.request.RequestPlayroomDto;
 import hotsixturtles.tupli.dto.response.ErrorResponse;
 import hotsixturtles.tupli.dto.simple.SimpleBadgeDto;
-import hotsixturtles.tupli.dto.simple.SimplePlaylistCategoryDto;
 import hotsixturtles.tupli.dto.simple.SimplePlayroomCategoryDto;
 import hotsixturtles.tupli.entity.Badge;
-import hotsixturtles.tupli.entity.Playlist;
 import hotsixturtles.tupli.entity.Playroom;
 import hotsixturtles.tupli.entity.UserBadge;
 import hotsixturtles.tupli.entity.likes.PlayroomLikes;
@@ -36,9 +32,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 

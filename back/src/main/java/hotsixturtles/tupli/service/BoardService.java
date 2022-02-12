@@ -1,8 +1,12 @@
 package hotsixturtles.tupli.service;
 
+import hotsixturtles.tupli.dto.request.BoardRequestDto;
+import hotsixturtles.tupli.dto.request.PlaylistRequest;
 import hotsixturtles.tupli.dto.simple.SimpleHomeInfoDto;
 import hotsixturtles.tupli.entity.Board;
 import hotsixturtles.tupli.entity.HomeInfo;
+import hotsixturtles.tupli.entity.Playlist;
+import hotsixturtles.tupli.entity.Playroom;
 import hotsixturtles.tupli.entity.likes.BoardLikes;
 import hotsixturtles.tupli.repository.*;
 import lombok.RequiredArgsConstructor;
@@ -17,16 +21,12 @@ import java.util.List;
 @RequiredArgsConstructor
 public class BoardService {
 
-    private final BoardRepository boardRepository;
-
     private final UserRepository userRepository;
-
-    private final CommentRepository commentRepository;
-
+    private final BoardRepository boardRepository;
+    private final PlaylistRepository playlistRepository;
+    private final PlayroomRepository playroomRepository;
     private final BoardLikesRepository boardLikesRepository;
-
     private final BoardRepositoryCustom boardRepositoryCustom;
-
     private final HomeInfoRepository homeInfoRepository;
 
     //    @Transactional
@@ -56,18 +56,38 @@ public class BoardService {
     }
 
     @Transactional
-    public Board addBoard(Long userSeq, Board board){
+    public Board addBoard(Long userSeq, BoardRequestDto boardDto){
+        // 기본 설정
+        Board board = new Board();
+        board.setTitle(boardDto.getTitle());
+        board.setContent(boardDto.getContent());
 
+        // 연결
         board.setUser(userRepository.findByUserSeq(userSeq));
+        // 플레이룸 연계 게시물
+        if (boardDto.getType().equals("playroom")) {
+            Playroom playroom = playroomRepository.findById(boardDto.getTypeId()).orElse(null);
+            if (playroom != null) {
+                board.setPlayroom(playroom);
+            }
+        }
+        // 플레이리스트 연계 게시물
+        if (boardDto.getType().equals("playlist")) {
+            Playlist playlist = playlistRepository.findById(boardDto.getTypeId()).orElse(null);
+            if (playlist != null) {
+                board.setPlaylist(playlist);
+            }
+        }
         Board nowBoard = boardRepository.save(board);
 
+        // Home쪽 연결
         HomeInfo homeInfo = new HomeInfo();
         homeInfo.setType("board");
         homeInfo.setInfoId(nowBoard.getId());
 
         homeInfoRepository.save(homeInfo);
-
         return board;
+
     }
 
     @Transactional

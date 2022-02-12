@@ -1,11 +1,9 @@
 package hotsixturtles.tupli.api;
 
-import hotsixturtles.tupli.dto.BoardDto;
+import hotsixturtles.tupli.dto.response.BoardResponseDto;
 import hotsixturtles.tupli.dto.PlaylistDto;
 import hotsixturtles.tupli.dto.PlayroomDto;
-import hotsixturtles.tupli.dto.simple.SimpleHomeInfoDto;
 import hotsixturtles.tupli.entity.Board;
-import hotsixturtles.tupli.entity.HomeInfo;
 import hotsixturtles.tupli.entity.Playlist;
 import hotsixturtles.tupli.entity.Playroom;
 import hotsixturtles.tupli.service.BoardService;
@@ -40,7 +38,7 @@ public class HomeApiController {
     public ResponseEntity<?> getHomeBoardList(@PageableDefault(size = 10, sort ="id",  direction = Sort.Direction.DESC) Pageable pageable){
         List<Board> boardList= boardService.getHomeBoardList(pageable);
         if(boardList.size() == 0) return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
-        List<BoardDto> result = boardList.stream().map(b -> new BoardDto(b)).collect(Collectors.toList());
+        List<BoardResponseDto> result = boardList.stream().map(b -> new BoardResponseDto(b)).collect(Collectors.toList());
 
         return ResponseEntity.ok().body(result);
     }

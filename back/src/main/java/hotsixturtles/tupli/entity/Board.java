@@ -22,8 +22,8 @@ public class Board {
 
     @Size(max = 200)
     private String title;
-
     private String content;
+    private String type; // null, "playlist", "playroom"
 
     @Column(name = "created_at")
     private OffsetDateTime created;
@@ -51,6 +51,12 @@ public class Board {
 
     @OneToMany(mappedBy = "board")
     private List<BoardLikes> boardLikes = new ArrayList<>();
+
+    @OneToOne(mappedBy = "board")
+    private Playlist playlist;
+
+    @OneToOne(mappedBy = "board")
+    private Playroom playroom;
 
 
 }

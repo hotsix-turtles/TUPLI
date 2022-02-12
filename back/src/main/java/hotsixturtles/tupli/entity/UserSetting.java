@@ -16,7 +16,7 @@ public class UserSetting {
     @GeneratedValue
     private Long id;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
 

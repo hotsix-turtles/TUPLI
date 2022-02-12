@@ -1,7 +1,6 @@
 package hotsixturtles.tupli.api;
 
 
-import hotsixturtles.tupli.dto.BoardDto;
 import hotsixturtles.tupli.dto.response.ErrorResponse;
 import hotsixturtles.tupli.dto.simple.SimpleBadgeDto;
 import hotsixturtles.tupli.entity.Badge;
