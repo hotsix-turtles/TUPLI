@@ -65,15 +65,30 @@ export default new Vuex.Store({
         state.profileImage = null
       }
       state.is_vip = res.is_vip
-      state.following = res.to_user
-      state.followers = res.from_user
+      
+      if (res.to_user != null) { // 서버 오류시 프로필의 following.length 망가지는 것 방지
+        state.following = res.to_user
+      }
+      if(res.from_user != null) { // 서버 오류시 프로필의 followers.length 망가지는 것 방지
+        state.followers = res.from_user
+      }      
       state.taste = res.taste
+    },
+    // 유저 설정만 갱신
+    GET_USER_SETTING(state, res) {
+      state.alarmSetting = res.alarmSetting,
+      state.alarmOnRealtime = res.alarmOnRealtime,
+      state.alarmOnInvite = res.alarmOnInvite,
+      state.inviteDomain = res.inviteDomain,
+      state.alarmOnPlayroomMake = res.alarmOnPlayroomMake,
+      state.alarmOnBadge = res.alarmOnBadge
     },
     // 프로필 변경
     UPDATE_PROFILE(state, res) {
-      console.log('프로필 변경', res)
-      state.nickname = res.nickname
-      state.introduction = res.introduction
+      // 임시일지 최종일지 확인 필요
+      state.nickname = decodeURIComponent(res.nickname)
+      state.introduction = decodeURIComponent(res.introduction)
+      // OAUTH 고려
       if (res.image) {
         image = SERVER.ROUTES.image + res.image
       } else {
@@ -97,6 +112,7 @@ export default new Vuex.Store({
           console.log('로그인', res)
           commit('TOKEN', res.data.token)
           dispatch('getUserInfo', res.data.token)
+          dispatch('getSetting', res.data.token)
           router.push({ name: 'Home' })
         })
         .catch((err) => {
@@ -116,6 +132,7 @@ export default new Vuex.Store({
         .then((res) => {
           commit('TOKEN', res.data.token)
           dispatch('getUserInfo', res.data.token)
+          dispatch('getSetting', res.data.token)
         })
         .catch((err) => {
           console.log(err.response.data)
@@ -128,7 +145,7 @@ export default new Vuex.Store({
     },
     // jwt 토큰 유효 여부 + 자동 로그아웃
     checkLogin({commit}, state) {
-      console.log('자동로그아웃 chk', localStorage.getItem('jwt'))
+      // console.log('자동로그아웃 chk', localStorage.getItem('jwt'))
       if (localStorage.getItem('jwt') === null || localStorage.getItem('jwt') === undefined) {
         // 토큰 없음
         commit('DELETE_TOKEN')
@@ -182,10 +199,24 @@ export default new Vuex.Store({
         headers: {Authorization: token}
       })
         .then(res => {
-          console.log(res.data)
           commit('GET_USER_INFO', res.data)
         })
         .catch(err => console.log(err.response.data))
+    },
+    // 사용자 설정 얻기
+    getSetting({commit}, token)  {
+      axios({
+        method: 'GET',
+        url: SERVER.URL + '/account/setting',
+        headers: {Authorization: token}
+      })
+        .then((res) => {
+          // 설정 정보 갱신
+          commit('GET_USER_SETTING', res.data)
+        })
+        .catch((err) => {
+          console.log(err.response.data)
+        })
     },
   },
   modules: {
