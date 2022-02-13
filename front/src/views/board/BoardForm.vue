@@ -75,8 +75,10 @@
               선택하기
             </v-btn>
           </v-col>
+
           {{ formData.radioVal }}
           {{ selectedPlaylist }}
+          {{ selectedPlayroom }}
           <!-- <playlist-item-medium
             v-for="(playlist, idx) in selectedPlaylist"
             :key="idx"
@@ -122,7 +124,8 @@ export default {
     ...mapState('board', {
       savedFormData: state => state.savedFormData,
       isSaved: state => state.isSaved,
-      selectedPlaylist: state => state.selectedPlaylist
+      selectedPlaylist: state => state.selectedPlaylist,
+      selectedPlayroom: state => state.selectedPlayroom
     }),
   },
   created: function() {
@@ -137,7 +140,8 @@ export default {
   methods: {
     ...mapActions('board', [
       'saveFormData',
-      'resetBoardPlaylistAddState'
+      'resetBoardPlaylistAddState',
+      'selectPlaylistOrPlayroom'
     ]),
     onClickCompletion: function () {
       // 필수항목을 채웠는가?
@@ -186,6 +190,7 @@ export default {
         console.log("플레이룸 또는 플레이리스트 선택바람.")
       }
       else {
+        this.selectPlaylistOrPlayroom(this.formData.radioVal);
         this.saveFormData(this.formData)
         if(this.formData.radioVal == "playroom") {
           this.$router.push({ name: 'BoardSelectPlayroom' })

@@ -24,7 +24,7 @@
 </template>
 
 <script>
-import { mapActions } from 'vuex'
+import { mapState, mapActions } from 'vuex'
 
 export default {
   name: 'AddButtonBottom',
@@ -35,15 +35,32 @@ export default {
       type: Object, default() {}
     }
   },
+  computed: {
+    ...mapState('board', {
+      playlistOrPlayroom: state => state.playlistOrPlayroom,
+    })
+  },
+  created: function() {
+    console.log("ABBP에서", this.playlistOrPlayroom)
+  },
   methods: {
     ...mapActions('board', [
-      'selectPlaylist'
+      'selectPlaylist',
+      'selectPlayroom'
     ]),
     runSelectPlaylist() {
-      console.log("you selected", this.selected)
-      this.selectPlaylist(this.selected)
-      this.$router.push({ name: 'BoardForm'})
+      if(this.playlistOrPlayroom == "playlist") {
+        console.log("you selected", this.selected)
+        this.selectPlaylist(this.selected)
+        this.$router.push({ name: 'BoardForm'})
+      }
+      else if(this.playlistOrPlayroom == "playroom") {
+        console.log("you selected playroom, and ", this.selected)
+        this.selectPlayroom(this.selected)
+        this.$router.push({ name: 'BoardForm'})
+      }
     }
-  }
+  },
+
 }
 </script>
