@@ -34,13 +34,19 @@
           게시글
         </v-tab>
         <v-tab-item>
-          <playlist-list />
+          <playlist-list
+            class="mt-3"
+          />
         </v-tab-item>
         <v-tab-item>
-          <playroom-list />
+          <playroom-list
+            class="mt-3"
+          />
         </v-tab-item>
         <v-tab-item>
-          <post-list />
+          <post-list
+            class="mt-3"
+          />
         </v-tab-item>
       </v-tabs>
     </div>
@@ -65,56 +71,56 @@ export default {
   },
   data: function() {
     return {
-      playlistLikesList: [],
-      playroomLikesList: [],
-      BoardLikesList: []
+      // playlistLikesList: [],
+      // playroomLikesList: [],
+      // BoardLikesList: []
     }
   },
   computed: {
     ...mapState(['authToken'])
   },
   created: function() {
-    this.getBoardLikesList()
-    this.getPlaylistLikesList()
-    this.getPlayroomLikesList()
+    // this.getBoardLikesList()
+    // this.getPlaylistLikesList()
+    // this.getPlayroomLikesList()
   },
   methods: {
-    // 좋아요 한 플레이리스트들
-    getPlaylistLikesList: function() {
-      axios({
-        method: 'GET',
-        url: SERVER.URL + '/playlist/likes',
-        headers: {Authorization: this.authToken}
-      })
-        .then((res) => {
-          console.log('플레이리스트', res.data)
-          this.playlistLikesList = res.data
-        }) 
-    },
-    // 좋아요 한 플레이룸
-    getPlayroomLikesList: function() {
-      axios({
-        method: 'GET',
-        url: SERVER.URL + '/playroom/likes',
-        headers: {Authorization: this.authToken}
-      })
-        .then((res) => {
-          console.log('플레이룸', res.data)
-          this.playlistLikesList = res.data
-        }) 
-    },
-    // 좋아요 한 게시물들
-    getBoardLikesList: function() {
-      axios({
-        method: 'GET',
-        url: SERVER.URL + '/board/likes',
-        headers: {Authorization: this.authToken}
-      })
-        .then((res) => {
-          console.log('게시물', res.data)
-          this.playlistLikesList = res.data
-        }) 
-    }
+    // // 좋아요 한 플레이리스트들
+    // getPlaylistLikesList: function() {
+    //   axios({
+    //     method: 'GET',
+    //     url: SERVER.URL + '/playlist/likes',
+    //     headers: {Authorization: this.authToken}
+    //   })
+    //     .then((res) => {
+    //       console.log('플레이리스트', res.data)
+    //       this.playlistLikesList = res.data
+    //     })
+    // },
+    // // 좋아요 한 플레이룸
+    // getPlayroomLikesList: function() {
+    //   axios({
+    //     method: 'GET',
+    //     url: SERVER.URL + '/playroom/likes',
+    //     headers: {Authorization: this.authToken}
+    //   })
+    //     .then((res) => {
+    //       console.log('플레이룸', res.data)
+    //       this.playlistLikesList = res.data
+    //     })
+    // },
+    // // 좋아요 한 게시물들
+    // getBoardLikesList: function() {
+    //   axios({
+    //     method: 'GET',
+    //     url: SERVER.URL + '/board/likes',
+    //     headers: {Authorization: this.authToken}
+    //   })
+    //     .then((res) => {
+    //       console.log('게시물', res.data)
+    //       this.playlistLikesList = res.data
+    //     })
+    // }
   }
 
 

@@ -118,15 +118,15 @@ export default {
       // 물론 서버에서 처리하면 서버와 DB에서도 읽을 수 있다.
       formData.append('nickname', encodeURIComponent(this.credentials.newNickname))
       formData.append('introduction', encodeURIComponent(this.credentials.newIntroduction))
-      axios({
-        method: 'PUT',
-        headers: {Authorization: this.authToken},
-        url: SERVER.URL + '/profile',
-        data: formData
-      })
-      // axiosConnector.put(`/profile`,
-      //   formData
-      // )
+      // axios({
+      //   method: 'PUT',
+      //   headers: {Authorization: this.authToken},
+      //   url: SERVER.URL + '/profile',
+      //   data: formData
+      // })
+      axiosConnector.put(`/profile`,
+        formData
+      )
         .then((res) => {
           this.$router.push({ name: 'MyProfile' })
           // state 갱신
