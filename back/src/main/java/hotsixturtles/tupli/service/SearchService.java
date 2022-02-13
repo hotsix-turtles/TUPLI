@@ -54,25 +54,27 @@ public class SearchService {
     }
 
     public List<SearchHistory> searchRankList(){
-        return searchHistoryRepository.findTop10ByOrderByScoreDesc();
+        return searchHistoryRepository.findTop10ByOrderByScoreDescIdDesc();
     }
 
     @Transactional
     public void addScoreNum(SearchHistory searchHistory){
         List<SearchHistory> searchHistoryList = searchHistoryRepository.findByKeyword(searchHistory.getKeyword().trim());
-
-        if(searchHistoryList.size() != 0){
-            for(SearchHistory findHistory: searchHistoryList){
-                if(findHistory.getKeyword().trim().equals(searchHistory.getKeyword().trim())
-                        && findHistory.getType().equals(searchHistory.getType())){
-                    findHistory.setScore(findHistory.getScore() + 1);
+        if(searchHistoryList != null && searchHistoryList.size() != 0) {
+            for (SearchHistory findHistory : searchHistoryList) {
+                if (findHistory.getKeyword().trim().equals(searchHistory.getKeyword().trim())
+                        && findHistory.getType().equals(searchHistory.getType())) {
+                    findHistory.setScore(findHistory.getScore() + 10);
+                    findHistory.setNoSearch(0);
+                    searchHistoryRepository.save(findHistory);
                     return;
                 }
             }
         }
 
-        searchHistory.setScore(1);
+        searchHistory.setScore(10);
         searchHistoryRepository.save(searchHistory);
+
     }
 
     // 카테고리 분류 플레이리스트 (나중에 이동)
