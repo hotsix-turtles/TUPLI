@@ -18,14 +18,13 @@ export default {
   components: {
   },
   props: {
-    // eslint-disable-next-line vue/require-default-prop
-    pageName: {
-      type: [Object, String],
-    }
+    pageName: {type: String, default: ''},
+    cnt: {type: Number, default: 0}, // 같은 페이지 안에서 여러 번 페이지 변경한뒤 상위 페이지로 가고싶을때 사용
   },
   methods: {
     goBack: function() {
-      this.$router.go(-1)
+      const goCnt = -1 - this.cnt
+      this.$router.go(goCnt)
     }
   }
 }

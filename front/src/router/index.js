@@ -36,7 +36,7 @@ import Category from '@/views/common/Category'
 import Search from '@/views/common/Search'
 import SearchDetail from '@/views/common/SearchDetail'
 // video
-import VideoSearch from '../views/video/VideoSearch.vue'
+import VideoSearch from '../views/playlist/VideoSearch.vue'
 import VideoWatch from '../views/video/VideoWatch.vue'
 // playroom
 import PlayroomForm from '../views/playroom/PlayroomForm.vue'
@@ -141,7 +141,7 @@ const routes = [
     // }
   },
   {
-    path: '/video/watch',
+    path: '/video/watch/:isVideoList',
     name: 'VideoWatch',
     component: VideoWatch
   },

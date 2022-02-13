@@ -14,14 +14,42 @@
       <div class="d-flex">
         <div class="video-thumbnail">
           <img
+            v-if="!isVideoList"
             :src="video.thumbnail"
             style="width: 35vw; height: 100px; object-fit: cover;"
             class=""
             @click="watchingVideo(video)"
           >
+          <img
+            v-else
+            :src="video.thumbnail"
+            style="width: 35vw; height: 100px; object-fit: cover;"
+            class=""
+            @click="changeVideo(video)"
+          >
           <span class="duration">{{ video.duration }}</span>
         </div>
-        <div class="d-flex-column mx-2">
+        <div
+          v-if="!isVideoList"
+          class="d-flex-column mx-2"
+        >
+          <div
+            class="h6"
+          >
+            <div class="font-3 semi-bold line-height-s txt-3">
+              {{ video.title }}
+            </div>
+          </div>
+          <div class="font-4 color-dark-gray">
+            <div>{{ video.channelTitle }}</div>
+            <div>{{ video.date.slice(0, 10) }}</div>
+          </div>
+        </div>
+        <div
+          v-else
+          class="d-flex-column mx-2"
+          @click="changeVideo(video)"
+        >
           <div
             class="h6"
           >
@@ -45,8 +73,8 @@ import { mapActions, mapState } from 'vuex'
 export default {
   name: 'VideoItemSmall',
   props: {
-    // eslint-disable-next-line vue/require-default-prop
-    video: { type: Object },
+    video: { type: Object, default () { } },
+    isVideoList: { type: Boolean, default: false }
   },
   data() {
     return {
@@ -71,12 +99,16 @@ export default {
       'resetVideoSearchState',
     ]),
     selectVideo: function() {
+      if (this.isVideoList) return;
       if (this.isSelected !== -1) {
         this.removeSelectedVideo(this.video.videoId)
       } else {
         this.addSelectedVideo(this.video)
       }
     },
+    changeVideo: function (video) {
+      this.$emit('change-video', video)
+    }
   },
 }
 </script>

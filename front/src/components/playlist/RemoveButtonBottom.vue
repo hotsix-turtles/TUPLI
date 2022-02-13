@@ -16,17 +16,37 @@
       overlap
       class="videoCounter"
     />
-    <div
-      class="d-flex align-center"
-      @click="removeVideos"
-    >
-      <div>
-        <v-icon color="white">
-          mdi-trash-can-outline
-        </v-icon>
+    <div class="d-flex text-center align-center">
+      <div
+        class="d-flex-column justify-center mx-5 font-3 clickable"
+      >
+        <div>
+          <v-icon
+            color="white"
+            @click="removeVideos"
+          >
+            mdi-trash-can-outline
+          </v-icon>
+        </div>
+        <div style="color: white;">
+          삭제
+        </div>
       </div>
-      <div style="color: white;">
-        삭제
+      <div class="mx-5" />
+      <div
+        class="d-flex-column justify-center mx-5 font-3 clickable"
+      >
+        <div>
+          <v-icon
+            color="white"
+            @click="watchingVideos(selectedVideos)"
+          >
+            mdi-play-circle
+          </v-icon>
+        </div>
+        <div style="color: white;">
+          영상보기
+        </div>
       </div>
     </div>
   </v-bottom-navigation>
@@ -48,7 +68,8 @@ export default {
   },
   methods: {
     ...mapActions('video', [
-      'removeVideos'
+      'removeVideos',
+      'watchingVideos',
     ])
   }
 }

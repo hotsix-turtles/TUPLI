@@ -255,13 +255,40 @@ const playlist = {
           console.log(err)
         })
     },
-    // 플레이리스트 댓글
-    getPlaylistComments: function (playlistId) {
-      axiosConnector.get(`/${playlistId}/comment`
+    // [플레이리스트 댓글]
+    // 플레이리스트 댓글 조회
+    getPlaylistComments: function ({ commit }, playlistId) {
+      axiosConnector.get(`/playlist/${playlistId}/comment`
       )
         .then((res) => {
           console.log(res)
-          commit('GET_PLAYLIST_DETAIL_COMMENT', res.data)
+          commit('GET_PLAYLIST_COMMENTS', res.data)
+        })
+        .catch((err) => {
+          console.log(err)
+        })
+    },
+    // 플레이리스트 댓글 생성
+    createPlaylistComment: function ({ commit }, { playlistId, data }) {
+      console.log('data', data)
+      axiosConnector.post(`/playlist/${playlistId}/comment`,
+        data
+      )
+        .then((res) => {
+          console.log(createPlaylistComment, res)
+          commit('CREATE_PLAYLIST_COMMENT', res.data)
+        })
+        .catch((err) => {
+          console.log(err)
+        })
+    },
+    // 플레이리스트 댓글 삭제
+    deletePlaylistComment: function ({ commit }, playlistId) {
+      axiosConnector.get(`/playlist/${playlistId}/comment`
+      )
+        .then((res) => {
+          console.log(res)
+          commit('DELETE_PLAYLIST_COMMENT', res.data)
         })
         .catch((err) => {
           console.log(err)

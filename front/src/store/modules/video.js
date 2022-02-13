@@ -12,10 +12,12 @@ const video = {
     searchedVideos: [], // 검색한 영상
     searchedVideoIds: [], // 검색한 영상의 ID
     watchingVideo: '', // 시청하는 영상
+    watchingVideos: [], // 시청하는 영상 리스트
     nextPageToken: '', // 다음 페이지(무한 스크롤용)
     query: '', // 검색어
     order: '', // 정렬 필터
     likedVideos: [], // 좋아한 영상
+    watchedVideos: [], // 시청한 영상
     order: 'relevance', // 정렬 타입
 
     // [둘러보기]
@@ -64,6 +66,9 @@ const video = {
       state.addedVideos = []
       state.selectedVideos = []
       console.log('RESET_VIDEO_ADD_STATE')
+    },
+    RESET_VIDEO_SELECT_STATE: function (state) {
+      state.selectedVideos = []
     },
     // 정렬 변경
     ON_CHANGE_ORDER: function (state, order) {
@@ -171,7 +176,11 @@ const video = {
     },
     WATCHING_VIDEO: function (state, watchingVideo) {
       state.watchingVideo = watchingVideo
-      router.push({ name: 'VideoWatch' })
+      router.push({ name: 'VideoWatch', params: { isVideoList: false } })
+    },
+    WATCHING_VIDEOS: function (state, watchingVideos) {
+      state.watchingVideos = watchingVideos
+      router.push({ name: 'VideoWatch', params: { isVideoList: true } })
     },
     // [둘러보기]
     RESET_VIDEO_CATEGORY_STATE: function (state) {
@@ -242,6 +251,13 @@ const video = {
       }
       console.log('state.categoryVideo', state.categoryVideos)
     },
+    // [나의 영상 정보]
+    GET_LIKED_VIDEOS: function (state, videos) {
+      state.likedVideos = videos
+    },
+    GET_WATCHED_VIDEOS: function (state, videos) {
+      state.watchedVideos = videos
+    }
   },
   actions: {
     // [검색]
@@ -252,6 +268,10 @@ const video = {
     // Video 생성 데이터 초기화
     resetVideoAddState: function ({ commit }) {
       commit('RESET_VIDEO_ADD_STATE')
+    },
+    // Video 생성 데이터 초기화
+    resetVideoSelectState: function ({ commit }) {
+      commit('RESET_VIDEO_SELECT_STATE')
     },
     // 정렬 변경
     onChangeOrder: function ({ commit }, order) {
@@ -393,8 +413,14 @@ const video = {
       commit('REMOVE_SELECTED_VIDEO', videoId)
     },
     // 영상 보기 선택한 영상
-    watchingVideo: function ({ commit }, watchingVideo) {
+    watchingVideo: function ({ commit, dispatch }, watchingVideo) {
       commit('WATCHING_VIDEO', watchingVideo)
+      dispatch('resetVideoSelectState')
+    },
+    // 영상 보기 선택한 영상 리스트
+    watchingVideos: function ({ commit, dispatch }, watchingVideos) {
+      commit('WATCHING_VIDEOS', watchingVideos)
+      dispatch('resetVideoSelectState')
     },
     // [둘러보기]
     // 리셋 둘러보기 데이터
@@ -517,6 +543,29 @@ const video = {
       )
         .then((res) => {
           console.log('video.js 189 unlikevideo', res)
+        })
+        .catch((err) => {
+          console.log(err)
+        })
+    },
+    // [나의 영상 정보]
+    getLikedVideos: function ({ commit }) {
+      axiosConnector.get(`/profile/video/likes`,
+      )
+        .then((res) => {
+          console.log('video.js 531 getLikedVideos', res)
+          commit('GET_LIKED_VIDEOS', res.data)
+        })
+        .catch((err) => {
+          console.log(err)
+        })
+    },
+    getWatchedVideos: function ({ commit }) {
+      axiosConnector.get(`/profile/video/saved`,
+      )
+        .then((res) => {
+          console.log('video.js 531 getWatchedVideos', res)
+          commit('GET_WATCHED_VIDEOS', res.data)
         })
         .catch((err) => {
           console.log(err)

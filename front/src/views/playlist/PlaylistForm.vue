@@ -5,7 +5,7 @@
       <back :page-name="pageName" />
       <div
         v-if="formType === 'create'"
-        class="clickable"
+        class="clickable font-2"
         @click="onClickCompletion"
       >
         완료

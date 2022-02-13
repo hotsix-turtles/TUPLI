@@ -4,6 +4,8 @@
       v-for="(video, idx) in videos"
       :key="idx"
       :video="video"
+      :is-video-list="isVideoList"
+      @change-video="changeVideo"
     />
   </div>
 </template>
@@ -14,14 +16,17 @@ export default {
   name: 'VideoItem',
   components: { VideoItemSmall },
   props: {
-    // eslint-disable-next-line vue/require-default-prop
-    videos: { type: Array }
+    videos: { type: Array, default () { [] } },
+    isVideoList: { type: Boolean, default: false }
   },
   data: function () {
     return {
     }
   },
   methods: {
+    changeVideo: function (video) {
+      this.$emit('change-video', video)
+    }
   },
 }
 </script>
