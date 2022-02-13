@@ -48,7 +48,8 @@ public class SimpleHomePlayroomDto {
         this.userProfileImg = playroom.getUser().getProfileImage();
         this.userFollowersCnt = playroom.getUser().getTo_user() == null ? 0 : playroom.getUser().getTo_user().size();
 
-        this.videos = playroom.getVideos() == null ? null : new SimpleYoutubeVideoDto(playroom.getVideos().get(0));
+        if(playroom.getVideos() == null || playroom.getVideos().size() == 0) this.videos = null;
+        else this.videos = new SimpleYoutubeVideoDto(playroom.getVideos().get(0));
     }
 
 
