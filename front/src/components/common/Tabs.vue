@@ -102,17 +102,17 @@ export default {
       },
       tabsMatchVideo: {
         '지금 핫한': '999',
-        '여행': '19',
-        '게임': '20',
-        '일상': '22',
-        '노하우/스타일': '26',
-        '동물': '15',
-        '엔터테인먼트': '24',
-        '영화/드라마': '30',
-        '음악': '10',
-        '교육/시사': '28',
-        '스포츠': '17',
-        '기타': '43',
+        '여행': '2', // Autos & Vehicles (되는 카테고리ID가 한정적이라 우선 자동차 카테고리로 넣어둠)
+        '게임': '20', // Game
+        '일상': '22', // People & Blogs
+        '노하우/스타일': '26', // Howto & Style
+        '동물': '15', // Pets & Animals
+        '엔터테인먼트': '24', // Entertainment
+        '영화/드라마': '1', // Film & Animation
+        '음악': '10', // Music
+        '교육/시사': '28', // Education
+        '스포츠': '17', // Sports
+        '기타': '23', // Comedy
       }
     }
   },
@@ -122,12 +122,14 @@ export default {
     }),
   },
   created: function () {
+    console.log('this.tabs', this.tabs)
     // 페이지 처음엔 플레이리스트 전체 카테고리 가져옴
     if (this.tabType === 'playlist') {
       this.getCategoryPlaylists('all')
     } else if (this.tabType === 'playroom') {
       this.getCategoryPlayrooms('all')
     } else if (this.tabType === 'video') {
+      this.tab = '지금 핫한'
       const categoryName = '지금 핫한'
       const categoryId = this.tabsMatchVideo[categoryName]
       this.getCategoryVideos({ categoryName, categoryId })
@@ -142,9 +144,11 @@ export default {
     ]),
     ...mapActions('video', [
       'getCategoryVideos',
+      'setCategoryInfos',
     ]),
     onClick: function(tabName) {
       console.log('tabName', tabName)
+      console.log('this.categoryVideos[tabName]', this.categoryVideos[tabName])
       this.tab = tabName
       if (this.tabType === 'playlist') {
         const categoryName = this.tabsMatch[tabName]
@@ -152,11 +156,16 @@ export default {
       } else if (this.tabType === 'playroom') {
         const categoryName = this.tabsMatch[tabName]
         this.getCategoryPlayrooms(categoryName)
-      } else if (this.tabType === 'video' && this.categoryVideos[tabName] === []) {
-        const categoryId = this.tabsMatchVideo[tabName]
+      } else if (this.tabType === 'video') {
+        this.$emit('on-click-category')
+        console.log('onClick', tabName)
         const categoryName = tabName
-        console.log(categoryName)
-        this.getCategoryVideos({ categoryName, categoryId })
+        const categoryId = this.tabsMatchVideo[categoryName]
+        if (this.categoryVideos[tabName].length === 0) {
+          this.getCategoryVideos({ categoryName, categoryId })
+        } else {
+          this.setCategoryInfos({ categoryName, categoryId })
+        }
       }
     }
   }

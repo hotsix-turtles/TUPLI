@@ -9,7 +9,7 @@
     <div class="d-flex-column">
       <!-- 제목 -->
       <div
-        class="txt-2"
+        class="txt-2 semi-bold"
         @click="$router.push({ name: 'PlaylistDetail', params: { playlistId: playlist.id } })"
       >
         {{ playlist.title }}
