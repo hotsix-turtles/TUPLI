@@ -4,6 +4,7 @@ import com.google.firebase.database.*;
 import hotsixturtles.tupli.dto.noti.NotificationDto;
 import hotsixturtles.tupli.entity.User;
 import hotsixturtles.tupli.entity.UserSetting;
+import hotsixturtles.tupli.repository.UserLikesRepository;
 import hotsixturtles.tupli.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -18,7 +19,7 @@ import java.time.format.DateTimeFormatter;
 public class NotificationService {
 
     private final UserRepository userRepository;
-    private final UserService userService;
+    private final UserLikesRepository userLikesRepository;
 
     /**
      * 팔로우시 알림
@@ -139,14 +140,14 @@ public class NotificationService {
         // 대상의 초대범위가 맞팔로우인데 그렇지 않음
         String inviteDomain = userSetting.getInviteDomain();
         if (inviteDomain.equals("co-followers")) {
-            if ((userService.getFollow(from_userSeq, to_userSeq) == null)
-                    || (userService.getFollow(to_userSeq, from_userSeq) == null)){
+            if ((userLikesRepository.findExist(to_userSeq, from_userSeq) == null)
+                    || (userLikesRepository.findExist(to_userSeq, from_userSeq) == null)){
                 return;
             }
         // 대상의 초대범위가 팔로워인데 그렇지 않음
         } else if (inviteDomain.equals("followers") ) {
             // 알림을 받는 내가 알림을 보내는 상대를 팔로우 했어야 함
-            if (userService.getFollow(to_userSeq, from_userSeq) == null) {
+            if (userLikesRepository.findExist(to_userSeq, from_userSeq) == null) {
                 return;
             }
         }
