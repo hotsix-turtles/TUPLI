@@ -338,12 +338,6 @@ const playlist = {
   modules: {
   },
   getters: {
-    isLogin: function(state, getters, rootState, rootGetters) {
-      return rootState.isLogin
-    },
-    config: function (state, getters, rootState, rootGetters) {
-      return rootGetters.config
-    },
     numberOfAddedPlaylists: state => state.addedPlaylists.length,
     numberOfAddedPlaylistVideos: state => state.addedPlaylists.reduce((acc, cur) => acc + (cur.videos ? cur.videos.length : 0), 0),
     numberOfAddedPlaylistSelectedVideos: state => state.addedPlaylistVideoIds.length,

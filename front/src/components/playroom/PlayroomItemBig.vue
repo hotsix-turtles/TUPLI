@@ -36,7 +36,6 @@
       <!-- playroom 정보 -->
       <div class="d-flex justify-space-between">
         <!-- 프로필 이미지 -->
-        <!-- 나중에 src 변경 필요 -->
         <div class="d-flex">
           <img
             style="border-radius: 100px;"

@@ -19,17 +19,28 @@
       >
         {{ item }}
       </v-tab>
-    </v-tabs>
 
-    <!-- 탭에 따른 결과물 -->
-    <video-list-item-small
-      :videos="likedVideos"
-    />
+      <!-- 좋아한 영상 리스트 -->
+      <v-tab-item>
+        <video-list-item-small
+          :videos="likedVideos"
+          width="100vw"
+        />
+      </v-tab-item>
+
+      <!-- 시청한 영상 리스트 -->
+      <v-tab-item>
+        <video-list-item-small
+          :videos="watchedVideos"
+          width="100vw"
+        />
+      </v-tab-item>
+    </v-tabs>
   </div>
 </template>
 
 <script>
-import { mapState } from 'vuex'
+import { mapActions, mapState } from 'vuex'
 import Back from '../../components/common/Back.vue'
 import SearchBar from '../../components/common/SearchBar.vue'
 import VideoListItemSmall from '../../components/video/VideoListItemSmall.vue'
@@ -41,18 +52,26 @@ export default {
       pageName: "영상 추가하기",
       tab: null,
       items: [
-        '좋아한 영상', '최근 시청한 영상',
+        '좋아한 영상', '시청한 영상',
       ],
     }
   },
   computed: {
     ...mapState('video', {
       likedVideos: state => state.likedVideos,
+      watchedVideos: state => state.watchedVideos,
     })
   },
   created: function() {
-    // setLikedVideos()
+    this.getLikedVideos()
+    this.getWatchedVideos()
   },
+  methods: {
+    ...mapActions('video', [
+      'getLikedVideos',
+      'getWatchedVideos',
+    ])
+  }
 }
 </script>
 
