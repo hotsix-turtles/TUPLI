@@ -44,18 +44,6 @@
           내 플레이리스트
         </div>
       </div>
-      <!-- <div
-        class="d-flex-column justify-center mx-3 font-3 clickable"
-      >
-        <div>
-          <v-icon color="white">
-            mdi-bookmark-outline
-          </v-icon>
-        </div>
-        <div style="color: white;">
-          저장하기
-        </div>
-      </div> -->
     </div>
   </v-bottom-navigation>
 </template>

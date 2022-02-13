@@ -17,7 +17,7 @@ const video = {
     query: '', // 검색어
     order: '', // 정렬 필터
     likedVideos: [], // 좋아한 영상
-    watchedVideos: [], // 좋아한 영상
+    watchedVideos: [], // 시청한 영상
     order: 'relevance', // 정렬 타입
 
     // [둘러보기]

@@ -49,6 +49,7 @@ export default {
       const playlistId = this.playlistId
       const data = {
         content: comment,
+        emoticon: null,
       }
       this.createPlaylistComment({ playlistId, data })
     }
