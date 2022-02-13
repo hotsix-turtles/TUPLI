@@ -271,6 +271,37 @@
   height: 30px;
 }
 
+// 프로필 사진 Large
+.profile-img-large {
+  border-radius: 100%;
+  border: solid 1px;
+  border-color: $color-main;
+  width: 88px;
+  height: 88px;
+  margin-top: 16px;
+  margin-bottom: 16px;
+  img {
+    border-radius: 100%;
+    width: 88px;
+    height: 88px;
+  }
+}
+
+// 프로필 사진 Medium7
+.profile-img-medium {
+  border-radius: 100%;
+  border: solid 1px;
+  border-color: $color-main;
+  width: 60px;
+  height: 60px;
+  align-items: center;
+  img {
+    border-radius: 100%;
+    width: 60px;
+    height: 60px;
+  }
+}
+
 
 //태그
 .tag {

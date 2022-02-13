@@ -171,16 +171,6 @@ export default new Vuex.Store({
     // 회원가입
     signup: function (context, credentials) {
       axiosConnector.post('/account/signup', { email: credentials.email, password: credentials.password, nickname: credentials.nickname })
-      // axios({
-      //   method: 'POST',
-      //   url: SERVER.URL + '/account/signup',
-      //   data: {
-      //     email: credentials.email,
-      //     password: credentials.password,
-      //     // username: credentials.username,
-      //     nickname: credentials.nickname,
-      //   }
-      // })
         .then((res) => {
           // 회원가입시 자동 로그인까지 하고 signup 3으로 보내기 (강민구)
           this.dispatch('loginHere', credentials)

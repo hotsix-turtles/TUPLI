@@ -14,6 +14,7 @@ const account = {
     followers: [],
     taste: null,
 
+
     // [검색]
     searchedAccounts: [],
 
@@ -30,6 +31,19 @@ const account = {
     SEARCH_ACCOUNTS: function (state, accounts) {
       state.searchedAccounts = accounts
     },
+
+    // // [타 유저 정보 조회]
+    // GET_ACCOUNTS: function (state, getAccounts) {
+    //   getAccounts.tags = playlistDetail.tags.split(',')
+    //   playlistDetail.createdAt = timeConverter(playlistDetail.createdAt)
+    //   state.playlistDetail = playlistDetail
+    //   console.log(state.getAccounts)
+    // },
+
+    // 팔로우
+    FOLLOW: function (state) {
+      console.log('ddd')
+    }
   },
   actions: {
     async validateToken() {
@@ -52,6 +66,24 @@ const account = {
         console.log(err)
       })
     },
+    // 팔로우
+    follow: function({ commit }, params) {
+      console.log('follow')
+    }
+
+
+    // // [조회]
+    // getAccounts: function ({ commit }, params) {
+    //   console.log('getAccounts params', params)
+    //   axiosConnector.get(`userinfo/${userId}`)
+    //     .then((res) => {
+    //       console.log(res)
+    //       commit('GET_ACCOUNTS', res.data)
+    //     })
+    //     .catch((err) => {
+    //       console.log(err)
+    //     })
+    // }
   },
   modules: {
   }

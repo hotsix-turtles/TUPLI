@@ -16,7 +16,6 @@
           alt="프로필 사진"
           width="50"
           height="50"
-          @click="$router.push({ name: 'PersonFollow'})"
         >
         <div class="d-flex flex-column align-start">
           <h4 class="mb-0 mt-2">

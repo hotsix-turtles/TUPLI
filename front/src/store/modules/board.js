@@ -7,23 +7,48 @@ const board = {
   state: {
     saveFormData: '',
     isSaved: false,
+    selectedPlaylist: null,
+    selectedPlayroom: null,
+    playlistOrPlayroom: '',
   },
   mutations: {
     RESET_FORM_DATA: function (state) {
       state.savedFormData = ''
       state.isSaved = false
+      state.selectedPlaylist = null
       console.log('RESET_FORM_DATA (board)', state.savedFormData)
     },
     SAVE_FORM_DATA: function (state, formData) {
       state.savedFormData = formData
       state.isSaved = true
     },
+    SELECT_PLAYLIST: function (state, playlist) {
+      state.selectedPlaylist = playlist
+    },
+    SELECT_PLAYROOM: function (state, playroom) {
+      state.selectedPlayroom = playroom
+    },
+    SELECT_PLAYLIST_OR_PLAYROOM: function (state, radioVal) {
+      state.playlistOrPlayroom = radioVal
+    }
   },
   actions: {
     saveFormData: function ({ commit }, formData) {
-      console.log('saveFormData (board)', formData)
+      // console.log('saveFormData (board)', formData)
       commit('SAVE_FORM_DATA', formData)
     },
+    selectPlaylist: function ({ commit }, playlist) {
+      commit('SELECT_PLAYLIST', playlist)
+    },
+    selectPlayroom: function ({ commit }, playroom) {
+      commit('SELECT_PLAYROOM', playroom)
+    },
+    resetBoardPlaylistAddState: function ({ commit }) {
+      commit('RESET_FORM_DATA',);
+    },
+    selectPlaylistOrPlayroom: function ({ commit }, radioVal) {
+      commit('SELECT_PLAYLIST_OR_PLAYROOM', radioVal)
+    }
   },
   modules: {
   }
