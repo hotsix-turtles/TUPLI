@@ -51,7 +51,11 @@ public class SimpleHomePlaylistDto {
         this.likesCnt = playlist.getPlaylistLikes() == null ? 0 :playlist.getPlaylistLikes().size();
         this.playlistLikes = playlist.getPlaylistLikes()
                 .stream().map(x-> new SimpleUserDto(x.getUser())).collect(Collectors.toList());
-        this.videos = playlist.getYoutubeVideos() == null ? null : new SimpleYoutubeVideoDto(playlist.getYoutubeVideos().get(0));
+
+        if(playlist.getYoutubeVideos() == null || playlist.getYoutubeVideos().size() == 0){
+            this.videos = null;
+        }
+        else this.videos = new SimpleYoutubeVideoDto(playlist.getYoutubeVideos().get(0));
 
     }
 }
