@@ -405,7 +405,7 @@ public class PlaylistApiController {
      * @return null
      * 반환 코드 : 200, 401, 403, 404
      */
-    @DeleteMapping("/playlist/comment/{commentId}")
+    @DeleteMapping("/playlist/{commentId}/comment")
     public ResponseEntity<?> deleteComment(@RequestHeader(value = "Authorization") String token,
                                            @PathVariable("commentId") Long commentId){
 
