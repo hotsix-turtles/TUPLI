@@ -52,7 +52,7 @@ public class SearchApiController {
     public ResponseEntity<?> searchUser(@RequestParam(value = "keyword") String keyword,
                                         @RequestParam(value = "order") String order,
                                         @PageableDefault(size = 1000) Pageable pageable ){
-        SearchHistory searchHistory = new SearchHistory(null, "유저",keyword.trim(),0);
+        SearchHistory searchHistory = new SearchHistory(null, "유저",keyword.trim(),0, 0);
         searchService.addScoreNum(searchHistory);
         UserSearchCondition userSearchCondition = new UserSearchCondition();
         userSearchCondition.setKeyword(keyword);
@@ -73,7 +73,7 @@ public class SearchApiController {
     @GetMapping("/board/search")
     public ResponseEntity<?> searchBoard(@RequestParam String keyword,
                                         @PageableDefault(size = 1000, sort ="title", direction = Sort.Direction.ASC) Pageable pageable ){
-        SearchHistory searchHistory = new SearchHistory(null, "게시글",keyword.trim(),0);
+        SearchHistory searchHistory = new SearchHistory(null, "게시글",keyword.trim(),0, 0);
         searchService.addScoreNum(searchHistory);
         BoardSearchCondition boardSearchCondition = new BoardSearchCondition();
         boardSearchCondition.setKeyword(keyword);
@@ -95,7 +95,7 @@ public class SearchApiController {
     public ResponseEntity<?> searchPlayroom(@RequestParam String keyword,
                                         @RequestParam String order,
                                         @PageableDefault(size = 1000) Pageable pageable ){
-        SearchHistory searchHistory = new SearchHistory(null, "플레이룸",keyword.trim(),0);
+        SearchHistory searchHistory = new SearchHistory(null, "플레이룸",keyword.trim(),0, 0);
         searchService.addScoreNum(searchHistory);
         PlayroomSearchCondition playroomSearchCondition = new PlayroomSearchCondition();
         playroomSearchCondition.setKeyword(keyword);
@@ -126,7 +126,7 @@ public class SearchApiController {
     @GetMapping("/videos/search")
     public ResponseEntity<?> searchVideos(@RequestParam String keyword,
                                         @PageableDefault(size = 1000, sort ="title",  direction = Sort.Direction.ASC) Pageable pageable ){
-        SearchHistory searchHistory = new SearchHistory(null, "영상",keyword.trim(),0);
+        SearchHistory searchHistory = new SearchHistory(null, "영상",keyword.trim(),0,0);
         searchService.addScoreNum(searchHistory);
         VideoSearchCondition videoSearchCondition = new VideoSearchCondition();
         videoSearchCondition.setKeyword(keyword);
