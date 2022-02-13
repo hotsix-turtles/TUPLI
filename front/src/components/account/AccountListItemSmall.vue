@@ -14,8 +14,7 @@
         </div>
         <div class="ml-3 d-flex-column justify-center">
           <div class="font-2 semi-bold">
-            {{ account.username }}
-          <!-- {{ account.nickname }} -->
+            {{ account.nickname }}
           </div>
           <div class="color-dark-gray">
             {{ account.email }}

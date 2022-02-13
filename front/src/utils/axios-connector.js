@@ -1,8 +1,13 @@
 import axios from 'axios';
 import SERVER from '@/api/server'
 
+<<<<<<< HEAD
 // const baseURL = SERVER.URL  // 드래곤볼 검토
 const baseURL = "https://tupli.kr/api/v1"
+=======
+const baseURL = SERVER.URL  // 드래곤볼 검토
+// const baseURL = "https://tupli.kr"
+>>>>>>> dev-front
 const axiosConnector = axios.create({
   baseURL
 })
