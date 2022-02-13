@@ -278,7 +278,7 @@ public class PlaylistApiController {
         PlaylistSearchCondition playlistSearchCondition = new PlaylistSearchCondition();
         playlistSearchCondition.setKeyword(keyword);
         List<Playlist> playlists = playlistService.searchPlaylistSimple(playlistSearchCondition, order, pageable);
-        SearchHistory searchHistory = new SearchHistory(null, "플레이리스트",playlistSearchCondition.getKeyword().trim(),0);
+        SearchHistory searchHistory = new SearchHistory(null, "플레이리스트",playlistSearchCondition.getKeyword().trim(),0, 0);
         searchService.addScoreNum(searchHistory);
         List<PlaylistDto> response = playlists.stream().map(x -> new PlaylistDto(x)).collect(Collectors.toList());
 
