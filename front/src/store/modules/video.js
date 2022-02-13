@@ -11,7 +11,6 @@ const video = {
     selectedVideos: [], // 생성용으로 추가하기 위해 선택한 영상
     searchedVideos: [], // 검색한 영상
     searchedVideoIds: [], // 검색한 영상의 ID
-    rerenderKey: '',
     watchingVideo: '', // 시청하는 영상
     nextPageToken: '', // 다음 페이지(무한 스크롤용)
     query: '', // 검색어
@@ -20,7 +19,8 @@ const video = {
     order: 'relevance', // 정렬 타입
 
     // [둘러보기]
-    videoTab: '',
+    videoCategory: '지금 핫한',
+    videoCategoryId: 999,
     categoryVideos: {
       '지금 핫한': [],
       '여행': [],
@@ -71,13 +71,12 @@ const video = {
       state.order = order
     },
     // 유튜브 검색 (기본 정보)
-    SEARCH_VIDEOS: function (state, { searchedVideos, isScroll }) {
+    SEARCH_VIDEOS: function (state, searchedVideos) {
       console.log('video.js 35 searchedVideos', searchedVideos)
+      state.selectedVideos = []
+      state.searchedVideos = []
       state.searchedVideoIds = []
-      if (!isScroll) {
-        state.selectedVideos = []
-        state.searchedVideos = []
-      }
+      console.log('SEARCH_VIDEOS', searchedVideos)
       for (let searchedVideo of searchedVideos) {
         const idx = state.searchedVideos.findIndex(i => i.videoId === searchedVideo.videoId)
         if (idx === -1) {
@@ -91,7 +90,20 @@ const video = {
           state.searchedVideos.push(data)
           state.searchedVideoIds.push(searchedVideo.id.videoId)
         }
-        console.log('idx', idx)
+      }
+    },
+    SEARCH_VIDEOS_BY_SCROLL: function (state, searchedVideos) {
+      state.searchedVideoIds = []
+      for (let searchedVideo of searchedVideos) {
+        const data = {
+          videoId: searchedVideo.id.videoId,
+          title: searchedVideo.snippet.title,
+          date: searchedVideo.snippet.publishTime,
+          thumbnail: searchedVideo.snippet.thumbnails.medium.url,
+          channelTitle: searchedVideo.snippet.channelTitle,
+        }
+        state.searchedVideos.push(data)
+        state.searchedVideoIds.push(searchedVideo.id.videoId)
       }
     },
     // 카테고리ID, 영상길이 정보 추가
@@ -104,7 +116,6 @@ const video = {
             break
           }
         }
-        state.rerenderKey = addInfos[0].id
       })
     },
     NEXT_PAGE_TOKEN: function (state, nextPageToken) {
@@ -192,35 +203,44 @@ const video = {
         '스포츠': '',
         '기타': '',
       }
+      state.videoCategory = '지금 핫한'
+      state.videoCategoryId = '999'
       state.categoryVideos = categoryVideos
       state.categoryNextPageToken = categoryNextPageToken
     },
-    SET_CATEGORY_NEXT_PAGE_TOKEN: function (state, { categoryName, nextPageToken }) {
-      state.categoryNextPageToken[categoryName] = nextPageToken
+    SET_CATEGORY_INFOS: function (state, { categoryName, categoryId }) {
+      state.videoCategory = categoryName
+      state.videoCategoryId = categoryId
+      console.log('categoryName', categoryName)
+      console.log('categoryId', categoryId)
+      console.log('state.videoCategory', state.videoCategory)
+      console.log('state.videoCategoryId', state.videoCategoryId)
     },
-    GET_CATEGORY_VIDEOS: function (state, { categoryName, videos }) {
-      state.videoTab = categoryName
-      console.log('GET_CATEGORY_VIDEOS', state.categoryVideos)
-      // state.categoryVideos[categoryName] = videos
-      // console.log('state.categoryVideos[categoryName]', categoryName)
-      // console.log('state.categoryVideos[categoryName]', state.categoryVideos[categoryName])
-      for (let video of videos) {
-        const idx = state.categoryVideos[categoryName].findIndex(i => i.videoId === video.videoId)
-        if (idx === -1) {
-          const data = {
-            videoId: video.id.videoId,
-            title: video.snippet.title,
-            date: video.snippet.publishTime,
-            thumbnail: video.snippet.thumbnails.medium.url,
-            channelTitle: video.snippet.channelTitle,
-            categoryId: video.snippet.categoryId,
-            duration: DurationChange(video.contentDetails.duration)
-          }
-          state.categoryVideos[categoryName].push(data)
+    GET_CATEGORY_VIDEOS: function (state, { categoryName, categoryId, videos, infos, nextPageToken }) {
+      state.videoCategory = categoryName
+      state.videoCategoryId = categoryId
+      state.categoryNextPageToken[categoryName] = nextPageToken
+      const isLikedList = infos.isLikesList
+      const isLikesCnt = infos.isLikesCnt
+      const isWatchedList = infos.isSavedList
+      console.log('GET_CATEGORY_VIDEOS nextPageToken', nextPageToken)
+      console.log('GET_CATEGORY_VIDEOS videoCategory', state.videoCategory)
+      for (let i = 0; i < videos.length; i++) {
+        const data = {
+          videoId: videos[i].id,
+          title: videos[i].snippet.title,
+          date: videos[i].snippet.publishedAt,
+          thumbnail: videos[i].snippet.thumbnails.medium.url,
+          channelTitle: videos[i].snippet.channelTitle,
+          categoryId: videos[i].snippet.categoryId,
+          duration: DurationChange(videos[i].contentDetails.duration),
+          isLiked: isLikedList[i],
+          likesCnt: isLikesCnt[i],
+          isWatched: isWatchedList[i],
         }
-        console.log('data', idx, state.categoryVideos[categoryName])
+        state.categoryVideos[categoryName].push(data)
       }
-      console.log('state.categoryVideos[categoryName]', state.categoryVideos)
+      console.log('state.categoryVideo', state.categoryVideos)
     },
   },
   actions: {
@@ -254,7 +274,6 @@ const video = {
         // eventType: 'completed', // 완료된 영상만 검색
         maxResults: 5, // 반환할 영상 개수
       }
-
       axios({
         method: 'get',
         url: SEARCH_API_URL,
@@ -262,9 +281,7 @@ const video = {
       })
         .then((res) => {
           console.log('video.js 203 searchParams', searchParams)
-          const searchedVideos = res.data.items
-          const isScroll = false
-          commit('SEARCH_VIDEOS', { searchedVideos, isScroll })
+          commit('SEARCH_VIDEOS', res.data.items)
           commit('NEXT_PAGE_TOKEN', res.data.nextPageToken)
           commit('QUERY', query)
           commit('ORDER', order)
@@ -275,6 +292,47 @@ const video = {
         .catch((err) => {
           console.log(err)
         })
+    },
+    // 유튜브 검색 (무한스크롤)
+    searchVideosByScroll: function ({ state, commit, dispatch }, $state) {
+      const SEARCH_API_URL = 'https://www.googleapis.com/youtube/v3/search'
+      const API_KEY = process.env.VUE_APP_YOUTUBE_API_KEY
+      console.log('searchVideosByScroll')
+      if (state.nextPageToken != '') {
+        setTimeout(() => {
+          const params = {
+            key: API_KEY,
+            part: 'snippet',
+            fields: 'nextPageToken,items(id/videoId,snippet(title,publishTime,thumbnails/medium,channelTitle))',
+            type: 'video',
+            q: state.query, // 검색어
+            order: state.order,
+            // eventType: 'completed', // 완료된 영상만 검색
+            maxResults: 5, // 반환할 영상 개수
+            pageToken: state.nextPageToken,
+          }
+          // console.log(params)
+          axios({
+            method: 'get',
+            url: SEARCH_API_URL,
+            params,
+          })
+            .then((res) => {
+              // console.log(res)
+              commit('NEXT_PAGE_TOKEN', res.data.nextPageToken)
+              commit('SEARCH_VIDEOS_BY_SCROLL', res.data.items)
+              // console.log('248 NEXT_PAGE_TOKEN', res.data.nextPageToken)
+            })
+            .then(() => {
+              dispatch('searchVideosAddInfo')
+              $state.loaded()
+            })
+            .catch((err) => {
+              console.log(err)
+              $state.complete()
+            })
+        }, 800)
+      }
     },
     // 유튜브 API로 영상 리스트 검색 (추가 정보 categoryId, duration)
     searchVideosAddInfo: function ({ state, commit }) {
@@ -299,46 +357,6 @@ const video = {
         .catch((err) => {
           console.log(err)
         })
-    },
-    // 유튜브 검색 (무한스크롤)
-    searchVideosByScroll: function ({ state, commit, dispatch }, $state) {
-      const SEARCH_API_URL = 'https://www.googleapis.com/youtube/v3/search'
-      const API_KEY = process.env.VUE_APP_YOUTUBE_API_KEY
-      console.log('searchVideosByScroll')
-      if (state.nextPageToken != '') {
-        setTimeout(() => {
-          const params = {
-            key: API_KEY,
-            part: 'snippet',
-            fields: 'nextPageToken,items(id/videoId,snippet(title,publishTime,thumbnails/medium,channelTitle))',
-            type: 'video',
-            q: state.query, // 검색어
-            order: state.order,
-            // eventType: 'completed', // 완료된 영상만 검색
-            maxResults: 5, // 반환할 영상 개수
-            pageToken: state.nextPageToken,
-          }
-          axios({
-            method: 'get',
-            url: SEARCH_API_URL,
-            params,
-          })
-            .then((res) => {
-              const searchedVideos = res.data.items
-              const isScroll = true
-              commit('NEXT_PAGE_TOKEN', res.data.nextPageToken)
-              commit('SEARCH_VIDEOS', { searchedVideos, isScroll })
-            })
-            .then(() => {
-              dispatch('searchVideosAddInfo')
-              $state.loaded()
-            })
-            .catch((err) => {
-              console.log(err)
-              $state.complete()
-            })
-        }, 800)
-      }
     },
     // 최종 생성할 영상 리스트에 추가
     addVideos: function ({ commit }) {
@@ -379,42 +397,12 @@ const video = {
       commit('WATCHING_VIDEO', watchingVideo)
     },
     // [둘러보기]
-    // 지금 핫한
-    getHotCategoryVideos: function ({ commit, dispatch }) {
-      const SEARCH_API_URL = 'https://www.googleapis.com/youtube/v3/videos'
-      const API_KEY = process.env.VUE_APP_YOUTUBE_API_KEY
-      console.log('video.js 338 getHotCategoryVideos')
-
-      // 검색 API
-      const params = {
-        key: API_KEY,
-        part: 'snippet,contentDetails',
-        fields: 'nextPageToken,items(id,snippet(title,publishTime,thumbnails/medium,categoryId,channelTitle),contentDetails(duration))',
-        chart: 'mostPopular',
-        maxResults: 5, // 반환할 영상 개수
-      }
-      axiosConnector.get(SEARCH_API_URL, {
-        params
-      })
-        .then((res) => {
-          console.log('video.js 350 getHotCategoryVideos', res)
-          const categoryName = '지금 핫한'
-          const nextPageToken = res.nextPageToken
-          const videos = res.data.items
-
-          commit('SET_CATEGORY_NEXT_PAGE_TOKEN', { categoryName, nextPageToken })
-          dispatch('getCategoryVideosLikesInfo', { categoryName, videos })
-        }).catch((err) => {
-          console.log(err)
-        })
-    },
-    // [둘러보기]
     // 리셋 둘러보기 데이터
     resetVideoCategoryState: function ({ commit }) {
-      commit('RESET_CATEGORY_STATE')
+      commit('RESET_VIDEO_CATEGORY_STATE')
     },
-    // 카테고리 데이터 가져오기
-    getCategoryVideos: function ({ commit, dispatch }, { categoryName, categoryId }) {
+    // 유튜브 API에서 카테고리 데이터 가져오기
+    getCategoryVideos: function ({ dispatch }, { categoryName, categoryId }) {
       const SEARCH_API_URL = 'https://www.googleapis.com/youtube/v3/videos'
       const API_KEY = process.env.VUE_APP_YOUTUBE_API_KEY
       console.log('video.js 338 getCategoryVideos', categoryName)
@@ -423,8 +411,9 @@ const video = {
       const params = {
         key: API_KEY,
         part: 'snippet,contentDetails',
-        fields: 'nextPageToken,items(id,snippet(title,publishTime,thumbnails/medium,categoryId,channelTitle),contentDetails(duration))',
+        fields: 'nextPageToken,items(id,snippet(title,publishedAt,thumbnails/medium,categoryId,channelTitle),contentDetails(duration))',
         chart: 'mostPopular',
+        regionCode: 'KR',
         maxResults: 5, // 반환할 영상 개수
       }
       if (categoryName !== '지금 핫한') {
@@ -434,18 +423,58 @@ const video = {
         params
       })
         .then((res) => {
-          console.log('video.js 350 getCategoryVideos', res)
-          const nextPageToken = res.nextPageToken
+          // console.log('video.js 350 getCategoryVideos', res)
+          const nextPageToken = res.data.nextPageToken
           const videos = res.data.items
-
-          commit('SET_CATEGORY_NEXT_PAGE_TOKEN', { categoryName, nextPageToken })
-          dispatch('getCategoryVideosLikesInfo', { categoryName, videos })
+          dispatch('getCategoryVideosLikesInfo', { categoryName, categoryId, videos, nextPageToken })
         }).catch((err) => {
           console.log(err)
         })
     },
-    // 카테고리 영상 결과 좋아요 정보 가져오기
-    getCategoryVideosLikesInfo: function ({ commit }, { categoryName, videos }) {
+    // 유튜브 API에서 카테고리 데이터 가져오기 (무한스크롤)
+    getCategoryVideosByScroll: function ({ state, dispatch }, $state) {
+      const SEARCH_API_URL = 'https://www.googleapis.com/youtube/v3/videos'
+      const API_KEY = process.env.VUE_APP_YOUTUBE_API_KEY
+      const categoryName = state.videoCategory
+      const categoryId = state.videoCategoryId
+      // const nextPageToken = state.categoryNextPageToken[categoryName]
+
+
+
+      // 검색 API
+      if (state.categoryNextPageToken[categoryName] != '') {
+        setTimeout(() => {
+          const params = {
+            key: API_KEY,
+            part: 'snippet,contentDetails',
+            fields: 'nextPageToken,items(id,snippet(title,publishedAt,thumbnails/medium,categoryId,channelTitle),contentDetails(duration))',
+            chart: 'mostPopular',
+            regionCode: 'KR',
+            maxResults: 5, // 반환할 영상 개수
+            pageToken: state.categoryNextPageToken[categoryName],
+          }
+          if (categoryName !== '지금 핫한') {
+            params.videoCategoryId = categoryId
+          }
+          axiosConnector.get(SEARCH_API_URL, {
+            params
+          })
+            .then((res) => {
+              // console.log('video.js 449 getCategoryVideos', res)
+              const nextPageToken = res.data.nextPageToken
+              console.log('video.js 448 getCategoryVideosByScroll', nextPageToken, categoryName, categoryId)
+              const videos = res.data.items
+              dispatch('getCategoryVideosLikesInfo', { categoryName, categoryId, videos, nextPageToken })
+              $state.loaded()
+            }).catch((err) => {
+              console.log(err)
+              $state.complete()
+            })
+        }, 800)
+      }
+    },
+    // 백엔드 API에서 카테고리 영상 결과 좋아요 정보 가져오기
+    getCategoryVideosLikesInfo: function ({ commit }, { categoryName, categoryId, videos, nextPageToken }) {
       const urls = []
       for (let video of videos) {
         urls.push(video.id)
@@ -454,21 +483,45 @@ const video = {
         urls: urls
       }
       console.log(data)
-      axiosConnector.get(`/profile/video/isLikes`,
+      axiosConnector.put(`/profile/video/isLikes`,
         data
       )
         .then((res) => {
           console.log(res)
-          const isLikedList = []
-          for (let i; i < videos.length; i++) {
-            videos[i].isLiked = isLikedList[i]
-          }
-          commit('GET_CATEGORY_VIDEOS', { categoryName, videos })
+          const infos = res.data
+          commit('GET_CATEGORY_VIDEOS', { categoryName, categoryId, videos, infos, nextPageToken })
         }).catch((err) => {
           console.log(err)
-          commit('GET_CATEGORY_VIDEOS', { categoryName, videos })
         })
-    }
+    },
+    setCategoryInfos: function ({ commit }, { categoryName, categoryId }) {
+      commit('SET_CATEGORY_INFOS', { categoryName, categoryId })
+    },
+    // [리액션]
+    // 영상 좋아요
+    likeVideo: function ({ commit }, video) {
+      console.log('likeVideo', video)
+      axiosConnector.post(`/video/likes`,
+        video
+      )
+        .then((res) => {
+          console.log('video.js 189 likevideo', res)
+        })
+        .catch((err) => {
+          console.log(err)
+        })
+    },
+    // 영상 좋아요 취소
+    unlikeVideo: function ({ commit }, videoId) {
+      axiosConnector.delete(`/video/likes/${videoId}`,
+      )
+        .then((res) => {
+          console.log('video.js 189 unlikevideo', res)
+        })
+        .catch((err) => {
+          console.log(err)
+        })
+    },
   },
 }
 export default video

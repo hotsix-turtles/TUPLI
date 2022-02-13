@@ -9,18 +9,15 @@
         height="235px"
         @click="watchingVideo(video)"
       >
-      <div>
-        <v-icon>mdi-play-circle-outline</v-icon>
-      </div>
     </div>
     <div class="d-flex-column mb-5">
       <!-- video 정보 -->
       <div class="d-flex justify-space-between">
         <div class="d-flex">
           <!-- 제목, 채널명, 날짜 -->
-          <div class="d-flex-column">
+          <div class="d-flex-column ml-3 mr-2">
             <div
-              class="text-left semi-bold"
+              class="text-left semi-bold txt-2"
               @click="watchingVideo(video)"
             >
               {{ video.title }}
@@ -33,13 +30,13 @@
                 mdi-circle-small
               </v-icon>
               <div>
-                {{ video.date }}
+                {{ video.date.slice(0,10) }}
               </div>
             </div>
           </div>
         </div>
         <!-- 좋아요 -->
-        <!-- <div class="mr-2">
+        <div class="d-flex-column text-center mr-2">
           <div
             v-if="video.isLiked"
             class="animate__animated animate__heartBeat"
@@ -55,7 +52,10 @@
           >
             <v-icon>mdi-cards-heart-outline</v-icon>
           </div>
-        </div> -->
+          <div class="font-4">
+            {{ video.likesCnt }}
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -78,18 +78,18 @@ export default {
   methods: {
     ...mapActions('video', [
       'watchingVideo',
-      'likevideo',
-      'unlikevideo',
+      'likeVideo',
+      'unlikeVideo',
     ]),
     onClickLike: function () {
       this.video.isLiked = true
       this.video.likesCnt++
-      this.likevideo(this.video.id)
+      this.likeVideo(this.video)
     },
     onClickUnlike: function () {
       this.video.isLiked = false
       this.video.likesCnt--
-      this.unlikevideo(this.video.id)
+      this.unlikeVideo(this.video.id)
     },
   }
 }

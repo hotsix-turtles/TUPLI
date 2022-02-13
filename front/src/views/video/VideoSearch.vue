@@ -86,7 +86,7 @@ export default {
     ...mapState('video', {
       searchedVideos: state => state.searchedVideos,
       selectedVideos: state => state.selectedVideos,
-      rerenderKey: state => state.rerenderKey,  // video는 API 두번 요청해서 변경내용 반영하기 위한 key
+      // rerenderKey: state => state.rerenderKey,  // video는 API 두번 요청해서 변경내용 반영하기 위한 key
       nextPageToken: state => state.nextPageToken,
     }),
     ...mapState('common', {
