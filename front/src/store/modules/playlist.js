@@ -275,8 +275,8 @@ const playlist = {
         data
       )
         .then((res) => {
-          console.log(createPlaylistComment, res)
-          commit('CREATE_PLAYLIST_COMMENT', res.data)
+          console.log('createPlaylistComment', res)
+          // commit('CREATE_PLAYLIST_COMMENT', res.data)
         })
         .catch((err) => {
           console.log(err)

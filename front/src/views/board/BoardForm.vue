@@ -41,7 +41,7 @@
                 플레이룸/플레이리스트
               </p>
               <p class="font-4 ml-1 mr-auto">
-                공유하고 싶은 플레이룸/플레이리스트를 1개 선택합니다.(선택 사항)
+                공유하고 싶은 게시물을 1개 선택합니다.(선택 사항)
               </p>
             </div>
 
@@ -129,19 +129,19 @@ export default {
     }),
   },
   created: function() {
-    if (this.isSaved) {
-      this.formData = this.savedFormData
-      console.log("내가 가져온 플레이리스트는", this.selectedPlaylist)
-    } else {
-      // this.resetVideoAddState()
-      // console.log("boardForm첨왔어요")
-    }
+    // if (this.isSaved) {
+    //   this.formData = this.savedFormData
+    //   console.log("내가 가져온 플레이리스트는", this.selectedPlaylist)
+    // } else {
+    // this.resetVideoAddState()
+    // console.log("boardForm첨왔어요")
+    // }
   },
   methods: {
     ...mapActions('board', [
       'saveFormData',
       'resetBoardPlaylistAddState',
-      'selectPlaylistOrPlayroom'
+      'selectPlaylistOrPlayroom',
     ]),
     onClickCompletion: function () {
       // 필수항목을 채웠는가?

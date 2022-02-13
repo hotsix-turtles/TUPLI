@@ -46,6 +46,8 @@ import PlayroomDetail from '../views/playroom/PlayroomDetail.vue'
 import BoardForm from '../views/board/BoardForm.vue'
 import BoardSelectPlayroom from '../views/board/BoardSelectPlayroom.vue'
 import BoardSelectPlaylist from '../views/board/BoardSelectPlaylist.vue'
+import PlayroomSearch from '@/views/board/PlayroomSearch.vue'
+import PlaylistSearch from '@/views/board/PlaylistSearch.vue'
 
 import AuthHandler from '../views/handler/AuthHandler.vue'
 import KakaoPaySuccess from '../views/handler/kakaoPay/KakaoPaySuccess.vue'
@@ -276,6 +278,16 @@ const routes = [
     path: '/board/playroom',
     name: 'BoardSelectPlayroom',
     component: BoardSelectPlayroom
+  },
+  {
+    path: '/playlist/search',
+    name: 'PlaylistSearch',
+    component: PlaylistSearch
+  },
+  {
+    path: '/playroom/search',
+    name: 'PlayroomSearch',
+    component: PlayroomSearch
   },
 
   //handler

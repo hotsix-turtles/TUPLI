@@ -7,8 +7,8 @@ const board = {
   state: {
     saveFormData: '',
     isSaved: false,
-    selectedPlaylist: null,
-    selectedPlayroom: null,
+    addedPlaylist: { 'id': 0 },
+    addedPlayroom: { 'id': 0 },
     playlistOrPlayroom: '',
   },
   mutations: {
@@ -23,10 +23,10 @@ const board = {
       state.isSaved = true
     },
     SELECT_PLAYLIST: function (state, playlist) {
-      state.selectedPlaylist = playlist
+      state.addedPlaylist = playlist
     },
     SELECT_PLAYROOM: function (state, playroom) {
-      state.selectedPlayroom = playroom
+      state.addedPlayroom = playroom
     },
     SELECT_PLAYLIST_OR_PLAYROOM: function (state, radioVal) {
       state.playlistOrPlayroom = radioVal
