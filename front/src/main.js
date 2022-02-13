@@ -9,6 +9,7 @@ import firebase from 'firebase/compat/app';
 
 Vue.config.productionTip = false
 
+
 var firebaseConfig = {
   apiKey: process.env.VUE_APP_FIREBASE_APIKEY,
   authDomain: process.env.VUE_APP_FIREBASE_AUTHDOMAIN,

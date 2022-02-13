@@ -51,6 +51,11 @@ export default {
         });
       console.log('알람', this.notices)
       console.log('길이', this.notices.length)
+      // 해당 유저의 알람 전부 읽은 것으로 처리
+      axios({
+        method: 'GET',
+        url: SERVER.URL + '/noti/readAll/' + this.userId,
+      })
     },
   }
 

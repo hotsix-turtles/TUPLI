@@ -1,10 +1,19 @@
 <template>
   <div>
-    <back-only />
-    <search-bar
-      :label="'검색어를 입력해주세요'"
-      @input-change="search"
-    />
+    <!-- 뒤로가기/검색바 -->
+    <div class="d-flex">
+      <v-icon
+        class="ml-2"
+        @click="$router.go(-1)"
+      >
+        mdi-arrow-left
+      </v-icon>
+      <search-bar
+        :label="'검색어를 입력해주세요'"
+        :is-detail="true"
+        @input-change="search"
+      />
+    </div>
     <!-- 하단 리스트에 추가하기 버튼 -->
     <add-button-bottom />
 
@@ -14,6 +23,7 @@
         v-model="tab"
         background-color="transparent"
         grow
+        color="#5B5C9D"
       >
         <!-- 탭 -->
         <v-tab
@@ -27,18 +37,32 @@
         <v-tab-item>
           <!-- 플리 정렬 필터 -->
           <div
-            class="text-right clickable"
-            @click="onClickModal"
+            class="text-right clickable mt-1 mb-2"
+            mt-1
+            mb-3
           >
-            <span>
-              {{ selected }}
+            <span
+              :key="rerenderKey"
+              @click="onClickModal"
+            >
+              {{ convertSelect[playlistOrder] }}
             </span>
-            <v-icon>mdi-menu-down</v-icon>
+            <v-icon @click="onClickModal">
+              mdi-menu-down
+            </v-icon>
           </div>
           <modal
-            :items="videoSelectList"
+            :items="playlistSelectList"
             :modal-name="'정렬 필터 변경'"
+            :modal-type="'order'"
             @on-select="onSelect"
+          />
+          <!-- 검색한 플레이리스트 -->
+          <playlist-list-item-small
+            :playlists="searchedPlaylists"
+            :playlist-readonly="true"
+            :video-readonly="true"
+            :likeable="true"
           />
         </v-tab-item>
 
@@ -46,55 +70,69 @@
         <v-tab-item>
           <!-- 플레이룸 정렬 필터 -->
           <div
-            class="text-right clickable"
-            @click="onClickModal"
+            class="text-right clickable mt-1 mb-2"
           >
-            <span>
-              {{ selected }}
+            <span
+              :key="rerenderKey + 1"
+              @click="onClickModal"
+            >
+              {{ convertSelect[playroomOrder] }}
             </span>
-            <v-icon>mdi-menu-down</v-icon>
+            <v-icon @click="onClickModal">
+              mdi-menu-down
+            </v-icon>
           </div>
           <modal
-            :items="videoSelectList"
+            :items="playroomSelectList"
             :modal-name="'정렬 필터 변경'"
+            :modal-type="'order'"
             @on-select="onSelect"
           />
+          <playroom-list-item-small :playrooms="searchedPlayrooms" />
         </v-tab-item>
 
         <!-- 계정 검색 -->
         <v-tab-item>
           <!-- 계정 정렬 필터 -->
           <div
-            class="text-right clickable"
+            class="text-right clickable mt-1 mb-2"
+            mt-1
+            mb-3
             @click="onClickModal"
           >
-            <span>
-              {{ selected }}
+            <span :key="rerenderKey + 2">
+              {{ convertSelect[accountOrder] }}
             </span>
             <v-icon>mdi-menu-down</v-icon>
           </div>
           <modal
-            :items="videoSelectList"
+            :items="accountSelectList"
             :modal-name="'정렬 필터 변경'"
+            :modal-type="'order'"
             @on-select="onSelect"
           />
+          <account-list-item-small :accounts="searchedAccounts" />
+          <!-- {{ searchedAccounts }} -->
         </v-tab-item>
 
         <!-- 영상 검색 -->
         <v-tab-item>
           <!-- 영상 정렬 필터 -->
           <div
-            class="text-right clickable"
+            class="text-right clickable mt-1 mb-2"
+            mt-1
+            mb-3
             @click="onClickModal"
           >
-            <span>
-              {{ selected }}
+            <span :key="rerenderKey + 3">
+              {{ convertSelect[videoOrder] }}
             </span>
             <v-icon>mdi-menu-down</v-icon>
           </div>
           <modal
             :items="videoSelectList"
             :modal-name="'정렬 필터 변경'"
+            :modal-type="'order'"
             @on-select="onSelect"
           />
           <!-- 영상 리스트 -->
@@ -122,21 +160,25 @@
 import { mapActions, mapState } from 'vuex'
 import InfiniteLoading from "vue-infinite-loading"
 
-import BackOnly from '@/components/common/BackOnly.vue'
 import SearchBar from '@/components/common/SearchBar.vue'
 import VideoListItemSmall from '../../components/video/VideoListItemSmall.vue'
 import AddButtonBottom from '../../components/playlist/AddButtonBottom.vue'
 import Modal from '../../components/common/Modal.vue'
+import PlaylistListItemSmall from '../../components/playlist/PlaylistListItemSmall.vue'
+import PlayroomListItemSmall from '../../components/playroom/PlayroomListItemSmall.vue'
+import AccountListItemSmall from '../../components/account/AccountListItemSmall.vue'
 
 export default {
   name: 'SearchDetail',
   components: {
     SearchBar,
-    BackOnly,
     VideoListItemSmall,
     InfiniteLoading,
     AddButtonBottom,
-    Modal
+    Modal,
+    PlaylistListItemSmall,
+    PlayroomListItemSmall,
+    AccountListItemSmall,
   },
   data: function () {
     return {
@@ -146,26 +188,69 @@ export default {
         '플리', '플레이룸', '계정', '영상',
       ],
       tabName: '플리',
-
+      rerenderKey: 0,
+      // 전체 검색어
       query: '',
+
+      // 플레이리스트
       playlistQuery: '',
+      playlistOrder: 'relevance',
+      playlistSelectList: {
+        '관련순': 'relevance',
+        '최근순': 'date',
+        '인기순': 'likesCnt',
+      },
+
+      // 플레이룸
       playroomQuery: '',
+      playroomOrder: 'relevance',
+      playroomSelectList: {
+        '관련순': 'relevance',
+        '최근순': 'date',
+        '시청자순': 'participantsCnt',
+      },
+
+      // 계정
       accountQuery: '',
-      // 영상 검색
+      accountOrder: 'relevance',
+      accountSelectList: {
+        '관련순': 'relevance',
+        '팔로워순': 'followersCnt',
+      },
+
+      // 영상
       videoQuery: '',
-      videoOrder: '',
+      videoOrder: 'relevance',
       videoSelectList: {
         '관련순': 'relevance',
         '최근순': 'date',
         '조회순': 'viewCount',
       },
       infiniteId: +new Date(),
+
+      // 정렬 표시용
+      convertSelect: {
+        'relevance': '관련순',
+        'date': '최근순',
+        'viewCount': '조회순',
+        'followersCnt': '팔로워순',
+        'participantsCnt': '시청자순',
+        'likesCnt': '인기순',
+      }
     }
   },
   computed: {
+    ...mapState('playlist', {
+      searchedPlaylists: state => state.searchedPlaylists,
+    }),
+    ...mapState('playroom', {
+      searchedPlayrooms: state => state.searchedPlayrooms,
+    }),
+    ...mapState('account', {
+      searchedAccounts: state => state.searchedAccounts,
+    }),
     ...mapState('video', {
       searchedVideos: state => state.searchedVideos,
-      selectedVideos: state => state.selectedVideos,
       rerenderKey: state => state.rerenderKey,
       nextPageToken: state => state.nextPageToken,
     }),
@@ -177,9 +262,20 @@ export default {
     if (this.searchedVideos) {
       this.resetVideoSearchState()
     }
-    this.videoOrder = this.videoSelectList[Object.keys(this.videoSelectList)[0]]
   },
   methods: {
+    ...mapActions('playlist', [
+      'searchPlaylists',
+      'resetPlaylistSearchState',
+    ]),
+    ...mapActions('playroom', [
+      'searchPlayrooms',
+      'resetPlayroomSearchState',
+    ]),
+    ...mapActions('account', [
+      'searchAccounts',
+      'resetAccountSearchState',
+    ]),
     ...mapActions('video', [
       'searchVideos',
       'searchVideosByScroll',
@@ -194,13 +290,31 @@ export default {
       this.query = query
       if (this.tabName === '플리') {
         this.playlistQuery = query
-        // searchPlaylists(query)
+        const keyword = this.playlistQuery
+        const order = this.playlistOrder
+        const params = {
+          keyword,
+          order,
+        }
+        this.searchPlaylists(params)
       } else if (this.tabName === '플레이룸') {
         this.playroomQuery = query
-        // searchPlayrooms(query)
+        const keyword = this.playroomQuery
+        const order = this.playroomOrder
+        const params = {
+          keyword,
+          order,
+        }
+        this.searchPlayrooms(params)
       } else if (this.tabName === '계정') {
         this.accountQuery = query
-        // searchAccounts(query)
+        const keyword = this.accountQuery
+        const order = this.accountOrder
+        const params = {
+          keyword,
+          order,
+        }
+        this.searchAccounts(params)
       } else if (this.tabName === '영상') {
         this.videoQuery = query
         const order = this.videoOrder
@@ -215,23 +329,38 @@ export default {
     },
     // 탭 변경 + 해당 탭 해당 검색어로 입력한 적 없을시
     onChangeTab: function(tabName) {
-      console.log('onChangeTab', tabName)
-      console.log('this.videoQuery', this.videoQuery)
-      console.log('this.query', this.query)
       this.tabName = tabName
       if (this.tabName === '플리' && this.playlistQuery !== this.query) {
         this.playlistQuery = this.query
-        // searchPlaylists(query)
+        const keyword = this.playlistQuery
+        const order = this.playlistOrder
+        const params = {
+          keyword,
+          order,
+        }
+        this.searchPlaylists(params)
       } else if (this.tabName === '플레이룸' && this.playroomQuery !== this.query) {
         this.playroomQuery = this.query
-        // searchPlayrooms(query)
+        const keyword = this.playroomQuery
+        const order = this.playroomOrder
+        const params = {
+          keyword,
+          order,
+        }
+        this.searchPlayrooms(params)
       } else if (this.tabName === '계정' && this.accountQuery !== this.query) {
         this.accountQuery = this.query
-        // searchAccounts(query)
+        const keyword = this.accountQuery
+        const order = this.accountOrder
+        const params = {
+          keyword,
+          order,
+        }
+        this.searchAccounts(params)
       } else if (this.tabName === '영상' && this.videoQuery !== this.query) {
         this.videoQuery = this.query
         const query = this.videoQuery
-        const order = this.videoSelectList[this.videoOrder]
+        const order = this.videoOrder
         const params = {
           query,
           order,
@@ -244,26 +373,59 @@ export default {
     },
     // 영상 정렬 필터 선택 + 해당 정렬 새로 선택한 거일때
     onSelect: function (order) {
-      if (this.tabName === '플리' && this.playlistQuery && this.playlistOrder !== order) {
+      if (this.tabName === '플리') {
+        const temp = this.playlistOrder
         this.playlistOrder = order
-        // searchPlaylists(query)
-      } else if (this.tabName === '플레이룸' && this.playroomQuery && this.playroomOrder !== order) {
-        this.playroomOrder = order
-        // searchPlayrooms(query)
-      } else if (this.tabName === '계정' && this.accountQuery && this.accountOrder !== order) {
-        this.accountOrder = order
-        // searchAccounts(query)
-      } else if (this.tabName === '영상' && this.videoQuery && this.videoOrder !== order) {
-        this.videoOrder = order
-        const query = this.videoQuery
-        const params = {
-          query,
-          order,
+        console.log('temp, this.playlistOrder', temp, this.playlistOrder)
+        if (this.playlistQuery && temp !== order) {
+          console.log('실행됨')
+          const keyword = this.playlistQuery
+          const params = {
+            keyword,
+            order,
+          }
+          this.searchPlaylists(params)
         }
-        this.resetVideoSearchState()
-        this.infiniteId += 1;
-        this.searchVideos(params)
+      } else if (this.tabName === '플레이룸') {
+        const temp = this.playroomOrder
+        this.playroomOrder = order
+        if (this.playroomQuery && temp !== order) {
+          console.log('실행됨')
+          const keyword = this.playroomQuery
+          const params = {
+            keyword,
+            order,
+          }
+          this.searchPlayrooms(params)
+        }
+      } else if (this.tabName === '계정') {
+        const temp = this.accountOrder
+        this.accountOrder = order
+        if (this.accountQuery && temp !== order) {
+          console.log('실행됨')
+          const keyword = this.accountQuery
+          const params = {
+            keyword,
+            order,
+          }
+          this.searchAccounts(params)
+        }
+      } else if (this.tabName === '영상') {
+        const temp = this.videoOrder
+        this.videoOrder = order
+        if (this.videoQuery && temp !== order) {
+          console.log('실행됨')
+          const query = this.videoQuery
+          const params = {
+            query,
+            order,
+          }
+          this.resetVideoSearchState()
+          this.infiniteId += 1;
+          this.searchVideos(params)
+        }
       }
+      this.rerenderKey++
     },
   },
 }

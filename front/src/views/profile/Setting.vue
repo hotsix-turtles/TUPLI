@@ -7,7 +7,7 @@
         <v-icon
           color="#5B5C9D"
           size="30"
-          @click="$router.push({ name: 'Profile' })"
+          @click="$router.go(-1)"
         >
           mdi-chevron-left
         </v-icon>
@@ -219,7 +219,7 @@ export default {
         icon: 'info',
         title: '로그아웃',
         text: '로그아웃되었습니다.',
-        width: '200px'
+        // width: '200px'
       })
     },
 

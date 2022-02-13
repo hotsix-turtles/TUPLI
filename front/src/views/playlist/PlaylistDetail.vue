@@ -29,10 +29,19 @@
         </div>
         <!-- 작성자일 경우, 수정하기 삭제하기 모달창 -->
         <div v-if="userId === playlistDetail.userId">
-          <v-icon>mdi-dots-vertical</v-icon>
+          <v-icon @click="onClickModal">
+            mdi-dots-vertical
+          </v-icon>
         </div>
+        <modal
+          :items="selectList"
+          :modal-name="'플레이리스트 변경'"
+          :modal-type="'modal'"
+          @on-select="onSelect"
+        />
       </div>
     </div><br><br>
+    <!-- {{ playlistDetail }} -->
     <div class="container">
       <div class="text-center">
         <!-- 제목 공개여부 -->
@@ -79,6 +88,7 @@
 
 <script>
 import { mapActions, mapState } from 'vuex'
+import axiosConnector from '../../utils/axios-connector';
 
 import BackOnly from '../../components/common/BackOnly.vue'
 import DetailButtonBottom from '../../components/playlist/DetailButtonBottom.vue'
@@ -87,6 +97,7 @@ import Tags from '../../components/common/Tags.vue'
 import PlaylistCd from '../../components/playlist/PlaylistCd.vue'
 
 import VideoListItemSmall from '../../components/video/VideoListItemSmall.vue'
+import Modal from '../../components/common/Modal.vue'
 export default {
   name: 'PlaylistFormVideo',
   components: {
@@ -95,10 +106,15 @@ export default {
     VideoListItemSmall,
     PlaylistCd,
     Tags,
+    Modal
   },
   data: function() {
     return {
       isSelectedAll: false,
+      selectList: {
+        '수정하기': 'update',
+        '삭제하기': 'delete',
+      }
     }
   },
   computed: {
@@ -106,23 +122,33 @@ export default {
       playlistDetail: state => state.playlistDetail,
       isLiked: state => state.isLiked,
     }),
-    ...mapState('account', {
+    // ...mapState('common', {
+    //   selected: state => state.selected,
+    // }),
+    ...mapState({
       userId: state => state.userId,
+      taste: state => state.taste,
     })
     // 좋아요 여부 받아와서 isLiked에 저장
   },
   created: function() {
     this.getPlaylistDetail(this.$route.params.playlistId)
+    console.log('취향 반영됐나', this.taste)
   },
   methods: {
     ...mapActions('playlist', [
       'getPlaylistDetail',
       'likePlaylist',
       'unlikePlaylist',
+      'saveFormData',
     ]),
     ...mapActions('video', [
       'deselectAllDetailVideos',
       'selectAllDetailVideos',
+      'saveAddedVideos',
+    ]),
+    ...mapActions('common', [
+      'onClickModal',
     ]),
     onClickSelectAll: function () {
       if (this.isSelectedAll) {
@@ -131,6 +157,29 @@ export default {
         this.selectAllDetailVideos(this.playlistDetail.videos)
       }
       this.isSelectedAll = !this.isSelectedAll
+    },
+    onSelect: function (item) {
+      if (item === 'update') {
+        const formData = {
+          title: this.playlistDetail.title,
+          content: this.playlistDetail.content,
+          tags: this.playlistDetail.tags,
+          isPublic: this.playlistDetail.isPublic,
+          videos: [],
+        }
+        this.saveFormData(formData)
+        this.saveAddedVideos(this.playlistDetail.videos)
+        this.$router.push({ name: 'PlaylistUpdateForm', params: { playlistId: this.playlistDetail.id } })
+      } else if (item === 'delete') {
+        console.log('onSelect 삭제', item)
+        axiosConnector.delete(`/playlist/${this.playlistDetail.id}`
+        ).then((res) => {
+          console.log('삭제되었습니다')
+          this.$router.push({ name: 'Home' })
+        }).catch((err) => {
+          console.log(err)
+        })
+      }
     },
   },
 }

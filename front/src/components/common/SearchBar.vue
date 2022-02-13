@@ -6,7 +6,8 @@
       rounded
       dense
       solo
-      class="mx-5 mt-5"
+      :class="{ 'search-bar': isDetail, 'mx-3': isDetail, 'mx-4': !isDetail }"
+      class="mt-5"
       prepend-inner-icon="mdi-magnify"
       type="text"
       @keypress.enter="onInputKeyword"
@@ -18,10 +19,11 @@
 
 <script>
 export default {
-  name: 'VideoSearch',
+  name: 'SearchBar',
   props: {
     label: { type: String, default: '' },
     routerPage: { type: String, default: '' },
+    isDetail: { type: Boolean, default: false },
   },
   methods: {
     onInputKeyword: function (event) {
@@ -37,5 +39,9 @@ export default {
 </script>
 
 <style>
+
+  .search-bar {
+    width: 84vw !important;
+  }
 
 </style>

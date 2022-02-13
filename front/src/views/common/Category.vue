@@ -5,59 +5,40 @@
       v-model="tab"
       background-color="transparent"
       grow
+      color="#5B5C9D"
     >
       <v-tab
         v-for="item in items"
         :key="item"
       >
-        <span @click="onChangeTab">{{ item }}</span>
+        <span>{{ item }}</span>
+        <!-- <span @click="onChangeTab">{{ item }}</span> -->
       </v-tab>
       <!-- 플리 탭 -->
       <v-tab-item>
-        <div class="row text-center mt-3">
-          <div class="col-4 py-2 px-2">
-            <div
-              class="clickable on-clicked py-3"
-              @click="onClick"
-            >
-              전체
-            </div>
-          </div>
-          <div class="col-4 py-2 px-2">
-            <div class="clickable gray-background py-3">
-              지금 핫한
-            </div>
-          </div>
-          <div class="col-4 py-2 px-2">
-            <div class="clickable gray-background py-3">
-              일상
-            </div>
-          </div>
-          <div class="col-4 py-2 px-2">
-            <div class="clickable gray-background py-3">
-              영화/드라마
-            </div>
-          </div>
-          <div class="col-4 py-2 px-2">
-            <div class="clickable gray-background py-3">
-              노하우/스타일
-            </div>
-          </div>
-          <div class="col-4 py-2 px-2">
-            <div class="clickable gray-background py-3">
-              동물
-            </div>
-          </div>
-        </div>
-        <playlist-list-item-medium :playlists="playlists" />
+        <tabs
+          :tab-type="'playlist'"
+          :tabs="tastes"
+        />
+        <playlist-list-item-medium
+          :key="rerenderPlaylistKey"
+          :playlists="categoryPlaylists"
+        />
         <!-- {{ playlists }} -->
       </v-tab-item>
       <!-- 플레이룸 탭 -->
       <v-tab-item>
-        플레이룸
+        <tabs
+          :tab-type="'playroom'"
+          :tabs="tastes"
+        />
       </v-tab-item>
       <!-- 영상 탭 -->
       <v-tab-item>
+        <tabs
+          :tab-type="'video'"
+          :tabs="tastes"
+        />
         <!-- <video-list-item-small
           :key="rerenderKey"
           :videos="searchedVideos"
@@ -79,13 +60,15 @@
 <script>
 import { mapActions, mapState } from 'vuex'
 import PlaylistListItemMedium from '../../components/playlist/PlaylistListItemMedium.vue';
+import Tabs from '../../components/common/Tabs.vue';
 import axiosConnector from '../../utils/axios-connector';
 // import InfiniteLoading from "vue-infinite-loading"
 
 export default {
   name: 'Category',
   components: {
-    PlaylistListItemMedium
+    PlaylistListItemMedium,
+    Tabs,
     // VideoListItemSmall,
     // InfiniteLoading,
     // AddButtonBottom,
@@ -96,67 +79,86 @@ export default {
       items: [
         '플리', '플레이룸', '영상',
       ],
+      tastes: ['영화/드라마', '노하우/스타일', '일상', '동물'],
+
       category: '',
       playlistCategory: '',
       playroomCategory: '',
       videoCategory: '',
-      playlists: [],
     }
   },
   computed: {
-    ...mapState('video', {
-      // searchedVideos: state => state.searchedVideos,
-      rerenderKey: state => state.rerenderKey,
-      nextPageToken: state => state.nextPageToken,
-    })
+    ...mapState('playlist', {
+      categoryPlaylists: state => state.categoryPlaylists,
+    }),
+    // ...mapState('video', {
+    //   // searchedVideos: state => state.searchedVideos,
+    //   rerenderKey: state => state.rerenderKey,
+    //   nextPageToken: state => state.nextPageToken,
+    // }),
   },
   created: function () {
-    // if (this.searchedVideos) {
-    //   this.resetVideoSearchState()
-    // }
+    // 유저 취향 기반으로 탭 셋팅
+    axiosConnector.get(`/account/userInfo`,
+    ).then((res) => {
+      const userTastes = res.data.taste
+      for (let userTaste of userTastes) {
+        this.tastes.unshift(userTaste)
+      }
+      this.tastes.splice(4, userTastes.length)
+      console.log(this.tastes)
+    })
+      .catch((err) => {
+        console.log(err)
+      })
+    this.getCategoryPlaylists('all')
+    this.rerenderPlaylistKey++
   },
   methods: {
+    ...mapActions('playlist', [
+      'getCategoryPlaylists',
+    ]),
     ...mapActions('video', [
       'searchVideos',
       'searchVideosByScroll',
       'resetVideoSearchState',
     ]),
-    onChangeCategory: function(category) {
-      console.log('category', category)
-      this.category = category
-      if (this.tab === 0) {
-        this.playlistCategory = category
-        // searchPlaylists(Category)
-      } else if (this.tab === 1) {
-        this.playroomCategory = category
-        // searchPlayrooms(Category)
-      } else if (this.tab === 3) {
-        this.videoCategory = category
-        this.searchVideos(category)
-      }
-    },
-    onChangeTab: function() {
-      if (this.tab === 0 && this.playlistCategory !== this.category) {
-        this.playlistCategory = this.category
-        // searchPlaylists(Category)
-      } else if (this.tab === 1 && this.playroomCategory !== this.category) {
-        this.playroomCategory = this.category
-        // searchPlayrooms(Category)
-      } else if (this.tab === 3 && this.videoCategory !== this.category) {
-        this.videoCategory = this.category
-        this.searchVideos(category)
-      }
-    },
+    // onChangeCategory: function(category) {
+    //   console.log('category', category)
+    //   this.category = category
+    //   if (this.tab === 0) {
+    //     this.playlistCategory = category
+    //     // searchPlaylists(Category)
+    //   } else if (this.tab === 1) {
+    //     this.playroomCategory = category
+    //     // searchPlayrooms(Category)
+    //   } else if (this.tab === 3) {
+    //     this.videoCategory = category
+    //     this.searchVideos(category)
+    //   }
+    // },
+    // onChangeTab: function() {
+    //   if (this.tab === 0 && this.playlistCategory !== this.category) {
+    //     this.playlistCategory = this.category
+    //     // searchPlaylists(Category)
+    //   } else if (this.tab === 1 && this.playroomCategory !== this.category) {
+    //     this.playroomCategory = this.category
+    //     // searchPlayrooms(Category)
+    //   } else if (this.tab === 3 && this.videoCategory !== this.category) {
+    //     this.videoCategory = this.category
+    //     this.searchVideos(category)
+    //   }
+    // },
     // 임시용 플리(전체)
-    onClick: function () {
-      axiosConnector.get(`/playlist/category/trip`,
-      ).then((res) => {
-        this.playlists = res.data
-      })
-        .catch((err) => {
-          console.log(err)
-        })
-    }
+    // onClick: function () {
+    //   axiosConnector.get(`/playlist/category/all`,
+    //   ).then((res) => {
+    //     this.playlists = res.data
+    //   })
+    //     .catch((err) => {
+    //       console.log(err)
+    //     })
+    // }
   },
 }
 </script>

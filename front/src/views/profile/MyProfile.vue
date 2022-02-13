@@ -18,18 +18,15 @@
           <h3 class="text-center pt-3 pb-1">
             {{ nickname }}
           </h3>
-          <img
-            class="py-3"
-            src="../../assets/logo_semi.png"
-            alt=""
-            width="40px"
-            fab
-          >
+          <div class="profile-img-large">
+            <img
+              src="../../assets/logo_semi.png"
+              alt=""
+              fab
+            >
+          </div>
           <div class="d-flex align-center">
-            <h5 class="mr-5">
-              자기소개
-            </h5>
-            <p class="mb-0">
+            <p class="mb-0 mt-1">
               {{ introduction }}
             </p>
           </div>
@@ -38,31 +35,30 @@
         <div class="d-flex justify-center pt-3">
           <div
             class="d-flex mx-3"
-            @click="$router.push({ name: 'Follow' })"
+            @click="$router.push({ name: 'MyFollow' })"
           >
             <p class="mr-2">
               팔로잉
             </p>
-            <p>{{ following }}</p>
+            <p>{{ following.length }}</p>
           </div>
           <div
             class="d-flex mx-3"
-            @click="$router.push({ name: 'Follow' })"
+            @click="$router.push({ name: 'MyFollow' })"
           >
             <p class="mr-2">
               팔로워
             </p>
-            <p>{{ followers }}</p>
+            <p>{{ followers.length }}</p>
           </div>
         </div>
         <!-- 프로필 편집 버튼 -->
         <div class="d-flex justify-center">
           <v-btn
-            class="text-center pt-1"
+            class="text-center"
             outlined
             color="#5B5C9D"
             rounded
-            small
             to="/editprofile"
           >
             프로필 편집하기
@@ -96,8 +92,6 @@
 import ProfilePlaylist from '../../components/profile/timeline/ProfilePlaylist.vue'
 import ProfileTaste from '../../components/profile/timeline/ProfileTaste.vue'
 
-import axios from 'axios'
-import SERVER from '@/api/server'
 import { mapState } from 'vuex'
 
 export default {

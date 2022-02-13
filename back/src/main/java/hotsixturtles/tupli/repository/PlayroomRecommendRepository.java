@@ -37,13 +37,6 @@ public class PlayroomRecommendRepository {
 
     // 2번
     public List<Playroom> findFolloweesMakePlayroom(Long userSeq){
-//        return jpaQueryFactory
-//                .selectFrom(playlist)
-//                .join(userLikes).fetchJoin()
-//                .on(playlist.user.userSeq.eq(userLikes.toUser.userSeq))
-//                .where(userLikes.fromUser.userSeq.eq(userSeq))
-//                .fetch();
-
         // 최적화: fetch join 못쓸까
         return jpaQueryFactory
                 .select(playroom)

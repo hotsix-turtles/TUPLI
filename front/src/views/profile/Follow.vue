@@ -7,12 +7,12 @@
         <v-icon
           color="#5B5C9D"
           size="30"
-          @click="$router.push({ name: 'Profile' })"
+          @click="$router.go(-1)"
         >
           mdi-chevron-left
         </v-icon>
         <h3 class="">
-          김춘식
+          {{ this.$route.params.userId }}
         </h3>
       </v-row>
     </v-container>
@@ -27,20 +27,20 @@
         <v-tab class="v-tap-width">
           <div class="d-flex align-center">
             <p class="mx-1 mb-0">
-              135
+              팔로워
             </p>
             <p class="mx-1 mb-0">
-              팔로워
+              135
             </p>
           </div>
         </v-tab>
         <v-tab class="v-tap-width">
           <div class="d-flex align-center">
             <p class="mx-1 mb-0">
-              351
+              팔로잉
             </p>
             <p class="mx-1 mb-0">
-              팔로잉
+              351
             </p>
           </div>
         </v-tab>
@@ -60,11 +60,28 @@
 import FollowersList from '@/components/profile/user/FollowersList.vue'
 import FollowingsList from '@/components/profile/user/FollowingsList.vue'
 
+import { mapState } from 'vuex'
+
 export default {
   name: 'Follow',
   components: {
     FollowersList,
     FollowingsList,
+  },
+  data: function() {
+    return {
+      followerList: [],
+      followingList: []
+    }
+  },
+  created: function() {
+    this.getFollowList()
+  },
+  methods: {
+    // 팔로우. 팔로잉 리스트 조회
+    getFollowList: function() {
+      console.log('팔로우 리스트 조회 시도')
+    }
   }
 }
 </script>

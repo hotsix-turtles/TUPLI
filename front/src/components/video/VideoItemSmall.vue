@@ -15,7 +15,7 @@
         <div class="video-thumbnail">
           <img
             :src="video.thumbnail"
-            style="width: 35vw; height: 100px;"
+            style="width: 35vw; height: 100px; object-fit: cover;"
             class=""
             @click="watchingVideo(video)"
           >
@@ -25,7 +25,7 @@
           <div
             class="h6"
           >
-            <div class="font-3 line-height-s">
+            <div class="font-3 semi-bold line-height-s">
               {{ video.title }}
             </div>
           </div>

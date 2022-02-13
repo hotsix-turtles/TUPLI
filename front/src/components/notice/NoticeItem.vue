@@ -30,7 +30,7 @@
               class="mb-0"
               @click="setProfile"
             >
-              {{ notice.fromId }}
+              {{ notice.from }}
               님이&nbsp;
               {{ nickname }}님을 팔로우합니다.
             </p>
@@ -134,7 +134,8 @@ export default {
   methods: {
     // 타 유저 프로필로 가기
     setProfile: function() {
-      this.$router.push({ name: 'Profile' })
+      console.log( this.notice.fromId )
+      this.$router.push({ name: 'Profile', params: { userId : this.notice.fromId }})
     },
     // 팔로우
     clickFollow: function() {

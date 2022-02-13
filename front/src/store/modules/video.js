@@ -1,6 +1,6 @@
 import axios from 'axios'
 import router from '@/router/index.js'
-
+import { DurationChange } from '../../utils/utils';
 
 const video = {
   namespaced: true,
@@ -60,38 +60,6 @@ const video = {
     },
     // 카테고리ID, 영상길이 정보 추가
     SEARCH_VIDEOS_ADD_INFO: function (state, addInfos) {
-
-      function HMS(input, type){
-        let index = input.indexOf(type);
-
-        if(index < 0 & type != 'H'){
-          return "00"; // 들어오는 값이 없는 경우 index가 -1 , H를 00: 으로 표시하고 싶으면 뒤에 유닛값조건만 지우면 된다.
-        }
-        if(isNaN(input.charAt(index-2))){ //해당 유닛의 인덱스 2번째앞이 숫자인지 확인
-          if (type == 'H') { // H이고 한자리 숫자인경우 한자리 숫자만 반환
-            return input.charAt(index-1);
-          } else{
-            return '0' + input.charAt(index-1);} // 숫자 아닌 경우에는 0을 붙인걸 반환
-        }else{
-          return input.charAt(index-2) + input.charAt(index-1); // 숫자인 경우에는 합쳐서 반환
-        }
-      }
-
-      function DurationChange(input){
-        let H = HMS(input, 'H');
-        let M = HMS(input, 'M');
-        let S = HMS(input, 'S');
-
-        if (H) { //H가 들어있는 경우에는 : 더하기
-          H += ':'
-        } else
-        {
-          if (M=='00') { // H없고 M이 00 인 경우 0으로 변환
-            M='0'
-          }
-        }
-        return H  + M + ':' + S ;
-      }
       state.searchedVideos.forEach(searchedVideo => {
         for (let addInfo of addInfos) {
           if (searchedVideo.videoId === addInfo.id) {
@@ -126,6 +94,7 @@ const video = {
     ORDER: function (state, order) {
       state.order = order
     },
+    // 생성하기
     ADD_VIDEOS: function (state) {
       for (let selectedVideo of state.selectedVideos) {
         const idx = state.addedVideos.findIndex(i => i.videoId === selectedVideo.videoId)
@@ -143,6 +112,11 @@ const video = {
       }
       state.selectedVideos = []
     },
+    // 수정하기
+    SAVE_ADDED_VIDEOS: function (state, videos) {
+      state.addedVideos = videos
+    },
+    // 검색하기
     SELECT_ALL_ADDED_VIDEOS: function (state) {
       state.selectedVideos = state.addedVideos.slice()
     },
@@ -289,13 +263,18 @@ const video = {
     removeVideos: function ({ commit }) {
       commit('REMOVE_VIDEOS')
     },
-    //
+    // 수정하기
+    saveAddedVideos: function ({ commit }, videos) {
+      commit('SAVE_ADDED_VIDEOS', videos)
+    },
+    // 검색하기
     selectAllAddedVideos: function ({ commit }) {
       commit('SELECT_ALL_ADDED_VIDEOS')
     },
     deselectAllAddedVideos: function ({ commit }) {
       commit('DESELECT_ALL_ADDED_VIDEOS')
     },
+    // 디테일
     selectAllDetailVideos: function ({ commit }, videos) {
       commit('SELECT_ALL_DETAIL_VIDEOS', videos)
     },

@@ -136,8 +136,8 @@ public class JwtTokenProvider {
     // JWT 토큰에서 인증 정보 조회
     public Authentication getAuthentication(String token) {
         // 이메일이 들어가야 함
-        UserDetails userDetails = userDetailsService.loadUserByUsername(this.getUserPk(token));
-//        UserDetails userDetails = userDetailsService.loadUserByUsername(this.getUser(token).getEmail());
+//        UserDetails userDetails = userDetailsService.loadUserByUsername(this.getUserPk(token));
+        UserDetails userDetails = userDetailsService.loadUserByUsername(this.getUser(token).getEmail());
         return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
     }
 
