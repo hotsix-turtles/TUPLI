@@ -40,7 +40,7 @@ public class YoutubeVideoService {
         YoutubeVideo youtubeVideo = youtubeVideoRepository.findByVideoId(youtubeVideoDto.getVideoId());
         if(youtubeVideo == null) {
             youtubeVideo = new YoutubeVideo();
-            youtubeVideo.setInit(youtubeVideoDto);  // Custom setter
+            youtubeVideo.newVideo(youtubeVideoDto);  // Custom setter
             youtubeVideoRepository.save(youtubeVideo);
         } else {
             // 만약 정보 업데이트 넣을거면 여기

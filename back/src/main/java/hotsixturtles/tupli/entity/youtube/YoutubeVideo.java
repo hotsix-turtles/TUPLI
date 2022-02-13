@@ -37,7 +37,7 @@ public class YoutubeVideo {
     private Playroom playroom;
 
 
-    public void setInit(SimpleYoutubeVideoDto simpleYoutubeVideoDto) {
+    public void newVideo(SimpleYoutubeVideoDto simpleYoutubeVideoDto) {
         this.videoId = simpleYoutubeVideoDto.getVideoId();
         this.title = simpleYoutubeVideoDto.getTitle();
         this.date = simpleYoutubeVideoDto.getDate();
@@ -47,7 +47,7 @@ public class YoutubeVideo {
         this.categoryId = simpleYoutubeVideoDto.getCategoryId();
     }
 
-    public void setInit(YoutubeVideo youtubeVideo) {
+    public void copyVideo(YoutubeVideo youtubeVideo) {
         this.videoId = youtubeVideo.getVideoId();
         this.title = youtubeVideo.getTitle();
         this.date = youtubeVideo.getDate();

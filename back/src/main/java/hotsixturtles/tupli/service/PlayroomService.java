@@ -115,7 +115,7 @@ public class PlayroomService {
                     playroom.setImage(image);
                 }
                 video.setPlayroom(playroom);
-                video.setInit(existVideo);
+                video.copyVideo(existVideo);
                 youtubeVideoRepository.save(video);
                 YoutubeVideo nowVideo = youtubeVideoRepository.findFirstByVideoIdOrderByIdDesc(videoUrl);
                 playroomPlList.add(nowVideo.getId());

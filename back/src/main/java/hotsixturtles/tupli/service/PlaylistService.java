@@ -91,7 +91,7 @@ public class PlaylistService {
 
             // 기존에 저장, 좋아요 해놓은것과 상관없이 별도로 제작
             YoutubeVideo video = new YoutubeVideo();
-            video.setInit(videoDto);
+            video.newVideo(videoDto);
             video.setPlaylist(playlist);  // 연결
             youtubeVideoRepository.save(video);
 
@@ -195,7 +195,7 @@ public class PlaylistService {
 
                 // 기존에 저장, 좋아요 해놓은것과 상관없이 별도로 제작
                 YoutubeVideo video = new YoutubeVideo();
-                video.setInit(videoDto);
+                video.newVideo(videoDto);
                 video.setPlaylist(playlistUpdate);  // 연결
                 youtubeVideoRepository.save(video);
 
