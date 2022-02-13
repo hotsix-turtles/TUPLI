@@ -50,9 +50,9 @@
           <v-row class="justify-center">
             <v-col col>
               <v-row class="justify-center mb-2">
-                <p>-------------------</p>
+                <p>----------</p>
                 <p>또는</p>
-                <p>-------------------</p>
+                <p>----------</p>
               </v-row>
               <v-row class="justify-center">
                 <v-btn
@@ -176,7 +176,8 @@ export default {
       // const FRONTEND_PORT = SERVER.FRONTEND_PORT === null ? '' : `:${SERVER.FRONTEND_PORT}`
       // const REDIRECT_URI = `${location.protocol}//${location.hostname}${FRONTEND_PORT}/oauth/redirect`
       // console.log(`${BACKEND_URL}/oauth2/authorization/${socialType}?redirect_uri=${REDIRECT_URI}`)
-      return `https://i6a102.p.ssafy.io/api/v1/oauth2/authorization/${socialType}?redirect_uri=https://i6a102.p.ssafy.io/oauth/redirect`
+      // return `https://i6a102.p.ssafy.io/api/v1/oauth2/authorization/${socialType}?redirect_uri=https://i6a102.p.ssafy.io/oauth/redirect`
+      return `https://tupli.kr/api/v1/oauth2/authorization/${socialType}?redirect_uri=https://tupli.kr/oauth/redirect`
     }
 
   },

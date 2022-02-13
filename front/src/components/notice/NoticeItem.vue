@@ -61,7 +61,7 @@
                 class="mb-0"
                 @click="setProfile"
               >
-                {{ notice.fromId }}님이&nbsp;{{ nickname }}님을 초대하였습니다.
+                {{ notice.from }}님이&nbsp;{{ nickname }}님을 초대하였습니다.
                 플레이룸 제목이 들어갈 공간입니다
               </p>
             </div>
@@ -72,7 +72,10 @@
             </p>
           </div>
           <div>
-            <v-btn class="ml-4 notice-btn">
+            <v-btn
+              class="ml-4 notice-btn"
+              @click="acceptInvite"
+            >
               수락
             </v-btn>
           </div>
@@ -89,17 +92,7 @@
             class="mb-0"
             @click="setProfile"
           >
-            {{ notice.fromId }}
-          </p>
-          <p class="mb-0">
-            님이&nbsp;
-          </p>
-          <p class="mb-0">
-            {{ nickname }}님의 플레이리스트로 플레이룸을 생성하였습니다.
-          </p>
-          <br>
-          <p>
-            플레이룸 제목이 들어갈 공간
+            {{ notice.from }}님이&nbsp;{{ nickname }}님의 플레이리스트로 플레이룸을 생성하였습니다.
           </p>
         </div>
         <div>
@@ -140,6 +133,11 @@ export default {
     // 팔로우
     clickFollow: function() {
 
+    },
+
+    // 플레이룸 수락
+    acceptInvite: function() {
+      this.$router.push({ name: 'playroomDetail', params: { id: this.notice.id }})
     }
   },
 }

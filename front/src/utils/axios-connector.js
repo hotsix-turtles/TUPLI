@@ -2,7 +2,7 @@ import axios from 'axios';
 import SERVER from '@/api/server'
 
 // const baseURL = SERVER.URL  // 드래곤볼 검토
-const baseURL = "https://i6a102.p.ssafy.io/api/v1"
+const baseURL = "https://tupli.kr/api/v1"
 const axiosConnector = axios.create({
   baseURL
 })

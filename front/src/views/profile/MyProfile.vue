@@ -15,16 +15,16 @@
       <div>
         <!-- 유저 정보 : 프로필 사진, 닉네임, 자기소개 -->
         <div class="d-flex flex-column align-center">
-          <h3 class="text-center pt-3 pb-1">
-            {{ nickname }}
-          </h3>
           <div class="profile-img-large">
             <img
-              src="../../assets/logo_semi.png"
+              :src="image"
               alt=""
               fab
             >
           </div>
+          <h3 class="text-center pt-2 pb-1">
+            {{ nickname }}
+          </h3>
           <div class="d-flex align-center">
             <p class="mb-0 mt-1">
               {{ introduction }}
@@ -97,7 +97,7 @@ import { mapState } from 'vuex'
 export default {
   components: { ProfilePlaylist, ProfileTaste, },
   computed: {
-    ...mapState(['authToken', 'nickname', 'introduction', 'following', 'followers'])
+    ...mapState(['authToken', 'nickname', 'image', 'introduction', 'following', 'followers'])
   },
   methods: {
 

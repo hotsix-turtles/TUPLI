@@ -1,3 +1,4 @@
+import router from '@/router/index.js'
 import axiosConnector from '../../utils/axios-connector'
 
 const account = {
@@ -8,11 +9,19 @@ const account = {
     email: null,
     nickname: null,
     introduction: null,
-    image: null,
+    image: '@/assets/tupli_logo2_dark',
     is_vip: null,
     following: [],
     followers: [],
     taste: null,
+
+    // 좋아요한 게시물
+    likePlayroomList: [],
+    likePlaylistList: [],
+    likeBoardList: [],
+
+    // 시청 기록
+    historyList: [],
 
 
     // [검색]
@@ -32,18 +41,28 @@ const account = {
       state.searchedAccounts = accounts
     },
 
-    // // [타 유저 정보 조회]
-    // GET_ACCOUNTS: function (state, getAccounts) {
-    //   getAccounts.tags = playlistDetail.tags.split(',')
-    //   playlistDetail.createdAt = timeConverter(playlistDetail.createdAt)
-    //   state.playlistDetail = playlistDetail
-    //   console.log(state.getAccounts)
-    // },
+    // 좋아요한 게시물
+    LIKE_PLAYROOM: function (state, likePlayroomList) {
+      state.likePlayroomList = likePlayroomList
+    },
+    LIKE_PLAYLIST: function (state, likePlaylistList) {
+      state.likePlaylistList = likePlaylistList
+    },
+    LIKE_BOARD: function (state, likeBoardList) {
+      state.likeBoardList = likeBoardList
+    },
+
+    // 플레이룸 시청 기록
+    GET_HISTORY: function (state, historyList) {
+      state.historyList = historyList
+    },
+
 
     // 팔로우
     FOLLOW: function (state) {
       console.log('ddd')
-    }
+    },
+
   },
   actions: {
     async validateToken() {
@@ -66,24 +85,77 @@ const account = {
         console.log(err)
       })
     },
-    // 팔로우
-    follow: function({ commit }, params) {
-      console.log('follow')
-    }
 
+    // [좋아요한 게시물]
+    // 좋아요한 플레이룸 조회
+    getLikePlayroomList: function ({ commit }) {
+      // console.log('getListPlayroomList', '좋아요한 플레이룸')
+      axiosConnector.get(`playroom/likes`
+      )
+        .then((res) => {
+          // console.log('좋아요한 플룸')
+          commit('LIKE_PLAYROOM', res.data)
+        })
+        .catch((err) => {
+          console.log(err)
+        })
+    },
+    // 좋아요한 플레이리스트 조회
+    getLikePlaylistList: function ({ commit }) {
+      // console.log('getLikePlaylistList', '좋아요한 플레이리스트 2')
+      axiosConnector.get(`playlist/likes`
+      )
+        .then((res) => {
+          // console.log('getLikePlaylistList', '좋아요한 플레이리스트 3')
+          commit('LIKE_PLAYLIST', res.data)
+        })
+        .catch((err) => {
+          console.log(err)
+        })
+    },
+    // 좋아요한 게시글 조회
+    getLikeBoardList: function ({ commit }) {
+      // console.log('getLikeBoardList', '좋아요한 플레이룸')
+      axiosConnector.get(`board/likes`
+      )
+        .then((res) => {
+          // console.log('좋아요한 게시글')
+          commit('LIKE_BOARD', res.data)
+        })
+        .catch((err) => {
+          console.log(err)
+        })
+    },
+    // 플레이룸 시청 기록
+    getHistory: function ({ commit }) {
+      axiosConnector.get(`userInfo/playroom`
+      )
+        .then((res) => {
+          console.log('플레이룸 시청 기록', res.data)
+          commit('GET_HISTORY', res.data)
+        })
+        .catch((err) => {
+          console.log(err)
+        })
+    },
 
-    // // [조회]
-    // getAccounts: function ({ commit }, params) {
-    //   console.log('getAccounts params', params)
-    //   axiosConnector.get(`userinfo/${userId}`)
-    //     .then((res) => {
-    //       console.log(res)
-    //       commit('GET_ACCOUNTS', res.data)
-    //     })
-    //     .catch((err) => {
-    //       console.log(err)
-    //     })
-    // }
+    // 플레이룸 생성
+    makePlayroom: function(params) {
+      router.push({ name: 'PlayroomForm', params: params })
+    },
+    // 플레이리스트 생성
+    makePlaylist: function(params) {
+      router.push({ name: 'PlaylistForm', params: params })
+    },
+    // 게시글 생성
+    makeBoard: function(params) {
+      router.push({ name: 'BoardForm', params: params })
+    },
+    // 좋아요 취소
+    cancelLike: function() {
+      console.log('좋아요 취소')
+    },
+
   },
   modules: {
   }

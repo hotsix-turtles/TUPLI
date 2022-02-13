@@ -12,7 +12,7 @@
           mdi-chevron-left
         </v-icon>
         <h3 class="">
-          {{ this.$route.params.userId }}
+          {{ profile.nickname }}
         </h3>
       </v-row>
     </v-container>
@@ -30,7 +30,7 @@
               팔로워
             </p>
             <p class="mx-1 mb-0">
-              135
+              {{ profile.to_user.length }}
             </p>
           </div>
         </v-tab>
@@ -40,7 +40,7 @@
               팔로잉
             </p>
             <p class="mx-1 mb-0">
-              351
+              {{ profile.from_user.length }}
             </p>
           </div>
         </v-tab>
@@ -60,7 +60,7 @@
 import FollowersList from '@/components/profile/user/FollowersList.vue'
 import FollowingsList from '@/components/profile/user/FollowingsList.vue'
 
-import { mapState } from 'vuex'
+import axiosConnector from '@/utils/axios-connector.js'
 
 export default {
   name: 'Follow',
@@ -70,14 +70,28 @@ export default {
   },
   data: function() {
     return {
+      profile: [],
       followerList: [],
       followingList: []
     }
   },
   created: function() {
     this.getFollowList()
+    this.getAccounts()
   },
   methods: {
+    // [조회]
+    getAccounts: function () {
+      console.log('getAccounts params')
+      axiosConnector.get(`userinfo/${this.$route.params.userId}`)
+        .then((res) => {
+          console.log('성공적', res.data)
+          this.profile = res.data
+        })
+        .catch((err) => {
+          console.log('에러', err)
+        })
+    },
     // 팔로우. 팔로잉 리스트 조회
     getFollowList: function() {
       console.log('팔로우 리스트 조회 시도')
