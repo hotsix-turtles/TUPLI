@@ -174,6 +174,7 @@ const playlist = {
       axiosConnector.post('/playlist',
         formData
       ).then((res) => {
+        console.log('---------------[플레이리스트 생성]', formData)
         console.log(res)
         router.push({ name: 'PlaylistDetail', params: { playlistId: res.data.id } })
         commit('RESET_FORM_DATA')
