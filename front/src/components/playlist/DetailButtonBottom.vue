@@ -21,12 +21,15 @@
         class="d-flex-column justify-center mx-5 font-3 clickable"
       >
         <div>
-          <v-icon color="white">
-            mdi-youtube
+          <v-icon
+            color="white"
+            @click="watchingVideos(selectedVideos)"
+          >
+            mdi-play-circle
           </v-icon>
         </div>
         <div style="color: white;">
-          플레이룸
+          영상보기
         </div>
       </div>
       <div
@@ -73,8 +76,9 @@ export default {
   },
   methods: {
     ...mapActions('video', [
-      'removeVideos'
-    ])
+      'removeVideos',
+      'watchingVideos'
+    ]),
   }
 }
 </script>

@@ -141,7 +141,7 @@ const routes = [
     // }
   },
   {
-    path: '/video/watch',
+    path: '/video/watch/:isVideoList',
     name: 'VideoWatch',
     component: VideoWatch
   },

@@ -36,6 +36,7 @@
         />
       </v-tab-item>
     </v-tabs>
+    <add-button-bottom />
   </div>
 </template>
 
@@ -43,10 +44,11 @@
 import { mapActions, mapState } from 'vuex'
 import Back from '../../components/common/Back.vue'
 import SearchBar from '../../components/common/SearchBar.vue'
+import AddButtonBottom from '../../components/playlist/AddButtonBottom.vue'
 import VideoListItemSmall from '../../components/video/VideoListItemSmall.vue'
 export default {
   name: 'PlaylistFormVideo',
-  components: { SearchBar, VideoListItemSmall, Back },
+  components: { SearchBar, VideoListItemSmall, Back, AddButtonBottom },
   data: function() {
     return {
       pageName: "영상 추가하기",

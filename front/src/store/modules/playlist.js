@@ -270,11 +270,12 @@ const playlist = {
     },
     // 플레이리스트 댓글 생성
     createPlaylistComment: function ({ commit }, { playlistId, data }) {
+      console.log('data', data)
       axiosConnector.post(`/playlist/${playlistId}/comment`,
         data
       )
         .then((res) => {
-          console.log(res)
+          console.log(createPlaylistComment, res)
           commit('CREATE_PLAYLIST_COMMENT', res.data)
         })
         .catch((err) => {
