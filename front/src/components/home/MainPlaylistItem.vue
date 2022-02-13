@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="mb-5">
-      <!-- playroom 썸네일 -->
+      <!-- playlist 썸네일 -->
       <span
         class="playlist-cd-case"
       >
@@ -20,7 +20,7 @@
           alt="프로필 사진"
           width="50"
           height="50"
-          @click="$router.push({ name: 'PersonFollow'})"
+          @click="$router.push({ name: 'Profile' })"
         >
         <div class="d-flex flex-column align-start">
           <h4 class="mb-0 mt-2">
@@ -59,7 +59,14 @@
 
 <script>
 export default {
-  name: 'MainPlaylistItem'
+  name: 'MainPlaylistItem',
+  data: function() {
+    return {
+    }
+  },
+  methods: {
+
+  },
 }
 </script>
 

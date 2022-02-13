@@ -86,6 +86,8 @@ import axios from 'axios'
 import SERVER from '@/api/server'
 import { mapState } from 'vuex'
 
+import axiosConnector from '@/utils/axios-connector'
+
 export default {
   name: 'EditProfile',
   data: function() {
@@ -120,10 +122,13 @@ export default {
         method: 'PUT',
         headers: {Authorization: this.authToken},
         url: SERVER.URL + '/profile',
-        data: formData        
+        data: formData
       })
+      // axiosConnector.put(`/profile`,
+      //   formData
+      // )
         .then((res) => {
-          this.$router.push({ name: 'Profile' })
+          this.$router.push({ name: 'MyProfile' })
           // state 갱신
           this.$store.commit('UPDATE_PROFILE', res.data)
         })

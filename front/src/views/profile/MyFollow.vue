@@ -12,7 +12,7 @@
           mdi-chevron-left
         </v-icon>
         <h3 class="">
-          {{ this.$route.params.userId }}
+          {{ nickname }}
         </h3>
       </v-row>
     </v-container>
@@ -30,7 +30,7 @@
               팔로워
             </p>
             <p class="mx-1 mb-0">
-              135
+              {{ followers.length }}
             </p>
           </div>
         </v-tab>
@@ -40,7 +40,7 @@
               팔로잉
             </p>
             <p class="mx-1 mb-0">
-              351
+              {{ following.length }}
             </p>
           </div>
         </v-tab>
@@ -68,20 +68,8 @@ export default {
     FollowersList,
     FollowingsList,
   },
-  data: function() {
-    return {
-      followerList: [],
-      followingList: []
-    }
-  },
-  created: function() {
-    this.getFollowList()
-  },
-  methods: {
-    // 팔로우. 팔로잉 리스트 조회
-    getFollowList: function() {
-      console.log('팔로우 리스트 조회 시도')
-    }
+  computed: {
+    ...mapState(['authToken', 'userId', 'nickname', 'following', 'followers'])
   }
 }
 </script>
