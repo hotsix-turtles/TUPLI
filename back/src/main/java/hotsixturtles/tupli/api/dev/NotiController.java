@@ -2,9 +2,11 @@ package hotsixturtles.tupli.api.dev;
 
 import hotsixturtles.tupli.service.NotificationService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RestController;
 import springfox.documentation.annotations.ApiIgnore;
 
 /**
@@ -12,7 +14,7 @@ import springfox.documentation.annotations.ApiIgnore;
  * SWAGGER 대상되면 안됨!!!  : ApiIgnore
  */
 @ApiIgnore
-@Controller
+@RestController
 @RequiredArgsConstructor
 public class NotiController {
 
@@ -24,9 +26,10 @@ public class NotiController {
      * @param toId
      */
     @GetMapping("/noti/invite/from/{fromId}/to/{toId}")
-    public void notiInvite(@PathVariable("fromId") Long fromId,
+    public ResponseEntity notiInvite(@PathVariable("fromId") Long fromId,
                          @PathVariable("toId") Long toId) {
         notificationService.notiInvite(fromId, toId);
+        return ResponseEntity.ok().body("초청 알림 완료");
     }
 
     /**
@@ -35,9 +38,10 @@ public class NotiController {
      * @param toId
      */
     @GetMapping("/noti/follow/from/{fromId}/to/{toId}")
-    public void notiFollow(@PathVariable("fromId") Long fromId,
-                         @PathVariable("toId") Long toId) {
+    public ResponseEntity notiFollow(@PathVariable("fromId") Long fromId,
+                                     @PathVariable("toId") Long toId) {
         notificationService.notiFollow(fromId, toId);
+        return ResponseEntity.ok().body("팔로우 알림 완료");
     }
 
     /**
@@ -46,9 +50,10 @@ public class NotiController {
      * @param toId
      */
     @GetMapping("/noti/playroom/from/{fromId}/to/{toId}")
-    public void notiPlayroomMake(@PathVariable("fromId") Long fromId,
+    public ResponseEntity notiPlayroomMake(@PathVariable("fromId") Long fromId,
                            @PathVariable("toId") Long toId) {
         notificationService.notiPlayroomMake(fromId, toId);
+        return ResponseEntity.ok().body("플레이룸 개설 알림 완료");
     }
 
 
