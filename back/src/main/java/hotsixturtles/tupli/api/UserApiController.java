@@ -621,12 +621,13 @@ public class UserApiController {
                     .body(new ErrorResponse(messageSource.getMessage
                             ("error.valid.jwt", null, LocaleContextHolder.getLocale())));
         }
-        // user_likes 테이블에 to_user 에 otherUserSeq 이 들어간 리스트 반환하면 될듯
-        // 22.02.02 한길 - 미완성... 잘 될지 안될지 모름.
-        // 민구. 네 이대로는 안될겁니다. 이건 중간 테이블이고 가공을 해서 보내주셔야죠. 거의 다 오셨습니다.
-        // 반환은 Entity가 아니라 DTO로 해주세요. 이거 하다보면 눈치 채실겁니당b
+
         List<UserLikes> followerList = userService.getFollowers(userSeq);
-        return ResponseEntity.status(HttpStatus.OK).body(followerList);
+
+        List<SimpleUserDto> response = followerList.stream()
+                .map(x -> new SimpleUserDto(x.getFromUser())).collect(Collectors.toList());
+
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
 
