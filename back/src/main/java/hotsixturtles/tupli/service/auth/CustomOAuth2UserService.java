@@ -82,6 +82,8 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             userInfoRepository.save(nowUserInfo);
         } else {
             savedUser = createUser(userInfo, providerType);
+            savedUser.setIs_vip("N");
+            savedUser.setNickname(savedUser.getUsername());
             UserInfo nowUserInfo = new UserInfo();
             nowUserInfo.setUserSeq(savedUser.getUserSeq());
             userInfoRepository.save(nowUserInfo);
