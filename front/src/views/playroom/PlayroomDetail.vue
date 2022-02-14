@@ -141,7 +141,7 @@
               alt=""
               class="rounded-circle"
               style="width: 100%; height: auto;"
-              @click="$router.push(`/profile/${roomAuthorId}`)"
+              @click="gotoAuthorProfile"
             >
           </div>
 
@@ -284,8 +284,7 @@
               v-for="chat in roomChats"
               :id="chat.id"
               :key="chat.id"
-              :name="chat.author.name"
-              :profile="chat.author.thumbnail"
+              :author="chat.author"
               :content="chat.content"
               :timestamp="chat.timestamp"
               :blocked-user="chat.blockedUser"
@@ -504,6 +503,7 @@ export default {
       isDuplicatedError: false,
       isKickedError: false,
       exitPrompt: false,
+      exitTo: null,
       roomPlaytime: null,
       certification: false,
     }
@@ -569,6 +569,7 @@ export default {
     {
       // 토큰 만료시 현재 vuex 정보를 초기화하고 로그인 페이지로 이동
       localStorage.clear();
+      this.certification = true;
       this.$router.push('/login')
     }
   },
@@ -650,12 +651,15 @@ export default {
       return;
     }
 
+    console.log(to)
+
     if (this.certification)
     {
-      if (from.name == to.name) await this.releaseChatroom();
+      await this.releaseChatroom();
       next();
       return;
     } else {
+      this.exitTo = to.path;
       this.exitPrompt = true;
       next(false);
       return;
@@ -670,7 +674,8 @@ export default {
       if (idx == 0)
       {
         this.certification = true;
-        this.$router.go(-1);
+        if (this.exitTo) this.$router.push(this.exitTo);
+        else this.$router.go(-1);
       }
       this.exitPrompt = false;
     },
@@ -1102,6 +1107,10 @@ export default {
     },
     ImgUrl: function(img) {
       return getImage(img)
+    },
+    gotoAuthorProfile() {
+      this.certification = true;
+      this.$router.push(`/profile/${this.roomAuthorId}`);
     },
     ...mapMutations('playroom', ['RESET_VUEX_DATA', 'SET_ROOM_AUTHOR', 'SET_ROOM_LIKED', 'SET_ROOM_REPEAT', 'SEEK_VIDEO',
       'SET_ROOM_CURRENT_PLAYLIST_ID', 'SET_ROOM_CURRENT_VIDEO_ID', 'SET_ROOM_CURRENT_VIDEO_PLAYTIME',
