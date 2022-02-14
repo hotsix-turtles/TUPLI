@@ -3,13 +3,8 @@ package hotsixturtles.tupli.service;
 import hotsixturtles.tupli.dto.simple.home.SimpleHomeBoardDto;
 import hotsixturtles.tupli.dto.simple.home.SimpleHomePlaylistDto;
 import hotsixturtles.tupli.dto.simple.home.SimpleHomePlayroomDto;
-import hotsixturtles.tupli.entity.HomeInfo;
-import hotsixturtles.tupli.entity.Playlist;
-import hotsixturtles.tupli.entity.Playroom;
-import hotsixturtles.tupli.repository.BoardRepository;
-import hotsixturtles.tupli.repository.HomeInfoRepository;
-import hotsixturtles.tupli.repository.PlaylistRepository;
-import hotsixturtles.tupli.repository.PlayroomRepository;
+import hotsixturtles.tupli.entity.*;
+import hotsixturtles.tupli.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -32,31 +27,49 @@ public class HomeInfoService {
 
     private final PlayroomRepository playroomRepository;
 
+    private final UserRepository userRepository;
+
     private final BoardRepository boardRepository;
 
-    public List<Object> getHomeInfoList(Pageable pageable){
+    public List<Object> getHomeInfoList(Long userSeq, Pageable pageable){
         Page<HomeInfo> homeInfoPage = homeInfoRepository.findAll(pageable);
 
         List<HomeInfo> result = homeInfoPage.getContent();
+        User user = null;
+
+        if(userSeq != -1) user = userRepository.findByUserSeq(userSeq);
 
         List<Object> infoResult = new ArrayList<>();
         for(HomeInfo nowHomeInfo : result){
            String type = nowHomeInfo.getType();
            if(type.equals("playlist")){
-               infoResult.add(new SimpleHomePlaylistDto(playlistRepository.findById(nowHomeInfo.getInfoId()).orElse(null)));
+               Playlist nowPlaylist = playlistRepository.findById(nowHomeInfo.getInfoId()).orElse(null);
+               if(nowPlaylist == null) continue;
+               if(userSeq == -1L) infoResult.add(new SimpleHomePlaylistDto(nowPlaylist));
+               else infoResult.add(new SimpleHomePlaylistDto(nowPlaylist, user));
            }
            else if(type.equals("playroom")){
-               infoResult.add(new SimpleHomePlayroomDto(playroomRepository.findById(nowHomeInfo.getInfoId()).orElse(null)));
+               Playroom nowPlayroom = playroomRepository.findById(nowHomeInfo.getInfoId()).orElse(null);
+               if(nowPlayroom == null) continue;
+               if(userSeq == -1L) infoResult.add(new SimpleHomePlayroomDto(nowPlayroom));
+               else infoResult.add(new SimpleHomePlayroomDto(nowPlayroom, user));
            }
            else{
-               infoResult.add(new SimpleHomeBoardDto(boardRepository.findById(nowHomeInfo.getInfoId()).orElse(null)));
+               Board nowBoard = boardRepository.findById(nowHomeInfo.getInfoId()).orElse(null);
+               if(nowBoard == null) continue;
+               if(userSeq == -1L) infoResult.add(new SimpleHomeBoardDto(nowBoard));
+               else infoResult.add(new SimpleHomeBoardDto(nowBoard, user));
            }
         }
 
         return infoResult;
 
     }
-    public List<Object> getRecommendHomeList(List<Object> homeInfos, ConcurrentHashMap<String, Integer> tastes, Pageable pageable){
+    public List<Object> getRecommendHomeList(List<Object> homeInfos,
+                                             ConcurrentHashMap<String, Integer> tastes,
+                                             Long userSeq,
+                                             Pageable pageable){
+        User user = userRepository.findByUserSeq(userSeq);
         List<String> userTaste = new ArrayList<>();
         for(Map.Entry<String,Integer> tasteMap : tastes.entrySet()){
             userTaste.add(tasteMap.getKey());
@@ -71,7 +84,7 @@ public class HomeInfoService {
             }
             for(String nowPlCate : nowPlaylist.getPlaylistCate().split(",")){
                 if(userTaste.contains(nowPlCate)){
-                    SimpleHomePlaylistDto nowDto = new SimpleHomePlaylistDto(nowPlaylist);
+                    SimpleHomePlaylistDto nowDto = new SimpleHomePlaylistDto(nowPlaylist, user);
                     if(!homeInfos.contains(nowDto)) homeInfos.add(nowDto);
                     break;
                 }
@@ -91,7 +104,7 @@ public class HomeInfoService {
             }
             for(String nowPlayroomCate : nowPlayroom.getPlayroomCate().split(",")){
                 if(userTaste.contains(nowPlayroomCate)){
-                    SimpleHomePlayroomDto nowDto = new SimpleHomePlayroomDto(nowPlayroom);
+                    SimpleHomePlayroomDto nowDto = new SimpleHomePlayroomDto(nowPlayroom, user);
                     if(!homeInfos.contains(nowDto)) homeInfos.add(nowDto);
                     break;
                 }

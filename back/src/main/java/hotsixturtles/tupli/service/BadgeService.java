@@ -490,7 +490,8 @@ public class BadgeService {
             }
             int addTime = nowTime + userTime;
             for(j = i + ((nowCategory-1) * 3) ; j < i + ((nowCategory-1) * 3) + 3; j++){
-                if(addTime >= Badge12List.get(j - i + ((nowCategory-1) * 3))){
+                int k = 0;
+                if(addTime >= Badge12List.get(k++)){
                     if(!badges.contains(Long.valueOf(i))){
                         UserBadge userBadge = new UserBadge(null, userSeq, Long.valueOf(i), OffsetDateTime.now());
                         result.add(badgeRepository.findByBadgeSeq(Long.valueOf(i)));
