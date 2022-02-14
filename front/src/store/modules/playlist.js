@@ -349,7 +349,7 @@ const playlist = {
       commit('REVOKE_PLAYLISTS')
     },
     // 선택한 플레이리스트 리스트에 추가
-    selectPlaylist: function ({ commit }, playlist) {
+    selectPlaylist2: function ({ commit }, playlist) {
       commit('SELECT_PLAYLIST', playlist)
     },
     // 선택한 플레이리스트 리스트에서 제거
