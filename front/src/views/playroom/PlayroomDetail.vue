@@ -718,7 +718,7 @@ export default {
     },
     initChatRoom() {
       const token = localStorage.getItem('jwt')
-      const baseURL = "https://i6a102.p.ssafy.io/api/v1" + "/ws-stomp"
+      const baseURL = "https://tupli.kr/api/v1" + "/ws-stomp"
       const sock = new SockJS(baseURL);
       this.wsConnector = Stomp.over(sock);
       this.wsConnector.connect(
