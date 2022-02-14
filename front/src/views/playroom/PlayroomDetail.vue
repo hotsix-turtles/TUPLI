@@ -636,7 +636,8 @@ export default {
     });
   },
   beforeDestroy() {
-    this.releaseChatroom()
+    if (this.wsConnector) this.releaseChatroom();
+  },
   },
   methods: {
     loadRoomPlaytime() {
@@ -914,6 +915,12 @@ export default {
     async sendMessage(payload) {
       if (!this.chatroomId) return;
       if (!payload || !payload.type || !payload.message || !payload.token) return;
+
+      if (!this.wsConnector)
+        if (this.$router.currentRoute.name == 'PlayroomDetail') await this.initChatRoom();
+        else return;
+
+      if (!this.wsConnector.subscriptions) return;
 
       return await this.wsConnector.send(
         "/pub/chat/message",
