@@ -1010,7 +1010,8 @@ export default {
       // 이 방에 있었던 시간 (밀리초 단위)
       this.SET_USER_END_TIME(new Date())
 
-      var time = Math.floor((this.roomUserEndTime.getTime() - this.roomUserStartTime.getTime()) / 1000)
+
+      var time = Math.floor((new Date(this.roomUserEndTime).getTime() - new Date(this.roomUserStartTime).getTime()) / 1000 / 1000)
       console.log(time, '초 경과')
 
       // 새로운 뱃지 취득시 이거 응답으로 받습니다...
