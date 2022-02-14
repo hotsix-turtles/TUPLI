@@ -481,6 +481,7 @@ export default {
       isAuthorChangedInfo: false,
       exitPrompt: false,
       roomPlaytime: null,
+      certification: false,
     }
   },
   metaInfo () {
@@ -616,6 +617,24 @@ export default {
   beforeDestroy() {
     if (this.wsConnector) this.releaseChatroom();
   },
+  async beforeRouteLeave(to, from, next) {
+    if (this.isChatting)
+    {
+      this.isChatting = false;
+      next(false);
+      return;
+    }
+
+    if (this.certification)
+    {
+      if (from.name == to.name) await this.releaseChatroom();
+      next();
+      return;
+    } else {
+      this.exitPrompt = true;
+      next(false);
+      return;
+    }
   },
   methods: {
     errorPromptHandler() {
