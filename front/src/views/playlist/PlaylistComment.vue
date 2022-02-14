@@ -5,23 +5,68 @@
     <div
       v-for="(playlistComment, index) in playlistComments"
       :key="index"
+      class="ml-2"
     >
-      <v-img lazy-src="`{playlistComment.user.profileImage}`" />
-      <!-- playlistComment.created 하면 생성시간이어야 하는데, 숫자가 이상하다. 오류가 있는 듯 하다. -->
-      {{ playlistComment.user.nickname }} {{ playlistComment.content }}
-      <!-- 댓글삭제 버튼 -->
-      <span class="text-right">
-        <v-btn
-          v-if="userId == playlistComment.user.userSeq"
-          x-small
-          @click="deleteComment(playlistComment.id)"
-        >
-          X
-        </v-btn>
-      </span>
+      <v-container>
+        <v-row>
+          <v-col :cols="2">
+            <!-- 프로필사진 노출 -->
+            <img
+              style="border-radius: 100px;"
+              :src="ImgUrl(playlistComment.user.profileImage)"
+              alt="프로필 사진"
+              width="35px"
+              height="35px"
+              class=""
+            >
+          </v-col>
+          <v-col :cols="10">
+            <v-row style="table-layout:fixed">
+              <!-- 유저닉네임 노출 -->
+              <span style="font-weight:bold">
+                {{ playlistComment.user.nickname }}
+              </span>
+              &nbsp;
+              <span>
+                <!-- 덧글내용 노출 -->
+                {{ playlistComment.content }}
+              </span>
+            </v-row>
+            <v-row>
+              <!-- 날짜 표시 -->
+              <div class="mb-2">
+                <span style="color:gray">
+                  {{ playlistComment.created }}
+                </span>
+                <!-- 댓글삭제 버튼 -->
+                <span
+                  v-if="userId == playlistComment.user.userSeq"
+                  style="color:gray;font-size:13px"
+                  class="ml-1"
+                  @click.stop="deleteComment(playlistComment.id)"
+                >
+                  삭제
+                </span>
+              </div>
+            </v-row>
+          </v-col>
+        </v-row>
+      </v-container>
     </div>
+
+    <!-- 덧글이 한개도 없을때 나오는 출력창 -->
+    <div
+      v-if="playlistComments.length == 0"
+      class="text-center text--secondary"
+    >
+      덧글이 없습니다.
+    </div>
+
     <!-- 댓글 입력창 -->
-    <div class="container">
+    <div
+      class="
+      container"
+    >
       <comment-input @send-comment="sendComment" />
     </div>
   </div>
@@ -31,6 +76,7 @@
 import { mapActions, mapState } from 'vuex'
 import Back from '../../components/common/Back.vue'
 import CommentInput from '../../components/playlist/CommentInput.vue'
+import { getImage } from '../../utils/utils'
 
 export default {
   name: 'PlaylistComment',
@@ -41,7 +87,7 @@ export default {
   data: function() {
     return {
       playlistId: 0,
-      forShowComments: null,
+      convertedTime: [],
     }
   },
   computed: {
@@ -53,15 +99,9 @@ export default {
       playlistComments: state => state.playlistComments,
     }),
   },
-  watch: {
-    playlistComments: function(value) {
-      this.playlistComments = value;
-    }
-  },
   created: function() {
     this.playlistId = this.$route.params.playlistId
     this.getPlaylistComments(this.playlistId)
-    this.forShowComments = this.playlistComments
   },
   methods: {
     ...mapActions('playlist', [
@@ -81,6 +121,9 @@ export default {
       const playlistId = this.playlistId
       console.log("playlistComment.vue : playlistId", playlistId)
       this.deletePlaylistComment({commentId, playlistId})
+    },
+    ImgUrl: function(img) {
+      return getImage(img)
     }
   },
 }
