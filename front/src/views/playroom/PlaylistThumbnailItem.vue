@@ -13,8 +13,8 @@
 import { mapMutations } from 'vuex'
 import PlaylistCdMedium from '../../components/playlist/PlaylistCdMedium.vue'
 export default {
-  components: { PlaylistCdMedium },
   name: 'PlaylistThumbnailItem',
+  components: { PlaylistCdMedium },
   props: {
     id: {type: String, default: ''},
     src: {type: String, default: ''},

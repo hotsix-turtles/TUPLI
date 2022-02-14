@@ -1,24 +1,21 @@
 <template>
   <v-card
-    class="playroom mx-auto overflow-hidden mb-10"
+    class="mx-auto mb-10 overflow-hidden"
     height="100%"
   >
     <!-- 하단 네비게이션 (플레이리스트 조작) -->
     <v-bottom-navigation
       absolute
+      class="fixed-bottom"
       background-color="#5B5C9D"
       height="60px"
-      class="fixed-bottom"
-      :input-value="selectedItem.length > 0"
+      :input-value="selectedVideoItem.length > 0"
     >
       <!-- 선택된 동영상 개수 뱃지 -->
       <v-badge
-        :content="selectedItem.length"
+        :content="selectedVideoItem.length"
         color="#EAEAEA"
-        offset-x="20"
-        offset-y="20"
         overlap
-        class="videoCounter"
       />
 
       <!-- 영상보기 버튼 -->
@@ -99,8 +96,21 @@
             <v-icon>mdi-share</v-icon>
           </v-btn>
 
+          <!-- 플레이룸 반복 -->
+          <v-btn
+            v-if="roomAuthorId == userInfo.userSeq"
+            class="playroomReport"
+            @click="playroomRepeat"
+          >
+            <span>반복</span>
+            <v-icon :color="roomRepeat ? 'blue' : undefined">mdi-repeat</v-icon>
+          </v-btn>
+
           <!-- 플레이룸 신고 -->
-          <v-btn class="playroomReport">
+          <v-btn
+            v-else
+            class="playroomReport"
+          >
             <span>신고</span>
             <v-icon>mdi-alert</v-icon>
           </v-btn>
@@ -475,7 +485,7 @@ export default {
       playerVars: {
         mute: 1
       },
-      selectedItem: [],
+      selectedVideoItem: [],
       isChatting: false,
       lastPlaytime: 0,
       wsConnector: null,
@@ -515,6 +525,7 @@ export default {
       'roomTitle',
       'roomPublic',
       'roomLiked',
+      'roomRepeat',
       'roomAuthorId',
       'roomAuthorProfilePic',
       'roomAuthorName',
@@ -738,12 +749,12 @@ export default {
     onPlaylistVideoSelected({ id, selected }) {
       if (selected)
       {
-        const idx = this.selectedItem.findIndex(el => el == id)
-        this.selectedItem.splice(idx, 1)
+        const idx = this.selectedVideoItem.findIndex(el => el == id)
+        this.selectedVideoItem.splice(idx, 1)
       }
       else
       {
-        this.selectedItem.push(id)
+        this.selectedVideoItem.push(id)
       }
       if (this.roomAuthorId == this.userInfo.userSeq) this.playThisVideo()
     },
@@ -823,12 +834,12 @@ export default {
       }
     },
     selectAllVideo() {
-      this.selectedItem = (this.selectedItem.length == this.roomCurrentPlaylistVideos.length) ?
+      this.selectedVideoItem = (this.selectedVideoItem.length == this.roomCurrentPlaylistVideos.length) ?
         [] :
         this.roomCurrentPlaylistVideos.map(v => parseInt(v.id));
     },
     isSelectedVideo(id) {
-      return this.selectedItem.findIndex(el => el == id) > -1
+      return this.selectedVideoItem.findIndex(el => el == id) > -1
     },
     loadNextVideo() {
       if (this.roomNextVideo)
@@ -836,6 +847,8 @@ export default {
         this.SET_ROOM_CURRENT_PLAYLIST_ID(this.roomNextVideo.playlistId)
         this.SET_ROOM_CURRENT_VIDEO_ID(this.roomNextVideo.videoId)
         this.SET_ROOM_CURRENT_VIDEO_PLAYTIME(0)
+      } else if (this.roomRepeat) {
+        this.loadFirstVideo();
       }
     },
     updateVideoId() {
@@ -853,14 +866,14 @@ export default {
       //setTimeout(this.player.playVideo, 1000)
     },
     playThisVideo() {
-      if (this.selectedItem.length != 1) {
+      if (this.selectedVideoItem.length != 1) {
         alert('바로 재생할 영상을 1개만 선택해주세요')
         return;
       }
-      console.log(this.selectedItem)
-      this.SET_ROOM_CURRENT_VIDEO_ID(this.selectedItem[0])
+      console.log(this.selectedVideoItem)
+      this.SET_ROOM_CURRENT_VIDEO_ID(this.selectedVideoItem[0])
       this.SET_ROOM_CURRENT_VIDEO_PLAYTIME(0)
-      this.selectedItem = []
+      this.selectedVideoItem = []
       this.seekTo()
     },
     async loadLikeState() {
@@ -885,6 +898,18 @@ export default {
       }
 
       await this.loadLikeState();
+    },
+    async playroomRepeat() {
+      if (this.roomRepeat)
+      {
+        // 반복 설정 되어있으면 반복 해제
+        this.SET_ROOM_REPEAT(false)
+      }
+      else
+      {
+        // 반복 설정 안되어있으면 반복 설정
+        this.SET_ROOM_REPEAT(true)
+      }
     },
     async sendMessage(payload) {
       if (!this.chatroomId) return;
@@ -994,7 +1019,7 @@ export default {
       await this.wsConnector.disconnect()
       this.wsConnector = null
     },
-    ...mapMutations('playroom', ['RESET_VUEX_DATA', 'SET_ROOM_AUTHOR', 'SET_ROOM_LIKED', 'SEEK_VIDEO',
+    ...mapMutations('playroom', ['RESET_VUEX_DATA', 'SET_ROOM_AUTHOR', 'SET_ROOM_LIKED', 'SET_ROOM_REPEAT', 'SEEK_VIDEO',
       'SET_ROOM_CURRENT_PLAYLIST_ID', 'SET_ROOM_CURRENT_VIDEO_ID', 'SET_ROOM_CURRENT_VIDEO_PLAYTIME',
       'SET_ROOM_LAST_SYNC_SENDER', 'SET_USER_START_TIME', 'SET_USER_END_TIME']),
     ...mapActions('account', ['validateToken']),
@@ -1131,9 +1156,5 @@ iframe {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-}
-
-.videoCounter {
-  color: black;
 }
 </style>
