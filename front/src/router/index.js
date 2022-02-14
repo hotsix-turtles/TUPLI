@@ -246,7 +246,7 @@ const routes = [
 
   //playroom
   {
-    path: '/playroom',
+    path: '/playroom/create',
     name: 'PlayroomForm',
     component: PlayroomForm
   },
