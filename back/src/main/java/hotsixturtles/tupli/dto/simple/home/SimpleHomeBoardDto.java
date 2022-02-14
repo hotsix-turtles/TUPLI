@@ -80,7 +80,10 @@ public class SimpleHomeBoardDto {
         this.nickName = board.getUser().getNickname();
         this.userProfileImg = board.getUser().getProfileImage();
         // 연결
-        if(this.contentType.equals("playroom")){
+        if(this.contentType == null || this.contentType.trim().length() == 0){
+            this.contents = null;
+        }
+        else if(this.contentType.equals("playroom")){
             this.contents = new SimpleHomePlayroomDto(board.getPlayroom());
         }
         else if(this.contentType.equals("playlist")){
