@@ -33,11 +33,11 @@
       />
 
       <!-- 저장하기 버튼 -->
-      <NavButton
+      <!-- <NavButton
         color="white"
         content="저장하기"
         icon="mdi-bookmark"
-      />
+      /> -->
     </v-bottom-navigation>
 
     <!-- 플레이룸 페이지 -->
