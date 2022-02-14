@@ -98,7 +98,7 @@
 
           <!-- 플레이룸 반복 -->
           <v-btn
-            v-if="roomAuthorId == userInfo.userSeq"
+            v-if="roomAuthorId == userId"
             class="playroomReport"
             @click="playroomRepeat"
           >
@@ -493,9 +493,6 @@ export default {
       canChat: true,
       errorOnSend: false,
       playlistThumbnails: [],
-      userInfo: {
-        userSeq: null
-      },
       heartbeat: 0,
       isOperationTimeError: false,
       isNotInvitedError: false,
@@ -523,6 +520,7 @@ export default {
     }
   },
   computed: {
+    ...mapState(['userId']),
     ...mapState('playroom', [
       'roomId',
       'roomTitle',
@@ -739,7 +737,7 @@ export default {
         this.showErrorOperationTime();
 
       // 비공개방이고 미초대 유저면
-      if (!this.roomPublic && !this.roomInviteIds.find(inviteId => inviteId == this.userInfo.userSeq)) {
+      if (!this.roomPublic && !this.roomInviteIds.find(inviteId => inviteId == this.userId)) {
         this.showErrorNotInvited();
       }
     },
@@ -804,7 +802,7 @@ export default {
       {
         this.selectedVideoItem.push(id)
       }
-      if (this.roomAuthorId == this.userInfo.userSeq) this.playThisVideo()
+      if (this.roomAuthorId == this.userId) this.playThisVideo()
     },
     onVideoReady() {
     },
@@ -855,7 +853,7 @@ export default {
           await this.SET_ROOM_LAST_SYNC_SENDER(syncSender)
         }
 
-        if (this.userInfo.userSeq == this.roomAuthorId) return;
+        if (this.userId == this.roomAuthorId) return;
 
         if (currentPlaylistId != syncPlaylistId) this.SET_ROOM_CURRENT_PLAYLIST_ID(syncPlaylistId)
         if (currentVideoId != syncVideoId) this.SET_ROOM_CURRENT_VIDEO_ID(syncVideoId)
@@ -999,7 +997,7 @@ export default {
       };
 
       if (!token) return;
-      if (this.userInfo.userSeq != this.roomAuthorId) return;
+      if (this.userId != this.roomAuthorId) return;
 
       this.sendMessage({ type: 'KICK', message: JSON.stringify(kickData), token })
     },
@@ -1017,9 +1015,9 @@ export default {
       };
 
       if (!token) return;
-      if (this.userInfo.userSeq != this.roomAuthorId) return;
 
       if (this.roomLastSyncSender != this.userId) await this.getRoomInfo2();
+      if (this.userId != this.roomAuthorId) return;
 
       this.sendMessage({ type: 'SYNC', message: JSON.stringify(syncData), token })
     },
@@ -1074,8 +1072,8 @@ export default {
         // const userOffset = this.roomUsers.findIndex(roomUser => roomUser == this.userInfo.userSeq)
 
         // 그런거 없으니까 일단은.. 무작정 도전!
-        if (this.userInfo.userSeq)
-          if ((parseInt(this.userInfo.userSeq) + Date.now()) % 10 == (parseInt(this.roomId) + parseInt(this.roomAuthorId)) % 10)
+        if (this.userId)
+          if ((parseInt(this.userId) + Date.now()) % 10 == (parseInt(this.roomId) + parseInt(this.roomAuthorId)) % 10)
           {
             this.showInfoAuthorChanged()
             this.requestRoomAuthor()
@@ -1083,7 +1081,7 @@ export default {
 
       }
 
-      if (this.userInfo.userSeq && this.userInfo.userSeq == this.roomAuthorId) return;
+      if (this.userId && this.userId == this.roomAuthorId) return;
       this.heartbeat += 1;
     },
     async requestRoomAuthor() {
