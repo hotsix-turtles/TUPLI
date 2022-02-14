@@ -6,6 +6,7 @@ import hotsixturtles.tupli.dto.simple.SimpleYoutubeVideoDto;
 import hotsixturtles.tupli.entity.Badge;
 import hotsixturtles.tupli.entity.Playroom;
 import hotsixturtles.tupli.entity.User;
+import hotsixturtles.tupli.entity.likes.PlayroomLikes;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -44,6 +45,8 @@ public class PlayroomDto {
 //    private List<SimpleUserDto> guest;  // 참여자 정보 다 보내는 버전
     private List<SimpleBadgeDto> badges;
 
+    private Boolean isLiked;
+
 
     public PlayroomDto(Playroom playroom) {
         this.id = playroom.getId();
@@ -62,6 +65,38 @@ public class PlayroomDto {
         this.user = new SimpleUserDto(playroom.getUser());
         this.videos = playroom.getVideos()
                 .stream().map(x -> new SimpleYoutubeVideoDto(x)).collect(Collectors.toList());
+    }
+
+    public PlayroomDto(Playroom playroom, User user) {
+        this.id = playroom.getId();
+        this.title = playroom.getTitle();
+        this.content = playroom.getContent();
+        this.isPublic = playroom.getIsPublic();
+        this.tags = playroom.getTags();
+        this.playlists = playroom.getPlaylists();
+        this.inviteIds = inviteIds;
+        this.startTime = playroom.getStartTime();
+        this.endTime = playroom.getEndTime();
+        this.userCount = playroom.getUserCount();
+        this.likesCnt = playroom.getLikesCnt();
+        this.userCountMax = playroom.getUserCountMax();
+        // 연결
+        this.user = new SimpleUserDto(playroom.getUser());
+        this.videos = playroom.getVideos()
+                .stream().map(x -> new SimpleYoutubeVideoDto(x)).collect(Collectors.toList());
+
+        if(playroom.getPlayroomLikes() == null){
+            this.isLiked = false;
+        }
+        else{
+            this.isLiked = false;
+            for(PlayroomLikes nowPlayroomLikes : playroom.getPlayroomLikes()){
+                if(nowPlayroomLikes.getUser().getUserSeq() == user.getUserSeq()){
+                    this.isLiked = true;
+                    break;
+                }
+            }
+        }
     }
 
 //    // 참여자 정보까지 다 받아가는 버전

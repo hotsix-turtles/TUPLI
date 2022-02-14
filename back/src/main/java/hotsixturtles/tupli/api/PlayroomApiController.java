@@ -8,9 +8,7 @@ import hotsixturtles.tupli.dto.response.ErrorResponse;
 import hotsixturtles.tupli.dto.response.ResponsePlayroomDto;
 import hotsixturtles.tupli.dto.simple.SimpleBadgeDto;
 import hotsixturtles.tupli.dto.simple.SimplePlayroomCategoryDto;
-import hotsixturtles.tupli.entity.Badge;
-import hotsixturtles.tupli.entity.Playroom;
-import hotsixturtles.tupli.entity.UserBadge;
+import hotsixturtles.tupli.entity.*;
 import hotsixturtles.tupli.entity.likes.PlayroomLikes;
 import hotsixturtles.tupli.entity.youtube.YoutubeVideo;
 import hotsixturtles.tupli.service.*;
@@ -56,6 +54,8 @@ public class PlayroomApiController {
 
     private final PlaylistService playlistService;
 
+    private final UserService userService;
+
     /**
      * 내가 작성한 플레이룸들
      * @param token
@@ -94,23 +94,41 @@ public class PlayroomApiController {
      * 반환 코드 : 200, 404
      */
     @GetMapping("/playroom/list")
-    public ResponseEntity<?> getPlayroomList(){
+    public ResponseEntity<?> getPlayroomList(HttpServletRequest request){
 
         List<Playroom> playroomList = playroomService.getPlayroomList();
 
+        String token = request.getHeader("Authorization");
+        if (token == null || !jwtTokenProvider.validateToken(token)) {
+            List<PlayroomDto> playroomDtoList = playroomList.stream().map(b -> new PlayroomDto(b)).collect(Collectors.toList());
 
-        List<PlayroomDto> playroomDtoList = playroomList.stream().map(b -> new PlayroomDto(b)).collect(Collectors.toList());
-
-        for(PlayroomDto nowPlayroom : playroomDtoList) {
-            List<PlaylistDto> plList = new ArrayList<>();
-            for (Map.Entry<Long, List<Long>> entry : nowPlayroom.getPlaylists().entrySet()){
-                Long playlistId = entry.getKey();
-                plList.add(new PlaylistDto(playlistService.getPlaylist(playlistId)));
+            for(PlayroomDto nowPlayroom : playroomDtoList) {
+                List<PlaylistDto> plList = new ArrayList<>();
+                for (Map.Entry<Long, List<Long>> entry : nowPlayroom.getPlaylists().entrySet()){
+                    Long playlistId = entry.getKey();
+                    plList.add(new PlaylistDto(playlistService.getPlaylist(playlistId)));
+                }
+                nowPlayroom.setPlaylistsInfo(plList);
             }
-            nowPlayroom.setPlaylistsInfo(plList);
-        }
 
-        return ResponseEntity.status(HttpStatus.OK).body(playroomDtoList);
+            return ResponseEntity.status(HttpStatus.OK).body(playroomDtoList);
+        } else {
+            Long userSeq = jwtTokenProvider.getUserSeq(token);
+
+            User user = userService.getUserByUserseq(userSeq);
+            List<PlayroomDto> playroomDtoList = playroomList.stream().map(b -> new PlayroomDto(b, user)).collect(Collectors.toList());
+
+            for(PlayroomDto nowPlayroom : playroomDtoList) {
+                List<PlaylistDto> plList = new ArrayList<>();
+                for (Map.Entry<Long, List<Long>> entry : nowPlayroom.getPlaylists().entrySet()){
+                    Long playlistId = entry.getKey();
+                    plList.add(new PlaylistDto(playlistService.getPlaylist(playlistId)));
+                }
+                nowPlayroom.setPlaylistsInfo(plList);
+            }
+
+            return ResponseEntity.status(HttpStatus.OK).body(playroomDtoList);
+        }
     }
 
     /**
@@ -133,6 +151,7 @@ public class PlayroomApiController {
             return ResponseEntity.status(HttpStatus.OK).body(new PlayroomDto(playroom));
         } else {
             Long userSeq = jwtTokenProvider.getUserSeq(token);
+            User user = userService.getUserByUserseq(userSeq);
             Playroom playroom = playroomService.getPlayroom(playroomId);
             if (playroom == null) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
@@ -143,7 +162,7 @@ public class PlayroomApiController {
                         .body(new ErrorResponse(messageSource.getMessage("error.same.room", null, LocaleContextHolder.getLocale())));
             }
             playroomService.addGuest(userSeq, playroom);
-            return ResponseEntity.status(HttpStatus.OK).body(new PlayroomDto(playroom));
+            return ResponseEntity.status(HttpStatus.OK).body(new PlayroomDto(playroom, user));
         }
     }
 
@@ -283,9 +302,11 @@ public class PlayroomApiController {
         }
         Long userSeq = jwtTokenProvider.getUserSeq(token);
 
+        User user = userService.getUserByUserseq(userSeq);
+
         List<Playroom> playrooms = playroomService.getLikedPlayrooms(userSeq);
 
-        List<PlayroomDto> playroomDtoList = playrooms.stream().map(b -> new PlayroomDto(b)).collect(Collectors.toList());
+        List<PlayroomDto> playroomDtoList = playrooms.stream().map(b -> new PlayroomDto(b,user)).collect(Collectors.toList());
 
         for(PlayroomDto nowPlayroom : playroomDtoList) {
             List<PlaylistDto> plList = new ArrayList<>();
