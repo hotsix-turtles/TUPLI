@@ -25,10 +25,11 @@ public class NotiController {
      * @param fromId
      * @param toId
      */
-    @GetMapping("/noti/invite/from/{fromId}/to/{toId}")
+    @GetMapping("/noti/invite/from/{fromId}/to/{toId}/playroom/{playroomId}")
     public ResponseEntity notiInvite(@PathVariable("fromId") Long fromId,
-                         @PathVariable("toId") Long toId) {
-        notificationService.notiInvite(fromId, toId);
+                                     @PathVariable("toId") Long toId,
+                                     @PathVariable("playroomId") Long playroomId) {
+        notificationService.notiInvite(fromId, toId, playroomId);
         return ResponseEntity.ok().body("초청 알림 완료");
     }
 
@@ -49,10 +50,11 @@ public class NotiController {
      * @param fromId
      * @param toId
      */
-    @GetMapping("/noti/playroom/from/{fromId}/to/{toId}")
+    @GetMapping("/noti/playroom/from/{fromId}/to/{toId}/playroom/{playroomId}")
     public ResponseEntity notiPlayroomMake(@PathVariable("fromId") Long fromId,
-                           @PathVariable("toId") Long toId) {
-        notificationService.notiPlayroomMake(fromId, toId);
+                                           @PathVariable("toId") Long toId,
+                                           @PathVariable("playroomId") Long playroomId) {
+        notificationService.notiPlayroomMake(fromId, toId, playroomId);
         return ResponseEntity.ok().body("플레이룸 개설 알림 완료");
     }
 

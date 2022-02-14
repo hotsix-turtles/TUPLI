@@ -407,8 +407,9 @@ public class UserApiController {
      * @param userSeq
      * @return
      */
-    @PutMapping("/account/passwordFind/{userSeq}")
-    public ResponseEntity passwordFind(@PathVariable("userSeq") Long userSeq) {
+    @PutMapping("/account/passwordFind/{userSeq}/nickname/{nickname}")
+    public ResponseEntity passwordFind(@PathVariable("userSeq") Long userSeq,
+                                       @PathVariable("nickname") String nickname) {
         // 임시 비밀번호
         mailSendService.sendTmpPassword(userSeq);
         return ResponseEntity.ok().body(null);

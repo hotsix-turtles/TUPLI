@@ -184,14 +184,14 @@ public class PlayroomService {
 
         // 플레이룸 개설 알림 보내기 (초청 유저)
         for (Long inviteId : playroomDto.getInviteIds()) {
-            notificationService.notiPlayroomMake(userSeq, inviteId);
+            notificationService.notiPlayroomMake(userSeq, inviteId, nowPlayroom.getId());
         }
 
         // 플레이룸 개설 알림 보내기 (로직짜고, 팔로우한 유저들에게, 유저 설정 부분 만들어지면 그 때 수정)
         if (false) {
             List<UserLikes> followers = userService.getFollowers(userSeq);
             for (UserLikes follower : followers) {
-                notificationService.notiInvite(userSeq, follower.getFromUser().getUserSeq());
+                notificationService.notiInvite(userSeq, follower.getFromUser().getUserSeq(), nowPlayroom.getId());
             }
 
         }

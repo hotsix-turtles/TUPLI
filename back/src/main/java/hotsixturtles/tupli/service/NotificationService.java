@@ -72,7 +72,7 @@ public class NotificationService {
     /**
      * 플레이룸 개설시 알림
      */
-    public void notiPlayroomMake(Long from_userSeq, Long to_userSeq) {
+    public void notiPlayroomMake(Long from_userSeq, Long to_userSeq, Long playroomId) {
 
         User toUser = userRepository.findByUserSeq(to_userSeq);
         UserSetting userSetting = toUser.getUserSetting();
@@ -100,6 +100,7 @@ public class NotificationService {
         notificationDto.setFromId(String.valueOf(from_userSeq));  // 라우터용 userSeq
         notificationDto.setImage(fromUser.getProfileImage());
         notificationDto.setIsRead("false");
+        notificationDto.setRouteId(String.valueOf(playroomId));
 
         // 알림 개인 확인용
         final FirebaseDatabase database = FirebaseDatabase.getInstance();
@@ -125,7 +126,7 @@ public class NotificationService {
     /**
      * 플레이룸 초대시 알림
      */
-    public void notiInvite(Long from_userSeq, Long to_userSeq) {
+    public void notiInvite(Long from_userSeq, Long to_userSeq, Long playroomId) {
 
         User toUser = userRepository.findByUserSeq(to_userSeq);
         UserSetting userSetting = toUser.getUserSetting();
@@ -167,6 +168,7 @@ public class NotificationService {
         notificationDto.setFromId(String.valueOf(from_userSeq));  // 라우터용 userSeq
         notificationDto.setImage(fromUser.getProfileImage());
         notificationDto.setIsRead("false");
+        notificationDto.setRouteId(String.valueOf(playroomId));
 
         // 알림 개인 확인용
         final FirebaseDatabase database = FirebaseDatabase.getInstance();
