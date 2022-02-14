@@ -32,6 +32,8 @@ public class SimplePlayroomCategoryDto {
     private Integer likesCnt;
     private Boolean isLiked;
 
+    private Integer userCountMax;
+
    public SimplePlayroomCategoryDto(Playroom playroom) {
         this.id = playroom.getId();
         this.title = playroom.getTitle();
@@ -44,6 +46,7 @@ public class SimplePlayroomCategoryDto {
         this.startTime = playroom.getStartTime();
         this.endTime = playroom.getEndTime();
         this.userCount = playroom.getUserCount();
+        this.userCountMax = playroom.getUserCountMax();
 
         // 추가 변수
        this.userId = playroom.getUser().getUserSeq();
@@ -66,6 +69,7 @@ public class SimplePlayroomCategoryDto {
         this.startTime = playroom.getStartTime();
         this.endTime = playroom.getEndTime();
         this.userCount = playroom.getUserCount();
+        this.userCountMax = playroom.getUserCountMax();
 
         // 추가 변수
         this.userId = playroom.getUser().getUserSeq();

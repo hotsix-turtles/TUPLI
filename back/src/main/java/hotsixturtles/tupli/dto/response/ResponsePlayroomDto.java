@@ -31,6 +31,9 @@ public class ResponsePlayroomDto {
     private List<SimpleYoutubeVideoDto> videos;
     private List<PlaylistDto> playlistsInfo;
 
+    private Integer userCount;
+    private Integer likesCnt;
+    private Integer userCountMax;
 
     public ResponsePlayroomDto(Playroom playroom) {
         this.id = playroom.getId();
@@ -42,6 +45,9 @@ public class ResponsePlayroomDto {
         this.inviteIds = inviteIds;
         this.startTime = playroom.getStartTime();
         this.endTime = playroom.getEndTime();
+        this.userCount = playroom.getUserCount();
+        this.likesCnt = playroom.getLikesCnt();
+        this.userCountMax = playroom.getUserCountMax();
 
         // 연결
         this.user = new SimpleUserDto(playroom.getUser());

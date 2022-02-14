@@ -685,8 +685,6 @@ public class UserApiController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-
-
     /**
      * 해당 유저의 팔로워(이 유저를 팔로우 한 사람) 수 보기
      */
@@ -698,4 +696,74 @@ public class UserApiController {
         int followersCnt = userService.getFollowersCount(userSeq);
         return ResponseEntity.status(HttpStatus.OK).body(followersCnt);
     }
+
+    /**
+     * 내가 팔로우 한 유저 목록
+     * @param token
+     * @return
+     */
+    @GetMapping("/profile/followings/{userSeq}")
+    public ResponseEntity<?> getMyFollowees(
+            @ApiParam(value = "auth token")
+            @RequestHeader(value = "Authorization") String token,
+            @ApiParam(value = "path로 userSeq가 입력된다.")
+            @PathVariable("userSeq") Long userSeq) {
+        if (!jwtTokenProvider.validateToken(token)) {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(new ErrorResponse(messageSource.getMessage
+                            ("error.valid.jwt", null, LocaleContextHolder.getLocale())));
+        }
+
+        Long tokenUserSeq = jwtTokenProvider.getUserSeq(token);
+
+        List<UserLikes> followerList = userService.getFollowees(tokenUserSeq);
+
+        List<SimpleUserDto> response = followerList.stream()
+                .map(x -> new SimpleUserDto(x.getToUser())).collect(Collectors.toList());
+
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    /**
+     * 자신의 맞팔로워 목록
+     * @param token
+     * @return
+     */
+    @GetMapping("/profile/cofollowers/{userSeq}")
+    public ResponseEntity<?> getMyCoFollowers(
+            @ApiParam(value = "auth token")
+            @RequestHeader(value = "Authorization") String token,
+            @ApiParam(value = "path로 userSeq가 입력된다.")
+            @PathVariable("userSeq") Long userSeq) {
+        if (!jwtTokenProvider.validateToken(token)) {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(new ErrorResponse(messageSource.getMessage
+                            ("error.valid.jwt", null, LocaleContextHolder.getLocale())));
+        }
+
+        Long tokenUserSeq = jwtTokenProvider.getUserSeq(token);
+
+        List<UserLikes> followerList = userService.getFollowers(tokenUserSeq);
+        List<SimpleUserDto> result = new ArrayList<>();
+        List<User> followers = new ArrayList<>();
+        for(UserLikes userLikes : followerList){
+            followers.add(userLikes.getFromUser());
+        }
+
+        List<UserLikes> followeeList = userService.getFollowees(tokenUserSeq);
+        for(UserLikes userLikes : followeeList){
+            User myFollowee = userLikes.getToUser();
+            for(User myFollower : followers){
+                if(myFollower.getUserSeq() == myFollowee.getUserSeq() && !result.contains(new SimpleUserDto(myFollower))){
+                    result.add(new SimpleUserDto(myFollower));
+                    break;
+                }
+            }
+        }
+
+        return ResponseEntity.status(HttpStatus.OK).body(result);
+    }
+
 }

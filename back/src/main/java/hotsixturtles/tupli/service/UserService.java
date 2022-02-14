@@ -39,7 +39,8 @@ public class UserService {
         validateDuplicateUser(user);
         user.setPassword(user.getPassword());
         user.encodePassword(passwordEncoder);
-
+        int randNum = (int)(Math.random()*20) + 1;
+        user.setProfileImage("#" + randNum);
         userRepository.save(user);
         UserInfo userInfo = new UserInfo();
         userInfo.setUserSeq(user.getUserSeq());
@@ -204,6 +205,18 @@ public class UserService {
 
     // 22.02.02 한길 - 팔로워 리턴하기
     public List<UserLikes> getFollowers(Long otherUserSeq) {
+        // to_user_id 가 otherUserSeq 로 이루어져있는 녀석들만 골라서 저장하고 리턴
+        List<UserLikes> userlikes = userLikesRepository.findFollowers(otherUserSeq);
+        return userlikes;
+    }
+
+    public List<UserLikes> getFollowees(Long otherUserSeq) {
+        // to_user_id 가 otherUserSeq 로 이루어져있는 녀석들만 골라서 저장하고 리턴
+        List<UserLikes> userlikes = userLikesRepository.findByFromUser(otherUserSeq);
+        return userlikes;
+    }
+
+    public List<UserLikes> getCoFollowers(Long otherUserSeq) {
         // to_user_id 가 otherUserSeq 로 이루어져있는 녀석들만 골라서 저장하고 리턴
         List<UserLikes> userlikes = userLikesRepository.findFollowers(otherUserSeq);
         return userlikes;
