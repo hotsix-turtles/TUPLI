@@ -417,6 +417,30 @@
             />
           </v-col>
         </v-row>
+
+        <!-- 플레이룸 최대 인원 수 -->
+        <v-row>
+          <v-col
+            cols="12"
+            md="4"
+            class="d-flex flex-row justify-space-between"
+          >
+            <p class="font-3">
+              최대 인원수
+            </p>
+            <p class="font-4 ml-1 mr-auto">
+              참여할 최대 유저 수를 설정합니다.
+            </p>
+            <v-combobox
+              class="ml-5"
+              style="width: 50px;"
+              dense
+              solo
+              v-model="formData.userCountMax"
+              :items="userCountMaxItems"
+            ></v-combobox>
+          </v-col>
+        </v-row>
       </v-container>
     </v-form>
   </div>
@@ -469,7 +493,8 @@ export default {
         tags: [],
         isPublic: true,
         inviteIds: [],
-        playlists: []
+        playlists: [],
+        userCountMax: 20
       },
       numberOfPlaylist: 0,
       numberOfPlaylistVideos: 0,
@@ -487,6 +512,7 @@ export default {
       endDateTime: new Date(),
 
       autoTime: true,
+      userCountMaxItems: [2,3,5,10,20] // TODO: 프리미엄 유저 기능으로 100명 무제한 이런식?
     }
   },
   computed: {
