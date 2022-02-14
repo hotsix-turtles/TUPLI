@@ -186,10 +186,8 @@ const playroom = {
       commit('SET_ROOM_CONTENT', data.content);
       commit('SET_ROOM_INVITE_IDS', data.inviteIds);
       commit('SET_ROOM_TAGS', data.tags);
-      commit('SET_ROOM_CURRENT_PLAYLIST_ID', Object.keys(data.playlists).length ? Object.keys(data.playlists)[0] : 0)
       commit('SET_ROOM_PLAYLISTS', data.playlists);
       commit('SET_ROOM_VIDEOS', data.videos);
-      commit('SET_ROOM_CURRENT_VIDEO_ID', data.playlists.length ? data.playlists[0] : 0)
       // commit('SET_ROOM_CURRENT_VIDEO_PLAYTIME', data.currentVideoPlaytime)
       commit('SET_ROOM_CHATROOM_ID', `playroom-${data.id}`);//'731f3b99-8257-4eae-86b2-ed38ea36ccff');//data.chatroomId);
     }),
@@ -359,20 +357,6 @@ const playroom = {
       }
 
       return nextVideo;
-      // if (roomCurrentPlaylistVideos.filter(v => v.included).length < this.roomCurrentVideoId + 1)
-      // {
-      //   if (Object.keys(this.roomPlaylists).length <= this.roomCurrentPlaylistId + 1)
-      //     this.SET_ROOM_CURRENT_PLAYLIST_ID(0)
-      //   else
-      //     this.SET_ROOM_CURRENT_PLAYLIST_ID(this.roomCurrentPlaylistId + 1)
-      //   this.SET_ROOM_CURRENT_VIDEO_ID(0)
-      //   this.SET_ROOM_CURRENT_VIDEO_PLAYTIME(0)
-      // }
-      // else
-      // {
-      //   this.SET_ROOM_CURRENT_VIDEO_ID(this.roomCurrentVideoId + 1)
-      //   this.SET_ROOM_CURRENT_VIDEO_PLAYTIME(0)
-      // }
     },
   }
 };
