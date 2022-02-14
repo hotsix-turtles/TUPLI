@@ -74,15 +74,19 @@ public class HomeApiController {
     @GetMapping("/home/all")
     public ResponseEntity<?> getAllList(@PageableDefault(page = 0, size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable,
                                         HttpServletRequest request) {
-        List<Object> homeInfos = homeInfoService.getHomeInfoList(pageable);
-        if (homeInfos.size() == 0) return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
 
         // 회원, 비회원(유효하지 않은 토큰) 구분
         String token = request.getHeader("Authorization");
         if (token == null || !jwtTokenProvider.validateToken(token)) {
+            List<Object> homeInfos = homeInfoService.getHomeInfoList(-1L, pageable);
+            if (homeInfos.size() == 0) return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
             return ResponseEntity.ok().body(homeInfos);
         } else {
             Long userSeq = jwtTokenProvider.getUserSeq(token);
+
+            List<Object> homeInfos = homeInfoService.getHomeInfoList(userSeq, pageable);
+            if (homeInfos.size() == 0) return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+
             ConcurrentHashMap<String, Integer> tastes = userInfoService.getTaste(userSeq);
 
 //            // 테스트용 코드입니다 시작
@@ -93,7 +97,7 @@ public class HomeApiController {
             if(tastes == null || tastes.size() == 0){
                 return ResponseEntity.ok().body(homeInfos);
             }
-            homeInfos = homeInfoService.getRecommendHomeList(homeInfos, tastes, pageable);
+            homeInfos = homeInfoService.getRecommendHomeList(homeInfos, tastes, userSeq, pageable);
             return ResponseEntity.ok().body(homeInfos);
         }
     }
