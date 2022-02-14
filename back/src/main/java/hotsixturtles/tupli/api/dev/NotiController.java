@@ -30,7 +30,7 @@ public class NotiController {
                                      @PathVariable("toId") Long toId,
                                      @PathVariable("playroomId") Long playroomId) {
         notificationService.notiInvite(fromId, toId, playroomId);
-        return ResponseEntity.ok().body("초청 알림 완료");
+        return ResponseEntity.ok().body("invite alarm");
     }
 
     /**
@@ -42,7 +42,7 @@ public class NotiController {
     public ResponseEntity notiFollow(@PathVariable("fromId") Long fromId,
                                      @PathVariable("toId") Long toId) {
         notificationService.notiFollow(fromId, toId);
-        return ResponseEntity.ok().body("팔로우 알림 완료");
+        return ResponseEntity.ok().body("follow alarm");
     }
 
     /**
@@ -55,7 +55,7 @@ public class NotiController {
                                            @PathVariable("toId") Long toId,
                                            @PathVariable("playroomId") Long playroomId) {
         notificationService.notiPlayroomMake(fromId, toId, playroomId);
-        return ResponseEntity.ok().body("플레이룸 개설 알림 완료");
+        return ResponseEntity.ok().body("playroom alarm");
     }
 
 
