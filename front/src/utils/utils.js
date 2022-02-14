@@ -106,14 +106,6 @@ function getImage(image) {
       return require(`@/assets/profile/profile_20.png`)
     } else if (image == '#21') {
       return require(`@/assets/profile/profile_21.png`)
-    } else if (image == '#22') {
-      return require(`@/assets/profile/profile_22.png`)
-    } else if (image == '#23') {
-      return require(`@/assets/profile/profile_23.png`)
-    } else if (image == '#24') {
-      return require(`@/assets/profile/profile_24.png`)
-    } else if (image == '#25') {
-      return require(`@/assets/profile/profile_25.png`)
     } else {
       return require(`@/assets/profile_basic.jpg`)
     }
