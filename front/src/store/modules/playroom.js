@@ -9,6 +9,7 @@ const playroom = {
     roomTitle: '',
     roomPublic: false,
     roomLiked: false,
+    roomRepeat: false,
     roomAuthorId: -1,
     roomAuthorProfilePic: '',
     roomAuthorName: '',
@@ -79,6 +80,7 @@ const playroom = {
     SET_ROOM_TITLE: ( state, value ) => state.roomTitle = value ? value : state.roomTitle,
     SET_ROOM_PUBLIC: ( state, value ) => state.roomPublic = value ? value : state.roomPublic,
     SET_ROOM_LIKED: ( state, value ) => state.roomLiked = value != undefined ? value : state.roomLiked,
+    SET_ROOM_REPEAT: ( state, value ) => state.roomRepeat = value != undefined ? value : state.roomRepeat,
     SET_ROOM_AUTHOR: ( state, value ) => {
       state.roomAuthorId = value.id != undefined ? parseInt(value.id) : state.roomAuthorId;
       state.roomAuthorName = value.name ? value.name : state.roomAuthorName;

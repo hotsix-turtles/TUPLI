@@ -254,6 +254,12 @@
             <p class="font-4 ml-1 mr-auto">
               플레이룸을 운영할 시간을 지정합니다.
             </p>
+            <v-checkbox
+              v-model="autoTime"
+              label="자동"
+              class="mt-0"
+            >
+            </v-checkbox>
           </v-col>
         </v-row>
 
@@ -282,6 +288,7 @@
                   :rules="startDateRules"
                   v-bind="attrs"
                   v-on="on"
+                  :disabled="autoTime"
                 />
               </template>
               <v-date-picker
@@ -311,6 +318,7 @@
                   readonly
                   v-bind="attrs"
                   v-on="on"
+                  :disabled="autoTime"
                 />
               </template>
               <v-time-picker
@@ -348,6 +356,7 @@
                   :rules="endDateRules"
                   v-bind="attrs"
                   v-on="on"
+                  :disabled="autoTime"
                 />
               </template>
               <v-date-picker
@@ -377,6 +386,7 @@
                   readonly
                   v-bind="attrs"
                   v-on="on"
+                  :disabled="autoTime"
                 />
               </template>
               <v-time-picker
@@ -386,6 +396,49 @@
                 @click:minute="$refs.endTimeMenu.save(endTime)"
               />
             </v-menu>
+          </v-col>
+        </v-row>
+
+        <!-- 플레이리스트 셔플 여부 -->
+        <v-row>
+          <v-col
+            cols="12"
+            md="4"
+            class="d-flex flex-row justify-space-between"
+          >
+            <p class="font-3">
+              셔플 사용
+            </p>
+            <p class="font-4 ml-1 mr-auto">
+              {{ isShuffleMsg }}
+            </p>
+            <v-switch
+              v-model="isShuffle"
+            />
+          </v-col>
+        </v-row>
+
+        <!-- 플레이룸 최대 인원 수 -->
+        <v-row>
+          <v-col
+            cols="12"
+            md="4"
+            class="d-flex flex-row justify-space-between"
+          >
+            <p class="font-3">
+              최대 인원수
+            </p>
+            <p class="font-4 ml-1 mr-auto">
+              참여할 최대 유저 수를 설정합니다.
+            </p>
+            <v-combobox
+              class="ml-5"
+              style="width: 50px;"
+              dense
+              solo
+              v-model="formData.userCountMax"
+              :items="userCountMaxItems"
+            ></v-combobox>
           </v-col>
         </v-row>
       </v-container>
@@ -425,13 +478,14 @@ export default {
       ],
       endDateRules: [
         v => !!v || '종료날짜는 필수입니다.',
-        v => this.startDateTime.getTime() < this.endDateTime.getTime() || '종료날짜은 시작날짜보다 이후이어야 합니다',
+        v => this.startDateTime.getTime() < this.endDateTime.getTime() || '종료날짜는 시작날짜 이전일 수 없습니다',
       ],
       endTimeRules: [
         v => !!v || '종료시간은 필수입니다.',
-        v => this.startDateTime.getTime() < this.endDateTime.getTime() || '종료시간은 시간시간보다 이후이어야 합니다',
+        v => this.startDateTime.getTime() < this.endDateTime.getTime() || '종료시간은 시간시간 이전일 수 없습니다',
       ],
       isValid: false,
+      isShuffle: false,
       // Create할 때 넘길 데이터
       formData: {
         title: '',
@@ -439,7 +493,8 @@ export default {
         tags: [],
         isPublic: true,
         inviteIds: [],
-        playlists: []
+        playlists: [],
+        userCountMax: 20
       },
       numberOfPlaylist: 0,
       numberOfPlaylistVideos: 0,
@@ -455,6 +510,9 @@ export default {
       endDateMenu: false,
       endTimeMenu: false,
       endDateTime: new Date(),
+
+      autoTime: true,
+      userCountMaxItems: [2,3,5,10,20] // TODO: 프리미엄 유저 기능으로 100명 무제한 이런식?
     }
   },
   computed: {
@@ -463,6 +521,9 @@ export default {
     },
     isPublicMsg () {
       return this.formData.isPublic ? "내 플레이룸을 공개합니다." : "내 플레이룸을 비공개합니다."
+    },
+    isShuffleMsg () {
+      return this.isShuffle ? "플레이리스트를 랜덤으로 섞습니다." : "플레이리스트 순서대로 재생합니다."
     },
     numberOfFriend () {
       console.log(this.formData, this.formData.inviteIds)
@@ -542,8 +603,9 @@ export default {
     submit() {
       // TODO: 원래 axiosConnector에서 알아서 갱신하고 보내야하지만...
       const token = localStorage.getItem('jwt')
+      let totalDuration = 0
 
-      this.formData.tags = this.formData.tags.join();
+      this.formData.tags = typeof(this.formData.tags) != String ? this.formData.tags.join() : this.formData.tags;
       this.formData.playlists =
         this.addedPlaylists.reduce((prevPlaylists, curPlaylist) => {
           if (curPlaylist.videos)
@@ -551,17 +613,44 @@ export default {
             // 현재 플레이리스트에 비디오가 존재한다면
             prevPlaylists[curPlaylist.id] = curPlaylist.videos.reduce((prevVideoIds, curVideo) => {
               if (this.addedPlaylistVideoIds.find(addedPlaylistVideoId => addedPlaylistVideoId == curVideo.videoId))
+              {
                 prevVideoIds.push(curVideo.videoId)
+
+                const curVideoDuration = curVideo.duration.split(':')
+                totalDuration += parseInt(curVideoDuration[0]) * 60 + parseInt(curVideoDuration[1]);
+              }
+
               return prevVideoIds
             }, [])
           }
+
+          // 플레이리스트 셔플
+          if (this.isShuffle) curPlaylist.videos.sort(() => Math.random() - 0.5);
+
           return prevPlaylists
         }, {})
 
       // '2022-02-06T04:41:08.443Z'
-      this.formData.startTime = `${this.startDate}T${this.startTime}:00.000+09:00`
-      this.formData.endTime = `${this.endDate}T${this.endTime}:00.000+09:00`
-      console.log(this.formData)
+
+      if (this.autoTime)
+      {
+        this.startDate = (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10);
+        this.startTime = (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(11, 5);
+        this.formData.startTime = `${this.startDate}T${this.startTime}:00.000+09:00`
+
+        const endTimeLong = Date.now() - (new Date()).getTimezoneOffset() * 60000 + totalDuration * 1000
+        const endTimeCalc = new Date(endTimeLong)
+        const endDate = endTimeCalc.toISOString().substr(0, 10)
+        const endTime = endTimeCalc.toISOString().substr(11, 5)
+        this.formData.endTime = `${endDate}T${endTime}:00.000+09:00`;
+      }
+      else
+      {
+        this.formData.startTime = `${this.startDate}T${this.startTime}:00.000+09:00`
+        this.formData.endTime = `${this.endDate}T${this.endTime}:00.000+09:00`
+      }
+
+      if (((this.endDateTime.getTime() - this.startDateTime.getTime()) / 1000) < totalDuration) console.log('이상한데?')
 
       this.createPlayroom({ formData: this.formData, token })
         .then((res) => {
@@ -602,7 +691,7 @@ export default {
       else
         this.deselectAllPlaylistVideo()
     },
-    createPlayroom: function ({formData, token}) {
+    createPlayroom: function ({formData}) {
       return axiosConnector.post('/playroom', formData)
     },
     ...mapMutations('playroom', ['RESET_FORM_DATA']),

@@ -1,13 +1,13 @@
 <template>
   <div>
     <v-text-field
+      v-model="inputVal"
       class="comment-input"
       label="메시지를 입력하세요"
       solo
       dense
       :disabled="!isLogin"
       @keydown.enter="sendComment"
-      @keypress.enter="sendComment"
       @click:append-outer="sendComment"
     >
       <template v-slot:append>
@@ -68,6 +68,7 @@ export default {
   data: function () {
     return {
       showEmoji: false,
+      inputVal: '',
     }
   },
   computed: {
@@ -77,7 +78,15 @@ export default {
   },
   methods: {
     sendComment: function (event) {
-      this.$emit('send-comment', event.target.value)
+      if(this.inputVal == '') {
+        console.log("CommentInput.vue : 덧글 내용 입력을 해주세요")
+        return
+      }
+      else {
+        // console.log("CommentInput.vue 로 왔씁니까?")
+        this.$emit('send-comment', this.inputVal)
+        this.inputVal = ''
+      }
     }
   }
 }
