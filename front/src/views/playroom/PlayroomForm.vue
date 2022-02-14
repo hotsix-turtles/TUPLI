@@ -579,7 +579,7 @@ export default {
       const token = localStorage.getItem('jwt')
       let totalDuration = 0
 
-      this.formData.tags = this.formData.tags.join();
+      this.formData.tags = typeof(this.formData.tags) != String ? this.formData.tags.join() : this.formData.tags;
       this.formData.playlists =
         this.addedPlaylists.reduce((prevPlaylists, curPlaylist) => {
           if (curPlaylist.videos)
