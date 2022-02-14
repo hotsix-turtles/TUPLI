@@ -241,7 +241,8 @@ public class PlayroomService {
 
         Playroom playroom = playroomRepository.findById(playroomId).orElse(null);
 
-        if(playroom == null || playroom.getUser().getUserSeq() != userSeq){
+        //userSeq == -1L 이면 관리자
+        if(playroom == null || playroom.getUser().getUserSeq() != userSeq || userSeq != -1L){
             return null;
         }
 

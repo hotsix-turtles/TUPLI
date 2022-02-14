@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import springfox.documentation.annotations.ApiIgnore;
 
 /**
- * 관리자 API : 플라스크 제어
+ * 관리자 API : 알림 제어
  * SWAGGER 대상되면 안됨!!!  : ApiIgnore
  */
 @ApiIgnore
