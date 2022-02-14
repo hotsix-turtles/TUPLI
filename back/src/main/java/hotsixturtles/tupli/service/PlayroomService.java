@@ -354,7 +354,9 @@ public class PlayroomService {
         Playroom playroom = playroomRepository.findById(playroomId).orElse(null);
         if (playroom != null) {
             List<Long> guests = playroom.getGuests();
+//            if (guests.contains(userSeq)) {
             guests.remove(userSeq);
+//            }
             playroom.setGuests(guests);
             playroomRepository.save(playroom);
         }

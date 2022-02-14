@@ -17,10 +17,12 @@ public class ChatUserInfo implements Serializable {
 
     private String roomId; // 방번호
     private String sender; // 유저 이름
+    private String userSeq; // 유저 번호
 
     @Builder
-    public ChatUserInfo(String roomId, String sender) {
+    public ChatUserInfo(String roomId, String sender, String userSeq) {
         this.roomId = roomId;
         this.sender = sender;
+        this.userSeq = userSeq;
     }
 }

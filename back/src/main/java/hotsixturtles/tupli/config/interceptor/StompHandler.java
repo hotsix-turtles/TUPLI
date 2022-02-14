@@ -6,6 +6,7 @@ import hotsixturtles.tupli.dto.chat.ChatUserInfo;
 import hotsixturtles.tupli.entity.User;
 import hotsixturtles.tupli.repository.chat.ChatRoomRepository;
 import hotsixturtles.tupli.service.ChatService;
+import hotsixturtles.tupli.service.PlayroomService;
 import hotsixturtles.tupli.service.token.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -36,6 +37,7 @@ public class StompHandler implements ChannelInterceptor {
 
     private final JwtTokenProvider jwtTokenProvider;
     private final ChatRoomRepository chatRoomRepository;
+    private final PlayroomService playroomService;
     private final ChatService chatService;
 
     // websocket을 통해 들어온 요청이 처리 되기전 실행된다.
@@ -63,14 +65,20 @@ public class StompHandler implements ChannelInterceptor {
             String jwtToken = accessor.getFirstNativeHeader("Authorization");
             String name = "익명의 유저";
             String img = null;
+            String userSeq = null;
             if (jwtToken != null) {
                 // 회원일 경우 이름 변경
                 User user = jwtTokenProvider.getUser(jwtToken);
                 name = user.getNickname();
+                // 보험
+                if (name == null) {
+                    name = user.getEmail();
+                }
                 img = user.getProfileImage();
+                userSeq = String.valueOf(user.getUserSeq());
             }
             // 채팅방에 들어온 클라이언트 정보를 roomId와 맵핑해 놓는다.(나중에 특정 세션이 어떤 채팅방에 들어가 있는지 알기 위함)
-            chatRoomRepository.setUserEnterInfo(sessionId, ChatUserInfo.builder().sender(name).roomId(roomId).build());
+            chatRoomRepository.setUserEnterInfo(sessionId, ChatUserInfo.builder().sender(name).roomId(roomId).userSeq(userSeq).build());
             chatService.sendChatMessage(ChatMessage.builder().type(ChatMessage.MessageType.ENTER).roomId(roomId).sender(name).img(img).build());
             log.info("SUBSCRIBED {}, {}", name, roomId);
         } else if (StompCommand.DISCONNECT == accessor.getCommand()) { // Websocket 연결 종료
@@ -79,7 +87,9 @@ public class StompHandler implements ChannelInterceptor {
             // 퇴장한 클라이언트의 sessionId로 roomId를 얻고, roomId 맵핑 정보를 삭제한다.
             ChatUserInfo chatUserInfo = chatRoomRepository.getUserEnterRoomId(sessionId);
             String name = chatUserInfo.getSender();
-            String roomId = chatUserInfo.getRoomId();
+            String roomId = chatUserInfo.getRoomId().replaceFirst("playroom-", "");
+            String userSeq = chatUserInfo.getUserSeq();
+
             chatRoomRepository.removeUserEnterInfo(sessionId);
             // 채팅방의 인원수를 -1한다.
             chatRoomRepository.minusUserCount(roomId);
@@ -89,6 +99,8 @@ public class StompHandler implements ChannelInterceptor {
 //            String name = jwtTokenProvider.getUser(accessor.getFirstNativeHeader("Authorization")).getEmail();  // 나중에 닉네임으로 변경
             chatService.sendChatMessage(ChatMessage.builder().type(ChatMessage.MessageType.QUIT).roomId(roomId).sender(name).build());
             log.info("DISCONNECTED {}, {}", sessionId, roomId);
+            // 참가자 제거 보험 코드
+            playroomService.deleteGuest(Long.valueOf(userSeq), Long.valueOf(roomId));
         }
         return message;
     }

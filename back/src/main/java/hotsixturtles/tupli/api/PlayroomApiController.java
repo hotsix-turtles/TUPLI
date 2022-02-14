@@ -156,13 +156,14 @@ public class PlayroomApiController {
             if (playroom == null) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
             }
-            if (playroom.getGuests().contains(userSeq)) {
-                return ResponseEntity
-                        .status(HttpStatus.BAD_REQUEST)
-                        .body(new ErrorResponse(messageSource.getMessage("error.same.room", null, LocaleContextHolder.getLocale())));
-            }
-            playroomService.addGuest(userSeq, playroom);
-            return ResponseEntity.status(HttpStatus.OK).body(new PlayroomDto(playroom, user));
+//            if (playroom.getGuests().contains(userSeq)) {
+//                return ResponseEntity
+//                        .status(HttpStatus.BAD_REQUEST)
+//                        .body(new ErrorResponse(messageSource.getMessage("error.same.room", null, LocaleContextHolder.getLocale())));
+//            }
+            PlayroomDto result = new PlayroomDto(playroom, user);  // 혹시 모르니 미리 DTO 짜놓고
+            playroomService.addGuest(userSeq, playroom);  // 게스트 추가
+            return ResponseEntity.status(HttpStatus.OK).body(result);
         }
     }
 
