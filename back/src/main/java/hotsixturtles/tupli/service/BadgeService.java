@@ -504,9 +504,9 @@ public class BadgeService {
             for(j = i + ((nowCategory-1) * 3) ; j < i + ((nowCategory-1) * 3) + 3; j++){
                 int k = 0;
                 if(addTime >= Badge12List.get(k++)){
-                    if(!badges.contains(Long.valueOf(i))){
-                        UserBadge userBadge = new UserBadge(null, userSeq, Long.valueOf(i), OffsetDateTime.now());
-                        result.add(badgeRepository.findByBadgeSeq(Long.valueOf(i)));
+                    if(!badges.contains(Long.valueOf(j))){
+                        UserBadge userBadge = new UserBadge(null, userSeq, Long.valueOf(j), OffsetDateTime.now());
+                        result.add(badgeRepository.findByBadgeSeq(Long.valueOf(j)));
                         userBadgeRepository.save(userBadge);
                     }
                 }
