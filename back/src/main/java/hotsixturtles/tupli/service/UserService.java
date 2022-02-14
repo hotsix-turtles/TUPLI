@@ -98,6 +98,10 @@ public class UserService {
         return user;
     }
 
+    public User getUserByUserseq(Long userSeq){
+        return userRepository.findByUserSeq(userSeq);
+    }
+
     // OAUTH용
     public User getUser(String userId) {
         return userRepository.findByUserId(userId);
