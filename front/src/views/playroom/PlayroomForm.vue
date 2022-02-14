@@ -494,7 +494,7 @@ export default {
         isPublic: true,
         inviteIds: [],
         playlists: [],
-        userCountMax: 20
+        userCountMax: 5
       },
       numberOfPlaylist: 0,
       numberOfPlaylistVideos: 0,
