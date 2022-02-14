@@ -39,7 +39,8 @@ public class UserService {
         validateDuplicateUser(user);
         user.setPassword(user.getPassword());
         user.encodePassword(passwordEncoder);
-
+        int randNum = (int)(Math.random()*20) + 1;
+        user.setProfileImage("#" + randNum);
         userRepository.save(user);
         UserInfo userInfo = new UserInfo();
         userInfo.setUserSeq(user.getUserSeq());

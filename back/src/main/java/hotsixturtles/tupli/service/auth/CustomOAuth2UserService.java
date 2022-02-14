@@ -90,6 +90,10 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             UserSetting userSetting = new UserSetting();
             userSetting.setUser(savedUser);
             userSettingRepository.save(userSetting);
+            if(savedUser.getProfileImage() == null || savedUser.getProfileImage() == ""){
+                int randNum = (int)(Math.random()*20) + 1;
+                savedUser.setProfileImage("#" + randNum);
+            }
         }
 
         return UserPrincipal.create(savedUser, user.getAttributes());
