@@ -170,14 +170,14 @@ export default {
 <style scoped>
   /* 만들기 버튼 일반 문서 흐름에서 제거 */
   .makeBtns {
-    z-index: 8;
+    z-index: 2;
     position: fixed;
     bottom: 6vh;
     width: 100% !important;
   }
 
   .makeBtn {
-    z-index: 9;
+    z-index: 5;
     font-size: 3.2rem !important;
     position: fixed;
     bottom: 0.8vh;
