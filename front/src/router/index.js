@@ -17,6 +17,7 @@ import MyProfile from '../views/profile/MyProfile.vue'
 import Profile from '../views/profile/Profile.vue'
 import Setting from '../views/profile/Setting.vue'
 //setting
+import Admin from '../views/profile/setting/Admin.vue'
 import ChangePassword from '../views/profile/setting/ChangePassword.vue'
 import History from '../views/profile/setting/History.vue'
 import InviteNoticeAlert from '../views/profile/setting/InviteNoticeAlert.vue'
@@ -205,6 +206,11 @@ const routes = [
   },
 
   //setting
+  {
+    path: '/admin',
+    name: 'Admin',
+    component: Admin
+  },
   {
     path: '/changepassword',
     name: 'ChangePassword',
