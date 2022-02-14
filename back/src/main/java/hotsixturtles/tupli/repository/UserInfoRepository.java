@@ -12,4 +12,8 @@ public interface UserInfoRepository extends JpaRepository<UserInfo, Long> {
 
     void deleteByUserSeq(Long userSeq);
 
+    @Modifying(flushAutomatically = true, clearAutomatically = true)
+    @Query("update UserInfo u set u.dailyLoginYN = 'N'")
+    void updateDailyCheck();
+
 }
