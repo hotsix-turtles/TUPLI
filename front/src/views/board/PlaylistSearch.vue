@@ -11,7 +11,7 @@
       <search-bar
         :label="'검색어를 입력해주세요'"
         :is-detail="true"
-        @input-change="onEnterSearch"
+        @input-change="search"
       />
     </div><br><br><br>
     <div class="container">
@@ -31,113 +31,89 @@
         :modal-type="'order'"
         @on-select="onSelect"
       />
-      <!-- 영상 리스트 -->
-      <video-list-item-small
-        :key="rerenderKey"
-        :videos="searchedVideos"
-        width="100vw"
-      />
-      <!-- 하단 리스트에 추가하기 버튼 -->
-      <add-button-bottom />
-      <!-- 무한스크롤 -->
-      <infinite-loading
-        v-if="searchedVideos.length > 0"
-        :identifier="infiniteId"
-        spinner="waveDots"
-        @infinite="searchVideosByScroll"
-      >
-        <div slot="no-results" />
-      </infinite-loading><br><br>
     </div>
+    <!-- 플레이룸 리스트 -->
+    <playlist-list-item-small
+      :playlists="searchedPlaylists"
+      :is-radio-btn="true"
+      :playlist-readonly="true"
+    />
+    <!-- 하단 리스트에 추가하기 버튼 -->
+    <add-button-bottom :selected="chosenPlaylist" />
   </div>
 </template>
 
 <script>
 import { mapActions, mapState } from 'vuex'
-import InfiniteLoading from "vue-infinite-loading"
 
 import SearchBar from '@/components/common/SearchBar.vue'
-import VideoListItemSmall from '../../components/video/VideoListItemSmall.vue'
-import AddButtonBottom from '../../components/playlist/AddButtonBottom.vue'
+import PlaylistListItemSmall from '../../components/playlist/PlaylistListItemSmall.vue'
 import Modal from '../../components/common/Modal.vue'
+import AddButtonBottom from '../../components/board/AddButtonBottom.vue';
 
 export default {
   name: 'VideoSearch',
   components: {
     SearchBar,
-    VideoListItemSmall,
-    InfiniteLoading,
-    AddButtonBottom,
+    PlaylistListItemSmall,
     Modal,
+    AddButtonBottom,
   },
   data: function () {
     return {
       selectList: {
         '관련순': 'relevance',
         '최근순': 'date',
-        '조회순': 'viewCount',
+        '인기순': 'likesCnt',
       },
       query: '',
-      newsType: 'story',
-      infiniteId: +new Date(),
+      order: '',
     }
   },
   computed: {
-    ...mapState('video', {
-      searchedVideos: state => state.searchedVideos,
-      selectedVideos: state => state.selectedVideos,
-      // rerenderKey: state => state.rerenderKey,  // video는 API 두번 요청해서 변경내용 반영하기 위한 key
-      nextPageToken: state => state.nextPageToken,
+    ...mapState('playlist', {
+      searchedPlaylists: state => state.searchedPlaylists,
     }),
     ...mapState('common', {
       selected: state => state.selected,
+    }),
+    ...mapState('board', {
+      chosenPlaylist: state => state.chosenPlaylist,
     })
   },
   created: function () {
-    // this.$router.beforeEach((to, from, next) => {
-    //   console.log(from.path)
-    //   console.log(from.path != '/video/watch')
-    //   console.log(typeof(from.path),typeof('/video/watch'))
-    //   if (from.path != '/video/watch') {
-    //     this.resetVideoSearchState()
-    //   }
-    //   next()
-    // })
-    this.resetVideoSearchState()
+    // this.resetVideoSearchState()
   },
   methods: {
-    ...mapActions('video', [
-      'searchVideos',
-      'searchVideosByScroll',
-      'resetVideoSearchState',
+    ...mapActions('playlist', [
+      'searchPlaylists',
+      'resetPlaylistSearchState',
     ]),
     ...mapActions('common', [
       'onClickModal',
     ]),
-    onSelect: function (order) {
-      console.log('VideoSearch', order)
-      if (this.query) {
-        const query = this.query
-        const params = {
-          query,
-          order,
-        }
-        this.resetVideoSearchState()
-        this.infiniteId += 1;
-        this.searchVideos(params)
-      }
-    },
-    onEnterSearch: function (query) {
-      console.log(this.selected)
+    search: function (query) {
+      this.query = query
+      const keyword = this.query
       const order = this.selectList[this.selected]
       const params = {
-        query,
+        keyword,
         order,
       }
-      this.resetVideoSearchState()
-      this.infiniteId += 1;
-      this.query = query
-      this.searchVideos(params)
+      this.searchPlaylists(params)
+    },
+    onSelect: function (order) {
+      const temp = this.order
+      this.order = order
+      if (this.query && temp !== order) {
+        console.log('실행됨')
+        const keyword = this.query
+        const params = {
+          keyword,
+          order,
+        }
+        this.searchPlaylists(params)
+      }
     },
   },
 }

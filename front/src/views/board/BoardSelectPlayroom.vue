@@ -29,23 +29,14 @@
       </v-tab-item>
 
       <!-- 좋아한 플레이룸 리스트 -->
-      <v-tab-item class="container">
-        <!-- <v-radio-group v-model="selectedPlayroom">
-          <v-radio
-            v-for="(playroom, n) in likedPlayroom"
-            :key="n"
-            :label="`${playroom.title}`"
-            :value="playroom"
-          >
-          </v-radio>
-        </v-radio-group> -->
+      <v-tab-item class="">
         <playroom-list-item-small
           :playrooms="likedPlayrooms"
           :is-radio-btn="true"
         />
       </v-tab-item>
     </v-tabs>
-    <add-button-bottom :selected="addedPlayroom" />
+    <add-button-bottom :selected="chosenPlayroom" />
   </div>
 </template>
 
@@ -55,6 +46,7 @@ import SearchBar from '../../components/common/SearchBar.vue'
 import axiosConnector from '../../utils/axios-connector'
 import AddButtonBottom from '../../components/board/AddButtonBottom.vue';
 import PlayroomListItemSmall from '../../components/playroom/PlayroomListItemSmall.vue'
+import { mapState } from 'vuex';
 
 
 export default {
@@ -63,8 +55,8 @@ export default {
     Back,
     SearchBar,
     PlayroomListItemSmall,
+    AddButtonBottom,
   },
-  // AddButtonBottom,
   data: function() {
     return {
       myPlayrooms: null,
@@ -74,6 +66,11 @@ export default {
         '작성한 플레이룸', '좋아한 플레이룸',
       ],
     }
+  },
+  computed: {
+    ...mapState('board', {
+      chosenPlayroom: state => state.chosenPlayroom
+    })
   },
   created: function() {
     // 좋아요 표시한 플레이룸만 뜨게하려면 playroom/likes 로 바꾸면 될 것 같다.

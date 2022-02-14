@@ -212,7 +212,6 @@ const playlist = {
         .catch((err) => {
           console.log(err)
         })
-      commit('RESET_FORM_DATA')
     },
     saveFormData: function ({ commit }, formData) {
       console.log('saveFormData', formData)

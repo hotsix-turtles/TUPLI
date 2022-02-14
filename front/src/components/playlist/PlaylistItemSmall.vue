@@ -10,6 +10,26 @@
       class="pl-0 py-3"
     >
       <v-list-item two-line>
+        <!-- 라디오 버튼 -->
+        <div
+          v-if="isRadioBtn"
+          class="mx-2"
+        >
+          <div v-if="playlist.id === chosenPlaylist.id">
+            <v-icon color="#5B5C9D">
+              mdi-radiobox-marked
+            </v-icon>
+          </div>
+          <div
+            v-else
+            @click.stop="select"
+          >
+            <v-icon>
+              mdi-radiobox-blank
+            </v-icon>
+          </div>
+        </div>
+        <!-- 추가 버튼 -->
         <v-btn
           v-if="!readonly"
           fab
@@ -41,7 +61,7 @@
             {{ playlist.title }}
           </v-list-item-title>
           <!-- 나중에 nickname으로 변경 -->
-          <v-list-item-subtitle>{{ playlist.title }}</v-list-item-subtitle>
+          <v-list-item-subtitle>{{ playlist.nickname }}</v-list-item-subtitle>
           <div class="text-center d-flex align-center">
             <div class="mr-1">
               <v-icon
@@ -96,6 +116,7 @@ export default {
     playlist: { type: Object, default() { {} } },
     readonly: { type: Boolean, default: false },
     videoReadonly: { type: Boolean, default: false },
+    isRadioBtn: { type: Boolean, default: false },
   },
   data() {
     return {
@@ -112,6 +133,9 @@ export default {
       return !this.readonly && this.selected ? "#dde" : "white"
     },
     ...mapState('playlist', ['addedPlaylists', 'selectedPlaylists']),
+    ...mapState('board', {
+      chosenPlaylist: state => state.chosenPlaylist
+    })
   },
   created() {
     this.selected = Boolean(this.selectedPlaylists && this.selectedPlaylists
@@ -134,6 +158,13 @@ export default {
       'selectPlaylist',
       'deselectPlaylist',
     ]),
+    ...mapActions('board', [
+      'selectPlaylist'
+    ]),
+    select: function () {
+      console.log('selectPlaylist')
+      this.selectPlaylist(this.playlist)
+    }
   }
 }
 </script>

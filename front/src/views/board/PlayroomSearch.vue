@@ -11,7 +11,7 @@
       <search-bar
         :label="'검색어를 입력해주세요'"
         :is-detail="true"
-        @input-change="onEnterSearch"
+        @input-change="search"
       />
     </div><br><br><br>
     <div class="container">
@@ -26,15 +26,18 @@
         <v-icon>mdi-menu-down</v-icon>
       </div>
       <modal
-        :items="playroomSelectList"
+        :items="selectList"
         :modal-name="'정렬 필터 변경'"
         :modal-type="'order'"
         @on-select="onSelect"
       />
       <!-- 플레이룸 리스트 -->
-      <playroom-list-item-small :playrooms="searchedPlayrooms" />
+      <playroom-list-item-small
+        :playrooms="searchedPlayrooms"
+        :is-radio-btn="true"
+      />
       <!-- 하단 리스트에 추가하기 버튼 -->
-      <add-button-bottom />
+      <add-button-bottom :selected="chosenPlayroom" />
     </div>
   </div>
 </template>
@@ -45,6 +48,7 @@ import { mapActions, mapState } from 'vuex'
 import SearchBar from '@/components/common/SearchBar.vue'
 import PlayroomListItemSmall from '../../components/playroom/PlayroomListItemSmall.vue'
 import Modal from '../../components/common/Modal.vue'
+import AddButtonBottom from '../../components/board/AddButtonBottom.vue';
 
 export default {
   name: 'VideoSearch',
@@ -52,6 +56,7 @@ export default {
     SearchBar,
     PlayroomListItemSmall,
     Modal,
+    AddButtonBottom,
   },
   data: function () {
     return {
@@ -61,65 +66,53 @@ export default {
         '시청자순': 'participantsCnt',
       },
       query: '',
-      newsType: 'story',
+      order: '',
     }
   },
   computed: {
-    ...mapState('video', {
-      searchedVideos: state => state.searchedVideos,
-      selectedVideos: state => state.selectedVideos,
-      // rerenderKey: state => state.rerenderKey,  // video는 API 두번 요청해서 변경내용 반영하기 위한 key
-      nextPageToken: state => state.nextPageToken,
+    ...mapState('playroom', {
+      searchedPlayrooms: state => state.searchedPlayrooms,
     }),
     ...mapState('common', {
       selected: state => state.selected,
+    }),
+    ...mapState('board', {
+      chosenPlayroom: state => state.chosenPlayroom,
     })
   },
   created: function () {
-    // this.$router.beforeEach((to, from, next) => {
-    //   console.log(from.path)
-    //   console.log(from.path != '/video/watch')
-    //   console.log(typeof(from.path),typeof('/video/watch'))
-    //   if (from.path != '/video/watch') {
-    //     this.resetVideoSearchState()
-    //   }
-    //   next()
-    // })
-    this.resetVideoSearchState()
+    // this.resetVideoSearchState()
   },
   methods: {
-    ...mapActions('video', [
-      'searchVideos',
-      'searchVideosByScroll',
-      'resetVideoSearchState',
+    ...mapActions('playroom', [
+      'searchPlayrooms',
+      'resetPlayroomSearchState',
     ]),
     ...mapActions('common', [
       'onClickModal',
     ]),
-    onSelect: function (order) {
-      console.log('VideoSearch', order)
-      if (this.query) {
-        const query = this.query
-        const params = {
-          query,
-          order,
-        }
-        this.resetVideoSearchState()
-        this.infiniteId += 1;
-        this.searchVideos(params)
-      }
-    },
-    onEnterSearch: function (query) {
-      console.log(this.selected)
+    search: function (query) {
+      this.query = query
+      const keyword = this.query
       const order = this.selectList[this.selected]
       const params = {
-        query,
+        keyword,
         order,
       }
-      this.resetVideoSearchState()
-      this.infiniteId += 1;
-      this.query = query
-      this.searchVideos(params)
+      this.searchPlayrooms(params)
+    },
+    onSelect: function (order) {
+      const temp = this.order
+      this.order = order
+      if (this.query && temp !== order) {
+        console.log('실행됨')
+        const keyword = this.query
+        const params = {
+          keyword,
+          order,
+        }
+        this.searchPlayrooms(params)
+      }
     },
   },
 }

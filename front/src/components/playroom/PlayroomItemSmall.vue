@@ -18,7 +18,7 @@
             v-if="isRadioBtn"
             class="mx-2"
           >
-            <div v-if="playroom.id === addedPlayroom.id">
+            <div v-if="playroom.id === chosenPlayroom.id">
               <v-icon color="#5B5C9D">
                 mdi-radiobox-marked
               </v-icon>
@@ -124,7 +124,7 @@ export default {
   },
   computed: {
     ...mapState('board', {
-      addedPlayroom: state => state.addedPlayroom
+      chosenPlayroom: state => state.chosenPlayroom
     })
   },
   methods: {

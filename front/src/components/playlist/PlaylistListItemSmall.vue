@@ -8,6 +8,7 @@
       :playlist="playlist"
       :readonly="playlistReadonly"
       :video-readonly="videoReadonly"
+      :is-radio-btn="isRadioBtn"
     />
   </v-expansion-panels>
 </template>
@@ -20,7 +21,8 @@ export default {
   props: {
     playlists: { type: Array, default() { [] } },
     playlistReadonly: { type: Boolean, default: false },
-    videoReadonly: { type: Boolean, default: false }
+    videoReadonly: { type: Boolean, default: false },
+    isRadioBtn: { type: Boolean, default: false },
   },
 }
 </script>

@@ -22,7 +22,7 @@
             class="py-0"
           >
             <v-text-field
-              v-model="formData.title"
+              v-model="formData.content"
               :rules="[rules.required, rules.counterMax300]"
               :counter="300"
               label="게시글 내용을 입력해주세요."
@@ -66,27 +66,64 @@
               />
             </v-radio-group>
 
-            <!-- 선택하기 버튼 -->
-            <v-btn
-              color="accent"
-              elevation="2"
-              @click="goSelect"
-            >
-              선택하기
-            </v-btn>
+            <div class="d-flex">
+              <!-- 선택하기 버튼 -->
+              <v-btn
+                color="accent"
+                elevation="2"
+                @click="goSelect"
+              >
+                선택하기
+              </v-btn>
+              <!-- 플레이리스트나 플레이룸이 선택되지 않고 완료버튼을 눌렀을 떄 -->
+              <div
+                v-if="!boardValid && formData.radioVal === 'playlist' && chosenPlaylist.id === 0"
+                color="red"
+              >
+                플레이리스트를 1개 선택해주세요.
+              </div>
+              <div
+                v-if="!boardValid && formData.radioVal === 'playroom' && chosenPlayroom.id === 0"
+                color="red"
+              >
+                플레이룸을 1개 선택해주세요.
+              </div>
+            </div>
           </v-col>
-
-          {{ formData.radioVal }}
-          {{ selectedPlaylist }}
-          {{ selectedPlayroom }}
-          <!-- <playlist-item-medium
-            v-for="(playlist, idx) in selectedPlaylist"
-            :key="idx"
-            :playlist="playlist"
-            class="col-6"
-          /> -->
-
-          <v-col />
+          <!-- 공유할 게시물 -->
+          <div
+            v-if="formData.isBoard"
+            class="container"
+          >
+            <div
+              v-if="formData.radioVal === 'playlist'"
+            >
+              {{ chosenPlaylist.id }}
+              <div
+                v-if="chosenPlaylist.id > 0"
+                class="container added"
+              >
+                <playlist-item-big
+                  :playlist="chosenPlaylist"
+                />
+              </div>
+              <v-col />
+            </div>
+            <div
+              v-else
+            >
+              <div
+                v-if="chosenPlayroom.id > 0"
+                class="container added"
+              >
+                {{ chosenPlayroom.id }}
+                <playroom-item-big
+                  :playroom="chosenPlayroom"
+                />
+              </div>
+              <v-col />
+            </div>
+          </div>
         </v-row>
       </v-container>
     </v-form>
@@ -96,117 +133,103 @@
 <script>
 import { mapActions, mapState } from 'vuex'
 import Back from '../../components/common/Back.vue'
-// import PlaylistItemMedium from '../../components/playlist/PlaylistItemMedium.vue'
+import PlayroomItemBig from '../../components/playroom/PlayroomItemBig.vue'
+import PlaylistItemBig from '../../components/playlist/PlaylistItemBig.vue'
 
 
 export default {
   name: 'BoardForm',
   components: {
     Back,
-    // PlaylistItemMedium
+    PlayroomItemBig,
+    PlaylistItemBig,
   },
   data: function() {
     return {
       pageName: "게시글 작성",
       formData: {
-        title: '',
+        content: '',
         isBoard: false,
-        radioVal: '',
+        radioVal: 'playroom',
       },
       valid: false,
       rules: {
         required: v => !!v || '필수 입력값입니다.',
         counterMax300: v => v.length <= 300 || '내용은 300글자 이상 작성할 수 없습니다.',
       },
+      boardValid: true,
     }
   },
   computed: {
     ...mapState('board', {
       savedFormData: state => state.savedFormData,
       isSaved: state => state.isSaved,
-      selectedPlaylist: state => state.selectedPlaylist,
-      selectedPlayroom: state => state.selectedPlayroom
+      chosenPlaylist: state => state.chosenPlaylist,
+      chosenPlayroom: state => state.chosenPlayroom
     }),
   },
   created: function() {
-    // if (this.isSaved) {
-    //   this.formData = this.savedFormData
-    //   console.log("내가 가져온 플레이리스트는", this.selectedPlaylist)
-    // } else {
-    // this.resetVideoAddState()
-    // console.log("boardForm첨왔어요")
-    // }
+    if (this.isSaved) {
+      this.formData = this.savedFormData
+      console.log("내가 가져온 플레이리스트는", this.chosenPlaylist)
+    } else {
+      this.resetVideoAddState()
+      console.log("boardForm첨왔어요")
+    }
   },
   methods: {
     ...mapActions('board', [
       'saveFormData',
       'resetBoardPlaylistAddState',
       'selectPlaylistOrPlayroom',
+      'createBoard',
     ]),
     onClickCompletion: function () {
-      // 필수항목을 채웠는가?
+      // 필수항목을 채웠을 경우
       if (this.valid) {
-        const data = {
-          title: this.formData.title,
-          isBoard: this.formData.isBoard,
-          radioVal: this.formData.radioVal,
+        const formData = {
+          content: this.formData.content,
+          type: null,
+          typeId: 0,
         }
-        // 순수 글인가?
-        if(data.isBoard == false) {
+        // 순수 글인 경우
+        if(!this.formData.isBoard) {
           console.log("순수 글 업로드")
-
+          this.createBoard(formData)
         }
         // 플레이룸 or 플레이리스트에 대한 글
         else {
-          if(this.formData.radioVal == '') {
-            console.log("플레이룸or플레이리스트 선택바람")
-            return
+          formData.type = this.formData.radioVal
+          formData.typeId = formData.type === 'playlist' ? this.chosenPlaylist.id : this.chosenPlayroom.id
+          if(formData.typeId) {
+            this.createBoard(formData)
           }
           else {
-            if(this.selectedPlaylist == null) {
-              console.log("하나 이상 선택해야함.")
-              return
-            }
-            else {
-              if(this.formData.radioVal == "playlist") {
-                console.log("플레이리스트에 대한 글 업로드")
-              }
-              else {
-                console.log("플레이룸에 대한 글 업로드")
-              }
-            }
+            this.boardValid = false
           }
         }
-        // this.createPlaylist(data)
         setTimeout(() => {this.resetBoardPlaylistAddState()}, 1000)
-      }
-      // 필수항목을 채우지 않은경우.
-      else {
-        console.log("제목을 입력해주세요.")
       }
     },
     goSelect: function() {
-      if(this.formData.radioVal == '') {
-        console.log("플레이룸 또는 플레이리스트 선택바람.")
+      this.selectPlaylistOrPlayroom(this.formData.radioVal);
+      this.saveFormData(this.formData)
+      if(this.formData.radioVal == "playroom") {
+        this.$router.push({ name: 'BoardSelectPlayroom' })
+        console.log("플레이룸으로가")
       }
-      else {
-        this.selectPlaylistOrPlayroom(this.formData.radioVal);
-        this.saveFormData(this.formData)
-        if(this.formData.radioVal == "playroom") {
-          this.$router.push({ name: 'BoardSelectPlayroom' })
-          console.log("플레이룸으로가")
-        }
-        else if(this.formData.radioVal == "playlist") {
-          this.$router.push({name: 'BoardSelectPlaylist'})
-          console.log("플레이리스트로가")
-        }
+      else if(this.formData.radioVal == "playlist") {
+        this.$router.push({name: 'BoardSelectPlaylist'})
+        console.log("플레이리스트로가")
       }
-
     }
   }
 }
 </script>
 
 <style>
-
+  .added {
+    border: solid 1px;
+    border-color: #d8d8ee;
+  }
 </style>
