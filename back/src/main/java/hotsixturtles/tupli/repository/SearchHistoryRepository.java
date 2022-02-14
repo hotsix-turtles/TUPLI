@@ -11,6 +11,13 @@ public interface SearchHistoryRepository extends JpaRepository<SearchHistory, Lo
     List<SearchHistory> findTop10ByOrderByScoreDescIdDesc();
     List<SearchHistory> findByKeyword(String keyword);
 
+    @Modifying(flushAutomatically = true, clearAutomatically = true)
+    @Query("update SearchHistory s set s.score = s.score /12 * s.noSearch - 1 where s.score > 0")
+    void updateScore();
+
+    @Modifying(flushAutomatically = true, clearAutomatically = true)
+    @Query("update SearchHistory s set s.noSearch = s.noSearch + 1")
+    void updateNoSearch();
 
     @Query("select count(s) from SearchHistory s")
     Integer getCountAll();
@@ -19,5 +26,10 @@ public interface SearchHistoryRepository extends JpaRepository<SearchHistory, Lo
     Integer getCountZero();
 
     void deleteByScoreEquals(Integer score);
+
+    @Modifying(flushAutomatically = true, clearAutomatically = true)
+    @Query("update SearchHistory s set s.score = s.score + 10")
+    void updateDailyKeywords();
+
 
 }
