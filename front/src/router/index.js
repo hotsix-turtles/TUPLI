@@ -17,6 +17,7 @@ import MyProfile from '../views/profile/MyProfile.vue'
 import Profile from '../views/profile/Profile.vue'
 import Setting from '../views/profile/Setting.vue'
 //setting
+import Admin from '../views/profile/setting/Admin.vue'
 import ChangePassword from '../views/profile/setting/ChangePassword.vue'
 import History from '../views/profile/setting/History.vue'
 import InviteNoticeAlert from '../views/profile/setting/InviteNoticeAlert.vue'
@@ -41,6 +42,7 @@ import VideoWatch from '../views/video/VideoWatch.vue'
 // playroom
 import PlayroomForm from '../views/playroom/PlayroomForm.vue'
 import PlayroomFormPlaylist from '../views/playroom/PlayroomFormPlaylist.vue'
+import PlayroomFormFriend from '../views/playroom/PlayroomFormFriend.vue'
 import PlayroomDetail from '../views/playroom/PlayroomDetail.vue'
 //board
 import BoardForm from '../views/board/BoardForm.vue'
@@ -206,6 +208,11 @@ const routes = [
 
   //setting
   {
+    path: '/admin',
+    name: 'Admin',
+    component: Admin
+  },
+  {
     path: '/changepassword',
     name: 'ChangePassword',
     component: ChangePassword
@@ -249,7 +256,7 @@ const routes = [
 
   //playroom
   {
-    path: '/playroom',
+    path: '/playroom/create',
     name: 'PlayroomForm',
     component: PlayroomForm
   },
@@ -257,6 +264,11 @@ const routes = [
     path: '/playroom/create/playlist',
     name: 'PlayroomFormPlaylist',
     component: PlayroomFormPlaylist
+  },
+  {
+    path: '/playroom/create/friend',
+    name: 'PlayroomFormFriend',
+    component: PlayroomFormFriend
   },
   {
     path: '/playroom/:id',

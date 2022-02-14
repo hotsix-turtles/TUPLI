@@ -33,11 +33,11 @@
       />
 
       <!-- 저장하기 버튼 -->
-      <NavButton
+      <!-- <NavButton
         color="white"
         content="저장하기"
         icon="mdi-bookmark"
-      />
+      /> -->
     </v-bottom-navigation>
 
     <!-- 플레이룸 페이지 -->
@@ -290,6 +290,7 @@
               :timestamp="chat.timestamp"
               :blocked-user="chat.blockedUser"
               :blocked-message="chat.blockedMessage"
+              @kick-user="sendKick"
             />
           </v-card-text>
           <v-spacer />
@@ -395,60 +396,45 @@
         미운영중 접속시 팝업
         하영님 팝업으로 교체 예정
       -->
-      <v-dialog
-        v-model="isOperationTimeError"
-        persistent
+      <normal-dialog
+        title="오류"
+        content-html="현재 운영중이 아닌 플레이룸입니다."
         max-width="290"
-      >
-        <v-card>
-          <v-card-title class="text-h5">
-            오류
-          </v-card-title>
-
-          <v-card-text>
-            현재 운영중이 아닌 플레이룸입니다.<br>
-            (하영님 팝업으로 교체 예정)
-          </v-card-text>
-
-          <v-card-actions>
-            <v-btn
-              color="green darken-1"
-              text
-              @click="$router.go(-1)"
-            >
-              확인
-            </v-btn>
-          </v-card-actions>
-        </v-card>
-      </v-dialog>
-      <v-dialog
-        v-model="isNotInvitedError"
+        :show="isOperationTimeError"
+        :buttons="[{name: '확인'}]"
+        button-spacing
         persistent
+        @button-click="errorPromptHandler"
+      />
+      <normal-dialog
+        title="오류"
+        content-html="비공개 플레이룸입니다."
         max-width="290"
-      >
-        <v-card>
-          <v-card-title class="text-h5">
-            오류
-          </v-card-title>
-
-          <v-card-text>
-            비공개 플레이룸입니다.<br>
-            (하영님 팝업으로 교체 예정)
-          </v-card-text>
-
-          <v-card-actions>
-            <v-spacer />
-
-            <v-btn
-              color="green darken-1"
-              text
-              @click="$router.go(-1)"
-            >
-              확인
-            </v-btn>
-          </v-card-actions>
-        </v-card>
-      </v-dialog>
+        :show="isNotInvitedError"
+        :buttons="[{name: '확인'}]"
+        button-spacing
+        persistent
+        @button-click="errorPromptHandler"
+      />
+      <normal-dialog
+        title="오류"
+        content-html="방장에게 강퇴당했습니다."
+        max-width="290"
+        :show="isKickedError"
+        :buttons="[{name: '확인'}]"
+        button-spacing
+        persistent
+        @button-click="errorPromptHandler"
+      />
+      <normal-dialog
+        content-html="플레이룸을 종료할까요?"
+        max-width="290"
+        :show="exitPrompt"
+        :buttons="[{name: '나가기'}, {name: '취소'},]"
+        button-spacing
+        persistent
+        @button-click="exitPromptHandler"
+      />
     </v-sheet>
   </v-card>
 </template>
@@ -466,6 +452,7 @@ import NavButton from '../../components/common/NavButton.vue'
 import Stomp from "webstomp-client"
 import SockJS from "sockjs-client"
 import Tags from '../../components/common/Tags.vue';
+import NormalDialog from '../../components/common/NormalDialog.vue';
 
 Vue.use(VueYoutube)
 
@@ -477,6 +464,7 @@ export default {
     ChatItem,
     NavButton,
     Tags,
+    NormalDialog,
   },
   data() {
     return {
@@ -502,7 +490,10 @@ export default {
       isOperationTimeError: false,
       isNotInvitedError: false,
       isAuthorChangedInfo: false,
-      roomPlaytime: null
+      isKickedError: false,
+      exitPrompt: false,
+      roomPlaytime: null,
+      certification: false,
     }
   },
   metaInfo () {
@@ -636,9 +627,40 @@ export default {
     });
   },
   beforeDestroy() {
-    this.releaseChatroom()
+    if (this.wsConnector) this.releaseChatroom();
+  },
+  async beforeRouteLeave(to, from, next) {
+    if (this.isChatting)
+    {
+      this.isChatting = false;
+      next(false);
+      return;
+    }
+
+    if (this.certification)
+    {
+      if (from.name == to.name) await this.releaseChatroom();
+      next();
+      return;
+    } else {
+      this.exitPrompt = true;
+      next(false);
+      return;
+    }
   },
   methods: {
+    errorPromptHandler() {
+      this.certification = true;
+      this.$router.go(-1)
+    },
+    exitPromptHandler(idx) {
+      if (idx == 0)
+      {
+        this.certification = true;
+        this.$router.go(-1);
+      }
+      this.exitPrompt = false;
+    },
     loadRoomPlaytime() {
       const roomStartTime = this.roomStartTime
       const roomEndTime = this.roomEndTime
@@ -776,7 +798,11 @@ export default {
       const id = payload.headers['message-id']
       const body = JSON.parse(payload.body);
 
-      if (body.type == 'SYNC')
+      if (body.type == 'KICK')
+      {
+        this.isKickedError = true
+      }
+      else if (body.type == 'SYNC')
       {
         const currentPlaylistId = this.roomCurrentPlaylistId
         const currentVideoId = this.roomCurrentVideoId
@@ -915,11 +941,30 @@ export default {
       if (!this.chatroomId) return;
       if (!payload || !payload.type || !payload.message || !payload.token) return;
 
+      if (!this.wsConnector)
+        if (this.$router.currentRoute.name == 'PlayroomDetail') await this.initChatRoom();
+        else return;
+
+      if (!this.wsConnector.subscriptions) return;
+
       return await this.wsConnector.send(
         "/pub/chat/message",
         JSON.stringify({ type: payload.type, roomId: this.chatroomId, message: payload.message }),
         { Authorization: payload.token }
       );
+    },
+    async sendKick(userId) {
+      const token = localStorage.getItem('jwt')
+
+      const kickData = {
+        timestamp: new Date().getTime(),
+        userId
+      };
+
+      if (!token) return;
+      if (this.userInfo.userSeq != this.roomAuthorId) return;
+
+      this.sendMessage({ type: 'KICK', message: JSON.stringify(kickData), token })
     },
     async sendSync() {
       const token = localStorage.getItem('jwt')
@@ -1010,7 +1055,8 @@ export default {
       // 이 방에 있었던 시간 (밀리초 단위)
       this.SET_USER_END_TIME(new Date())
 
-      var time = Math.floor((this.roomUserEndTime.getTime() - this.roomUserStartTime.getTime()) / 1000)
+
+      var time = Math.floor((new Date(this.roomUserEndTime).getTime() - new Date(this.roomUserStartTime).getTime()) / 1000 / 1000)
       console.log(time, '초 경과')
 
       // 새로운 뱃지 취득시 이거 응답으로 받습니다...
