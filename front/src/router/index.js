@@ -41,6 +41,7 @@ import VideoWatch from '../views/video/VideoWatch.vue'
 // playroom
 import PlayroomForm from '../views/playroom/PlayroomForm.vue'
 import PlayroomFormPlaylist from '../views/playroom/PlayroomFormPlaylist.vue'
+import PlayroomFormFriend from '../views/playroom/PlayroomFormFriend.vue'
 import PlayroomDetail from '../views/playroom/PlayroomDetail.vue'
 //board
 import BoardForm from '../views/board/BoardForm.vue'
@@ -257,6 +258,11 @@ const routes = [
     path: '/playroom/create/playlist',
     name: 'PlayroomFormPlaylist',
     component: PlayroomFormPlaylist
+  },
+  {
+    path: '/playroom/create/friend',
+    name: 'PlayroomFormFriend',
+    component: PlayroomFormFriend
   },
   {
     path: '/playroom/:id',

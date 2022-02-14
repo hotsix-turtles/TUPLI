@@ -1,20 +1,19 @@
 <template>
   <v-card
-    class="playroom mx-auto overflow-hidden"
-    height="100vh"
-    max-width="640"
+    class="playroom mx-auto overflow-hidden mb-10"
+    height="100%"
   >
-    <!-- 하단 네비게이션 (친구 조작) -->
+    <!-- 하단 네비게이션 (팔로우 목록 조작) -->
     <v-bottom-navigation
       absolute
       background-color="#5B5C9D"
       height="65px"
       class="fixed-bottom"
-      :input-value="addedPlaylists.length > 0 || selectedPlaylists.length > 0"
+      :input-value="addedFriends.length > 0 || selectedFriends.length > 0"
     >
-      <!-- 선택된 친구 명수 뱃지 -->
+      <!-- 선택된 계정 개수 뱃지 -->
       <v-badge
-        :content="selectedPlaylists.length"
+        :content="selectedFriends.length"
         color="#EAEAEA"
         offset-x="20"
         offset-y="20"
@@ -27,20 +26,20 @@
         color="white"
         content="추가"
         icon="mdi-plus"
-        @click="requestAddPlaylists"
+        @click="requestAddFriends"
       />
     </v-bottom-navigation>
 
-    <!-- 친구추가 페이지 -->
+    <!-- 플레이룸 페이지 -->
     <v-sheet
       id="scroll-threshold-example"
       class="overflow-y-auto"
-      :class="{ 'pb-16': selectedPlaylists.length > 0 }"
-      max-height="100%"
     >
       <back :page-name="pageName" />
       <search-bar
-        :label="'추가할 친구를 검색해주세요'"
+        :label="'초대할 친구를 검색해주세요'"
+        :is-detail="true"
+        @input-change="onEnterSearch"
       />
 
       <!-- 탭 -->
@@ -60,14 +59,19 @@
       <!-- 탭에 따른 결과물 -->
       <v-tabs-items v-model="tab">
         <v-tab-item
-          v-for="item in items"
-          :key="item"
+          v-for="(item, idx) in items"
+          :key="idx"
         >
-          <playlist-list-item-small
-            :playlists="item == '저장한 플레이리스트' ? savedPlaylists : likedPlaylists"
-            :playlist-readonly="false"
-            :video-readonly="true"
-          />
+          <v-container fluid>
+            <account-list-item-small
+              v-if="searchKeyword"
+              :accounts="idx ? cofollowerFriends.filter(friend => friend.nickname.search(`.*${searchKeyword}.*`)) : followerFriends.filter(friend => friend.nickname.search(`.*${searchKeyword}.*`))"
+            />
+            <account-list-item-small
+              v-else
+              :accounts="idx ? cofollowerFriends : followerFriends"
+            />
+          </v-container>
         </v-tab-item>
       </v-tabs-items>
     </v-sheet>
@@ -78,50 +82,58 @@
 import { mapActions, mapState } from 'vuex'
 import Back from '../../components/common/Back.vue'
 import SearchBar from '../../components/common/SearchBar.vue'
-import PlaylistListItemSmall from '../../components/playlist/PlaylistListItemSmall.vue'
+
 import NavButton from '../../components/common/NavButton.vue'
 import axiosConnector from '../../utils/axios-connector';
+import AccountListItemSmall from '../../components/account/AccountListItemSmall.vue'
 
 export default {
   name: 'PlayroomFormFriend',
-  components: { SearchBar, NavButton, PlaylistListItemSmall, Back },
+  components: { SearchBar, NavButton, Back, AccountListItemSmall },
   data() {
     return {
       pageName: "친구 추가하기",
       tab: null,
       items: [
-        '팔로우한 친구', '맞팔로우한 친구',
+        '나를 팔로우한 친구', '나와 맞팔로우한 친구',
       ],
+      searchKeyword: ''
     }
   },
   computed: {
-    ...mapState('playlist', ['addedPlaylists', 'selectedPlaylists', 'myPlaylists', 'likedPlaylists', 'savedPlaylists']),
+    ...mapState('friend', ['addedFriends', 'selectedFriends', 'followerFriends', 'cofollowerFriends']),
+    ...mapState(['userId'])
   },
   created: function () {
-    if (this.addedPlaylists.length) {
-      this.revokePlaylists()
+    if (this.addedFriends.length) {
+      this.revokeFriends()
     }
-    console.log(this.addedPlaylists, this.selectedPlaylists)
+    console.log(this.addedFriends, this.selectedFriends)
   },
   mounted () {
     this.$nextTick(() => {
-      this.getUserPlaylistInfo();
+      this.getUserFriendInfo();
     });
   },
   methods: {
-    async getUserPlaylistInfo() {
-      const token = localStorage.getItem('jwt')
+    async getUserFriendInfo() {
+      var followerFriends;
+      var cofollowerFriends;
 
-      const likedPlaylists = await axiosConnector.get(`/playlist/likes`);
-      //const savedPlaylists = await axiosConnector.get(`/playlist/saved`, { headers: { Authorization: token } });
-      console.log('liked', likedPlaylists.data)
-      this.setLikedPlaylist(likedPlaylists)
+      followerFriends = await axiosConnector.get(`/profile/followers/${this.userId}`);
+      cofollowerFriends = await axiosConnector.get(`/profile/cofollowers/${this.userId}`);
+
+      if (followerFriends) this.setFollowerFriend(followerFriends)
+      if (cofollowerFriends) this.setCofollowerFriend(cofollowerFriends)
     },
-    async requestAddPlaylists() {
-      await this.addPlaylists()
+    async requestAddFriends() {
+      await this.addFriends()
       this.$router.go(-1)
     },
-    ...mapActions('playlist', ['setLikedPlaylist', 'setSavedPlaylist', 'addPlaylists', 'revokePlaylists'])
+    onEnterSearch(value) {
+      this.searchKeyword = value;
+    },
+    ...mapActions('friend', ['setFollowerFriend','setCofollowerFriend', 'addFriends', 'revokeFriends'])
   }
 }
 </script>

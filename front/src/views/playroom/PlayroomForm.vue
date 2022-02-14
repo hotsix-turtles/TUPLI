@@ -128,7 +128,7 @@
               <span class="ml-1">전체 선택</span>
             </v-btn>
             <p class="font-4">
-              {{ numberOfFriend }}명 유저 선택
+              {{ numberOfAddedFriends }}명 유저 선택
             </p>
           </v-col>
         </v-row>
@@ -140,23 +140,17 @@
             md="12"
             class="pt-0"
           >
-            <v-expansion-panels class="mx-auto">
-              <v-expansion-panel
-                class="py-2"
-                elevation="0"
-              >
-                <v-expansion-panel-header>
-                  초대할 친구가 없습니다
-                </v-expansion-panel-header>
-                <v-expansion-panel-content
-                  v-for="(inviteId, idx) in formData.inviteIds"
-                  :id="idx"
-                  :key="idx"
-                >
-                  {{ inviteId }}
-                </v-expansion-panel-content>
-              </v-expansion-panel>
-            </v-expansion-panels>
+            <v-card
+              v-if="!addedFriends.length"
+              class="d-flex flex-column justify-center align-center"
+              min-height="300"
+            >
+              <p>초대한 친구가 없습니다</p>
+            </v-card>
+            <account-list-item-small
+              :accounts="addedFriends"
+              :readonly="true"
+            />
           </v-col>
         </v-row>
 
@@ -453,13 +447,15 @@ import PlaylistListItemSmall from '../../components/playlist/PlaylistListItemSma
 import TagInput from '../../components/common/TagInput.vue'
 import { mapMutations, mapActions } from 'vuex'
 import axiosConnector from '../../utils/axios-connector';
+import AccountListItemSmall from '../../components/account/AccountListItemSmall.vue'
 
 export default {
   name: 'PlaylistForm',
   components: {
     Back,
     TagInput,
-    PlaylistListItemSmall
+    PlaylistListItemSmall,
+    AccountListItemSmall
   },
   data: function() {
     return {
@@ -525,13 +521,11 @@ export default {
     isShuffleMsg () {
       return this.isShuffle ? "플레이리스트를 랜덤으로 섞습니다." : "플레이리스트 순서대로 재생합니다."
     },
-    numberOfFriend () {
-      console.log(this.formData, this.formData.inviteIds)
-      return this.formData.inviteIds.length
-    },
     ...mapState('playlist', ['addedPlaylists', 'addedPlaylistVideoIds']),
+    ...mapState('friend', ['addedFriends']),
     ...mapState('playroom', ['savedFormData']),
-    ...mapGetters('playlist', ['numberOfAddedPlaylists', 'numberOfAddedPlaylistSelectedVideos', 'numberOfAddedPlaylistVideos'])
+    ...mapGetters('playlist', ['numberOfAddedPlaylists', 'numberOfAddedPlaylistSelectedVideos', 'numberOfAddedPlaylistVideos']),
+    ...mapGetters('friend', ['numberOfAddedFriends'])
   },
   watch: {
     startDate (val) {
@@ -651,6 +645,9 @@ export default {
       }
 
       if (((this.endDateTime.getTime() - this.startDateTime.getTime()) / 1000) < totalDuration) console.log('이상한데?')
+
+      //inviteIds
+      this.formData.inviteIds = this.addedFriends.map(addedFriend => addedFriend.userSeq)
 
       this.createPlayroom({ formData: this.formData, token })
         .then((res) => {
