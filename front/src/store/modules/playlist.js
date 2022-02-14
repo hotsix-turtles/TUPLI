@@ -69,7 +69,15 @@ const playlist = {
     },
     // 플레이리스트 디테일 댓글 조회
     GET_PLAYLIST_COMMENTS: function (state, playlistComments) {
-      state.playlistComments = playlistComments
+      if (playlistComments.length != 0) {
+        playlistComments.forEach((playlistComment) => {
+          playlistComment.created = timeConverter(playlistComment.created)
+        })
+        state.playlistComments = playlistComments
+      }
+      else {
+        state.playlistComments = []
+      }
     },
 
     // [검색]
@@ -262,6 +270,7 @@ const playlist = {
       axiosConnector.get(`/playlist/${playlistId}/comment`)
         .then((res) => {
           commit('GET_PLAYLIST_COMMENTS', res.data)
+          console.log("playlist.js : res.data", res.data)
         })
         .catch((err) => {
           console.log(err)
@@ -284,7 +293,6 @@ const playlist = {
             .catch((err) => {
               console.log(err)
             })
-          console.log("최신화 완료")
         })
         .catch((err) => {
           console.log(err)
@@ -292,8 +300,6 @@ const playlist = {
     },
     // 플레이리스트 댓글 삭제
     deletePlaylistComment: function ({ commit }, { commentId, playlistId }) {
-      console.log("playlist.js : playlistId", playlistId)
-      console.log("playlist.js : commentId" , commentId)
       axiosConnector.delete(`/playlist/${ commentId }/comment`)
         .then((res) => {
           // 삭제 성공. 아무 행동 안함.
@@ -305,7 +311,6 @@ const playlist = {
             .catch((err) => {
               console.log(err)
             })
-          console.log("최신화 완료")
         })
         .catch((err) => {
           console.log(err)

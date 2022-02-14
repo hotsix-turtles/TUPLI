@@ -98,7 +98,7 @@
 
           <!-- 플레이룸 반복 -->
           <v-btn
-            v-if="roomAuthorId == userInfo.userSeq"
+            v-if="roomAuthorId == userId"
             class="playroomReport"
             @click="playroomRepeat"
           >
@@ -137,11 +137,11 @@
           <!-- 플레이룸 작성자 프로필 사진 -->
           <div class="authorProfilePic">
             <img
-              :src="roomAuthorProfilePic"
+              :src="ImgUrl(roomAuthorProfilePic)"
               alt=""
               class="rounded-circle"
               style="width: 100%; height: auto;"
-              @click="$router.push(`/profile/${roomAuthorId}`)"
+              @click="gotoAuthorProfile"
             >
           </div>
 
@@ -284,8 +284,7 @@
               v-for="chat in roomChats"
               :id="chat.id"
               :key="chat.id"
-              :name="chat.author.name"
-              :profile="chat.author.thumbnail"
+              :author="chat.author"
               :content="chat.content"
               :timestamp="chat.timestamp"
               :blocked-user="chat.blockedUser"
@@ -398,6 +397,16 @@
       -->
       <normal-dialog
         title="오류"
+        content-html="이미 접속한 플레이룸입니다."
+        max-width="290"
+        :show="isDuplicatedError"
+        :buttons="[{name: '확인'}]"
+        button-spacing
+        persistent
+        @button-click="errorPromptHandler"
+      />
+      <normal-dialog
+        title="오류"
         content-html="현재 운영중이 아닌 플레이룸입니다."
         max-width="290"
         :show="isOperationTimeError"
@@ -453,6 +462,7 @@ import Stomp from "webstomp-client"
 import SockJS from "sockjs-client"
 import Tags from '../../components/common/Tags.vue';
 import NormalDialog from '../../components/common/NormalDialog.vue';
+import { getImage } from '../../utils/utils'
 
 Vue.use(VueYoutube)
 
@@ -483,15 +493,14 @@ export default {
       canChat: true,
       errorOnSend: false,
       playlistThumbnails: [],
-      userInfo: {
-        userSeq: null
-      },
       heartbeat: 0,
       isOperationTimeError: false,
       isNotInvitedError: false,
       isAuthorChangedInfo: false,
+      isDuplicatedError: false,
       isKickedError: false,
       exitPrompt: false,
+      exitTo: null,
       roomPlaytime: null,
       certification: false,
     }
@@ -511,6 +520,7 @@ export default {
     }
   },
   computed: {
+    ...mapState(['userId']),
     ...mapState('playroom', [
       'roomId',
       'roomTitle',
@@ -557,6 +567,7 @@ export default {
     {
       // 토큰 만료시 현재 vuex 정보를 초기화하고 로그인 페이지로 이동
       localStorage.clear();
+      this.certification = true;
       this.$router.push('/login')
     }
   },
@@ -577,18 +588,19 @@ export default {
         return prevPlaylistIds;
       }, []);
     });
-    this.$watch('roomCurrentPlaylistId', (newVal, oldVal) => {
-      //this.updateVideoId()
-    });
-    this.$watch('roomCurrentVideoId', (newVal, oldVal) => {
-      this.updateVideoId()
-    });
-    this.$watch('roomCurrentVideoPlaytime', async (newVal, oldVal) => {
-      if (newVal - oldVal < 2 && Math.abs(newVal - await this.player.getCurrentTime()) < 1) return;
-      if (this.userInfo.userSeq == this.roomAuthorId) return;
-      if (document.hidden) return;
-      this.seekTo()
-    });
+    // this.$watch('roomCurrentPlaylistId', (newVal, oldVal) => {
+    //   //this.updateVideoId()
+    // });
+    // this.$watch('roomCurrentVideoId', (newVal, oldVal) => {
+    //   this.updateVideoId()
+    // });
+    // this.$watch('roomCurrentVideoPlaytime', async (newVal, oldVal) => {
+    //   if (newVal - oldVal < 2 && Math.abs(newVal - await this.player.getCurrentTime()) < 1) return;
+    //   if (this.userId == this.roomAuthorId) return;
+    //   if (document.hidden) return;
+    //   console.log('roomCurrentVideoPlaytime watch')
+    //   this.seekTo()
+    // });
 
     this.$watch('isChatting', (newVal, oldVal) => {
       if (newVal)
@@ -637,12 +649,15 @@ export default {
       return;
     }
 
+    console.log(to)
+
     if (this.certification)
     {
-      if (from.name == to.name) await this.releaseChatroom();
+      await this.releaseChatroom();
       next();
       return;
     } else {
+      this.exitTo = to.path;
       this.exitPrompt = true;
       next(false);
       return;
@@ -657,7 +672,8 @@ export default {
       if (idx == 0)
       {
         this.certification = true;
-        this.$router.go(-1);
+        if (this.exitTo) this.$router.push(this.exitTo);
+        else this.$router.go(-1);
       }
       this.exitPrompt = false;
     },
@@ -690,11 +706,10 @@ export default {
       const userFollowerInfo = await axiosConnector.get(`/profile/followers/${this.roomAuthorId}/count`);
       this.SET_ROOM_AUTHOR({ follower: parseInt(userFollowerInfo.data) })
 
-      // TODO: user profile 부분이 미완성이라 임시로 접속할때 얻어옴. 추후 삭제 필요
-      if (this.$store.state.isLogin)
+      if (roomInfo.data.guests.filter(guestId => guestId == this.userId).length > 1)
       {
-        var userInfo = await axiosConnector.get(`/account/userInfo`);
-        this.userInfo = userInfo.data;
+        this.isDuplicatedError = true
+        return;
       }
 
       await this.checkPermission();
@@ -707,13 +722,22 @@ export default {
       setInterval(this.sendSync, 1000);
       setInterval(this.checkHeartbeat, 1000);
     },
+    async getRoomInfo2() {
+      // const token = localStorage.getItem('jwt')
+
+      const roomInfo = await axiosConnector.get(`/playroom2/${this.$route.params.id}`);
+      await this.$store.dispatch('playroom/setRoomInfo', roomInfo);
+
+      const userFollowerInfo = await axiosConnector.get(`/profile/followers/${this.roomAuthorId}/count`);
+      this.SET_ROOM_AUTHOR({ follower: parseInt(userFollowerInfo.data) })
+    },
     checkPermission() {
       // 방 운영시간 외이면
       if (this.roomStartTime >= Date.now() || this.roomEndTime <= Date.now())
         this.showErrorOperationTime();
 
       // 비공개방이고 미초대 유저면
-      if (!this.roomPublic && !this.roomInviteIds.find(inviteId => inviteId == this.userInfo.userSeq)) {
+      if (!this.roomPublic && !this.roomInviteIds.find(inviteId => inviteId == this.userId)) {
         this.showErrorNotInvited();
       }
     },
@@ -778,7 +802,7 @@ export default {
       {
         this.selectedVideoItem.push(id)
       }
-      if (this.roomAuthorId == this.userInfo.userSeq) this.playThisVideo()
+      if (this.roomAuthorId == this.userId) this.playThisVideo()
     },
     onVideoReady() {
     },
@@ -804,6 +828,8 @@ export default {
       }
       else if (body.type == 'SYNC')
       {
+        this.heartbeat = 0;
+
         const currentPlaylistId = this.roomCurrentPlaylistId
         const currentVideoId = this.roomCurrentVideoId
         const currentVideoTime = await this.player.getCurrentTime();
@@ -827,12 +853,14 @@ export default {
           await this.SET_ROOM_LAST_SYNC_SENDER(syncSender)
         }
 
-        if (this.userInfo.userSeq == this.roomAuthorId) return;
+        if (this.userId == this.roomAuthorId) return;
 
+        if (currentPlaylistId != syncPlaylistId) this.SET_ROOM_CURRENT_PLAYLIST_ID(syncPlaylistId)
+        if (currentVideoId != syncVideoId) this.SET_ROOM_CURRENT_VIDEO_ID(syncVideoId)
+        this.updateVideoId();
+
+        // 싱크와 플레이어 상태가 다르다
         if (currentPlayerState != syncPlayerState) {
-          if (currentPlaylistId != syncPlaylistId) this.SET_ROOM_CURRENT_PLAYLIST_ID(syncPlaylistId)
-          if (currentVideoId != syncVideoId) this.SET_ROOM_CURRENT_VIDEO_ID(syncVideoId)
-
           if (syncPlayerState == 1) this.player.playVideo()
           else if (syncPlayerState == 2) this.player.pauseVideo()
         }
@@ -841,9 +869,11 @@ export default {
           // if (currentPlaylistId != syncPlaylistId) this.SET_ROOM_CURRENT_PLAYLIST_ID(syncPlaylistId)
           // if (currentVideoId != syncVideoId) this.SET_ROOM_CURRENT_VIDEO_ID(syncVideoId)
 
-          this.SET_ROOM_CURRENT_VIDEO_PLAYTIME(syncVideoTime);
+          if (syncVideoId == this.roomCurrentVideoId) this.SET_ROOM_CURRENT_VIDEO_PLAYTIME(syncVideoTime);
+
+          if (document.hidden) return;
+          this.seekTo()
         }
-        this.heartbeat = 0;
       }
       else// if (body.type == 'TALK')
       {
@@ -892,14 +922,19 @@ export default {
       //setTimeout(this.player.playVideo, 1000)
     },
     playThisVideo() {
-      if (this.selectedVideoItem.length != 1) {
-        alert('바로 재생할 영상을 1개만 선택해주세요')
-        return;
+      if (this.roomCurrentVideoId != this.selectedVideoItem[0])
+      {
+        this.SET_ROOM_CURRENT_VIDEO_ID(this.selectedVideoItem[0])
+        this.SET_ROOM_CURRENT_VIDEO_PLAYTIME(0)
+        this.updateVideoId();
       }
-      console.log(this.selectedVideoItem)
-      this.SET_ROOM_CURRENT_VIDEO_ID(this.selectedVideoItem[0])
-      this.SET_ROOM_CURRENT_VIDEO_PLAYTIME(0)
+      else
+      {
+        this.SET_ROOM_CURRENT_VIDEO_PLAYTIME(0)
+      }
+
       this.selectedVideoItem = []
+      console.log('playThisVideo')
       this.seekTo()
     },
     async loadLikeState() {
@@ -962,7 +997,7 @@ export default {
       };
 
       if (!token) return;
-      if (this.userInfo.userSeq != this.roomAuthorId) return;
+      if (this.userId != this.roomAuthorId) return;
 
       this.sendMessage({ type: 'KICK', message: JSON.stringify(kickData), token })
     },
@@ -980,7 +1015,9 @@ export default {
       };
 
       if (!token) return;
-      if (this.userInfo.userSeq != this.roomAuthorId) return;
+
+      if (this.roomLastSyncSender != this.userId) await this.getRoomInfo2();
+      if (this.userId != this.roomAuthorId) return;
 
       this.sendMessage({ type: 'SYNC', message: JSON.stringify(syncData), token })
     },
@@ -1024,8 +1061,9 @@ export default {
     clearSendError() {
       this.errorOnSend = false;
     },
-    checkHeartbeat() {
+    async checkHeartbeat() {
       this.checkPermission();
+      if (!this.wsConnector || (this.wsConnector && !this.wsConnector.subscriptions)) await this.initChatRoom();
 
       if (this.heartbeat > 30)
       {
@@ -1034,8 +1072,8 @@ export default {
         // const userOffset = this.roomUsers.findIndex(roomUser => roomUser == this.userInfo.userSeq)
 
         // 그런거 없으니까 일단은.. 무작정 도전!
-        if (this.userInfo.userSeq)
-          if ((parseInt(this.userInfo.userSeq) + Date.now()) % 10 == (parseInt(this.roomId) + parseInt(this.roomAuthorId)) % 10)
+        if (this.userId)
+          if ((parseInt(this.userId) + Date.now()) % 10 == (parseInt(this.roomId) + parseInt(this.roomAuthorId)) % 10)
           {
             this.showInfoAuthorChanged()
             this.requestRoomAuthor()
@@ -1043,12 +1081,12 @@ export default {
 
       }
 
-      if (this.userInfo.userSeq && this.userInfo.userSeq == this.roomAuthorId) return;
+      if (this.userId && this.userId == this.roomAuthorId) return;
       this.heartbeat += 1;
     },
     async requestRoomAuthor() {
       await axiosConnector.put(`/playroom/${this.roomId}/user`);
-      await this.getRoomInfo();
+      await this.getRoomInfo2();
       this.heartbeat = 0;
     },
     async releaseChatroom() {
@@ -1062,8 +1100,15 @@ export default {
       // 새로운 뱃지 취득시 이거 응답으로 받습니다...
       await axiosConnector.put(`/playroom/out/${this.roomId}`, { watchTime:time })
 
-      await this.wsConnector.disconnect()
+      if (this.wsConnector) await this.wsConnector.disconnect()
       this.wsConnector = null
+    },
+    ImgUrl: function(img) {
+      return getImage(img)
+    },
+    gotoAuthorProfile() {
+      this.certification = true;
+      this.$router.push(`/profile/${this.roomAuthorId}`);
     },
     ...mapMutations('playroom', ['RESET_VUEX_DATA', 'SET_ROOM_AUTHOR', 'SET_ROOM_LIKED', 'SET_ROOM_REPEAT', 'SEEK_VIDEO',
       'SET_ROOM_CURRENT_PLAYLIST_ID', 'SET_ROOM_CURRENT_VIDEO_ID', 'SET_ROOM_CURRENT_VIDEO_PLAYTIME',

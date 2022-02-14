@@ -3,7 +3,7 @@
     <v-text-field
       v-model="inputVal"
       class="comment-input"
-      label="메시지를 입력하세요"
+      label="댓글 입력"
       solo
       dense
       :disabled="!isLogin"
