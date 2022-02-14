@@ -5,14 +5,12 @@ import hotsixturtles.tupli.dto.request.BoardRequestDto;
 import hotsixturtles.tupli.dto.response.BoardResponseDto;
 import hotsixturtles.tupli.dto.response.ErrorResponse;
 import hotsixturtles.tupli.dto.simple.SimpleBadgeDto;
-import hotsixturtles.tupli.entity.Badge;
-import hotsixturtles.tupli.entity.Board;
-import hotsixturtles.tupli.entity.Playroom;
-import hotsixturtles.tupli.entity.UserBadge;
+import hotsixturtles.tupli.entity.*;
 import hotsixturtles.tupli.entity.likes.BoardLikes;
 import hotsixturtles.tupli.service.BadgeService;
 import hotsixturtles.tupli.service.BoardService;
 import hotsixturtles.tupli.service.UserInfoService;
+import hotsixturtles.tupli.service.UserService;
 import hotsixturtles.tupli.service.token.JwtTokenProvider;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -28,7 +26,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -46,6 +47,8 @@ public class BoardApiController {
     private final BadgeService badgeService;
 
     private final UserInfoService userInfoService;
+
+    private final UserService userService;
 
 
     /**
@@ -76,14 +79,22 @@ public class BoardApiController {
      * 반환 코드 : 200, 204, 404
      */
     @GetMapping("/board/list")
-    public ResponseEntity<List<BoardResponseDto>> getBoardList(){
+    public ResponseEntity<List<BoardResponseDto>> getBoardList(HttpServletRequest request){
         List<Board> boardList = boardService.getBoardList();
         if (boardList.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
         }
 
-        List<BoardResponseDto> result = boardList.stream().map(b -> new BoardResponseDto(b)).collect(Collectors.toList());
-        return ResponseEntity.status(HttpStatus.OK).body(result);
+        String token = request.getHeader("Authorization");
+        if (token == null || !jwtTokenProvider.validateToken(token)) {
+            List<BoardResponseDto> result = boardList.stream().map(b -> new BoardResponseDto(b)).collect(Collectors.toList());
+            return ResponseEntity.ok().body(result);
+        } else {
+            Long userSeq = jwtTokenProvider.getUserSeq(token);
+            User user = userService.getUserByUserseq(userSeq);
+            List<BoardResponseDto> result = boardList.stream().map(b -> new BoardResponseDto(b, user)).collect(Collectors.toList());
+            return ResponseEntity.ok().body(result);
+        }
     }
 
     /**
@@ -93,10 +104,19 @@ public class BoardApiController {
      * 반환 코드 : 200, 404
      */
     @GetMapping("/board/{boardId}")
-    public ResponseEntity<?> getBoard(@PathVariable("boardId") Long boardId){
+    public ResponseEntity<?> getBoard(@PathVariable("boardId") Long boardId,
+                                      HttpServletRequest request){
 
         Board board = boardService.getBoard(boardId);
-        return ResponseEntity.status(HttpStatus.OK).body(new BoardResponseDto(board));
+
+        String token = request.getHeader("Authorization");
+        if (token == null || !jwtTokenProvider.validateToken(token)) {
+            return ResponseEntity.status(HttpStatus.OK).body(new BoardResponseDto(board));
+        } else {
+            Long userSeq = jwtTokenProvider.getUserSeq(token);
+            User user = userService.getUserByUserseq(userSeq);
+            return ResponseEntity.status(HttpStatus.OK).body(new BoardResponseDto(board, user));
+        }
     }
 
     /**
@@ -118,6 +138,7 @@ public class BoardApiController {
 
         Long userSeq = jwtTokenProvider.getUserSeq(token);
 
+        User user = userService.getUserByUserseq(userSeq);
 
         Board boardResult = boardService.addBoard(userSeq, board);
 
@@ -127,11 +148,11 @@ public class BoardApiController {
         List<Long> badges = badgeService.getUserBadgeSeq(userBadges);
         // 배지갱신
         List<Badge> badgeResult = badgeService.checkBoardUpload(userSeq, badges);
-        if(badgeResult == null || badgeResult.size() == 0) return ResponseEntity.ok().body(new BoardResponseDto(boardResult, null));
+        if(badgeResult == null || badgeResult.size() == 0) return ResponseEntity.ok().body(new BoardResponseDto(boardResult, null, user));
         List<SimpleBadgeDto> result = badgeResult.stream().map(b -> new SimpleBadgeDto(b)).collect(Collectors.toList());
 
         // 뱃지 확인
-        return ResponseEntity.status(HttpStatus.CREATED).body(new BoardResponseDto(boardResult, result));
+        return ResponseEntity.status(HttpStatus.CREATED).body(new BoardResponseDto(boardResult, result, user));
     }
 
     /**
@@ -269,9 +290,11 @@ public class BoardApiController {
         }
         Long userSeq = jwtTokenProvider.getUserSeq(token);
 
+        User user = userService.getUserByUserseq(userSeq);
+
         List<Board> boards = boardService.getLikedBoards(userSeq);
 
-        List<BoardResponseDto> result = boards.stream().map(b -> new BoardResponseDto(b)).collect(Collectors.toList());
+        List<BoardResponseDto> result = boards.stream().map(b -> new BoardResponseDto(b,user)).collect(Collectors.toList());
 
         return ResponseEntity.ok().body(result);
     }

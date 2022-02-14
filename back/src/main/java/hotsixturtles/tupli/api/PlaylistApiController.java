@@ -49,6 +49,7 @@ public class PlaylistApiController {
     private final FlaskService flaskService;
     private final PlaylistCommentService playlistCommentService;
     private final SearchService searchService;
+    private final UserService userService;
 
     private final UserInfoService userInfoService;
     private final BadgeService badgeService;
@@ -102,10 +103,19 @@ public class PlaylistApiController {
      * 반환 코드 : 200, 404
      */
     @GetMapping("/playlist/{id}")
-    public ResponseEntity getPlaylist(@PathVariable("id") Long id){
-
-        Playlist playlist = playlistService.getPlaylist(id);
-        return ResponseEntity.status(HttpStatus.OK).body(new PlaylistDto(playlist));
+    public ResponseEntity getPlaylist(@PathVariable("id") Long id,
+                                      HttpServletRequest request){
+        // 회원, 비회원(유효하지 않은 토큰) 구분
+        String token = request.getHeader("Authorization");
+        if (token == null || !jwtTokenProvider.validateToken(token)) {
+            Playlist playlist = playlistService.getPlaylist(id);
+            return ResponseEntity.status(HttpStatus.OK).body(new PlaylistDto(playlist));
+        } else {
+            Long userSeq = jwtTokenProvider.getUserSeq(token);
+            Playlist playlist = playlistService.getPlaylist(id);
+            User user = userService.getUserByUserseq(userSeq);
+            return ResponseEntity.status(HttpStatus.OK).body(new PlaylistDto(playlist, user));
+        }
     }
 
     /**
@@ -136,13 +146,21 @@ public class PlaylistApiController {
      * 반환 코드 : 200, 404
      */
     @GetMapping("/playlist/list")
-    public ResponseEntity<?> getPlaylistList(){
+    public ResponseEntity<?> getPlaylistList(HttpServletRequest request){
+        // 회원, 비회원(유효하지 않은 토큰) 구분
+        String token = request.getHeader("Authorization");
+        if (token == null || !jwtTokenProvider.validateToken(token)) {
+            List<Playlist> Playlist = playlistService.getPlaylistList();
+            List<PlaylistDto> result = Playlist.stream().map(x -> new PlaylistDto(x)).collect(Collectors.toList());
 
-        List<Playlist> Playlist = playlistService.getPlaylistList();
-
-        List<PlaylistDto> result = Playlist.stream().map(x -> new PlaylistDto(x)).collect(Collectors.toList());
-
-        return ResponseEntity.status(HttpStatus.OK).body(result);
+            return ResponseEntity.status(HttpStatus.OK).body(result);
+        } else {
+            Long userSeq = jwtTokenProvider.getUserSeq(token);
+            List<Playlist> Playlist = playlistService.getPlaylistList();
+            User user = userService.getUserByUserseq(userSeq);
+            List<PlaylistDto> result = Playlist.stream().map(x -> new PlaylistDto(x, user)).collect(Collectors.toList());
+            return ResponseEntity.status(HttpStatus.OK).body(result);
+        }
     }
 
 
@@ -274,15 +292,24 @@ public class PlaylistApiController {
     @GetMapping("/playlist/search")
     public ResponseEntity searchPlaylistSimple(@RequestParam(value = "keyword") String keyword,
                                                @RequestParam(value = "order") String order,
-                                               @PageableDefault(size = 1000) Pageable pageable) {
+                                               @PageableDefault(size = 1000) Pageable pageable,
+                                               HttpServletRequest request) {
         PlaylistSearchCondition playlistSearchCondition = new PlaylistSearchCondition();
         playlistSearchCondition.setKeyword(keyword);
         List<Playlist> playlists = playlistService.searchPlaylistSimple(playlistSearchCondition, order, pageable);
         SearchHistory searchHistory = new SearchHistory(null, "플레이리스트",playlistSearchCondition.getKeyword().trim(),0, 0);
         searchService.addScoreNum(searchHistory);
-        List<PlaylistDto> response = playlists.stream().map(x -> new PlaylistDto(x)).collect(Collectors.toList());
 
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+        String token = request.getHeader("Authorization");
+        if (token == null || !jwtTokenProvider.validateToken(token)) {
+            List<PlaylistDto> response = playlists.stream().map(x -> new PlaylistDto(x)).collect(Collectors.toList());
+            return ResponseEntity.status(HttpStatus.OK).body(response);
+        } else {
+            Long userSeq = jwtTokenProvider.getUserSeq(token);
+            User user = userService.getUserByUserseq(userSeq);
+            List<PlaylistDto> response = playlists.stream().map(x -> new PlaylistDto(x, user)).collect(Collectors.toList());
+            return ResponseEntity.status(HttpStatus.OK).body(response);
+        }
     }
 
     /**
@@ -440,10 +467,10 @@ public class PlaylistApiController {
                     .body(new ErrorResponse(messageSource.getMessage("error.valid.jwt", null, LocaleContextHolder.getLocale())));
         }
         Long userSeq = jwtTokenProvider.getUserSeq(token);
-
+        User user = userService.getUserByUserseq(userSeq);
         List<Playlist> playlists = playlistService.getLikedPlaylists(userSeq);
 
-        List<PlaylistDto> result = playlists.stream().map(b -> new PlaylistDto(b)).collect(Collectors.toList());
+        List<PlaylistDto> result = playlists.stream().map(b -> new PlaylistDto(b, user)).collect(Collectors.toList());
 
         return ResponseEntity.ok().body(result);
     }

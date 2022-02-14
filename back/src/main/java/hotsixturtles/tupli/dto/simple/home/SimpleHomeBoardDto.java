@@ -39,7 +39,7 @@ public class SimpleHomeBoardDto {
 //    private List<BoardLikes> boardLikes;
 
     // 제작 변수
-    private Integer likes_count;
+    private Integer likesCnt;
     private String userLikesYN;
 
     public SimpleHomeBoardDto(Board board) {
@@ -66,7 +66,7 @@ public class SimpleHomeBoardDto {
         }
 
         // 변수
-        this.likes_count = board.getBoardLikes() == null ? 0 : board.getBoardLikes().size();
+        this.likesCnt = board.getBoardLikes() == null ? 0 : board.getBoardLikes().size();
 
     }
 
@@ -94,7 +94,7 @@ public class SimpleHomeBoardDto {
         }
 
         // 변수
-        this.likes_count = board.getBoardLikes() == null ? 0 : board.getBoardLikes().size();
+        this.likesCnt = board.getBoardLikes() == null ? 0 : board.getBoardLikes().size();
 
         if(board.getBoardLikes() == null){
             this.userLikesYN = "N";
