@@ -27,10 +27,9 @@ const playlist = {
     selectedPlaylists: [],
     addedPlaylists: [],
     addedPlaylistVideoIds: [],
-    // 아래 두줄은 추후 account.js로 옮길듯
+
+    myPlaylists: [],
     likedPlaylists: [],
-    myPlaylists: [ { playlistId: 1, title: '좋아요한 플레이리스트 1', thumbnail: '', videos: [{ videoId: 'a2dxf-fvfla', title: '냠냠', thumbnail: '' }] }, { playlistId: 2, title: '좋아요한 플레이리스트 2', thumbnail: '' }, { playlistId: 3, title: '좋아요한 플레이리스트 3', thumbnail: '' }, ],
-    savedPlaylists: [ { playlistId: 4, title: '저장한 플레이리스트 1', thumbnail: '', videos: [{ videoId: 'a2dxf-fvflb', title: '냠냠', thumbnail: '' }] }, { playlistId: 5, title: '저장한 플레이리스트 2', thumbnail: '' }, { playlistId: 6, title: '저장한 플레이리스트 3', thumbnail: '' }, ]
   },
   mutations: {
     // [플레이리스트 생성]
@@ -164,6 +163,9 @@ const playlist = {
       state.addedPlaylists = []
       state.addedPlaylistVideoIds = []
     },
+    SET_MY_PLAYLISTS: function (state, value) {
+      state.myPlaylists = value ? value : state.myPlaylists;
+    },
     SET_LIKED_PLAYLISTS: function (state, value) {
       state.likedPlaylists = value ? value : state.likedPlaylists;
     }
@@ -212,7 +214,6 @@ const playlist = {
         .catch((err) => {
           console.log(err)
         })
-      commit('RESET_FORM_DATA')
     },
     saveFormData: function ({ commit }, formData) {
       console.log('saveFormData', formData)
@@ -272,6 +273,8 @@ const playlist = {
         data
       )
         .then((res) => {
+          console.log('createPlaylistComment', res)
+          // commit('CREATE_PLAYLIST_COMMENT', res.data)
           // 생성 성공. 아무 행동 안함.
           console.log("덧글 작성 완료.")
           axiosConnector.get(`/playlist/${playlistId}/comment`)
@@ -346,7 +349,7 @@ const playlist = {
       commit('REVOKE_PLAYLISTS')
     },
     // 선택한 플레이리스트 리스트에 추가
-    selectPlaylist: function ({ commit }, playlist) {
+    selectPlaylist2: function ({ commit }, playlist) {
       commit('SELECT_PLAYLIST', playlist)
     },
     // 선택한 플레이리스트 리스트에서 제거
@@ -371,6 +374,9 @@ const playlist = {
     },
     resetAddedPlaylists: function ({ commit }) {
       commit('RESET_ADDED_PLAYLISTS')
+    },
+    setMyPlaylist: function ({ commit }, { data }) {
+      commit('SET_MY_PLAYLISTS', data);
     },
     setLikedPlaylist: function ({ commit }, { data }) {
       commit('SET_LIKED_PLAYLISTS', data);

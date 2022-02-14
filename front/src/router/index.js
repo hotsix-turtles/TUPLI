@@ -17,6 +17,7 @@ import MyProfile from '../views/profile/MyProfile.vue'
 import Profile from '../views/profile/Profile.vue'
 import Setting from '../views/profile/Setting.vue'
 //setting
+import Admin from '../views/profile/setting/Admin.vue'
 import ChangePassword from '../views/profile/setting/ChangePassword.vue'
 import History from '../views/profile/setting/History.vue'
 import InviteNoticeAlert from '../views/profile/setting/InviteNoticeAlert.vue'
@@ -41,11 +42,15 @@ import VideoWatch from '../views/video/VideoWatch.vue'
 // playroom
 import PlayroomForm from '../views/playroom/PlayroomForm.vue'
 import PlayroomFormPlaylist from '../views/playroom/PlayroomFormPlaylist.vue'
+import PlayroomFormFriend from '../views/playroom/PlayroomFormFriend.vue'
 import PlayroomDetail from '../views/playroom/PlayroomDetail.vue'
 //board
 import BoardForm from '../views/board/BoardForm.vue'
 import BoardSelectPlayroom from '../views/board/BoardSelectPlayroom.vue'
 import BoardSelectPlaylist from '../views/board/BoardSelectPlaylist.vue'
+import PlayroomSearch from '@/views/board/PlayroomSearch.vue'
+import PlaylistSearch from '@/views/board/PlaylistSearch.vue'
+import BoardDetail from '@/views/board/BoardDetail.vue'
 
 import AuthHandler from '../views/handler/AuthHandler.vue'
 import KakaoPaySuccess from '../views/handler/kakaoPay/KakaoPaySuccess.vue'
@@ -203,6 +208,11 @@ const routes = [
 
   //setting
   {
+    path: '/admin',
+    name: 'Admin',
+    component: Admin
+  },
+  {
     path: '/changepassword',
     name: 'ChangePassword',
     component: ChangePassword
@@ -246,7 +256,7 @@ const routes = [
 
   //playroom
   {
-    path: '/playroom',
+    path: '/playroom/create',
     name: 'PlayroomForm',
     component: PlayroomForm
   },
@@ -256,12 +266,17 @@ const routes = [
     component: PlayroomFormPlaylist
   },
   {
+    path: '/playroom/create/friend',
+    name: 'PlayroomFormFriend',
+    component: PlayroomFormFriend
+  },
+  {
     path: '/playroom/:id',
     name: 'PlayroomDetail',
     component: PlayroomDetail
   },
 
-  // board
+  // board (게시글)
   {
     path: '/board',
     name: 'BoardForm',
@@ -276,6 +291,21 @@ const routes = [
     path: '/board/playroom',
     name: 'BoardSelectPlayroom',
     component: BoardSelectPlayroom
+  },
+  {
+    path: '/playlist/search',
+    name: 'PlaylistSearch',
+    component: PlaylistSearch
+  },
+  {
+    path: '/playroom/search',
+    name: 'PlayroomSearch',
+    component: PlayroomSearch
+  },
+  {
+    path: '/board/:boardId',
+    name: 'BoardDetail',
+    component: BoardDetail
   },
 
   //handler

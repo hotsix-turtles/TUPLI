@@ -1,7 +1,7 @@
 <template>
   <v-dialog
-    class="tupli-dialog-normal"
     v-model="show"
+    class="tupli-dialog-normal"
     :width="width ? parseInt(width) : undefined"
     :max-width="maxWidth ? parseInt(maxWidth) : undefined"
     :scrollable="scrollable"
@@ -14,25 +14,24 @@
         {{ title }}
       </v-card-title>
       <v-card-text
-        class="tupli-dialog-normal-content"
         v-if="contentHtml"
-        v-html="contentHtml"
-      >
-      </v-card-text>
-      <v-card-text
         class="tupli-dialog-normal-content"
+        v-html="contentHtml"
+      />
+      <v-card-text
         v-else-if="content"
+        class="tupli-dialog-normal-content"
       >
         {{ content }}
       </v-card-text>
       <v-card-actions
         v-if="buttons.length"
       >
-        <v-spacer v-if="buttonSpacing"></v-spacer>
+        <v-spacer v-if="buttonSpacing" />
         <v-btn
-          text
           v-for="(button, idx) in buttons"
           :key="idx"
+          text
           :class="button.class"
           :color="button.color"
           @click="onButtonClick(idx)"
