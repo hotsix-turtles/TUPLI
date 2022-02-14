@@ -290,6 +290,7 @@
               :timestamp="chat.timestamp"
               :blocked-user="chat.blockedUser"
               :blocked-message="chat.blockedMessage"
+              @kick-user="sendKick"
             />
           </v-card-text>
           <v-spacer />
@@ -416,6 +417,16 @@
         @button-click="errorPromptHandler"
       />
       <normal-dialog
+        title="오류"
+        content-html="방장에게 강퇴당했습니다."
+        max-width="290"
+        :show="isKickedError"
+        :buttons="[{name: '확인'}]"
+        button-spacing
+        persistent
+        @button-click="errorPromptHandler"
+      />
+      <normal-dialog
         content-html="플레이룸을 종료할까요?"
         max-width="290"
         :show="exitPrompt"
@@ -479,6 +490,7 @@ export default {
       isOperationTimeError: false,
       isNotInvitedError: false,
       isAuthorChangedInfo: false,
+      isKickedError: false,
       exitPrompt: false,
       roomPlaytime: null,
       certification: false,
@@ -786,7 +798,11 @@ export default {
       const id = payload.headers['message-id']
       const body = JSON.parse(payload.body);
 
-      if (body.type == 'SYNC')
+      if (body.type == 'KICK')
+      {
+        this.isKickedError = true
+      }
+      else if (body.type == 'SYNC')
       {
         const currentPlaylistId = this.roomCurrentPlaylistId
         const currentVideoId = this.roomCurrentVideoId
@@ -936,6 +952,19 @@ export default {
         JSON.stringify({ type: payload.type, roomId: this.chatroomId, message: payload.message }),
         { Authorization: payload.token }
       );
+    },
+    async sendKick(userId) {
+      const token = localStorage.getItem('jwt')
+
+      const kickData = {
+        timestamp: new Date().getTime(),
+        userId
+      };
+
+      if (!token) return;
+      if (this.userInfo.userSeq != this.roomAuthorId) return;
+
+      this.sendMessage({ type: 'KICK', message: JSON.stringify(kickData), token })
     },
     async sendSync() {
       const token = localStorage.getItem('jwt')
