@@ -21,21 +21,23 @@ export default {
   data: function() {
     return {
       contents: [],
+      thumbnail: '',
     }
   },
   computed: {
     ...mapState('mainContent', ['mainContents'])
   },
   created: function() {
-    console.log('이건 뜨나요22', this.contents)
+    console.log('메인 컨텐츠', this.contents)
     this.getMainContent()
     this.contents = this.mainContents
-    console.log('이건 뜨나요44', this.contents)
+    console.log('메인 컨텐츠 조회 완료', this.contents)
   },
   methods: {
     ...mapActions('mainContent',[
       'getMainContent',
     ]),
+
   }
 }
 </script>

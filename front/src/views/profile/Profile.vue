@@ -2,12 +2,8 @@
   <v-app>
     <v-container>
       <div
-        class="d-flex justify-end mt-7 mr-5"
-      >
-        <v-icon>
-          mdi-cog
-        </v-icon>
-      </div>
+        class="d-flex justify-end mt-7 mr-5 pb-5"
+      />
       <div>
         <div class="d-flex flex-column align-center">
           <img
@@ -133,7 +129,6 @@ export default {
         .then((res) => {
           console.log('성공적', res.data)
           this.profile = res.data
-          console.log('이렇게 하는 게 맞나', this.profile)
         })
         .catch((err) => {
           console.log('에러', err)

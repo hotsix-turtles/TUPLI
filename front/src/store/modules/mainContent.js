@@ -13,9 +13,8 @@ const mainContent = {
   mutations: {
     // 메인 컨텐츠 얻기
     GET_MAIN_CONTENT: function (state, mainContents) {
-      console.log('메인 컨텐츠 얻기', state.mainContents)
+      // console.log('메인 컨텐츠 얻기', state.mainContents)
       state.mainContents = mainContents
-      console.log('메인 컨텐츠 얻기2', state.mainContents)
     },
 
     // *** 좋아요 ***
