@@ -398,6 +398,16 @@
       -->
       <normal-dialog
         title="오류"
+        content-html="이미 접속한 플레이룸입니다."
+        max-width="290"
+        :show="isDuplicatedError"
+        :buttons="[{name: '확인'}]"
+        button-spacing
+        persistent
+        @button-click="errorPromptHandler"
+      />
+      <normal-dialog
+        title="오류"
         content-html="현재 운영중이 아닌 플레이룸입니다."
         max-width="290"
         :show="isOperationTimeError"
@@ -490,6 +500,7 @@ export default {
       isOperationTimeError: false,
       isNotInvitedError: false,
       isAuthorChangedInfo: false,
+      isDuplicatedError: false,
       isKickedError: false,
       exitPrompt: false,
       roomPlaytime: null,
@@ -690,11 +701,10 @@ export default {
       const userFollowerInfo = await axiosConnector.get(`/profile/followers/${this.roomAuthorId}/count`);
       this.SET_ROOM_AUTHOR({ follower: parseInt(userFollowerInfo.data) })
 
-      // TODO: user profile 부분이 미완성이라 임시로 접속할때 얻어옴. 추후 삭제 필요
-      if (this.$store.state.isLogin)
+      if (roomInfo.data.guests.filter(guestId => guestId == this.userId).length > 1)
       {
-        var userInfo = await axiosConnector.get(`/account/userInfo`);
-        this.userInfo = userInfo.data;
+        this.isDuplicatedError = true
+        return;
       }
 
       await this.checkPermission();
