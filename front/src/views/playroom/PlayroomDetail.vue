@@ -588,18 +588,19 @@ export default {
         return prevPlaylistIds;
       }, []);
     });
-    this.$watch('roomCurrentPlaylistId', (newVal, oldVal) => {
-      //this.updateVideoId()
-    });
-    this.$watch('roomCurrentVideoId', (newVal, oldVal) => {
-      this.updateVideoId()
-    });
-    this.$watch('roomCurrentVideoPlaytime', async (newVal, oldVal) => {
-      if (newVal - oldVal < 2 && Math.abs(newVal - await this.player.getCurrentTime()) < 1) return;
-      if (this.userInfo.userSeq == this.roomAuthorId) return;
-      if (document.hidden) return;
-      this.seekTo()
-    });
+    // this.$watch('roomCurrentPlaylistId', (newVal, oldVal) => {
+    //   //this.updateVideoId()
+    // });
+    // this.$watch('roomCurrentVideoId', (newVal, oldVal) => {
+    //   this.updateVideoId()
+    // });
+    // this.$watch('roomCurrentVideoPlaytime', async (newVal, oldVal) => {
+    //   if (newVal - oldVal < 2 && Math.abs(newVal - await this.player.getCurrentTime()) < 1) return;
+    //   if (this.userId == this.roomAuthorId) return;
+    //   if (document.hidden) return;
+    //   console.log('roomCurrentVideoPlaytime watch')
+    //   this.seekTo()
+    // });
 
     this.$watch('isChatting', (newVal, oldVal) => {
       if (newVal)
@@ -717,6 +718,15 @@ export default {
       setInterval(this.sendSync, 1000);
       setInterval(this.checkHeartbeat, 1000);
     },
+    async getRoomInfo2() {
+      // const token = localStorage.getItem('jwt')
+
+      const roomInfo = await axiosConnector.get(`/playroom2/${this.$route.params.id}`);
+      await this.$store.dispatch('playroom/setRoomInfo', roomInfo);
+
+      const userFollowerInfo = await axiosConnector.get(`/profile/followers/${this.roomAuthorId}/count`);
+      this.SET_ROOM_AUTHOR({ follower: parseInt(userFollowerInfo.data) })
+    },
     checkPermission() {
       // 방 운영시간 외이면
       if (this.roomStartTime >= Date.now() || this.roomEndTime <= Date.now())
@@ -814,6 +824,8 @@ export default {
       }
       else if (body.type == 'SYNC')
       {
+        this.heartbeat = 0;
+
         const currentPlaylistId = this.roomCurrentPlaylistId
         const currentVideoId = this.roomCurrentVideoId
         const currentVideoTime = await this.player.getCurrentTime();
@@ -839,10 +851,12 @@ export default {
 
         if (this.userInfo.userSeq == this.roomAuthorId) return;
 
-        if (currentPlayerState != syncPlayerState) {
-          if (currentPlaylistId != syncPlaylistId) this.SET_ROOM_CURRENT_PLAYLIST_ID(syncPlaylistId)
-          if (currentVideoId != syncVideoId) this.SET_ROOM_CURRENT_VIDEO_ID(syncVideoId)
+        if (currentPlaylistId != syncPlaylistId) this.SET_ROOM_CURRENT_PLAYLIST_ID(syncPlaylistId)
+        if (currentVideoId != syncVideoId) this.SET_ROOM_CURRENT_VIDEO_ID(syncVideoId)
+        this.updateVideoId();
 
+        // 싱크와 플레이어 상태가 다르다
+        if (currentPlayerState != syncPlayerState) {
           if (syncPlayerState == 1) this.player.playVideo()
           else if (syncPlayerState == 2) this.player.pauseVideo()
         }
@@ -851,9 +865,11 @@ export default {
           // if (currentPlaylistId != syncPlaylistId) this.SET_ROOM_CURRENT_PLAYLIST_ID(syncPlaylistId)
           // if (currentVideoId != syncVideoId) this.SET_ROOM_CURRENT_VIDEO_ID(syncVideoId)
 
-          this.SET_ROOM_CURRENT_VIDEO_PLAYTIME(syncVideoTime);
+          if (syncVideoId == this.roomCurrentVideoId) this.SET_ROOM_CURRENT_VIDEO_PLAYTIME(syncVideoTime);
+
+          if (document.hidden) return;
+          this.seekTo()
         }
-        this.heartbeat = 0;
       }
       else// if (body.type == 'TALK')
       {
@@ -902,14 +918,19 @@ export default {
       //setTimeout(this.player.playVideo, 1000)
     },
     playThisVideo() {
-      if (this.selectedVideoItem.length != 1) {
-        alert('바로 재생할 영상을 1개만 선택해주세요')
-        return;
+      if (this.roomCurrentVideoId != this.selectedVideoItem[0])
+      {
+        this.SET_ROOM_CURRENT_VIDEO_ID(this.selectedVideoItem[0])
+        this.SET_ROOM_CURRENT_VIDEO_PLAYTIME(0)
+        this.updateVideoId();
       }
-      console.log(this.selectedVideoItem)
-      this.SET_ROOM_CURRENT_VIDEO_ID(this.selectedVideoItem[0])
-      this.SET_ROOM_CURRENT_VIDEO_PLAYTIME(0)
+      else
+      {
+        this.SET_ROOM_CURRENT_VIDEO_PLAYTIME(0)
+      }
+
       this.selectedVideoItem = []
+      console.log('playThisVideo')
       this.seekTo()
     },
     async loadLikeState() {
@@ -992,6 +1013,8 @@ export default {
       if (!token) return;
       if (this.userInfo.userSeq != this.roomAuthorId) return;
 
+      if (this.roomLastSyncSender != this.userId) await this.getRoomInfo2();
+
       this.sendMessage({ type: 'SYNC', message: JSON.stringify(syncData), token })
     },
     sendChat() {
@@ -1058,7 +1081,7 @@ export default {
     },
     async requestRoomAuthor() {
       await axiosConnector.put(`/playroom/${this.roomId}/user`);
-      await this.getRoomInfo();
+      await this.getRoomInfo2();
       this.heartbeat = 0;
     },
     async releaseChatroom() {
