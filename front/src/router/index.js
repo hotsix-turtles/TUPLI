@@ -100,7 +100,7 @@ const routes = [
     component: PlaylistForm
   },
   {
-    path: '/playlist/video',
+    path: '/playlist/create/video',
     name: 'PlaylistFormVideo',
     component: PlaylistFormVideo
   },

@@ -172,6 +172,9 @@ const playlist = {
   },
   actions: {
     // [플레이리스트 생성]
+    resetFormData: function ({ commit }) {
+      commit('RESET_FORM_DATA')
+    },
     createPlaylist: function ({ commit }, formData) {
       axiosConnector.post('/playlist',
         formData

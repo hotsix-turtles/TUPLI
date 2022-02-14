@@ -17,7 +17,7 @@
     <div class="container">
       <!-- 정렬 필터 -->
       <div
-        class="text-right clickable"
+        class="text-right clickable mb-3"
         @click="onClickModal"
       >
         <span>

@@ -1,6 +1,6 @@
 /* eslint-disable vue/require-default-prop */
 <template>
-  <div class="mb-3">
+  <div class="mb-1">
     <v-combobox
       v-model="tags"
       item-color="#5B5C9D"
