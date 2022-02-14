@@ -258,10 +258,8 @@ const playlist = {
     // [플레이리스트 댓글]
     // 플레이리스트 댓글 조회
     getPlaylistComments: function ({ commit }, playlistId) {
-      axiosConnector.get(`/playlist/${playlistId}/comment`
-      )
+      axiosConnector.get(`/playlist/${playlistId}/comment`)
         .then((res) => {
-          console.log(res)
           commit('GET_PLAYLIST_COMMENTS', res.data)
         })
         .catch((err) => {
@@ -270,25 +268,41 @@ const playlist = {
     },
     // 플레이리스트 댓글 생성
     createPlaylistComment: function ({ commit }, { playlistId, data }) {
-      console.log('data', data)
       axiosConnector.post(`/playlist/${playlistId}/comment`,
         data
       )
         .then((res) => {
-          console.log(createPlaylistComment, res)
-          commit('CREATE_PLAYLIST_COMMENT', res.data)
+          // 생성 성공. 아무 행동 안함.
+          console.log("덧글 작성 완료.")
+          axiosConnector.get(`/playlist/${playlistId}/comment`)
+            .then((res) => {
+              commit('GET_PLAYLIST_COMMENTS', res.data)
+            })
+            .catch((err) => {
+              console.log(err)
+            })
+          console.log("최신화 완료")
         })
         .catch((err) => {
           console.log(err)
         })
     },
     // 플레이리스트 댓글 삭제
-    deletePlaylistComment: function ({ commit }, playlistId) {
-      axiosConnector.get(`/playlist/${playlistId}/comment`
-      )
+    deletePlaylistComment: function ({ commit }, { commentId, playlistId }) {
+      console.log("playlist.js : playlistId", playlistId)
+      console.log("playlist.js : commentId" , commentId)
+      axiosConnector.delete(`/playlist/${ commentId }/comment`)
         .then((res) => {
-          console.log(res)
-          commit('DELETE_PLAYLIST_COMMENT', res.data)
+          // 삭제 성공. 아무 행동 안함.
+          console.log(commentId + "번 덧글 삭제 완료.")
+          axiosConnector.get(`/playlist/${playlistId}/comment`)
+            .then((res) => {
+              commit('GET_PLAYLIST_COMMENTS', res.data)
+            })
+            .catch((err) => {
+              console.log(err)
+            })
+          console.log("최신화 완료")
         })
         .catch((err) => {
           console.log(err)
