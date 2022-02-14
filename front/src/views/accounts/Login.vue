@@ -172,11 +172,10 @@ export default {
 
     socialLoginUrl: function(socialType){
       // const BACKEND_PORT = SERVER.BACKEND_PORT === null ? '' : `:${SERVER.BACKEND_PORT}`
-      // const BACKEND_URL = "https://i6a102.p.ssafy.io/api/v1"
+      // const BACKEND_URL = "https://tupli.kr/api/v1"
       // const FRONTEND_PORT = SERVER.FRONTEND_PORT === null ? '' : `:${SERVER.FRONTEND_PORT}`
       // const REDIRECT_URI = `${location.protocol}//${location.hostname}${FRONTEND_PORT}/oauth/redirect`
       // console.log(`${BACKEND_URL}/oauth2/authorization/${socialType}?redirect_uri=${REDIRECT_URI}`)
-      // return `https://i6a102.p.ssafy.io/api/v1/oauth2/authorization/${socialType}?redirect_uri=https://i6a102.p.ssafy.io/oauth/redirect`
       return `https://tupli.kr/api/v1/oauth2/authorization/${socialType}?redirect_uri=https://tupli.kr/oauth/redirect`
     }
 
