@@ -1,8 +1,10 @@
 /* eslint-disable vue/require-default-prop */
 <template>
-  <div>
+  <div class="mb-3">
     <v-combobox
       v-model="tags"
+      item-color="#5B5C9D"
+      color="#5B5C9D"
       multiple
       label="태그"
       append-icon
@@ -12,14 +14,23 @@
       :search-input.sync="search"
       @keyup.tab="updateTags"
       @paste="updateTags"
+      @keyup="recommend"
+    />
+    <recommend-tags
+      :tags="recommendTags"
+      @select-tag="selectTag"
     />
   </div>
 </template>
 
 <script>
+import { tags } from "@/utils/tags.js"
+import RecommendTags from './RecommendTags.vue'
+
 export default {
   name: 'TagInput',
   components: {
+    RecommendTags
   },
   props: {
     // eslint-disable-next-line vue/require-default-prop
@@ -32,7 +43,8 @@ export default {
       tags: [],
       items: [],
       search: "", //sync search
-      select: []
+      select: [],
+      recommendTags: [],
     }
   },
   watch: {
@@ -45,6 +57,7 @@ export default {
   },
   methods: {
     updateTags: function () {
+      console.log('updateTags')
       this.$nextTick(() => {
         this.select.push(...this.search.split(","));
         this.$nextTick(() => {
@@ -52,6 +65,26 @@ export default {
         });
       });
     },
+    recommend: function ($event) {
+      const keyword = $event.target.value
+      this.recommendTags = []
+      if (keyword) {
+        for (let tag of tags) {
+          if (tag.includes(keyword)) {
+            this.recommendTags.push(tag)
+          }
+          if (this.recommendTags.length > 10) {
+            break
+          }
+        }
+        console.log('recommend', this.recommendTags)
+      }
+    },
+    selectTag: function (tag) {
+      this.search = tag
+      this.updateTags
+      this.recommendTags = []  // 여러개 누르면서 다 추가하는거는 구현 못함 ㅠㅠ
+    }
   },
 }
 </script>
@@ -59,13 +92,13 @@ export default {
 <style scoped>
 
 .tag-input span.chip {
-  background-color: #1976d2;
+  background-color: #5B5C9D;
   color: #fff;
   font-size: 1em;
 }
 
 .tag-input span.v-chip {
-  background-color: #1976d2;
+  background-color: #5B5C9D;
   color: #fff;
   font-size:1em;
   padding-left:7px;
@@ -82,6 +115,14 @@ export default {
     white-space: nowrap;
     word-wrap: normal;
     direction: ltr;
+}
+
+.theme--light.v-chip:not(.v-chip--active) {
+    background: #5B5C9D !important;
+}
+
+.theme--light.v-chip {
+    color: white !important;
 }
 
 </style>

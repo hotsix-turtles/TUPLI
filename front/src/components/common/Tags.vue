@@ -18,6 +18,10 @@ export default {
     // eslint-disable-next-line vue/require-default-prop
     tags: { type: Array },
   },
+  data: function () {
+    return {
+    }
+  },
   methods: {
   }
 }
