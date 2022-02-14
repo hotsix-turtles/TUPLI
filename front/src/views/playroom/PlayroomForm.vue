@@ -665,7 +665,7 @@ export default {
       else
         this.deselectAllPlaylistVideo()
     },
-    createPlayroom: function ({formData, token}) {
+    createPlayroom: function ({formData}) {
       return axiosConnector.post('/playroom', formData)
     },
     ...mapMutations('playroom', ['RESET_FORM_DATA']),
