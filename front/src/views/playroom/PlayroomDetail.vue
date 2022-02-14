@@ -96,8 +96,21 @@
             <v-icon>mdi-share</v-icon>
           </v-btn>
 
+          <!-- 플레이룸 반복 -->
+          <v-btn
+            v-if="roomAuthorId == userInfo.userSeq"
+            class="playroomReport"
+            @click="playroomRepeat"
+          >
+            <span>반복</span>
+            <v-icon :color="roomRepeat ? 'blue' : undefined">mdi-repeat</v-icon>
+          </v-btn>
+
           <!-- 플레이룸 신고 -->
-          <v-btn class="playroomReport">
+          <v-btn
+            v-else
+            class="playroomReport"
+          >
             <span>신고</span>
             <v-icon>mdi-alert</v-icon>
           </v-btn>
@@ -512,6 +525,7 @@ export default {
       'roomTitle',
       'roomPublic',
       'roomLiked',
+      'roomRepeat',
       'roomAuthorId',
       'roomAuthorProfilePic',
       'roomAuthorName',
@@ -833,6 +847,8 @@ export default {
         this.SET_ROOM_CURRENT_PLAYLIST_ID(this.roomNextVideo.playlistId)
         this.SET_ROOM_CURRENT_VIDEO_ID(this.roomNextVideo.videoId)
         this.SET_ROOM_CURRENT_VIDEO_PLAYTIME(0)
+      } else if (this.roomRepeat) {
+        this.loadFirstVideo();
       }
     },
     updateVideoId() {
@@ -882,6 +898,18 @@ export default {
       }
 
       await this.loadLikeState();
+    },
+    async playroomRepeat() {
+      if (this.roomRepeat)
+      {
+        // 반복 설정 되어있으면 반복 해제
+        this.SET_ROOM_REPEAT(false)
+      }
+      else
+      {
+        // 반복 설정 안되어있으면 반복 설정
+        this.SET_ROOM_REPEAT(true)
+      }
     },
     async sendMessage(payload) {
       if (!this.chatroomId) return;
@@ -990,7 +1018,7 @@ export default {
       await this.wsConnector.disconnect()
       this.wsConnector = null
     },
-    ...mapMutations('playroom', ['RESET_VUEX_DATA', 'SET_ROOM_AUTHOR', 'SET_ROOM_LIKED', 'SEEK_VIDEO',
+    ...mapMutations('playroom', ['RESET_VUEX_DATA', 'SET_ROOM_AUTHOR', 'SET_ROOM_LIKED', 'SET_ROOM_REPEAT', 'SEEK_VIDEO',
       'SET_ROOM_CURRENT_PLAYLIST_ID', 'SET_ROOM_CURRENT_VIDEO_ID', 'SET_ROOM_CURRENT_VIDEO_PLAYTIME',
       'SET_ROOM_LAST_SYNC_SENDER', 'SET_USER_START_TIME', 'SET_USER_END_TIME']),
     ...mapActions('account', ['validateToken']),
