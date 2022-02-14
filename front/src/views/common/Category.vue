@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <div class="">
     <!-- 탭 -->
     <v-tabs
       v-model="tab"
@@ -12,7 +12,6 @@
         :key="item"
       >
         <span>{{ item }}</span>
-        <!-- <span @click="onChangeTab">{{ item }}</span> -->
       </v-tab>
       <!-- 플리 탭 -->
       <v-tab-item>
@@ -20,10 +19,11 @@
           :tab-type="'playlist'"
           :tabs="tastes"
         />
-        <playlist-list-item-medium
-          :key="rerenderPlaylistKey"
-          :playlists="categoryPlaylists"
-        />
+        <div class="container">
+          <playlist-list-item-medium
+            :playlists="categoryPlaylists"
+          />
+        </div>
         <!-- {{ playlists }} -->
       </v-tab-item>
       <!-- 플레이룸 탭 -->
@@ -32,26 +32,30 @@
           :tab-type="'playroom'"
           :tabs="tastes"
         />
+        <playroom-list-item-big
+          :playrooms="categoryPlayrooms"
+        />
       </v-tab-item>
       <!-- 영상 탭 -->
       <v-tab-item>
         <tabs
           :tab-type="'video'"
           :tabs="tastes"
+          @on-click-category="rerender"
         />
-        <!-- <video-list-item-small
-          :key="rerenderKey"
-          :videos="searchedVideos"
-          width="100vw"
-        /> -->
+        <video-list-item-big
+          :key="rerenderKeyList"
+          :videos="categoryVideos[videoCategory]"
+        />
         <!-- 영상 검색용 무한스크롤 -->
-        <!-- <infinite-loading
-          v-if="searchedVideos.length > 0"
+        <infinite-loading
+          v-if="tab === 2 && categoryVideos[videoCategory].length > 0"
+          :key="rerenderKeyInfinite"
           spinner="waveDots"
-          @infinite="searchVideosByScroll"
+          @infinite="getCategoryVideosByScroll"
         >
           <div slot="no-results" />
-        </infinite-loading><br><br> -->
+        </infinite-loading><br><br>
       </v-tab-item>
     </v-tabs>
   </div>
@@ -60,18 +64,20 @@
 <script>
 import { mapActions, mapState } from 'vuex'
 import PlaylistListItemMedium from '../../components/playlist/PlaylistListItemMedium.vue';
+import PlayroomListItemBig from '../../components/playroom/PlayroomListItemBig.vue';
+import VideoListItemBig from '../../components/video/VideoListItemBig.vue';
 import Tabs from '../../components/common/Tabs.vue';
 import axiosConnector from '../../utils/axios-connector';
-// import InfiniteLoading from "vue-infinite-loading"
+import InfiniteLoading from "vue-infinite-loading"
 
 export default {
   name: 'Category',
   components: {
     PlaylistListItemMedium,
+    PlayroomListItemBig,
+    VideoListItemBig,
     Tabs,
-    // VideoListItemSmall,
-    // InfiniteLoading,
-    // AddButtonBottom,
+    InfiniteLoading,
   },
   data: function () {
     return {
@@ -79,86 +85,68 @@ export default {
       items: [
         '플리', '플레이룸', '영상',
       ],
-      tastes: ['영화/드라마', '노하우/스타일', '일상', '동물'],
-
-      category: '',
-      playlistCategory: '',
-      playroomCategory: '',
-      videoCategory: '',
+      categoryTypes: ['일상', '노하우/스타일', '동물', '엔터테인먼트', '게임', '영화/드라마', '음악', '교육/시사', '스포츠', '기타', '여행'],
+      tastes: ['영화/드라마', '일상', '노하우/스타일', '동물', '엔터테인먼트'],
+      // category: '',
+      // playlistCategory: '',
+      // playroomCategory: '',
+      // videoCategory: '',
+      rerenderKeyInfinite: 999,
+      rerenderKeyList: 0,
     }
   },
   computed: {
     ...mapState('playlist', {
       categoryPlaylists: state => state.categoryPlaylists,
     }),
-    // ...mapState('video', {
-    //   // searchedVideos: state => state.searchedVideos,
-    //   rerenderKey: state => state.rerenderKey,
-    //   nextPageToken: state => state.nextPageToken,
-    // }),
+    ...mapState('playroom', {
+      categoryPlayrooms: state => state.categoryPlayrooms,
+    }),
+    ...mapState('video', {
+      videoCategory: state => state.videoCategory,
+      categoryVideos: state => state.categoryVideos,
+      categoryNextPageToken: state => state.categoryNextPageToken,
+      // rerenderKey: state => state.rerenderKey,
+    }),
   },
   created: function () {
     // 유저 취향 기반으로 탭 셋팅
     axiosConnector.get(`/account/userInfo`,
     ).then((res) => {
-      const userTastes = res.data.taste
-      for (let userTaste of userTastes) {
-        this.tastes.unshift(userTaste)
+      this.tastes = res.data.taste.slice()
+      let i = 0
+      while (this.tastes.length < 5) {
+        if (!this.tastes.includes(this.categoryTypes[i])) {
+          this.tastes.push(this.categoryTypes[i])
+        }
+        i++
       }
-      this.tastes.splice(4, userTastes.length)
-      console.log(this.tastes)
     })
       .catch((err) => {
         console.log(err)
       })
-    this.getCategoryPlaylists('all')
-    this.rerenderPlaylistKey++
+    this.resetVideoCategoryState()
+    console.log('this.tastes', this.tastes)
+    // console.log('categoryVideos[videoCategory]', this.categoryVideos[this.videoCategory].length)
   },
   methods: {
     ...mapActions('playlist', [
       'getCategoryPlaylists',
     ]),
     ...mapActions('video', [
-      'searchVideos',
-      'searchVideosByScroll',
-      'resetVideoSearchState',
+      'resetVideoCategoryState',
+      'getCategoryVideosByScroll',
     ]),
-    // onChangeCategory: function(category) {
-    //   console.log('category', category)
-    //   this.category = category
-    //   if (this.tab === 0) {
-    //     this.playlistCategory = category
-    //     // searchPlaylists(Category)
-    //   } else if (this.tab === 1) {
-    //     this.playroomCategory = category
-    //     // searchPlayrooms(Category)
-    //   } else if (this.tab === 3) {
-    //     this.videoCategory = category
-    //     this.searchVideos(category)
-    //   }
-    // },
-    // onChangeTab: function() {
-    //   if (this.tab === 0 && this.playlistCategory !== this.category) {
-    //     this.playlistCategory = this.category
-    //     // searchPlaylists(Category)
-    //   } else if (this.tab === 1 && this.playroomCategory !== this.category) {
-    //     this.playroomCategory = this.category
-    //     // searchPlayrooms(Category)
-    //   } else if (this.tab === 3 && this.videoCategory !== this.category) {
-    //     this.videoCategory = this.category
-    //     this.searchVideos(category)
-    //   }
-    // },
-    // 임시용 플리(전체)
-    // onClick: function () {
-    //   axiosConnector.get(`/playlist/category/all`,
-    //   ).then((res) => {
-    //     this.playlists = res.data
-    //   })
-    //     .catch((err) => {
-    //       console.log(err)
-    //     })
-    // }
+    rerender: function () {
+      setTimeout(() => { // 비동기 처리 문제 때문에 0.8초 후 리렌더
+        this.rerenderKeyInfinite++
+        this.rerenderKeyList++
+        console.log('this.rerenderKeyInfinite', this.rerenderKeyInfinite)
+        console.log('this.rerenderKeyList', this.rerenderKeyList)
+        console.log('this.videoCategory', this.videoCategory)
+        console.log('this.categoryVideos', this.categoryVideos)
+      }, 800)
+    }
   },
 }
 </script>

@@ -7,7 +7,7 @@
         <v-icon
           color="#5B5C9D"
           size="30"
-          @click="$router.push({ name: 'Setting' })"
+          @click="$router.go(-1)"
         >
           mdi-chevron-left
         </v-icon>
@@ -18,7 +18,7 @@
     </v-container>
     <div class="mx-8">
       <!-- <h3> 요약 </h3>
-      <p> 
+      <p>
         <br>
         서비스 제공자(TUPLI 운영자)는 TUPLI라는 유튜브 비디오 플랫폼을 기반으로 한 소셜 SNS 서비스를 운영하고 있습니다. 
         <br>
@@ -32,8 +32,8 @@
         <br>
         <br>
         본 이용 약관을 위반한다고 생각되는 TUPLI 방을 발견하면 <a href="mailto:mingu4969@naver.com?subject=튜플리 문의드립니다.">[저희에게 연락해 주십시오.]</a>
-      </p> -->      
-      <pre style="font-size:12px"> 
+      </p> -->
+      <pre style="font-size:12px">
 <strong style="font-size:20px">요 약</strong>
 서비스 제공자(TUPLI 운영자)는 TUPLI라는 유튜브 비디오 플랫폼을 기반으로 한 소셜 SNS 서비스를 운영하고 있습니다. 
 TUPLI의 기본 서비스는 무료이며 프리미엄 고급 기능에 대한 유료 업그레이드를 제공합니다. 
@@ -280,6 +280,6 @@ pre{
     padding:10px;
     overflow: auto;
     white-space: pre-wrap; /* pre tag내에 word wrap */
-}  
+}
 
 </style>

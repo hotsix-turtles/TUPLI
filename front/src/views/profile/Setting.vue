@@ -7,7 +7,7 @@
         <v-icon
           color="#5B5C9D"
           size="30"
-          @click="$router.push({ name: 'Profile' })"
+          @click="$router.push({ name: 'Setting' })"
         >
           mdi-chevron-left
         </v-icon>

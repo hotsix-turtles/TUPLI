@@ -5,6 +5,7 @@
       <div
         class="d-flex justify-center align-center notice-img"
         style="background-color: yellow; border-radius: 100%;"
+        @click="setProfile"
       >
         <img
           src="@/assets/tupli_logo2_dark.png"
@@ -29,7 +30,7 @@
               class="mb-0"
               @click="setProfile"
             >
-              {{ notice.fromId }}
+              {{ notice.from }}
               님이&nbsp;
               {{ nickname }}님을 팔로우합니다.
             </p>
@@ -40,7 +41,10 @@
             15분
           </p>
         </div>
-        <v-btn class="ml-4">
+        <v-btn
+          class="ml-4"
+          @click="clickFollow"
+        >
           팔로우
         </v-btn>
       </div>
@@ -57,7 +61,7 @@
                 class="mb-0"
                 @click="setProfile"
               >
-                {{ notice.fromId }}님이&nbsp;{{ nickname }}님을 초대하였습니다.
+                {{ notice.from }}님이&nbsp;{{ nickname }}님을 초대하였습니다.
                 플레이룸 제목이 들어갈 공간입니다
               </p>
             </div>
@@ -68,7 +72,10 @@
             </p>
           </div>
           <div>
-            <v-btn class="ml-4 notice-btn">
+            <v-btn
+              class="ml-4 notice-btn"
+              @click="acceptInvite"
+            >
               수락
             </v-btn>
           </div>
@@ -85,17 +92,7 @@
             class="mb-0"
             @click="setProfile"
           >
-            {{ notice.fromId }}
-          </p>
-          <p class="mb-0">
-            님이&nbsp;
-          </p>
-          <p class="mb-0">
-            {{ nickname }}님의 플레이리스트로 플레이룸을 생성하였습니다.
-          </p>
-          <br>
-          <p>
-            플레이룸 제목이 들어갈 공간
+            {{ notice.from }}님이&nbsp;{{ nickname }}님의 플레이리스트로 플레이룸을 생성하였습니다.
           </p>
         </div>
         <div>
@@ -130,19 +127,17 @@ export default {
   methods: {
     // 타 유저 프로필로 가기
     setProfile: function() {
-      this.$router.push({ name: 'Profile' })
+      console.log( this.notice.fromId )
+      this.$router.push({ name: 'Profile', params: { userId : this.notice.fromId }})
     },
-    // 알림 타입 구분
-    noticeTypeCheck: function() {
-      if (notice.type === 'follow') {
-        this.noticeType = '팔로우'
-      }
-      else if (notice.type === 'playroomMake') {
+    // 팔로우
+    clickFollow: function() {
 
-      }
-      else {
+    },
 
-      }
+    // 플레이룸 수락
+    acceptInvite: function() {
+      this.$router.push({ name: 'playroomDetail', params: { id: this.notice.id }})
     }
   },
 }

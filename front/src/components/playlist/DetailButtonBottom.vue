@@ -4,9 +4,9 @@
     v-if="selectedVideos.length"
     absolute
     background-color="#5B5C9D"
-    height="50px"
+    height="60px"
     :input-value="selectedVideos.length > 0"
-    class="fixed-bottom"
+    class="fixed-bottom animate__animated animate__slideInUp"
   >
     <v-badge
       :content="selectedVideos.length"
@@ -21,12 +21,15 @@
         class="d-flex-column justify-center mx-5 font-3 clickable"
       >
         <div>
-          <v-icon color="white">
-            mdi-youtube
+          <v-icon
+            color="white"
+            @click="watchingVideos(selectedVideos)"
+          >
+            mdi-play-circle
           </v-icon>
         </div>
         <div style="color: white;">
-          플레이룸
+          영상보기
         </div>
       </div>
       <div
@@ -41,18 +44,6 @@
           내 플레이리스트
         </div>
       </div>
-      <!-- <div
-        class="d-flex-column justify-center mx-3 font-3 clickable"
-      >
-        <div>
-          <v-icon color="white">
-            mdi-bookmark-outline
-          </v-icon>
-        </div>
-        <div style="color: white;">
-          저장하기
-        </div>
-      </div> -->
     </div>
   </v-bottom-navigation>
 </template>
@@ -73,8 +64,9 @@ export default {
   },
   methods: {
     ...mapActions('video', [
-      'removeVideos'
-    ])
+      'removeVideos',
+      'watchingVideos'
+    ]),
   }
 }
 </script>

@@ -11,8 +11,9 @@ import Signup2 from '../views/accounts/Signup2.vue'
 import Signup3 from '../views/accounts/Signup3.vue'
 //profile
 import EditProfile from '../views/profile/EditProfile.vue'
+import MyFollow from '../views/profile/MyFollow.vue'
 import Follow from '../views/profile/Follow.vue'
-import PersonFollow from '../views/profile/PersonFollow.vue'
+import MyProfile from '../views/profile/MyProfile.vue'
 import Profile from '../views/profile/Profile.vue'
 import Setting from '../views/profile/Setting.vue'
 //setting
@@ -35,7 +36,7 @@ import Category from '@/views/common/Category'
 import Search from '@/views/common/Search'
 import SearchDetail from '@/views/common/SearchDetail'
 // video
-import VideoSearch from '../views/video/VideoSearch.vue'
+import VideoSearch from '../views/playlist/VideoSearch.vue'
 import VideoWatch from '../views/video/VideoWatch.vue'
 // playroom
 import PlayroomForm from '../views/playroom/PlayroomForm.vue'
@@ -140,7 +141,7 @@ const routes = [
     // }
   },
   {
-    path: '/video/watch',
+    path: '/video/watch/:isVideoList',
     name: 'VideoWatch',
     component: VideoWatch
   },
@@ -172,18 +173,25 @@ const routes = [
     component: EditProfile
   },
   {
-    path: '/follow',
+    path: '/myfollow',
+    name: 'MyFollow',
+    component: MyFollow
+  },
+  {
+    path: '/follow/:userId',
     name: 'Follow',
     component: Follow
   },
-  {
-    path: '/personfollow',
-    name: 'PersonFollow',
-    component: PersonFollow
-  },
 
+  // 내 프로필
   {
-    path: '/profile',
+    path: '/myprofile',
+    name: 'MyProfile',
+    component: MyProfile
+  },
+  // 타인 프로필
+  {
+    path: '/profile/:userId',
     name: 'Profile',
     component: Profile
   },

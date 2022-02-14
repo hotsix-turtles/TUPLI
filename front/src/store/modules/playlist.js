@@ -174,6 +174,7 @@ const playlist = {
       axiosConnector.post('/playlist',
         formData
       ).then((res) => {
+        console.log('---------------[플레이리스트 생성]', formData)
         console.log(res)
         router.push({ name: 'PlaylistDetail', params: { playlistId: res.data.id } })
         commit('RESET_FORM_DATA')
@@ -200,10 +201,8 @@ const playlist = {
 
     // [플레이리스트 디테일]
     getPlaylistDetail: function ({ commit, dispatch }, playlistId) {
-      axios({
-        url: `https://i6a102.p.ssafy.io/api/v1/playlist/${playlistId}`,
-        method: 'get',
-      })
+      axiosConnector.get(`/playlist/${playlistId}`,
+      )
         .then((res) => {
           console.log(res)
           commit('GET_PLAYLIST_DETAIL', res.data)
@@ -223,10 +222,11 @@ const playlist = {
     isLiked: function ({ commit }, playlistId) {
       console.log('isLiked', playlistId)
       axiosConnector.get(`/playlist/${playlistId}/like`,
-      ).then((res) => {
-        console.log('isLiked 197', res)
-        commit('IS_LIKED', res.data)
-      })
+      )
+        .then((res) => {
+          console.log('isLiked 197', res)
+          commit('IS_LIKED', res.data)
+        })
         .catch((err) => {
           console.log(err)
         })
@@ -234,10 +234,11 @@ const playlist = {
     // 플레이리스트 좋아요
     likePlaylist: function ({ commit }, playlistId) {
       axiosConnector.post(`/playlist/${playlistId}/like`,
-      ).then((res) => {
-        console.log('playlist.js 189 likePlaylist', res)
-        commit('LIKE_PLAYLIST')
-      })
+      )
+        .then((res) => {
+          console.log('playlist.js 189 likePlaylist', res)
+          commit('LIKE_PLAYLIST')
+        })
         .catch((err) => {
           console.log(err)
         })
@@ -245,23 +246,49 @@ const playlist = {
     // 플레이리스트 좋아요 취소
     unlikePlaylist: function ({ commit }, playlistId) {
       axiosConnector.delete(`/playlist/${playlistId}/like`,
-      ).then((res) => {
-        console.log('playlist.js 189 unlikePlaylist', res)
-        commit('UNLIKE_PLAYLIST')
-      })
+      )
+        .then((res) => {
+          console.log('playlist.js 189 unlikePlaylist', res)
+          commit('UNLIKE_PLAYLIST')
+        })
         .catch((err) => {
           console.log(err)
         })
     },
-    // 플레이리스트 댓글
-    getPlaylistComments: function (playlistId) {
-      axios({
-        url: `https://i6a102.p.ssafy.io/api/v1/playlist/${playlistId}/comment`,
-        method: 'get',
-      })
+    // [플레이리스트 댓글]
+    // 플레이리스트 댓글 조회
+    getPlaylistComments: function ({ commit }, playlistId) {
+      axiosConnector.get(`/playlist/${playlistId}/comment`
+      )
         .then((res) => {
           console.log(res)
-          commit('GET_PLAYLIST_DETAIL_COMMENT', res.data)
+          commit('GET_PLAYLIST_COMMENTS', res.data)
+        })
+        .catch((err) => {
+          console.log(err)
+        })
+    },
+    // 플레이리스트 댓글 생성
+    createPlaylistComment: function ({ commit }, { playlistId, data }) {
+      console.log('data', data)
+      axiosConnector.post(`/playlist/${playlistId}/comment`,
+        data
+      )
+        .then((res) => {
+          console.log(createPlaylistComment, res)
+          commit('CREATE_PLAYLIST_COMMENT', res.data)
+        })
+        .catch((err) => {
+          console.log(err)
+        })
+    },
+    // 플레이리스트 댓글 삭제
+    deletePlaylistComment: function ({ commit }, playlistId) {
+      axiosConnector.get(`/playlist/${playlistId}/comment`
+      )
+        .then((res) => {
+          console.log(res)
+          commit('DELETE_PLAYLIST_COMMENT', res.data)
         })
         .catch((err) => {
           console.log(err)
@@ -273,12 +300,13 @@ const playlist = {
       console.log('searchPlaylists params', params)
       axiosConnector.get(`/playlist/search`, {
         params
-      }).then((res) => {
-        console.log(res)
-        commit('SEARCH_PLAYLISTS', res.data)
-      }).catch((err) => {
-        console.log(err)
       })
+        .then((res) => {
+          console.log(res)
+          commit('SEARCH_PLAYLISTS', res.data)
+        }).catch((err) => {
+          console.log(err)
+        })
     },
 
     // [둘러보기]
@@ -337,12 +365,6 @@ const playlist = {
   modules: {
   },
   getters: {
-    isLogin: function(state, getters, rootState, rootGetters) {
-      return rootState.isLogin
-    },
-    config: function (state, getters, rootState, rootGetters) {
-      return rootGetters.config
-    },
     numberOfAddedPlaylists: state => state.addedPlaylists.length,
     numberOfAddedPlaylistVideos: state => state.addedPlaylists.reduce((acc, cur) => acc + (cur.videos ? cur.videos.length : 0), 0),
     numberOfAddedPlaylistSelectedVideos: state => state.addedPlaylistVideoIds.length,

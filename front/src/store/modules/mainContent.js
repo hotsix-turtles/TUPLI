@@ -4,15 +4,18 @@ import axiosConnector from '@/utils/axios-connector'
 const mainContent = {
   namespaced: true,
   state: {
-    // 플레이룸
-    playroomId: '',
-
-    // 플레이리스트
+    // 메인 컨텐츠
+    mainContents: [],
 
     // 좋아요
     isLikedMain: false,
   },
   mutations: {
+    // 메인 컨텐츠 얻기
+    GET_MAIN_CONTENT: function (state, mainContents) {
+      // console.log('메인 컨텐츠 얻기', state.mainContents)
+      state.mainContents = mainContents
+    },
 
     // *** 좋아요 ***
     // 메인 컨텐츠 좋아요 여부 조회 GET
@@ -35,6 +38,16 @@ const mainContent = {
 
   },
   actions: {
+    getMainContent: function ({ commit }) {
+      console.log('getMainContent')
+      axiosConnector.get(`home/all/`,
+      ).then((res) => {
+        commit('GET_MAIN_CONTENT', res.data)
+      })
+        .catch((err) => {
+          console.log(err)
+        })
+    },
     isLikedMain: function ({ commit }, playlistId) {
       console.log('isLiked', mainId)
       axiosConnector.get(`home/playlist/`,

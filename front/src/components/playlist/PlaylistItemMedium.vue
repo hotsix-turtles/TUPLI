@@ -8,20 +8,23 @@
     </div>
     <div class="d-flex-column">
       <!-- 제목 -->
-      <div @click="$router.push({ name: 'PlaylistDetail', params: { playlistId: playlist.id } })">
+      <div
+        class="txt-2 semi-bold"
+        @click="$router.push({ name: 'PlaylistDetail', params: { playlistId: playlist.id } })"
+      >
         {{ playlist.title }}
       </div>
       <div class="d-flex justify-space-between">
         <div class="d-flex-column">
+          <!-- 닉네임 -->
+          <div class="font-3 color-dark-gray">
+            {{ playlist.nickname }}
+          </div>
           <!-- 태그 -->
           <tags
             v-if="playlist.tags"
             :tags="playlist.tags.split(',').splice(0,3)"
           />
-          <!-- 닉네임 -->
-          <div class="color-dark-gray">
-            {{ playlist.nickname }}
-          </div>
         </div>
         <!-- 좋아요 -->
         <div class="d-flex-column text-center">
