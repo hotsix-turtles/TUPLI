@@ -12,7 +12,8 @@ public interface SearchHistoryRepository extends JpaRepository<SearchHistory, Lo
     List<SearchHistory> findByKeyword(String keyword);
 
     @Modifying(flushAutomatically = true, clearAutomatically = true)
-    @Query("update SearchHistory s set s.score = s.score /12 * s.noSearch - 1 where s.score > 0")
+    @Query("update SearchHistory s set s.score = s.score - s.score / s.noSearch - 1 where s.score > 0 " +
+            "and s.noSearch >= 2")
     void updateScore();
 
     @Modifying(flushAutomatically = true, clearAutomatically = true)
