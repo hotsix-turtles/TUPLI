@@ -19,6 +19,7 @@ public class BoardResponseDto {
     private String title;
     private String content;
     private String type; // null, "playlist", "playroom"
+    private String image;
 
     private OffsetDateTime created;
     private OffsetDateTime updated;
@@ -45,8 +46,14 @@ public class BoardResponseDto {
 
         // 연결
         this.user = new SimpleUserDto(board.getUser());
-        this.playlist = new PlaylistDto(board.getPlaylist());
-        this.playroom = new PlayroomDto(board.getPlayroom());
+        if (board.getPlaylist() != null) {
+            this.playlist = new PlaylistDto(board.getPlaylist());
+            this.image = board.getPlaylist().getImage();
+        }
+        if (board.getPlayroom() != null) {
+            this.playroom = new PlayroomDto(board.getPlayroom());
+            this.image = board.getPlayroom().getImage();
+        }
 
         // 변수
         this.likes_count = board.getBoardLikes() == null ? 0 : board.getBoardLikes().size();
@@ -64,8 +71,14 @@ public class BoardResponseDto {
 
         // 연결
         this.user = new SimpleUserDto(board.getUser());
-        this.playlist = new PlaylistDto(board.getPlaylist());
-        this.playroom = new PlayroomDto(board.getPlayroom());
+        if (board.getPlaylist() != null) {
+            this.playlist = new PlaylistDto(board.getPlaylist());
+            this.image = board.getPlaylist().getImage();
+        }
+        if (board.getPlayroom() != null) {
+            this.playroom = new PlayroomDto(board.getPlayroom());
+            this.image = board.getPlayroom().getImage();
+        }
 
         // 변수
         this.likes_count = board.getBoardLikes() == null ? 0 : board.getBoardLikes().size();

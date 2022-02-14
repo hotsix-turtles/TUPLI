@@ -118,20 +118,18 @@ public class BoardApiController {
 
         Long userSeq = jwtTokenProvider.getUserSeq(token);
 
+
         Board boardResult = boardService.addBoard(userSeq, board);
 
+
         userInfoService.userInfoUpdateBoard(userSeq);
-
         List<UserBadge> userBadges = badgeService.getBadgeList(userSeq);
-
         List<Long> badges = badgeService.getUserBadgeSeq(userBadges);
-
         // 배지갱신
         List<Badge> badgeResult = badgeService.checkBoardUpload(userSeq, badges);
-
         if(badgeResult == null || badgeResult.size() == 0) return ResponseEntity.ok().body(new BoardResponseDto(boardResult, null));
         List<SimpleBadgeDto> result = badgeResult.stream().map(b -> new SimpleBadgeDto(b)).collect(Collectors.toList());
-        
+
         // 뱃지 확인
         return ResponseEntity.status(HttpStatus.CREATED).body(new BoardResponseDto(boardResult, result));
     }
