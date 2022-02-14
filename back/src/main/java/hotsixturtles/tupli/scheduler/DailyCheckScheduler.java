@@ -56,10 +56,10 @@ public class DailyCheckScheduler {
     @Transactional
     public void updateRealTimeKeyWord(){
         int allLen = searchHistoryRepository.getCountAll();
-        int zeroLen = searchHistoryRepository.getCountZero();
+        int zeroLen = searchHistoryRepository.getCountLtZero();
 
         if(allLen - zeroLen >= 10){
-            searchHistoryRepository.deleteByScoreEquals(0);
+            searchHistoryRepository.deleteByScoreLessThan(0);
         }
 
 //        List<SearchHistory> searchHistoryList = searchHistoryRepository.findAll();

@@ -22,10 +22,10 @@ public interface SearchHistoryRepository extends JpaRepository<SearchHistory, Lo
     @Query("select count(s) from SearchHistory s")
     Integer getCountAll();
 
-    @Query("select count(s) from SearchHistory s where s.score = 0")
-    Integer getCountZero();
+    @Query("select count(s) from SearchHistory s where s.score < 0")
+    Integer getCountLtZero();
 
-    void deleteByScoreEquals(Integer score);
+    void deleteByScoreLessThan(Integer score);
 
     @Modifying(flushAutomatically = true, clearAutomatically = true)
     @Query("update SearchHistory s set s.score = s.score + 10")
