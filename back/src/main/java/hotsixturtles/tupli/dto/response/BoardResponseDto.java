@@ -26,8 +26,8 @@ public class BoardResponseDto {
 
     // 연결
     private SimpleUserDto user;
-    private PlaylistDto playlist;  // $$$ 위험한 코드! 아직은 연결 없는데 아직은...
-    private PlayroomDto playroom;  // $$$ 위험한 코드! 아직은 연결 없는데 아직은...
+    private PlaylistDto playlist;
+    private PlayroomDto playroom;
 //    private List<Comment> comments;
 //    private List<BoardLikes> boardLikes;
 

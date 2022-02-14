@@ -15,4 +15,6 @@ public class NotificationDto {
     private String createdAt; // 아마 이걸로 나열 하거나 하겠지 싶음
     private String isRead;
 
+    private String routeId;  // 플레이룸 내지 추가 route 이동 필요할때 주어지는 id
+
 }
