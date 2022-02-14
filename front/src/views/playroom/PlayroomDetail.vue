@@ -1057,8 +1057,9 @@ export default {
     clearSendError() {
       this.errorOnSend = false;
     },
-    checkHeartbeat() {
+    async checkHeartbeat() {
       this.checkPermission();
+      if (!this.wsConnector || (this.wsConnector && !this.wsConnector.subscriptions)) await this.initChatRoom();
 
       if (this.heartbeat > 30)
       {
@@ -1095,7 +1096,7 @@ export default {
       // 새로운 뱃지 취득시 이거 응답으로 받습니다...
       await axiosConnector.put(`/playroom/out/${this.roomId}`, { watchTime:time })
 
-      await this.wsConnector.disconnect()
+      if (this.wsConnector) await this.wsConnector.disconnect()
       this.wsConnector = null
     },
     ...mapMutations('playroom', ['RESET_VUEX_DATA', 'SET_ROOM_AUTHOR', 'SET_ROOM_LIKED', 'SET_ROOM_REPEAT', 'SEEK_VIDEO',
