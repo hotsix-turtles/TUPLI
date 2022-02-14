@@ -1,17 +1,16 @@
 package hotsixturtles.tupli.api;
 
-import hotsixturtles.tupli.dto.BoardDto;
 import hotsixturtles.tupli.dto.PlayroomDto;
+import hotsixturtles.tupli.dto.request.BoardRequestDto;
+import hotsixturtles.tupli.dto.response.BoardResponseDto;
 import hotsixturtles.tupli.dto.response.ErrorResponse;
 import hotsixturtles.tupli.dto.simple.SimpleBadgeDto;
-import hotsixturtles.tupli.entity.Badge;
-import hotsixturtles.tupli.entity.Board;
-import hotsixturtles.tupli.entity.Playroom;
-import hotsixturtles.tupli.entity.UserBadge;
+import hotsixturtles.tupli.entity.*;
 import hotsixturtles.tupli.entity.likes.BoardLikes;
 import hotsixturtles.tupli.service.BadgeService;
 import hotsixturtles.tupli.service.BoardService;
 import hotsixturtles.tupli.service.UserInfoService;
+import hotsixturtles.tupli.service.UserService;
 import hotsixturtles.tupli.service.token.JwtTokenProvider;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -20,11 +19,17 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -43,6 +48,30 @@ public class BoardApiController {
 
     private final UserInfoService userInfoService;
 
+    private final UserService userService;
+
+
+    /**
+     * 내가 작성한 게시글들
+     * @param token
+     * @param pageable
+     * @return
+     */
+    @GetMapping("/board/my")
+    public ResponseEntity getMyBoard(@RequestHeader(value = "Authorization") String token,
+                                        @PageableDefault(size = 50, sort ="id",  direction = Sort.Direction.DESC) Pageable pageable){
+        // 유저 정보
+        if (!jwtTokenProvider.validateToken(token)) {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(new ErrorResponse(messageSource.getMessage("error.valid.jwt", null, LocaleContextHolder.getLocale())));
+        }
+        Long userSeq = jwtTokenProvider.getUserSeq(token);
+
+        List<Board> boards = boardService.getMyBoard(userSeq, pageable);
+        List<BoardResponseDto> result = boards.stream().map(x -> new BoardResponseDto(x)).collect(Collectors.toList());
+        return ResponseEntity.status(HttpStatus.OK).body(result);
+    }
 
     /**
      * 전체 게시글 list 가져오기
@@ -50,14 +79,22 @@ public class BoardApiController {
      * 반환 코드 : 200, 204, 404
      */
     @GetMapping("/board/list")
-    public ResponseEntity<List<BoardDto>> getBoardList(){
+    public ResponseEntity<List<BoardResponseDto>> getBoardList(HttpServletRequest request){
         List<Board> boardList = boardService.getBoardList();
         if (boardList.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
         }
 
-        List<BoardDto> result = boardList.stream().map(b -> new BoardDto(b)).collect(Collectors.toList());
-        return ResponseEntity.status(HttpStatus.OK).body(result);
+        String token = request.getHeader("Authorization");
+        if (token == null || !jwtTokenProvider.validateToken(token)) {
+            List<BoardResponseDto> result = boardList.stream().map(b -> new BoardResponseDto(b)).collect(Collectors.toList());
+            return ResponseEntity.ok().body(result);
+        } else {
+            Long userSeq = jwtTokenProvider.getUserSeq(token);
+            User user = userService.getUserByUserseq(userSeq);
+            List<BoardResponseDto> result = boardList.stream().map(b -> new BoardResponseDto(b, user)).collect(Collectors.toList());
+            return ResponseEntity.ok().body(result);
+        }
     }
 
     /**
@@ -67,10 +104,19 @@ public class BoardApiController {
      * 반환 코드 : 200, 404
      */
     @GetMapping("/board/{boardId}")
-    public ResponseEntity<?> getBoard(@PathVariable("boardId") Long boardId){
+    public ResponseEntity<?> getBoard(@PathVariable("boardId") Long boardId,
+                                      HttpServletRequest request){
 
         Board board = boardService.getBoard(boardId);
-        return ResponseEntity.status(HttpStatus.OK).body(new BoardDto(board));
+
+        String token = request.getHeader("Authorization");
+        if (token == null || !jwtTokenProvider.validateToken(token)) {
+            return ResponseEntity.status(HttpStatus.OK).body(new BoardResponseDto(board));
+        } else {
+            Long userSeq = jwtTokenProvider.getUserSeq(token);
+            User user = userService.getUserByUserseq(userSeq);
+            return ResponseEntity.status(HttpStatus.OK).body(new BoardResponseDto(board, user));
+        }
     }
 
     /**
@@ -82,7 +128,7 @@ public class BoardApiController {
      */
     @PostMapping("/board")
     public ResponseEntity<?> addBoard(@RequestHeader(value = "Authorization") String token,
-                                      @RequestBody Board board){
+                                      @RequestBody BoardRequestDto board){
 
         if (!jwtTokenProvider.validateToken(token)) {
             return ResponseEntity
@@ -92,22 +138,21 @@ public class BoardApiController {
 
         Long userSeq = jwtTokenProvider.getUserSeq(token);
 
+        User user = userService.getUserByUserseq(userSeq);
+
         Board boardResult = boardService.addBoard(userSeq, board);
 
+
         userInfoService.userInfoUpdateBoard(userSeq);
-
         List<UserBadge> userBadges = badgeService.getBadgeList(userSeq);
-
         List<Long> badges = badgeService.getUserBadgeSeq(userBadges);
-
         // 배지갱신
         List<Badge> badgeResult = badgeService.checkBoardUpload(userSeq, badges);
-
-        if(badgeResult == null || badgeResult.size() == 0) return ResponseEntity.ok().body(new BoardDto(boardResult, null));
+        if(badgeResult == null || badgeResult.size() == 0) return ResponseEntity.ok().body(new BoardResponseDto(boardResult, null, user));
         List<SimpleBadgeDto> result = badgeResult.stream().map(b -> new SimpleBadgeDto(b)).collect(Collectors.toList());
-        
+
         // 뱃지 확인
-        return ResponseEntity.status(HttpStatus.CREATED).body(new BoardDto(boardResult, result));
+        return ResponseEntity.status(HttpStatus.CREATED).body(new BoardResponseDto(boardResult, result, user));
     }
 
     /**
@@ -245,9 +290,11 @@ public class BoardApiController {
         }
         Long userSeq = jwtTokenProvider.getUserSeq(token);
 
+        User user = userService.getUserByUserseq(userSeq);
+
         List<Board> boards = boardService.getLikedBoards(userSeq);
 
-        List<BoardDto> result = boards.stream().map(b -> new BoardDto(b)).collect(Collectors.toList());
+        List<BoardResponseDto> result = boards.stream().map(b -> new BoardResponseDto(b,user)).collect(Collectors.toList());
 
         return ResponseEntity.ok().body(result);
     }

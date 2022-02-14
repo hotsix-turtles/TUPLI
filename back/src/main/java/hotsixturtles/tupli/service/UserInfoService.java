@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 @Transactional(readOnly = true)
@@ -62,6 +63,11 @@ public class UserInfoService {
         UserInfo userInfo = userInfoRepository.findOneByUserSeq(userSeq);
         userInfo.setMakePlayroom(userInfo.getMakePlayroom() + 1L);
         userInfoRepository.save(userInfo);
+    }
+
+    public ConcurrentHashMap<String, Integer> getTaste(Long userSeq){
+        UserInfo userInfo = userInfoRepository.findOneByUserSeq(userSeq);
+        return userInfo.getTasteInfo();
     }
 
 }

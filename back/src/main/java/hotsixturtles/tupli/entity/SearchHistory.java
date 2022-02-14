@@ -23,6 +23,8 @@ public class SearchHistory {
 
     private String keyword; // (검색어)
 
-    private Integer score; // : 처음 0 (검색 한 번 될때마다 +1)
+    private Integer score = 0; // : 처음 0 (검색 한 번 될때마다 +10)
+
+    private Integer noSearch = 0; // 검색 안된 연속 횟수
 
 }

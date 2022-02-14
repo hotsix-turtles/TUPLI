@@ -1,7 +1,5 @@
 package hotsixturtles.tupli.service;
 
-import hotsixturtles.tupli.entity.Board;
-import hotsixturtles.tupli.entity.Comment;
 import hotsixturtles.tupli.entity.PlaylistComment;
 import hotsixturtles.tupli.entity.likes.BoardLikes;
 import hotsixturtles.tupli.repository.*;

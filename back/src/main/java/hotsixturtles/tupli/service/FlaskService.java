@@ -51,4 +51,13 @@ public class FlaskService {
 
     }
 
+    public void recommendPlaylistRenew() {
+
+        RestTemplate restTemplate = new RestTemplate();
+
+        String url = baseurl + "/playlist/renew/all";
+        String goodAnswer = restTemplate.getForObject(url, String.class);
+        log.info("추천 갱신 결과 : {}", goodAnswer);
+
+    }
 }

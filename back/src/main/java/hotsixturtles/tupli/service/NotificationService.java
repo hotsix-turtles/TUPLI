@@ -3,6 +3,8 @@ package hotsixturtles.tupli.service;
 import com.google.firebase.database.*;
 import hotsixturtles.tupli.dto.noti.NotificationDto;
 import hotsixturtles.tupli.entity.User;
+import hotsixturtles.tupli.entity.UserSetting;
+import hotsixturtles.tupli.repository.UserLikesRepository;
 import hotsixturtles.tupli.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -17,13 +19,19 @@ import java.time.format.DateTimeFormatter;
 public class NotificationService {
 
     private final UserRepository userRepository;
+    private final UserLikesRepository userLikesRepository;
 
     /**
      * 팔로우시 알림
      */
     public void notiFollow(Long from_userSeq, Long to_userSeq) {
-        User fromUser = userRepository.findByUserSeq(from_userSeq);
         User toUser = userRepository.findByUserSeq(to_userSeq);
+        UserSetting userSetting = toUser.getUserSetting();
+        // 대상의 알람 세팅이 켜져있어야 보냄
+        if (!userSetting.getAlarmSetting()) {
+            return;
+        }
+        User fromUser = userRepository.findByUserSeq(from_userSeq);
 
         String alarmType = "follow";
         LocalDateTime curDateTime = LocalDateTime.now();
@@ -52,6 +60,10 @@ public class NotificationService {
         saveNoti.setValueAsync(notificationDto);
 
         // 실시간 알림용
+        // 대상의 실시간 알림 옵션이 켜져있어야 보냄
+        if (!userSetting.getAlarmOnRealtime()) {
+            return;
+        }
         final FirebaseDatabase rtdatabase = FirebaseDatabase.getInstance();
         DatabaseReference rtref = rtdatabase.getReference("tupli").child("realtime");
         rtref.setValueAsync(notificationDto);
@@ -60,9 +72,19 @@ public class NotificationService {
     /**
      * 플레이룸 개설시 알림
      */
-    public void notiPlayroomMake(Long from_userSeq, Long to_userSeq) {
-        User fromUser = userRepository.findByUserSeq(from_userSeq);
+    public void notiPlayroomMake(Long from_userSeq, Long to_userSeq, Long playroomId) {
+
         User toUser = userRepository.findByUserSeq(to_userSeq);
+        UserSetting userSetting = toUser.getUserSetting();
+        // 대상의 알람 세팅이 켜져있어야 보냄
+        if (!userSetting.getAlarmSetting()) {
+            return;
+        }
+        // 플레이룸 생성시 팔로워에게 알람 보낼지 설정해놨어야 함
+        if (!userSetting.getAlarmOnPlayroomMake()) {
+            return;
+        }
+        User fromUser = userRepository.findByUserSeq(from_userSeq);
 
         String alarmType = "playroomMake";
         LocalDateTime curDateTime = LocalDateTime.now();
@@ -78,6 +100,7 @@ public class NotificationService {
         notificationDto.setFromId(String.valueOf(from_userSeq));  // 라우터용 userSeq
         notificationDto.setImage(fromUser.getProfileImage());
         notificationDto.setIsRead("false");
+        notificationDto.setRouteId(String.valueOf(playroomId));
 
         // 알림 개인 확인용
         final FirebaseDatabase database = FirebaseDatabase.getInstance();
@@ -91,6 +114,10 @@ public class NotificationService {
         saveNoti.setValueAsync(notificationDto);
 
         // 실시간 알림용
+        // 대상의 실시간 알림 옵션이 켜져있어야 보냄
+        if (!userSetting.getAlarmOnRealtime()) {
+            return;
+        }
         final FirebaseDatabase rtdatabase = FirebaseDatabase.getInstance();
         DatabaseReference rtref = rtdatabase.getReference("tupli").child("realtime");
         rtref.setValueAsync(notificationDto);
@@ -99,9 +126,33 @@ public class NotificationService {
     /**
      * 플레이룸 초대시 알림
      */
-    public void notiInvite(Long from_userSeq, Long to_userSeq) {
-        User fromUser = userRepository.findByUserSeq(from_userSeq);
+    public void notiInvite(Long from_userSeq, Long to_userSeq, Long playroomId) {
+
         User toUser = userRepository.findByUserSeq(to_userSeq);
+        UserSetting userSetting = toUser.getUserSetting();
+        // 대상의 알람 세팅이 켜져있어야 보냄
+        if (!userSetting.getAlarmSetting()) {
+            return;
+        }
+        // 애초에 초대 세팅이 켜져있어야 함
+        if (!userSetting.getAlarmOnInvite()) {
+            return;
+        }
+        // 대상의 초대범위가 맞팔로우인데 그렇지 않음
+        String inviteDomain = userSetting.getInviteDomain();
+        if (inviteDomain.equals("co-followers")) {
+            if ((userLikesRepository.findExist(to_userSeq, from_userSeq) == null)
+                    || (userLikesRepository.findExist(to_userSeq, from_userSeq) == null)){
+                return;
+            }
+        // 대상의 초대범위가 팔로워인데 그렇지 않음
+        } else if (inviteDomain.equals("followers") ) {
+            // 알림을 받는 내가 알림을 보내는 상대를 팔로우 했어야 함
+            if (userLikesRepository.findExist(to_userSeq, from_userSeq) == null) {
+                return;
+            }
+        }
+        User fromUser = userRepository.findByUserSeq(from_userSeq);
 
         String alarmType = "invite";
         LocalDateTime curDateTime = LocalDateTime.now();
@@ -117,6 +168,7 @@ public class NotificationService {
         notificationDto.setFromId(String.valueOf(from_userSeq));  // 라우터용 userSeq
         notificationDto.setImage(fromUser.getProfileImage());
         notificationDto.setIsRead("false");
+        notificationDto.setRouteId(String.valueOf(playroomId));
 
         // 알림 개인 확인용
         final FirebaseDatabase database = FirebaseDatabase.getInstance();
@@ -130,6 +182,10 @@ public class NotificationService {
         saveNoti.setValueAsync(notificationDto);
 
         // 실시간 알림용
+        // 대상의 실시간 알림 옵션이 켜져있어야 보냄
+        if (!userSetting.getAlarmOnRealtime()) {
+            return;
+        }
         final FirebaseDatabase rtdatabase = FirebaseDatabase.getInstance();
         DatabaseReference rtref = rtdatabase.getReference("tupli").child("realtime");
         rtref.setValueAsync(notificationDto);
@@ -184,8 +240,8 @@ public class NotificationService {
      * JUNIT5에서 동작하지 않고 포스트맨에서 동작하는 성질때문에 이렇게 설정함
      */
     public void notiTest() {
-        Long to_userSeq = 122L;
-        Long from_userSeq = 37L;
+        Long to_userSeq = 7L;
+        Long from_userSeq = 1L;
         User fromUser = userRepository.findByUserSeq(from_userSeq);
         User toUser = userRepository.findByUserSeq(to_userSeq);
 

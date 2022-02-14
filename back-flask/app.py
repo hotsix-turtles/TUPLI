@@ -52,6 +52,7 @@ class Playlist(Base):
     id = Column(Integer, primary_key=True)
     # user_id = Column(Integer)
     playlist_info = Column(String)
+    recommend_playlists = Column(String)
 
 '''
 실제 작업
@@ -90,9 +91,51 @@ def db_conn(tid):
         # 본인 제외
         if playlists_num[rank] != int(tid):
             response.append(playlists_num[rank])
+    print('calc for', tid, 'finished:', response)
 
     return jsonify(response)
 
+
+# 모든 플레이리스트의 추천 재계산 (개발자용, 엔드포인트 공개 금지)
+@app.route("/playlist/renew/all")
+def playlist_recommend_renew_all():
+    playlists = Playlist.query.all()
+    playlists_list = list()
+    playlists_num = list()
+    request_nums = list()
+    for idx, playlist in enumerate(playlists):
+        tmp_dict = json.loads(playlist.playlist_info)
+        playlists_list.append(tmp_dict)
+        playlists_num.append(playlist.id)
+        request_nums.append(idx)
+
+    # 데이터 분석
+    vectorizer = DictVectorizer(sparse=False)
+    playlists_v = vectorizer.fit_transform(playlists_list)
+    cos_sim = cosine_similarity(playlists_v, playlists_v)
+    # 모든 플레이리스트 정렬
+    for request_num in request_nums:
+        sim_scores = list(enumerate(cos_sim[request_num]))  
+        sim_scores = sorted(sim_scores, key=lambda x: x[1], reverse=True)  # 코사인 유사성 순으로 정렬
+        sim_scores = sim_scores[:12]  # 넉넉히 한 11개 슬라이스 (본인 제외 될 준비)
+        ranking = [i[0] for i in sim_scores]  # 우선 순위
+        # 결과 적재 후 반환
+        response = list()        
+        for rank in ranking:
+            # 본인 제외
+            if playlists_num[rank] != int(playlists_num[request_num]):
+                response.append(playlists_num[rank])
+        # 결과 일단 출력
+        print('answer', playlists_num[request_num] , end=" : ")
+        print(response)
+        # 결과 각각 갱신
+        playlist_update = Playlist.query.filter(Playlist.id == playlists_num[request_num]).first()
+        playlist_update.recommend_playlists = json.dumps(response)
+    db_session.commit()
+
+    return "we've done a great job!";    
+
+# 작동 확인용
 @app.route("/") 
 def hello():
     return "Hello World!"
