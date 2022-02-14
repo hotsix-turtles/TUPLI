@@ -137,7 +137,7 @@
           <!-- 플레이룸 작성자 프로필 사진 -->
           <div class="authorProfilePic">
             <img
-              :src="roomAuthorProfilePic"
+              :src="ImgUrl(roomAuthorProfilePic)"
               alt=""
               class="rounded-circle"
               style="width: 100%; height: auto;"
@@ -463,6 +463,7 @@ import Stomp from "webstomp-client"
 import SockJS from "sockjs-client"
 import Tags from '../../components/common/Tags.vue';
 import NormalDialog from '../../components/common/NormalDialog.vue';
+import { getImage } from '../../utils/utils'
 
 Vue.use(VueYoutube)
 
@@ -1098,6 +1099,9 @@ export default {
 
       if (this.wsConnector) await this.wsConnector.disconnect()
       this.wsConnector = null
+    },
+    ImgUrl: function(img) {
+      return getImage(img)
     },
     ...mapMutations('playroom', ['RESET_VUEX_DATA', 'SET_ROOM_AUTHOR', 'SET_ROOM_LIKED', 'SET_ROOM_REPEAT', 'SEEK_VIDEO',
       'SET_ROOM_CURRENT_PLAYLIST_ID', 'SET_ROOM_CURRENT_VIDEO_ID', 'SET_ROOM_CURRENT_VIDEO_PLAYTIME',
