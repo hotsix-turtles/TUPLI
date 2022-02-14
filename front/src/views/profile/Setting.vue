@@ -31,17 +31,6 @@
 
       <hr>
 
-      <!-- 플레이룸 참여 기록 -->
-      <div
-        class="d-flex justify-space-between setting-bar align-center"
-        @click="$router.push({ name: 'History' })"
-      >
-        <p>플레이룸 참여 기록</p>
-        <v-icon>mdi-chevron-right</v-icon>
-      </div>
-
-      <hr>
-
       <!-- 결제 서비스 -->
       <div
         class="d-flex justify-space-between setting-bar align-center"

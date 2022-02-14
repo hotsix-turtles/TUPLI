@@ -59,8 +59,11 @@ const account = {
 
 
     // 팔로우
-    FOLLOW: function (state) {
-      console.log('ddd')
+    FOLLOW: function (state, following) {
+      console.log('팔로우 뮤테이션', following)
+      state.following = following
+      console.log('팔로우 뮤테이션2', state.following)
+
     },
 
   },
@@ -155,6 +158,33 @@ const account = {
     cancelLike: function() {
       console.log('좋아요 취소')
     },
+
+    // 팔로우
+    follow: function({ commit }, userSeq) {
+      console.log('팔로우 액션')
+      axiosConnector.post(`account/follow/${userSeq}`)
+        .then((res) => {
+          console.log('팔로우 성공적')
+          // 팔로잉 리스트 업데이트
+          commit('FOLLOW', userSeq)
+        })
+        .catch((err) => {
+          console.log('에러1')
+        })
+    },
+
+    // 언팔로우
+    unfollow: function({ commit }, userSeq) {
+      console.log('언팔로우 액션')
+      axiosConnector.delete(`account/follow/${userSeq}`)
+        .then((res) => {
+          console.log('언팔로우 성공적', res.data)
+          commit.FOLLOW(res.data)
+        })
+        .catch((err) => {
+          console.log('에러2')
+        })
+    }
 
   },
   modules: {

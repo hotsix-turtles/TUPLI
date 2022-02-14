@@ -207,11 +207,12 @@ const routes = [
     name: 'ChangePassword',
     component: ChangePassword
   },
-  {
-    path: '/history',
-    name: 'History',
-    component: History
-  },
+  // 일단 없앰.
+  // {
+  //   path: '/history',
+  //   name: 'History',
+  //   component: History
+  // },
   {
     path: '/invitenotice',
     name: 'InviteNoticeAlert',

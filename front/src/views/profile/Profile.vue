@@ -56,7 +56,7 @@
             color="#5B5C9D"
             rounded
             outlined
-            @click="followBtn"
+            @click="unfollowBtn"
           >
             &nbsp;{{ followText }}&nbsp;
           </v-btn>
@@ -101,7 +101,7 @@ import ProfileTaste from '../../components/profile/timeline/ProfileTaste.vue'
 import axiosConnector from '@/utils/axios-connector.js'
 
 import SERVER from '@/api/server'
-import { mapState } from 'vuex'
+import { mapActions, mapState } from 'vuex'
 
 export default {
   components: { ProfileTaste, ProfilePlaylist },
@@ -110,7 +110,7 @@ export default {
       profile: [],
       followText: '팔로우',
       follower_cnt: 0, // 팔로잉 하면 팔로워가 늘어남.
-      userId: ''
+      userId: '',
     }
   },
   computed: {
@@ -118,10 +118,16 @@ export default {
   },
   created: function() {
     console.log('타인 프로필 조회', this.profile)
-    console.log('타인 프로필 조회', this.$route.params.userId)
     this.getAccounts()
+    console.log('타인 프로필 조회', this.$route.params.userId)
+    console.log('팔로우리스트', this.following)
+    // console.log('팔로우리스트2', this.following.find(this.profile.userSeq))
+    this.followState()
+
+
   },
   methods: {
+    ...mapActions('account', ['follow', 'unfollow']),
     // [조회]
     getAccounts: function () {
       console.log('getAccounts params')
@@ -137,33 +143,38 @@ export default {
     // [팔로우]
     followBtn: function() {
       if (this.followText === '팔로우') {
-        console.log('aa', this.followText)
-        this.followText = '팔로잉'
-        this.follow(this.profile.id)
-        this.profile.from_user.unshift("userId");
         console.log('follow')
+        this.followText = '팔로잉'
+        console.log('follow222', this.profile.userSeq)
+        this.follow(this.profile.userSeq)
 
-      } else {
+        console.log('follow3')
+        // this.profile.from_user.unshift("userId");
+        console.log('follow4')
+      }
+    },
+    // [언팔로우]
+    unfollowBtn: function() {
+      if (this.followText === '팔로잉') {
         console.log('unfollow')
         this.followText = '팔로우'
-        this.unfollow(this.profileInfo.id)
-        this.follower_cnt--
+        console.log('unfollow222', this.profile.userSeq)
+        this.unfollow(this.profile.userSeq)
+        console.log('unfollow3')
+        // this.profile.from_user.unshift("userId");
+        console.log('unfollow4')
       }
-      axios({
-        method: 'POST',
-        url: SERVER.URL + SERVER.ROUTES.account.follow,
-        headers: {Authorization: this.authToken},
-      })
-        .then((res) => {
-          window.location.href = res.data
-        })
-        .catch (() => {
-          swal.fire ({
-            icon: 'error',
-            title: '결제 실패',
-            text: '서버가 혼잡합니다. 다시 시도해 주세요.'
-          })
-        })
+    },
+    // 팔로우 상태 확인
+    followState: function() {
+      console.log('팔로우리스트3', this.following)
+      if (this.following.find(this.profile.userSeq)) {
+        console.log('팔로잉 리스트', this.following)
+        this.followText = '팔로잉'
+      }  // 내가 팔로우한 사람이면 -> 내 followings 목록에 있으면 // followText = '팔로잉'
+      else {
+        this.followText = '팔로우'
+      }  // 팔로우 안했으면 followText = '팔로우'
     },
     // 같이 시청하기
     wacthTogether: function() {

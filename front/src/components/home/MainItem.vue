@@ -41,7 +41,8 @@
             class="d-flex"
           >
             <p
-              v-for="tag in tags"
+              v-for="tag in allTags
+              "
               :key="tag.id"
               class="mb-0 main-tag"
             >
@@ -54,13 +55,30 @@
           <div class="d-flex flex-column align-center mx-1">
             <!-- 좋아요 -->
             <div
-              class="animate__animated animate__heartBeat"
+              v-if="content.userLikesYN === 'Y'"
+              @click="onClickPlayroomUnLike"
             >
               <v-icon color="#5B5C9D">
                 mdi-cards-heart
               </v-icon>
-              <p>{{ content.likesCnt }}</p>
             </div>
+            <div
+              v-else-if="content.userLikesYN === 'N'"
+              @click="onClickPlayroomLike"
+            >
+              <v-icon color="#5B5C9D">
+                mdi-cards-heart-outline
+              </v-icon>
+            </div>
+            <div
+              v-else
+              @click="goLogin"
+            >
+              <v-icon color="#5B5C9D">
+                mdi-cards-heart-outline
+              </v-icon>
+            </div>
+            <p>{{ content.likesCnt }}</p>
           </div>
           <div class="d-flex flex-column align-center mx-1">
             <v-icon>
@@ -115,7 +133,7 @@
           </p>
           <div class="d-flex">
             <p
-              v-for="tag in tags"
+              v-for="tag in allTags"
               :key="tag.id"
               class="mb-0 main-tag"
             >
@@ -123,8 +141,34 @@
             </p>
           </div>
         </div>
+
+        <!-- 좋아요 -->
         <div class="d-flex mr-2 align-center">
-          <div class="d-flex flex-column align-center mx-1">
+          <div
+            v-if="content.userLikesYN === 'Y'"
+            class="d-flex flex-column align-center mx-1"
+            @click="onClickPlaylistUnlike"
+          >
+            <v-icon color="#5B5C9D">
+              mdi-cards-heart
+            </v-icon>
+            <p>{{ content.likesCnt }}</p>
+          </div>
+          <div
+            v-else-if="content.userLikesYN === 'N'"
+            class="d-flex flex-column align-center mx-1"
+            @click="onClickPlaylistLike"
+          >
+            <v-icon>
+              mdi-cards-heart-outline
+            </v-icon>
+            <p>{{ content.likesCnt }}</p>
+          </div>
+          <div
+            v-else-if="content.userLikesYN === null"
+            class="d-flex flex-column align-center mx-1"
+            @click="goLogin"
+          >
             <v-icon>
               mdi-cards-heart-outline
             </v-icon>
@@ -137,7 +181,7 @@
             <v-icon>
               mdi-video-plus-outline
             </v-icon>
-            <p>PLI</p>
+            <p>PRM</p>
           </div>
         </div>
       </div>
@@ -147,7 +191,7 @@
     <!-- 게시글 -->
     <div
       v-else-if="content.type == 'board'"
-      class="d-flex mt-5"
+      class="d-flex flex-column mt-5"
     >
       <!-- playlist 정보 -->
       <div class="d-flex">
@@ -158,26 +202,25 @@
             alt="프로필 사진"
             width="50"
             height="50"
-            @click="$router.push({ name: 'Profile' })"
+            @click="setProfile"
           >
         </div>
         <div class="d-flex flex-column align-start">
           <p class="mb-0">
+            {{ content.content }}
+          </p>
+          <p
+            class="mb-0"
+            @click="setProfile"
+          >
             {{ content.nickName }}
           </p>
-          <p>내용내용</p>
-          <div class="d-flex mr-2 align-center">
-            <div class="d-flex flex-column align-center mx-1">
+          <div class="d-flex align-center">
+            <div class="d-flex align-center">
               <v-icon>
                 mdi-cards-heart-outline
               </v-icon>
               <p>{{ content.likesCnt }}</p>
-            </div>
-            <div class="d-flex flex-column align-center mx-1">
-              <v-icon>
-                mdi-video-plus-outline
-              </v-icon>
-              <p>PLI</p>
             </div>
           </div>
         </div>
@@ -194,23 +237,21 @@ export default {
   name: 'MainItem',
   props: {
     // eslint-disable-next-line vue/require-default-prop
-    playroomcontent: { type: Object },
-    // eslint-disable-next-line vue/require-default-prop
     content: {type: Object}
   },
   data: function() {
     return {
       thumbnailImage: '',
       userProfileImg: '',
-      tags: [],
+      allTags: [],
     }
   },
   computed: {
     ...mapState('account', ['image'])
   },
   created: function() {
-    console.log('content', this.content)
-    console.log('content like', this.content.likesCnt)
+    // console.log('content', this.content)
+    // console.log('content like', this.content.likesCnt)
 
     this.getThumbnailImage()
     this.getProfileImage()
@@ -218,20 +259,25 @@ export default {
 
   },
   methods: {
-    // ...mapActions(
-    //   'playlist', [
-    //     'likePlaylist',
-    //     'unlikePlaylist',
-    //   ],
-    //   'playroom', [
-    //     'likePlayroom',
-    //     'unlikePlayroom',
-    //   ]),
+    ...mapActions(
+      'playlist', [
+        'likePlaylist',
+        'unlikePlaylist',
+      ],
+      'playroom', [
+        'likePlayroom',
+        'unlikePlayroom',
+      ]),
     // 태그
     getTag: function() {
-      console.log('태그', this.content.tags)
-      this.tags = this.content.tags.split(',')
-      console.log('태그2', this.tags)
+      if (this.content.tags) {
+        // console.log('태그 있을 때', this.content.tags, typeof(this.content.tags))
+        this.allTags = this.content.tags.split(',')
+      }
+      else {
+        this.allTags = []
+      }
+
     },
     // 썸네일 이미지
     getThumbnailImage: function() {
@@ -286,28 +332,49 @@ export default {
     },
     // 좋아요
     // 좋아요 - 플레이룸
-    // onClickPlayroomLike: function () {
-    //   this.content.isLiked = true
+    onClickPlayroomLike: function () {
+      console.log('좋아요 누름', this.content.userLikesYN)
+      this.content.userLikesYN = 'Y'
+      this.content.likesCnt++
+      this.likePlayroom(this.content.id)
+    },
+    onClickPlayroomUnlike: function () {
+      console.log('좋아요 취소', this.content.userLikesYN)
+      this.content.userLikesYN = 'N'
+      this.content.likesCnt--
+      this.unlikePlayroom(this.content.id)
+    },
+    // 좋아요 - 플레이리스트
+    onClickPlaylistLike: function () {
+      console.log('좋아요 플리 누름', this.content.userLikesYN)
+      this.content.userLikesYN = 'Y'
+      this.content.likesCnt++
+      this.likePlaylist(this.content.id)
+    },
+    onClickPlaylistUnlike: function () {
+      console.log('좋아요 취소 플리 누름', this.content.userLikesYN)
+      this.content.userLikesYN = 'N'
+      this.content.likesCnt--
+      this.unlikePlaylist(this.content.id)
+    },
+    // 좋아요 - 게시물
+    // onClickBoardLike: function () {
+    //   console.log('좋아요 게시글 누름', this.content.userLikesYN)
+    //   this.content.userLikesYN = 'Y'
     //   this.content.likesCnt++
-    //   this.likePlaylist(this.content.id)
+    //   this.likeBoard(this.content.id)
     // },
-    // onClickPlayroomUnlike: function () {
-    //   this.content.isLiked = false
+    // onClickBoardUnlike: function () {
+    //   console.log('좋아요 취소 게시글 누름', this.content.userLikesYN)
+    //   this.content.userLikesYN = 'N'
     //   this.content.likesCnt--
-    //   this.unlikePlaylist(this.content.id)
-    // },
-    // // 좋아요 - 플레이리스트
-    // onClickPlaylistLike: function () {
-    //   this.content.isLiked = true
-    //   this.content.likesCnt++
-    //   this.likePlaylist(this.content.id)
-    // },
-    // onClickPlaylistUnlike: function () {
-    //   this.content.isLiked = false
-    //   this.content.likesCnt--
-    //   this.unlikePlaylist(this.content.id)
+    //   this.unlikeBoard(this.content.id)
     // },
 
+    // 로그인 페이지로 이동
+    goLogin: function() {
+      this.$router.push({ name: 'Login' })
+    }
   },
 }
 
