@@ -156,13 +156,42 @@ public class PlayroomApiController {
             if (playroom == null) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
             }
-//            if (playroom.getGuests().contains(userSeq)) {
-//                return ResponseEntity
-//                        .status(HttpStatus.BAD_REQUEST)
-//                        .body(new ErrorResponse(messageSource.getMessage("error.same.room", null, LocaleContextHolder.getLocale())));
-//            }
+
             PlayroomDto result = new PlayroomDto(playroom, user);  // 혹시 모르니 미리 DTO 짜놓고
-            playroomService.addGuest(userSeq, playroom);  // 게스트 추가
+            // 게스트 추가
+            if (!playroom.getGuests().contains(userSeq)) {
+                playroomService.addGuest(userSeq, playroom);
+            }
+            return ResponseEntity.status(HttpStatus.OK).body(result);
+        }
+    }
+
+    /**
+     * 플레이룸 방장 변경시 정보 가져오기
+     * @param playroomId
+     * @return
+     * 반환 코드: 200, 404
+     */
+    @GetMapping("/playroom2/{playroomId}")
+    public ResponseEntity<?> getPlayroom2(@PathVariable("playroomId") Long playroomId,
+                                         HttpServletRequest request){
+
+        // 회원, 비회원(유효하지 않은 토큰) 구분
+        String token = request.getHeader("Authorization");
+        if (token == null || !jwtTokenProvider.validateToken(token)) {
+            Playroom playroom = playroomService.getPlayroom(playroomId);
+            if (playroom == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+            }
+            return ResponseEntity.status(HttpStatus.OK).body(new PlayroomDto(playroom));
+        } else {
+            Long userSeq = jwtTokenProvider.getUserSeq(token);
+            User user = userService.getUserByUserseq(userSeq);
+            Playroom playroom = playroomService.getPlayroom(playroomId);
+            if (playroom == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+            }
+            PlayroomDto result = new PlayroomDto(playroom, user);  // 혹시 모르니 미리 DTO 짜놓고
             return ResponseEntity.status(HttpStatus.OK).body(result);
         }
     }
