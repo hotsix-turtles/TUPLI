@@ -16,7 +16,7 @@
       <div class="d-flex">
         <img
           style="border-radius: 100px; margin: 10px;"
-          :src="content.userProfileImg"
+          :src="ImgUrl(content.userProfileImg)"
           alt="프로필 사진"
           width="50"
           height="50"
@@ -112,7 +112,7 @@
       <div class="d-flex">
         <img
           style="border-radius: 100px; margin: 10px;"
-          :src="content.userProfileImg"
+          :src="ImgUrl(content.userProfileImg)"
           alt="프로필 사진"
           width="50"
           height="50"
@@ -198,7 +198,7 @@
         <div class="d-flex align-start">
           <img
             style="border-radius: 100px; margin: 10px;"
-            :src="userProfileImg"
+            :src="ImgUrl(userProfileImg)"
             alt="프로필 사진"
             width="50"
             height="50"
@@ -215,12 +215,32 @@
           >
             {{ content.nickName }}
           </p>
-          <div class="d-flex align-center">
+          <div
+            v-if="content.userLikesYN === 'Y'"
+            class="d-flex align-center"
+            @click="onClickBoardUnlike"
+          >
+            <div class="d-flex align-center">
+              <v-icon>
+                mdi-cards-heart
+              </v-icon>
+              <p class="mx-2 mb-0">
+                {{ content.likesCnt }}
+              </p>
+            </div>
+          </div>
+          <div
+            v-if="content.userLikesYN === 'N'"
+            class="d-flex align-center"
+            @click="onClickBoardLike"
+          >
             <div class="d-flex align-center">
               <v-icon>
                 mdi-cards-heart-outline
               </v-icon>
-              <p>{{ content.likesCnt }}</p>
+              <p class="mx-2 mb-0">
+                {{ content.likesCnt }}
+              </p>
             </div>
           </div>
         </div>
@@ -232,6 +252,7 @@
 
 <script>
 import { mapActions, mapState } from 'vuex'
+import { getImage } from '../../utils/utils'
 
 export default {
   name: 'MainItem',
@@ -267,6 +288,10 @@ export default {
       'playroom', [
         'likePlayroom',
         'unlikePlayroom',
+      ],
+      'board', [
+        'likeBoard',
+        'unlikeBoard'
       ]),
     // 태그
     getTag: function() {
@@ -304,6 +329,10 @@ export default {
 
       // this.content.userProfileImg === null? this.userProfileImg = '@/assets/tupli_logo2_dark.png' : this.userProfileImg = this.content.userProfileImg;
       console.log('유저 프로필', this.userProfileImg)
+    },
+    // 이미지 조합
+    ImgUrl: function(img) {
+      return getImage(img)
     },
     // 타 유저 프로필로 가기
     setProfile: function() {
@@ -358,18 +387,18 @@ export default {
       this.unlikePlaylist(this.content.id)
     },
     // 좋아요 - 게시물
-    // onClickBoardLike: function () {
-    //   console.log('좋아요 게시글 누름', this.content.userLikesYN)
-    //   this.content.userLikesYN = 'Y'
-    //   this.content.likesCnt++
-    //   this.likeBoard(this.content.id)
-    // },
-    // onClickBoardUnlike: function () {
-    //   console.log('좋아요 취소 게시글 누름', this.content.userLikesYN)
-    //   this.content.userLikesYN = 'N'
-    //   this.content.likesCnt--
-    //   this.unlikeBoard(this.content.id)
-    // },
+    onClickBoardLike: function () {
+      console.log('좋아요 게시글 누름', this.content.userLikesYN)
+      this.content.userLikesYN = 'Y'
+      this.content.likesCnt++
+      this.likeBoard(this.content.id)
+    },
+    onClickBoardUnlike: function () {
+      console.log('좋아요 취소 게시글 누름', this.content.userLikesYN)
+      this.content.userLikesYN = 'N'
+      this.content.likesCnt--
+      this.unlikeBoard(this.content.id)
+    },
 
     // 로그인 페이지로 이동
     goLogin: function() {

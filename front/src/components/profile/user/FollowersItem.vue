@@ -1,5 +1,5 @@
 <template>
-  <v-app>
+  <div>
     <div
       class="d-flex justify-center mx-4 my-2"
       style="width: 360px;"
@@ -16,20 +16,22 @@
           </div>
           <p
             class="mb-0 mx-3"
-            @click="setProfile"
           >
-            너구리&nbsp;
+            {{ follower.nickname }}&nbsp;
           </p>
         </div>
         <v-btn>팔로잉</v-btn>
       </div>
     </div>
-  </v-app>
+  </div>
 </template>
 
 <script>
 export default {
-
+  name: 'FollowersItem',
+  props: {
+    follower: { type: Object, default() {} }
+  }
 }
 </script>
 

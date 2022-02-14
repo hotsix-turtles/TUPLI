@@ -160,13 +160,14 @@ const account = {
     },
 
     // 팔로우
-    follow: function({ commit }, userSeq) {
+    follow: function({ commit, dispatch }, userSeq) {
       console.log('팔로우 액션')
       axiosConnector.post(`account/follow/${userSeq}`)
         .then((res) => {
           console.log('팔로우 성공적')
           // 팔로잉 리스트 업데이트
           commit('FOLLOW', userSeq)
+          dispatch('getUserInfo', res.data.token)
         })
         .catch((err) => {
           console.log('에러1')

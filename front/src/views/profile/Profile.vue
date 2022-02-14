@@ -145,12 +145,8 @@ export default {
       if (this.followText === '팔로우') {
         console.log('follow')
         this.followText = '팔로잉'
-        console.log('follow222', this.profile.userSeq)
         this.follow(this.profile.userSeq)
-
-        console.log('follow3')
-        // this.profile.from_user.unshift("userId");
-        console.log('follow4')
+        this.profile.from_user.unshift("userId");
       }
     },
     // [언팔로우]

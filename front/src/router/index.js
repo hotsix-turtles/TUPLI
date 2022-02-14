@@ -46,6 +46,9 @@ import PlayroomDetail from '../views/playroom/PlayroomDetail.vue'
 import BoardForm from '../views/board/BoardForm.vue'
 import BoardSelectPlayroom from '../views/board/BoardSelectPlayroom.vue'
 import BoardSelectPlaylist from '../views/board/BoardSelectPlaylist.vue'
+import PlayroomSearch from '@/views/board/PlayroomSearch.vue'
+import PlaylistSearch from '@/views/board/PlaylistSearch.vue'
+import BoardDetail from '@/views/board/BoardDetail.vue'
 
 import AuthHandler from '../views/handler/AuthHandler.vue'
 import KakaoPaySuccess from '../views/handler/kakaoPay/KakaoPaySuccess.vue'
@@ -262,7 +265,7 @@ const routes = [
     component: PlayroomDetail
   },
 
-  // board
+  // board (게시글)
   {
     path: '/board',
     name: 'BoardForm',
@@ -277,6 +280,21 @@ const routes = [
     path: '/board/playroom',
     name: 'BoardSelectPlayroom',
     component: BoardSelectPlayroom
+  },
+  {
+    path: '/playlist/search',
+    name: 'PlaylistSearch',
+    component: PlaylistSearch
+  },
+  {
+    path: '/playroom/search',
+    name: 'PlayroomSearch',
+    component: PlayroomSearch
+  },
+  {
+    path: '/board/:boardId',
+    name: 'BoardDetail',
+    component: BoardDetail
   },
 
   //handler

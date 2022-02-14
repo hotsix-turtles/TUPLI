@@ -6,6 +6,7 @@
       v-for="(playroom, idx) in playrooms"
       :key="idx"
       :playroom="playroom"
+      :is-radio-btn="isRadioBtn"
     />
   </v-expansion-panels>
 </template>
@@ -17,6 +18,7 @@ export default {
   components: { PlayroomItemSmall },
   props: {
     playrooms: { type: Array, default() { [] } },
+    isRadioBtn: { type: Boolean, default: false }
   },
 }
 </script>

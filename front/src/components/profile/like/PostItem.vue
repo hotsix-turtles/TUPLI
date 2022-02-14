@@ -57,7 +57,6 @@ export default {
   props: {
     // eslint-disable-next-line vue/require-default-prop
     boardlist: { type: Object },
-    thumbnail: { type: String, default: '' },
   }
 }
 </script>
