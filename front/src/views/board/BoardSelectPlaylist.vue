@@ -38,7 +38,7 @@
         />
       </v-tab-item>
     </v-tabs>
-    <add-button-bottom :selected="chosenPlaylist" />
+    <add-button-bottom :chosen="chosenPlaylist" />
   </div>
 </template>
 
@@ -48,7 +48,7 @@ import SearchBar from '../../components/common/SearchBar.vue'
 import axiosConnector from '../../utils/axios-connector'
 import AddButtonBottom from '../../components/board/AddButtonBottom.vue';
 import PlaylistListItemSmall from '../../components/playlist/PlaylistListItemSmall.vue'
-import { mapState } from 'vuex';
+import { mapState, mapActions } from 'vuex';
 
 
 export default {
@@ -61,8 +61,6 @@ export default {
   },
   data: function() {
     return {
-      myPlaylists: null,
-      likedPlaylists: null,
       tab: null,
       items: [
         '작성한 플레이리스트', '좋아한 플레이리스트',
@@ -71,25 +69,20 @@ export default {
   },
   computed: {
     ...mapState('board', {
-      chosenPlaylist: state => state.chosenPlaylist
+      chosenPlaylist: state => state.chosenPlaylist,
+      myPlaylists: state => state.myPlaylists,
+      likedPlaylists: state => state.likedPlaylists,
     })
   },
   created: function() {
-    // 좋아요 표시한 플레이리스트만 뜨게하려면 playlist/likes 로 바꾸면 될 것 같다.
-    axiosConnector.get(`/playlist/likes`
-    ).then((res) => {
-      console.log('/playlist/likes', res.data)
-      this.likedPlaylists = res.data;
-    }).catch((err) => {
-      console.log(err)
-    })
-    axiosConnector.get(`/playlist/my`
-    ).then((res) => {
-      console.log('/playlist/my', res.data)
-      this.myPlaylists = res.data;
-    }).catch((err) => {
-      console.log(err)
-    })
+    this.getMyPlaylists()
+    this.getLikedPlaylists()
+  },
+  methods: {
+    ...mapActions('board', [
+      'getMyPlaylists',
+      'getLikedPlaylists',
+    ]),
   }
 }
 </script>

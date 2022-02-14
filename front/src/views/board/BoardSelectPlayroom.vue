@@ -27,7 +27,6 @@
           :is-radio-btn="true"
         />
       </v-tab-item>
-
       <!-- 좋아한 플레이룸 리스트 -->
       <v-tab-item class="">
         <playroom-list-item-small
@@ -36,17 +35,16 @@
         />
       </v-tab-item>
     </v-tabs>
-    <add-button-bottom :selected="chosenPlayroom" />
+    <add-button-bottom :chosen="chosenPlayroom" />
   </div>
 </template>
 
 <script>
 import Back from '../../components/common/Back.vue'
 import SearchBar from '../../components/common/SearchBar.vue'
-import axiosConnector from '../../utils/axios-connector'
 import AddButtonBottom from '../../components/board/AddButtonBottom.vue';
 import PlayroomListItemSmall from '../../components/playroom/PlayroomListItemSmall.vue'
-import { mapState } from 'vuex';
+import { mapState, mapActions } from 'vuex';
 
 
 export default {
@@ -59,8 +57,6 @@ export default {
   },
   data: function() {
     return {
-      myPlayrooms: null,
-      likedPlayrooms: null,
       tab: null,
       items: [
         '작성한 플레이룸', '좋아한 플레이룸',
@@ -69,25 +65,20 @@ export default {
   },
   computed: {
     ...mapState('board', {
-      chosenPlayroom: state => state.chosenPlayroom
+      chosenPlayroom: state => state.chosenPlayroom,
+      myPlayrooms: state => state.myPlayrooms,
+      likedPlayrooms: state => state.likedPlayrooms,
     })
   },
   created: function() {
-    // 좋아요 표시한 플레이룸만 뜨게하려면 playroom/likes 로 바꾸면 될 것 같다.
-    axiosConnector.get(`/playroom/likes`
-    ).then((res) => {
-      console.log('/playroom/likes', res.data)
-      this.likedPlayrooms = res.data;
-    }).catch((err) => {
-      console.log(err)
-    })
-    axiosConnector.get(`/playroom/my`
-    ).then((res) => {
-      console.log('/playroom/my', res.data)
-      this.myPlayrooms = res.data;
-    }).catch((err) => {
-      console.log(err)
-    })
+    this.getMyPlayrooms()
+    this.getLikedPlayrooms()
+  },
+  methods: {
+    ...mapActions('board', [
+      'getMyPlayrooms',
+      'getLikedPlayrooms',
+    ]),
   }
 }
 </script>

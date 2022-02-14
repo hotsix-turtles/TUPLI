@@ -114,6 +114,14 @@
           >
             유저 차단 해제
           </v-btn>
+          <v-btn
+            v-if="userId == roomAuthorId"
+            block
+            text
+            @click="kickUser(id)"
+          >
+            유저 강퇴
+          </v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -152,15 +160,19 @@ export default {
     selected () {
       return this.roomSelectedChatItem.id == this.id
     },
-    ...mapState('playroom', ['roomSelectedChatItem'])
+    ...mapState('playroom', ['roomAuthorId', 'roomSelectedChatItem']),
+    ...mapState(['userId'])
   },
   methods: {
     showUserProfile(id) {
       this.$router.push(`/profile/${this.id}`)
       this.DESELECT_CHAT_ITEM();
     },
+    kickUser(id) {
+      this.$emit('kick-user', this.id);
+    },
     ...mapMutations('playroom', ['SELECT_CHAT_ITEM', 'SELECT_CHAT_AVATAR', 'DESELECT_CHAT_ITEM']),
-    ...mapActions('playroom', [ 'followUser', 'blockUser', 'blockMessage', 'unblockUser', 'unblockMessage' ])
+    ...mapActions('playroom', [ 'followUser', 'blockUser', 'blockMessage', 'unblockUser', 'unblockMessage'])
   }
 }
 </script>

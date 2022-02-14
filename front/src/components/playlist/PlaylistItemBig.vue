@@ -3,7 +3,7 @@
     <!-- CD -->
     <div @click="$router.push({ name: 'PlaylistDetail', params: { playlistId: playlist.id } })">
       <playlist-cd
-        :thumbnail="playlist.image"
+        :thumbnail="playlist.image ? playlist.image : playlist.videos[0].thumbnail"
       />
     </div>
     <div class="d-flex-column">
@@ -18,7 +18,7 @@
         <div class="d-flex-column">
           <!-- 닉네임 -->
           <div class="font-3 color-dark-gray">
-            {{ playlist.nickname }}
+            {{ playlist.nickName }}
           </div>
           <!-- 태그 -->
           <tags

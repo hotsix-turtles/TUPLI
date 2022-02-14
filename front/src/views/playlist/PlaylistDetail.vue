@@ -134,14 +134,9 @@ export default {
       playlistDetail: state => state.playlistDetail,
       isLiked: state => state.isLiked,
     }),
-    // ...mapState('common', {
-    //   selected: state => state.selected,
-    // }),
     ...mapState({
       userId: state => state.userId,
-      taste: state => state.taste,
     })
-    // 좋아요 여부 받아와서 isLiked에 저장
   },
   created: function() {
     this.getPlaylistDetail(this.$route.params.playlistId)

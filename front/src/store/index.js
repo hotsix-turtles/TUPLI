@@ -11,6 +11,7 @@ import video from './modules/video.js'
 import playlist from './modules/playlist.js'
 import common from './modules/common.js'
 import board from './modules/board.js'
+import friend from './modules/friend.js'
 import mainContent from './modules/mainContent.js'
 
 import axios from 'axios'
@@ -237,5 +238,6 @@ export default new Vuex.Store({
     common: common,
     board: board,
     mainContent: mainContent,
+    friend: friend
   },
 })

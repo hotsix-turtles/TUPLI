@@ -3,10 +3,10 @@
     <!-- playroom 썸네일 -->
     <div class="video-thumbnail">
       <img
-        :src="playroom.image"
+        :src="playroom.image ? playroom.image : playroom.videos[0].thumbnail"
         alt="썸네일"
-        width="390px"
-        height="235px"
+        width="100%"
+        height="auto"
         @click="$router.push({ name: 'PlayroomDetail', params: { id: playroom.id }})"
       >
       <!-- <div
@@ -55,7 +55,7 @@
             </div>
             <div class="d-flex font-3 color-dark-gray">
               <div>
-                {{ playroom.nickname }}
+                {{ playroom.nickname ? playroom.nickname : playroom.user.nickname }}
               </div>
               <v-icon color="#8B8B8B">
                 mdi-circle-small
