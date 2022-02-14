@@ -210,6 +210,18 @@ public class UserService {
         return userlikes;
     }
 
+    public List<UserLikes> getFollowees(Long otherUserSeq) {
+        // to_user_id 가 otherUserSeq 로 이루어져있는 녀석들만 골라서 저장하고 리턴
+        List<UserLikes> userlikes = userLikesRepository.findByFromUser(otherUserSeq);
+        return userlikes;
+    }
+
+    public List<UserLikes> getCoFollowers(Long otherUserSeq) {
+        // to_user_id 가 otherUserSeq 로 이루어져있는 녀석들만 골라서 저장하고 리턴
+        List<UserLikes> userlikes = userLikesRepository.findFollowers(otherUserSeq);
+        return userlikes;
+    }
+
 
     @Transactional
     public void rankUpPremium(String token) {
