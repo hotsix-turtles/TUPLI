@@ -333,17 +333,21 @@ public class UserApiController {
 
     /**
      * token 유효 확인, 자동 로그아웃 등에 활용
-     * @param token
+     * @param request (token)
      * @return
      */
     @GetMapping("/account/tokenvalidate")
-    public ResponseEntity<?> checkTokenValidate(@RequestHeader(value = "Authorization") String token){
+    public ResponseEntity<?> checkTokenValidate(HttpServletRequest request){
+
         // 인증 확인후 돌리기
-        if (!jwtTokenProvider.validateToken(token)) {
+        String token = request.getHeader("Authorization");
+
+        if (token == null || !jwtTokenProvider.validateToken(token)) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(new ErrorResponse(messageSource.
                             getMessage("error.valid.jwt", null, LocaleContextHolder.getLocale())));
         }
+
         return ResponseEntity.ok().body(null);
     }
 
