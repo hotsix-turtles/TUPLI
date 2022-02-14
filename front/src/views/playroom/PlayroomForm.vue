@@ -672,7 +672,8 @@ export default {
         inviteIds: [],
         playlists: []
       }
-      this.resetAddedPlaylists()
+      this.resetAddedPlaylists();
+      this.resetAddedFriends();
     },
     saveAndGoPlaylist: function () {
       this.saveFormData(this.formData)
@@ -694,7 +695,8 @@ export default {
     ...mapMutations('playroom', ['RESET_FORM_DATA']),
     ...mapActions('playroom', ['saveFormData']),
     ...mapActions('playlist', ['selectAllPlaylistVideo', 'deselectAllPlaylistVideo', 'resetAddedPlaylists']),
-    ...mapActions('account', ['validateToken'])
+    ...mapActions('account', ['validateToken']),
+    ...mapActions('friend', ['resetAddedFriends'])
   },
 }
 </script>
