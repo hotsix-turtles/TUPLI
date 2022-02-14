@@ -68,18 +68,21 @@ public class BoardService {
 
         // 연결
         board.setUser(userRepository.findByUserSeq(userSeq));
-        // 플레이룸 연계 게시물
-        if (boardDto.getType().equals("playroom")) {
-            Playroom playroom = playroomRepository.findById(boardDto.getTypeId()).orElse(null);
-            if (playroom != null) {
-                board.setPlayroom(playroom);
+
+        if (boardDto.getType() != null) {
+            // 플레이룸 연계 게시물
+            if (boardDto.getType().equals("playroom")) {
+                Playroom playroom = playroomRepository.findById(boardDto.getTypeId()).orElse(null);
+                if (playroom != null) {
+                    board.setPlayroom(playroom);
+                }
             }
-        }
-        // 플레이리스트 연계 게시물
-        if (boardDto.getType().equals("playlist")) {
-            Playlist playlist = playlistRepository.findById(boardDto.getTypeId()).orElse(null);
-            if (playlist != null) {
-                board.setPlaylist(playlist);
+            // 플레이리스트 연계 게시물
+            if (boardDto.getType().equals("playlist")) {
+                Playlist playlist = playlistRepository.findById(boardDto.getTypeId()).orElse(null);
+                if (playlist != null) {
+                    board.setPlaylist(playlist);
+                }
             }
         }
         Board nowBoard = boardRepository.save(board);

@@ -71,8 +71,8 @@ public class Playroom {
     @OneToMany(mappedBy = "playroom", cascade = {CascadeType.ALL})
     private List<YoutubeVideo> videos = new ArrayList<>();
 
-    @OneToOne(fetch = FetchType.LAZY)
-    private Board board;
+    @OneToMany(fetch = FetchType.LAZY)
+    private List<Board> board;
 
 
     // 기타 : DTO 외 내부 추천 및 뱃지용
