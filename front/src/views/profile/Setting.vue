@@ -22,11 +22,11 @@
 
       <!-- 관리자 API : hotsixturtles@gmail.com -->
       <div
-        v-if="email=='asd'"
+        v-if="email=='hotsixturtles@gmail.com'"
         class="d-flex justify-space-between setting-bar align-center"
-        @click="$router.push({ name: 'Like' })"
+        @click="$router.push({ name: 'Admin' })"
       >
-        <p>관리자 API</p>
+        <p>관리자 페이지</p>
         <v-icon>mdi-chevron-right</v-icon>
       </div>
       
