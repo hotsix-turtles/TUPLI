@@ -507,6 +507,7 @@ public class BadgeService {
                     if(!badges.contains(Long.valueOf(j))){
                         UserBadge userBadge = new UserBadge(null, userSeq, Long.valueOf(j), OffsetDateTime.now());
                         result.add(badgeRepository.findByBadgeSeq(Long.valueOf(j)));
+                        badges.add(Long.valueOf(j));
                         userBadgeRepository.save(userBadge);
                     }
                 }
