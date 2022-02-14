@@ -7,7 +7,7 @@
         <v-icon
           color="#5B5C9D"
           size="30"
-          @click="$router.push({ name: 'Setting' })"
+          @click="$router.push({ name: 'MyProfile' })"
         >
           mdi-chevron-left
         </v-icon>
@@ -18,6 +18,18 @@
     </v-container>
 
     <div>
+      <hr>
+
+      <!-- 관리자 API : hotsixturtles@gmail.com -->
+      <div
+        v-if="email=='asd'"
+        class="d-flex justify-space-between setting-bar align-center"
+        @click="$router.push({ name: 'Like' })"
+      >
+        <p>관리자 API</p>
+        <v-icon>mdi-chevron-right</v-icon>
+      </div>
+      
       <hr>
 
       <!-- 좋아요한 게시물 -->
@@ -208,7 +220,7 @@ export default {
     }
   },
   computed: {
-    ...mapState(['authToken'])
+    ...mapState(['authToken', 'email'])
   },
   methods: {
     // 로그아웃
