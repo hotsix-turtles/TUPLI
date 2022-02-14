@@ -1,6 +1,5 @@
 package hotsixturtles.tupli.scheduler;
 
-import hotsixturtles.tupli.entity.SearchHistory;
 import hotsixturtles.tupli.entity.meta.UserInfo;
 import hotsixturtles.tupli.repository.SearchHistoryRepository;
 import hotsixturtles.tupli.repository.UserInfoRepository;
@@ -25,34 +24,31 @@ public class DailyCheckScheduler {
     @Scheduled(cron="0 0 0 * * *")
     @Transactional
     public void DailyCheck(){
-        List<UserInfo> userInfoList = userInfoRepository.findAll();
-        for(UserInfo nowUserInfo : userInfoList){
-            nowUserInfo.setDailyLoginYN("N");
-            userInfoRepository.save(nowUserInfo);
-        }
+//        List<UserInfo> userInfoList = userInfoRepository.findAll();
+//        for(UserInfo nowUserInfo : userInfoList){
+//            nowUserInfo.setDailyLoginYN("N");
+//            userInfoRepository.save(nowUserInfo);
+//        }
+        userInfoRepository.updateDailyCheck();
     }
 
     // 매 30분 search Keyword 체크 후 값 바꿔줌
     @Scheduled(cron="0 */30 * * * *")
     @Transactional
     public void realTimeKeywordCheck() {
-        List<SearchHistory> searchHistoryList = searchHistoryRepository.findAll();
-        for(SearchHistory searchHistory: searchHistoryList){
-            int nowScore = searchHistory.getScore();
-            searchHistory.setScore(nowScore - (nowScore / 12 * searchHistory.getNoSearch()));
-            searchHistoryRepository.save(searchHistory);
-        }
+        searchHistoryRepository.updateScore();
     }
 
     // 매 시간 search 안된 검색어에 부가 값 증가
     @Scheduled(cron="0 0 * * * *")
     @Transactional
     public void realTimeSearchPlus(){
-        List<SearchHistory> searchHistoryList = searchHistoryRepository.findAll();
-        for(SearchHistory searchHistory: searchHistoryList){
-            searchHistory.setNoSearch(searchHistory.getNoSearch()+ 1);
-            searchHistoryRepository.save(searchHistory);
-        }
+//        List<SearchHistory> searchHistoryList = searchHistoryRepository.findAll();
+//        for(SearchHistory searchHistory: searchHistoryList){
+//            searchHistory.setNoSearch(searchHistory.getNoSearch()+ 1);
+//            searchHistoryRepository.save(searchHistory);
+//        }
+        searchHistoryRepository.updateNoSearch();
     }
 
     // 하루에 한번 씩 score 0인 애들 정리 (search에 10개 넘을때만)
@@ -66,12 +62,14 @@ public class DailyCheckScheduler {
             searchHistoryRepository.deleteByScoreEquals(0);
         }
 
-        List<SearchHistory> searchHistoryList = searchHistoryRepository.findAll();
-        for(SearchHistory searchHistory: searchHistoryList){
-            searchHistory.setScore(searchHistory.getScore() + 10);
-            searchHistory.setNoSearch(searchHistory.getNoSearch()+ 1);
-            searchHistoryRepository.save(searchHistory);
-        }
+//        List<SearchHistory> searchHistoryList = searchHistoryRepository.findAll();
+//        for(SearchHistory searchHistory: searchHistoryList){
+//            searchHistory.setScore(searchHistory.getScore() + 10);
+//            searchHistory.setNoSearch(searchHistory.getNoSearch()+ 1);
+//            searchHistoryRepository.save(searchHistory);
+//        }
+
+        searchHistoryRepository.updateDailyKeywords();
 
     }
 
