@@ -395,60 +395,35 @@
         미운영중 접속시 팝업
         하영님 팝업으로 교체 예정
       -->
-      <v-dialog
-        v-model="isOperationTimeError"
-        persistent
+      <normal-dialog
+        title="오류"
+        content-html="현재 운영중이 아닌 플레이룸입니다."
         max-width="290"
-      >
-        <v-card>
-          <v-card-title class="text-h5">
-            오류
-          </v-card-title>
-
-          <v-card-text>
-            현재 운영중이 아닌 플레이룸입니다.<br>
-            (하영님 팝업으로 교체 예정)
-          </v-card-text>
-
-          <v-card-actions>
-            <v-btn
-              color="green darken-1"
-              text
-              @click="$router.go(-1)"
-            >
-              확인
-            </v-btn>
-          </v-card-actions>
-        </v-card>
-      </v-dialog>
-      <v-dialog
-        v-model="isNotInvitedError"
+        :show="isOperationTimeError"
+        :buttons="[{name: '확인'}]"
+        button-spacing
         persistent
+        @button-click="errorPromptHandler"
+      />
+      <normal-dialog
+        title="오류"
+        content-html="비공개 플레이룸입니다."
         max-width="290"
-      >
-        <v-card>
-          <v-card-title class="text-h5">
-            오류
-          </v-card-title>
-
-          <v-card-text>
-            비공개 플레이룸입니다.<br>
-            (하영님 팝업으로 교체 예정)
-          </v-card-text>
-
-          <v-card-actions>
-            <v-spacer />
-
-            <v-btn
-              color="green darken-1"
-              text
-              @click="$router.go(-1)"
-            >
-              확인
-            </v-btn>
-          </v-card-actions>
-        </v-card>
-      </v-dialog>
+        :show="isNotInvitedError"
+        :buttons="[{name: '확인'}]"
+        button-spacing
+        persistent
+        @button-click="errorPromptHandler"
+      />
+      <normal-dialog
+        content-html="플레이룸을 종료할까요?"
+        max-width="290"
+        :show="exitPrompt"
+        :buttons="[{name: '나가기'}, {name: '취소'},]"
+        button-spacing
+        persistent
+        @button-click="exitPromptHandler"
+      />
     </v-sheet>
   </v-card>
 </template>
@@ -466,6 +441,7 @@ import NavButton from '../../components/common/NavButton.vue'
 import Stomp from "webstomp-client"
 import SockJS from "sockjs-client"
 import Tags from '../../components/common/Tags.vue';
+import NormalDialog from '../../components/common/NormalDialog.vue';
 
 Vue.use(VueYoutube)
 
@@ -477,6 +453,7 @@ export default {
     ChatItem,
     NavButton,
     Tags,
+    NormalDialog,
   },
   data() {
     return {
@@ -502,7 +479,8 @@ export default {
       isOperationTimeError: false,
       isNotInvitedError: false,
       isAuthorChangedInfo: false,
-      roomPlaytime: null
+      exitPrompt: false,
+      roomPlaytime: null,
     }
   },
   metaInfo () {
@@ -640,6 +618,18 @@ export default {
   },
   },
   methods: {
+    errorPromptHandler() {
+      this.certification = true;
+      this.$router.go(-1)
+    },
+    exitPromptHandler(idx) {
+      if (idx == 0)
+      {
+        this.certification = true;
+        this.$router.go(-1);
+      }
+      this.exitPrompt = false;
+    },
     loadRoomPlaytime() {
       const roomStartTime = this.roomStartTime
       const roomEndTime = this.roomEndTime
