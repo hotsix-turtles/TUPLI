@@ -2,7 +2,7 @@
   <div>
     <!-- CD -->
     <div @click="$router.push({ name: 'PlaylistDetail', params: { playlistId: playlist.id } })">
-      <playlist-cd-medium
+      <playlist-cd
         :thumbnail="playlist.image"
       />
     </div>
@@ -55,11 +55,11 @@
 <script>
 import Tags from '../common/Tags.vue'
 import { mapActions, mapState } from 'vuex'
-import PlaylistCdMedium from './PlaylistCdMedium.vue'
+import PlaylistCd from './PlaylistCd.vue'
 
 export default {
-  name: 'PlaylistItemMedium',
-  components: { PlaylistCdMedium, Tags },
+  name: 'PlaylistItemBig',
+  components: { PlaylistCd, Tags },
   props: {
     playlist: { type: Object, default() { {} } },
   },

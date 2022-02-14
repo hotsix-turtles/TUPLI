@@ -4,7 +4,7 @@
     v-if="selected != 0"
     absolute
     background-color="#5B5C9D"
-    height="50px"
+    height="60px"
     class="fixed-bottom"
   >
     <div
