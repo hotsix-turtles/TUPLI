@@ -111,7 +111,11 @@
             :modal-type="'order'"
             @on-select="onSelect"
           />
-          <account-list-item-small :accounts="searchedAccounts" />
+          <account-list-item-small
+            :accounts="searchedAccounts"
+            readonly
+            underline
+          />
           <!-- {{ searchedAccounts }} -->
         </v-tab-item>
 

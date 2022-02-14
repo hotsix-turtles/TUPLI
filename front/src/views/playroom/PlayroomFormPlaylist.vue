@@ -57,11 +57,11 @@
       <!-- 탭에 따른 결과물 -->
       <v-tabs-items v-model="tab">
         <v-tab-item
-          v-for="item in items"
-          :key="item"
+          v-for="(item, idx) in items"
+          :key="idx"
         >
           <playlist-list-item-small
-            :playlists="item == '저장한 플레이리스트' ? savedPlaylists : likedPlaylists"
+            :playlists="idx ? likedPlaylists : myPlaylists"
             :playlist-readonly="false"
             :video-readonly="true"
           />
@@ -87,7 +87,7 @@ export default {
       pageName: "플레이리스트 추가하기",
       tab: null,
       items: [
-        '내 플레이리스트', '저장한 플레이리스트',
+        '내 플레이리스트', '좋아요한 플레이리스트',
       ],
     }
   },
@@ -109,16 +109,17 @@ export default {
     async getUserPlaylistInfo() {
       const token = localStorage.getItem('jwt')
 
+      const myPlaylists = await axiosConnector.get(`/playlist/my`);
       const likedPlaylists = await axiosConnector.get(`/playlist/likes`);
       //const savedPlaylists = await axiosConnector.get(`/playlist/saved`, { headers: { Authorization: token } });
-      console.log('liked', likedPlaylists.data)
+      this.setMyPlaylist(myPlaylists)
       this.setLikedPlaylist(likedPlaylists)
     },
     async requestAddPlaylists() {
       await this.addPlaylists()
       this.$router.go(-1)
     },
-    ...mapActions('playlist', ['setLikedPlaylist', 'setSavedPlaylist', 'addPlaylists', 'revokePlaylists'])
+    ...mapActions('playlist', ['setMyPlaylist','setLikedPlaylist', 'setSavedPlaylist', 'addPlaylists', 'revokePlaylists'])
   }
 }
 </script>
