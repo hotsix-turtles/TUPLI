@@ -284,11 +284,13 @@ export default {
       'playlist', [
         'likePlaylist',
         'unlikePlaylist',
-      ],
+      ]),
+    ...mapActions(
       'playroom', [
         'likePlayroom',
         'unlikePlayroom',
-      ],
+      ]),
+    ...mapActions(
       'board', [
         'likeBoard',
         'unlikeBoard'

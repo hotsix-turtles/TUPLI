@@ -1,7 +1,7 @@
 <template>
   <v-app>
     <followers-item
-      v-for="follower in followersList"
+      v-for="follower in followerlist"
       :key="follower.id"
       :follower="follower"
     />
@@ -11,33 +11,28 @@
 <script>
 import FollowersItem from './FollowersItem.vue'
 
-import { mapState } from 'vuex'
+import { mapState, mapActions } from 'vuex'
 
 export default {
   name: 'FollowersList',
   components: {
     FollowersItem,
   },
+  props: {
+    // eslint-disable-next-line vue/require-default-prop
+    followerlist: { type: Array }
+  },
   data: function() {
     return {
-      followersList: [],
     }
   },
   computed: {
-    ...mapState(['authToken', 'userId', 'following', 'followers'])
   },
   created: function() {
     console.log('팔로우 리스트 받아오기')
-    this.getFollowers()
   },
   methods: {
-    // 팔로우 리스트 받아오기
-    getFollowers: function() {
-      console.log('팔로우 리스트')
-      this.followersList = this.followers
-      console.log('팔로우 리스트 받아오기2', this.followersList)
 
-    }
   }
 }
 </script>

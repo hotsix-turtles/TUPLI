@@ -10,7 +10,7 @@
             class="d-flex profile-img-medium"
           >
             <img
-              :src="ImgUrl(follower.profileImage)"
+              src="@/assets/tupli_logo2_dark.png"
               alt="profile img"
             >
           </div>
@@ -27,18 +27,10 @@
 </template>
 
 <script>
-import { getImage } from '@/utils/utils'
-
 export default {
   name: 'FollowersItem',
   props: {
     follower: { type: Object, default() {} }
-  },
-  methods: {
-    // 이미지 조합
-    ImgUrl: function(img) {
-      return getImage(img)
-    },
   }
 }
 </script>

@@ -5,6 +5,7 @@
         <img
           :src="thumbnail"
           alt="playlist image"
+          @click="goPlaylist"
         >
         <div />
       </div>
@@ -15,7 +16,10 @@
         <p class="mb-0">
           {{ playlistlist.title }}
         </p>
-        <p class="mb-0">
+        <p
+          class="mb-0"
+          @click="setProfile"
+        >
           {{ playlistlist.nickName }}
         </p>
         <p class="mb-0">
@@ -52,7 +56,7 @@
           </v-list-item>
           <v-list-item
             dense
-            @click="cancelLike(playlistlist.id)"
+            @click="unLike"
           >
             좋아요 취소
           </v-list-item>
@@ -83,13 +87,31 @@ export default {
   },
   methods: {
     ...mapActions('account', [
-      'makePlayroom', 'makeBoard', 'cancelLike'
+      'makePlayroom', 'makeBoard'
     ]),
+    ...mapActions(
+      'playlist', [
+        'unlikePlaylist',
+      ]),
     // 태그
     getTag: function() {
-      console.log('태그', this.playroomlist.tags)
+      // console.log('태그', this.playroomlist.tags)
       this.tags = this.playroomlist.tags.split(',')
-      console.log('태그2', this.tags)
+      // console.log('태그2', this.tags)
+    },
+    // 플레이리스트 상세로 가기
+    goPlaylist: function() {
+      console.log( '플레이리스트 상세', this.playlistlist.id )
+      this.$router.push({ name: 'PlaylistDetail', params: { playlistId : this.playlistlist.id }})
+    },
+    // 좋아요 취소
+    unLike: function() {
+      this.unlikePlaylist(this.playlistlist.id)
+    },
+    // 타 유저 프로필로 가기
+    setProfile: function() {
+      console.log('타인 프로필')
+      this.$router.push({ name: 'Profile', params: { userId : this.playlistlist.userId }})
     },
   }
 }

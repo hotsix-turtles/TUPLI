@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <v-app>
     <div
       class="d-flex justify-center mx-4 my-2"
       style="width: 360px;"
@@ -10,36 +10,26 @@
             class="d-flex profile-img-medium"
           >
             <img
-              :src="ImgUrl(follower.profileImage)"
+              src="@/assets/tupli_logo2_dark.png"
               alt="profile img"
             >
           </div>
           <p
             class="mb-0 mx-3"
+            @click="setProfile"
           >
-            {{ follower.nickname }}&nbsp;
+            너구리&nbsp;
           </p>
         </div>
         <v-btn>팔로잉</v-btn>
       </div>
     </div>
-  </div>
+  </v-app>
 </template>
 
 <script>
-import { getImage } from '@/utils/utils'
-
 export default {
-  name: 'FollowersItem',
-  props: {
-    follower: { type: Object, default() {} }
-  },
-  methods: {
-    // 이미지 조합
-    ImgUrl: function(img) {
-      return getImage(img)
-    },
-  }
+
 }
 </script>
 

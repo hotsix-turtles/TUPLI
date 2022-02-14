@@ -111,6 +111,8 @@ export default {
       followText: '팔로우',
       follower_cnt: 0, // 팔로잉 하면 팔로워가 늘어남.
       userId: '',
+      // followerList: [],
+      // followingList: [],
     }
   },
   computed: {
@@ -119,6 +121,7 @@ export default {
   created: function() {
     console.log('타인 프로필 조회', this.profile)
     this.getAccounts()
+    this.getFollowerList()
     console.log('타인 프로필 조회', this.$route.params.userId)
     console.log('팔로우리스트', this.following)
     // console.log('팔로우리스트2', this.following.find(this.profile.userSeq))
@@ -127,19 +130,31 @@ export default {
 
   },
   methods: {
-    ...mapActions('account', ['follow', 'unfollow']),
+    ...mapActions('account', ['follow', 'unfollow', 'getAccounts']),
     // [조회]
     getAccounts: function () {
       console.log('getAccounts params')
       axiosConnector.get(`userinfo/${this.$route.params.userId}`)
         .then((res) => {
-          console.log('성공적', res.data)
+          console.log('성공적 프로필', res.data)
           this.profile = res.data
         })
         .catch((err) => {
           console.log('에러', err)
         })
     },
+    // // 팔로우 리스트 가져오기
+    // getFollowerList: function () {
+    //   console.log('getAccounts params')
+    //   axiosConnector.get(`userinfo/${this.$route.params.userId}`)
+    //     .then((res) => {
+    //       this.followerList = res.data.from_user
+    //       this.followingList = res.data.to_user
+    //     })
+    //     .catch((err) => {
+    //       console.log('에러', err)
+    //     })
+    // },
     // [팔로우]
     followBtn: function() {
       if (this.followText === '팔로우') {
