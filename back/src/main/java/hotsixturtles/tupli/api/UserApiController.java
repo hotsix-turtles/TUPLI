@@ -232,6 +232,56 @@ public class UserApiController {
         private String passwordChange;
     }
 
+    /**
+     * 비밀번호 변경(OUATH)
+     * @param token
+     * @return
+     */
+    @PutMapping("/account/password/oauth")
+    public ResponseEntity passwordOauthChange(@RequestHeader(value = "Authorization") String token,
+                                              @RequestBody passwordOauthChangeRequest request,
+                                              BindingResult bindingResult) {
+
+
+        if (bindingResult.hasErrors()) {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(new ErrorResponse(bindingResult.getAllErrors().get(0).getDefaultMessage()));
+        }
+
+        // 유저 인증 및 확인
+        if (!jwtTokenProvider.validateToken(token)) {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(new ErrorResponse(messageSource.getMessage("error.valid.jwt", null, LocaleContextHolder.getLocale())));
+        }
+        User user = jwtTokenProvider.getUser(token);
+
+        // Oauth유저 확인
+        if (!request.getPassword().equals("NO_PASS")) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new ErrorResponse(messageSource.getMessage("error.wrong.oauthpassword", null, LocaleContextHolder.getLocale())));
+        }
+
+        // 비밀번호 변경
+        try {
+            userService.changePassword(user, request.getPasswordChange());
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+        }
+        catch (IllegalStateException e) {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(new ErrorResponse(messageSource
+                            .getMessage("error", null, LocaleContextHolder.getLocale())));
+        }
+    }
+
+    @Data
+    static class passwordOauthChangeRequest {
+        private String password;
+        @Size(min=3, max=128, message = "{error.size.password}")
+        private String passwordChange;
+    }
 
     /**
      * 로그인 JWT 발급
