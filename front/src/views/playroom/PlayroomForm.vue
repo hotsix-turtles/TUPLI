@@ -398,6 +398,25 @@
             </v-menu>
           </v-col>
         </v-row>
+
+        <!-- 플레이리스트 셔플 여부 -->
+        <v-row>
+          <v-col
+            cols="12"
+            md="4"
+            class="d-flex flex-row justify-space-between"
+          >
+            <p class="font-3">
+              셔플 사용
+            </p>
+            <p class="font-4 ml-1 mr-auto">
+              {{ isShuffleMsg }}
+            </p>
+            <v-switch
+              v-model="isShuffle"
+            />
+          </v-col>
+        </v-row>
       </v-container>
     </v-form>
   </div>
@@ -442,6 +461,7 @@ export default {
         v => this.startDateTime.getTime() < this.endDateTime.getTime() || '종료시간은 시간시간 이전일 수 없습니다',
       ],
       isValid: false,
+      isShuffle: false,
       // Create할 때 넘길 데이터
       formData: {
         title: '',
@@ -475,6 +495,9 @@ export default {
     },
     isPublicMsg () {
       return this.formData.isPublic ? "내 플레이룸을 공개합니다." : "내 플레이룸을 비공개합니다."
+    },
+    isShuffleMsg () {
+      return this.isShuffle ? "플레이리스트를 랜덤으로 섞습니다." : "플레이리스트 순서대로 재생합니다."
     },
     numberOfFriend () {
       console.log(this.formData, this.formData.inviteIds)
@@ -574,6 +597,10 @@ export default {
               return prevVideoIds
             }, [])
           }
+
+          // 플레이리스트 셔플
+          if (this.isShuffle) curPlaylist.videos.sort(() => Math.random() - 0.5);
+
           return prevPlaylists
         }, {})
 
