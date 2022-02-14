@@ -25,6 +25,8 @@ public class RequestPlayroomDto {
     private OffsetDateTime startTime;
     private OffsetDateTime endTime;
 
+    private Integer userCountMax;
+
     // 연결
     private SimpleUserDto user;
     private List<SimpleYoutubeVideoDto> videos;
