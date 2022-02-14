@@ -65,8 +65,8 @@ public class UserProfileDto {
         this.taste = user.getTaste();
 
         // 연결
-        this.from_user = user.getFrom_user().stream().map(u -> new SimpleUserDto(u.getFromUser())).collect(toList());
-        this.to_user = user.getTo_user().stream().map(u-> new SimpleUserDto(u.getToUser())).collect(toList());
+        this.from_user = user.getTo_user().stream().map(u -> new SimpleUserDto(u.getFromUser())).collect(toList());
+        this.to_user = user.getFrom_user().stream().map(u-> new SimpleUserDto(u.getToUser())).collect(toList());
 
         // 추가 변수
 //        this.boards_count = user.getBoards() == null ? 0 : user.getBoards().size();
@@ -88,8 +88,8 @@ public class UserProfileDto {
         this.taste = user.getTaste();
 
         // 연결
-        this.from_user = user.getFrom_user().stream().map(u -> new SimpleUserDto(u.getFromUser())).collect(toList());
-        this.to_user = user.getTo_user().stream().map(u-> new SimpleUserDto(u.getToUser())).collect(toList());
+        this.from_user = user.getTo_user().stream().map(u -> new SimpleUserDto(u.getFromUser())).collect(toList());
+        this.to_user = user.getFrom_user().stream().map(u-> new SimpleUserDto(u.getToUser())).collect(toList());
 
         this.userInfo = new SimpleUserInfoDto(userInfo);
 
