@@ -39,6 +39,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.IOException;
@@ -117,8 +118,8 @@ public class UserApiController {
 //        @Size(min=3, max=128, message = "{error.size.username}")
         private String username;
         @Size(min=3, max=128, message = "{error.size.email}")
-//        @Email(message = "{error.format.email}")
-//        @Email(message = "{email.notempty}")
+        @Email(message = "{error.format.email}")
+        @Email(message = "{email.notempty}")
         private String email;
         private String nickname;
         @Size(min=3, max=128, message = "{error.size.password}")
@@ -231,6 +232,56 @@ public class UserApiController {
         private String passwordChange;
     }
 
+    /**
+     * 비밀번호 변경(OUATH)
+     * @param token
+     * @return
+     */
+    @PutMapping("/account/password/oauth")
+    public ResponseEntity passwordOauthChange(@RequestHeader(value = "Authorization") String token,
+                                              @RequestBody passwordOauthChangeRequest request,
+                                              BindingResult bindingResult) {
+
+
+        if (bindingResult.hasErrors()) {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(new ErrorResponse(bindingResult.getAllErrors().get(0).getDefaultMessage()));
+        }
+
+        // 유저 인증 및 확인
+        if (!jwtTokenProvider.validateToken(token)) {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(new ErrorResponse(messageSource.getMessage("error.valid.jwt", null, LocaleContextHolder.getLocale())));
+        }
+        User user = jwtTokenProvider.getUser(token);
+
+        // Oauth유저 확인
+        if (!request.getPassword().equals("NO_PASS")) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new ErrorResponse(messageSource.getMessage("error.wrong.oauthpassword", null, LocaleContextHolder.getLocale())));
+        }
+
+        // 비밀번호 변경
+        try {
+            userService.changePassword(user, request.getPasswordChange());
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+        }
+        catch (IllegalStateException e) {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(new ErrorResponse(messageSource
+                            .getMessage("error", null, LocaleContextHolder.getLocale())));
+        }
+    }
+
+    @Data
+    static class passwordOauthChangeRequest {
+        private String password;
+        @Size(min=3, max=128, message = "{error.size.password}")
+        private String passwordChange;
+    }
 
     /**
      * 로그인 JWT 발급
@@ -333,17 +384,21 @@ public class UserApiController {
 
     /**
      * token 유효 확인, 자동 로그아웃 등에 활용
-     * @param token
+     * @param request (token)
      * @return
      */
     @GetMapping("/account/tokenvalidate")
-    public ResponseEntity<?> checkTokenValidate(@RequestHeader(value = "Authorization") String token){
+    public ResponseEntity<?> checkTokenValidate(HttpServletRequest request){
+
         // 인증 확인후 돌리기
-        if (!jwtTokenProvider.validateToken(token)) {
+        String token = request.getHeader("Authorization");
+
+        if (token == null || !jwtTokenProvider.validateToken(token)) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(new ErrorResponse(messageSource.
                             getMessage("error.valid.jwt", null, LocaleContextHolder.getLocale())));
         }
+
         return ResponseEntity.ok().body(null);
     }
 

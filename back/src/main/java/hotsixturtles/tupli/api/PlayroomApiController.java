@@ -19,6 +19,7 @@ import hotsixturtles.tupli.service.list.CategoryListWord;
 import hotsixturtles.tupli.service.token.JwtTokenProvider;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
@@ -387,9 +388,8 @@ public class PlayroomApiController {
      */
     @PutMapping("/playroom/out/{playroomId}")
     public ResponseEntity playroomOut(@PathVariable("playroomId") Long playroomId,
-                                      @RequestBody Long watchTime,
+                                      @RequestBody RoomOutDto watchTime,
                                       HttpServletRequest request) {
-
         // 회원, 비회원(유효하지 않은 토큰) 구분
         String token = request.getHeader("Authorization");
         if (token == null || !jwtTokenProvider.validateToken(token)) {
@@ -402,7 +402,7 @@ public class PlayroomApiController {
             // 참여자 삭제
             playroomService.deleteGuest(userSeq, playroomId);
 
-            userInfoService.userInfoUpdateTime(userSeq, watchTime);
+            userInfoService.userInfoUpdateTime(userSeq, watchTime.getWatchTime());
 
             List<UserBadge> userbadges = badgeService.getBadgeList(userSeq);
             List<Long> badges = badgeService.getUserBadgeSeq(userbadges);
@@ -412,7 +412,7 @@ public class PlayroomApiController {
 
             ConcurrentHashMap<Integer, Integer> videosCategory = playroom.getPlayroomInfo();
 
-            badgeResult.addAll(badgeService.checkPlayroomWatchGenre(userSeq, badges, watchTime, videosCategory));
+            badgeResult.addAll(badgeService.checkPlayroomWatchGenre(userSeq, badges, watchTime.getWatchTime(), videosCategory));
 
             if(badgeResult == null || badgeResult.size() == 0) return ResponseEntity.ok().body(null);
 
@@ -420,6 +420,11 @@ public class PlayroomApiController {
 
             return ResponseEntity.ok().body(result);
         }
+    }
+
+    @Data
+    static class RoomOutDto {
+        private Long watchTime;
     }
 
 }
