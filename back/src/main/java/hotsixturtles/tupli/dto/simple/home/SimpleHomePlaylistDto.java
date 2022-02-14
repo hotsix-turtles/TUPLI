@@ -91,6 +91,7 @@ public class SimpleHomePlaylistDto {
             this.userLikesYN = "N";
         }
         else{
+            this.userLikesYN = "N";
             for(PlaylistLikes nowPlaylistLikes : playlist.getPlaylistLikes()){
                 if(nowPlaylistLikes.getUser().getUserSeq() == user.getUserSeq()){
                     this.userLikesYN = "Y";

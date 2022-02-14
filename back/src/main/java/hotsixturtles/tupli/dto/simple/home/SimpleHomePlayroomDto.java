@@ -75,6 +75,7 @@ public class SimpleHomePlayroomDto {
                 this.userLikesYN = "N";
             }
             else{
+                this.userLikesYN = "N";
                 for(PlayroomLikes nowPlayroomLikes : playroom.getPlayroomLikes()){
                     if(nowPlayroomLikes.getUser().getUserSeq() == user.getUserSeq()){
                         this.userLikesYN = "Y";
