@@ -16,7 +16,7 @@
       <div class="d-flex">
         <img
           style="border-radius: 100px; margin: 10px;"
-          :src="content.userProfileImg"
+          :src="ImgUrl(content.userProfileImg)"
           alt="프로필 사진"
           width="50"
           height="50"
@@ -94,7 +94,7 @@
       <div class="d-flex">
         <img
           style="border-radius: 100px; margin: 10px;"
-          :src="content.userProfileImg"
+          :src="ImgUrl(content.userProfileImg)"
           alt="프로필 사진"
           width="50"
           height="50"
@@ -154,7 +154,7 @@
         <div class="d-flex align-start">
           <img
             style="border-radius: 100px; margin: 10px;"
-            :src="userProfileImg"
+            :src="ImgUrl(userProfileImg)"
             alt="프로필 사진"
             width="50"
             height="50"
@@ -189,6 +189,7 @@
 
 <script>
 import { mapActions, mapState } from 'vuex'
+import { getImage } from '../../utils/utils'
 
 export default {
   name: 'MainItem',
@@ -258,6 +259,10 @@ export default {
 
       // this.content.userProfileImg === null? this.userProfileImg = '@/assets/tupli_logo2_dark.png' : this.userProfileImg = this.content.userProfileImg;
       console.log('유저 프로필', this.userProfileImg)
+    },
+    // 이미지 조합
+    ImgUrl: function(img) {
+      return getImage(img)
     },
     // 타 유저 프로필로 가기
     setProfile: function() {

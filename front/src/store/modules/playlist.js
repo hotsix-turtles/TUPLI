@@ -212,7 +212,6 @@ const playlist = {
         .catch((err) => {
           console.log(err)
         })
-      commit('RESET_FORM_DATA')
     },
     saveFormData: function ({ commit }, formData) {
       console.log('saveFormData', formData)
@@ -272,6 +271,8 @@ const playlist = {
         data
       )
         .then((res) => {
+          console.log('createPlaylistComment', res)
+          // commit('CREATE_PLAYLIST_COMMENT', res.data)
           // 생성 성공. 아무 행동 안함.
           console.log("덧글 작성 완료.")
           axiosConnector.get(`/playlist/${playlistId}/comment`)

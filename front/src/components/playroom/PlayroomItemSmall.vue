@@ -12,7 +12,26 @@
         class="d-flex justify-space-between"
         width="100%"
       >
-        <div class="d-flex">
+        <div class="d-flex align-center">
+          <!-- 라디오 버튼 -->
+          <div
+            v-if="isRadioBtn"
+            class="mx-2"
+          >
+            <div v-if="playroom.id === chosenPlayroom.id">
+              <v-icon color="#5B5C9D">
+                mdi-radiobox-marked
+              </v-icon>
+            </div>
+            <div
+              v-else
+              @click.stop="select"
+            >
+              <v-icon>
+                mdi-radiobox-blank
+              </v-icon>
+            </div>
+          </div>
           <div class="video-thumbnail">
             <img
               :src="playroom.videos[0].thumbnail"
@@ -97,16 +116,25 @@ export default {
   components: { Tags, PlayroomPlaylistItemSmall },
   props: {
     playroom: { type: Object, default() { {} } },
+    isRadioBtn: { type: Boolean, default: false },
   },
   data() {
     return {
     }
   },
   computed: {
+    ...mapState('board', {
+      chosenPlayroom: state => state.chosenPlayroom
+    })
   },
   methods: {
-    ...mapActions('playroom', [
+    ...mapActions('board', [
+      'selectPlayroom'
     ]),
+    select: function () {
+      console.log('selectPlayroom')
+      this.selectPlayroom(this.playroom)
+    }
   }
 }
 </script>

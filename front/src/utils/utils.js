@@ -1,8 +1,9 @@
+import SERVER from '@/api/server'
 
 function timeConverter(UNIX_timestamp){
   var a = new Date(UNIX_timestamp * 1000);
   var year = a.getFullYear();
-  var month = a.getMonth();
+  var month = a.getMonth() + 1;
   var date = a.getDate();
   var hour = a.getHours();
   var min = a.getMinutes();
@@ -51,4 +52,20 @@ function DurationChange(input){
   return H  + M + ':' + S ;
 }
 
-export { timeConverter, playtimeConverter, DurationChange }
+function getImage(image) {
+  // 내용물 비어있으면 startsWith 작동 안함
+  if (image == null || image == "") {
+    return require(`@/assets/profile_basic.jpg`)
+  // OAUTH 유저등의 풀 링크 사진
+  } else if (image.startsWith('http')) {
+    return image
+  // 일반 유저 등의 GCP 업로드 사진
+  } else if (image.startsWith('/')) {
+    return SERVER.ROUTES.image + image
+  // 이 와중에 없으면 일단 기본 사진
+  } else {
+    return require(`@/assets/profile_basic.jpg`)
+  }
+}
+
+export { timeConverter, playtimeConverter, DurationChange, getImage }
