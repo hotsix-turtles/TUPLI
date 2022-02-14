@@ -52,10 +52,12 @@ public class Board {
     @OneToMany(mappedBy = "board")
     private List<BoardLikes> boardLikes = new ArrayList<>();
 
-    @OneToOne(mappedBy = "board")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="playlist_id")
     private Playlist playlist;
 
-    @OneToOne(mappedBy = "board")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="playroom_id")
     private Playroom playroom;
 
 
