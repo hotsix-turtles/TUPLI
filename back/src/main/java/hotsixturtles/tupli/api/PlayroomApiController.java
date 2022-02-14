@@ -1,9 +1,11 @@
 package hotsixturtles.tupli.api;
 
+import hotsixturtles.tupli.dto.PlaylistDto;
 import hotsixturtles.tupli.dto.PlayroomDto;
 import hotsixturtles.tupli.dto.PlayroomLikesDto;
 import hotsixturtles.tupli.dto.request.RequestPlayroomDto;
 import hotsixturtles.tupli.dto.response.ErrorResponse;
+import hotsixturtles.tupli.dto.response.ResponsePlayroomDto;
 import hotsixturtles.tupli.dto.simple.SimpleBadgeDto;
 import hotsixturtles.tupli.dto.simple.SimplePlayroomCategoryDto;
 import hotsixturtles.tupli.entity.Badge;
@@ -11,10 +13,7 @@ import hotsixturtles.tupli.entity.Playroom;
 import hotsixturtles.tupli.entity.UserBadge;
 import hotsixturtles.tupli.entity.likes.PlayroomLikes;
 import hotsixturtles.tupli.entity.youtube.YoutubeVideo;
-import hotsixturtles.tupli.service.BadgeService;
-import hotsixturtles.tupli.service.PlayroomService;
-import hotsixturtles.tupli.service.SearchService;
-import hotsixturtles.tupli.service.UserInfoService;
+import hotsixturtles.tupli.service.*;
 import hotsixturtles.tupli.service.list.CategoryListWord;
 import hotsixturtles.tupli.service.token.JwtTokenProvider;
 import io.swagger.annotations.ApiOperation;
@@ -34,6 +33,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
@@ -54,6 +54,8 @@ public class PlayroomApiController {
 
     private final UserInfoService userInfoService;
 
+    private final PlaylistService playlistService;
+
     /**
      * 내가 작성한 플레이룸들
      * @param token
@@ -72,8 +74,18 @@ public class PlayroomApiController {
         Long userSeq = jwtTokenProvider.getUserSeq(token);
 
         List<Playroom> playrooms = playroomService.getMyPlayroom(userSeq, pageable);
-        List<PlayroomDto> result = playrooms.stream().map(x -> new PlayroomDto(x)).collect(Collectors.toList());
-        return ResponseEntity.status(HttpStatus.OK).body(result);
+        List<PlayroomDto> playroomDtoList = playrooms.stream().map(x -> new PlayroomDto(x)).collect(Collectors.toList());
+
+        for(PlayroomDto nowPlayroom : playroomDtoList) {
+            List<PlaylistDto> plList = new ArrayList<>();
+            for (Map.Entry<Long, List<Long>> entry : nowPlayroom.getPlaylists().entrySet()){
+                Long playlistId = entry.getKey();
+                plList.add(new PlaylistDto(playlistService.getPlaylist(playlistId)));
+            }
+            nowPlayroom.setPlaylistsInfo(plList);
+        }
+
+        return ResponseEntity.status(HttpStatus.OK).body(playroomDtoList);
     }
 
     /**
@@ -86,9 +98,19 @@ public class PlayroomApiController {
 
         List<Playroom> playroomList = playroomService.getPlayroomList();
 
-        List<PlayroomDto> result = playroomList.stream().map(b -> new PlayroomDto(b)).collect(Collectors.toList());
 
-        return ResponseEntity.status(HttpStatus.OK).body(result);
+        List<PlayroomDto> playroomDtoList = playroomList.stream().map(b -> new PlayroomDto(b)).collect(Collectors.toList());
+
+        for(PlayroomDto nowPlayroom : playroomDtoList) {
+            List<PlaylistDto> plList = new ArrayList<>();
+            for (Map.Entry<Long, List<Long>> entry : nowPlayroom.getPlaylists().entrySet()){
+                Long playlistId = entry.getKey();
+                plList.add(new PlaylistDto(playlistService.getPlaylist(playlistId)));
+            }
+            nowPlayroom.setPlaylistsInfo(plList);
+        }
+
+        return ResponseEntity.status(HttpStatus.OK).body(playroomDtoList);
     }
 
     /**
@@ -263,9 +285,18 @@ public class PlayroomApiController {
 
         List<Playroom> playrooms = playroomService.getLikedPlayrooms(userSeq);
 
-        List<PlayroomDto> result = playrooms.stream().map(b -> new PlayroomDto(b)).collect(Collectors.toList());
+        List<PlayroomDto> playroomDtoList = playrooms.stream().map(b -> new PlayroomDto(b)).collect(Collectors.toList());
 
-        return ResponseEntity.ok().body(result);
+        for(PlayroomDto nowPlayroom : playroomDtoList) {
+            List<PlaylistDto> plList = new ArrayList<>();
+            for (Map.Entry<Long, List<Long>> entry : nowPlayroom.getPlaylists().entrySet()){
+                Long playlistId = entry.getKey();
+                plList.add(new PlaylistDto(playlistService.getPlaylist(playlistId)));
+            }
+            nowPlayroom.setPlaylistsInfo(plList);
+        }
+
+        return ResponseEntity.ok().body(playroomDtoList);
     }
 
     /**
