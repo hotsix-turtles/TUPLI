@@ -283,6 +283,11 @@ const routes = [
     component: BoardForm
   },
   {
+    path: '/board/update',
+    name: 'BoardUpdateForm',
+    component: BoardForm
+  },
+  {
     path: '/board/playlist',
     name: 'BoardSelectPlaylist',
     component: BoardSelectPlaylist

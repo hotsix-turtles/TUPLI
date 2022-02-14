@@ -4,10 +4,18 @@
     <div class="d-flex justify-space-between fixed-top light-background">
       <back :page-name="pageName" />
       <div
-        class="clickable"
+        v-if="formType === 'create'"
+        class="clickable font-2"
         @click="onClickCompletion"
       >
         완료
+      </div>
+      <div
+        v-else
+        class="clickable"
+        @click="onClickCompletion"
+      >
+        수정
       </div>
     </div><br><br>
 
@@ -71,7 +79,7 @@
               <v-btn
                 color="accent"
                 elevation="2"
-                @click="goSelect"
+                @click="goChoose"
               >
                 선택하기
               </v-btn>
@@ -98,7 +106,6 @@
             <div
               v-if="formData.radioVal === 'playlist'"
             >
-              {{ chosenPlaylist.id }}
               <div
                 v-if="chosenPlaylist.id > 0"
                 class="container added"
@@ -116,7 +123,6 @@
                 v-if="chosenPlayroom.id > 0"
                 class="container added"
               >
-                {{ chosenPlayroom.id }}
                 <playroom-item-big
                   :playroom="chosenPlayroom"
                 />
@@ -146,7 +152,8 @@ export default {
   },
   data: function() {
     return {
-      pageName: "게시글 작성",
+      pageName: '게시글 작성',
+      formType: 'create',
       formData: {
         content: '',
         isBoard: false,
@@ -165,7 +172,7 @@ export default {
       savedFormData: state => state.savedFormData,
       isSaved: state => state.isSaved,
       chosenPlaylist: state => state.chosenPlaylist,
-      chosenPlayroom: state => state.chosenPlayroom
+      chosenPlayroom: state => state.chosenPlayroom,
     }),
   },
   created: function() {
@@ -173,16 +180,23 @@ export default {
       this.formData = this.savedFormData
       console.log("내가 가져온 플레이리스트는", this.chosenPlaylist)
     } else {
-      this.resetVideoAddState()
       console.log("boardForm첨왔어요")
+      this.resetFormData()
+    }
+    console.log('this.$route.params.boardId',this.$route.params.boardId)
+    if (typeof this.$route.params.boardId === 'undefined') {
+      this.formType = 'create'
+    } else {
+      this.formType = 'update'
     }
   },
   methods: {
     ...mapActions('board', [
+      'resetFormData',
       'saveFormData',
-      'resetBoardPlaylistAddState',
-      'selectPlaylistOrPlayroom',
+      'choosePlaylistOrPlayroom',
       'createBoard',
+      'updateBoard',
     ]),
     onClickCompletion: function () {
       // 필수항목을 채웠을 경우
@@ -195,24 +209,41 @@ export default {
         // 순수 글인 경우
         if(!this.formData.isBoard) {
           console.log("순수 글 업로드")
-          this.createBoard(formData)
+          if (this.formType === 'create') {
+            this.createBoard(formData)
+          } else {
+            const params = {
+              id: this.$route.params.boardId,
+              formData: formData,
+            }
+            this.updateBoard(params)
+          }
+          setTimeout(() => {this.resetFormData()}, 1000)
         }
         // 플레이룸 or 플레이리스트에 대한 글
         else {
           formData.type = this.formData.radioVal
           formData.typeId = formData.type === 'playlist' ? this.chosenPlaylist.id : this.chosenPlayroom.id
           if(formData.typeId) {
-            this.createBoard(formData)
+            if (this.formType === 'create') {
+              this.createBoard(formData)
+            } else {
+              const params = {
+                id: this.$route.params.boardId,
+                formData: formData,
+              }
+              this.updateBoard(params)
+            }
+            setTimeout(() => {this.resetFormData()}, 1000)
           }
           else {
             this.boardValid = false
           }
         }
-        setTimeout(() => {this.resetBoardPlaylistAddState()}, 1000)
       }
     },
-    goSelect: function() {
-      this.selectPlaylistOrPlayroom(this.formData.radioVal);
+    goChoose: function() {
+      this.choosePlaylistOrPlayroom(this.formData.radioVal);
       this.saveFormData(this.formData)
       if(this.formData.radioVal == "playroom") {
         this.$router.push({ name: 'BoardSelectPlayroom' })

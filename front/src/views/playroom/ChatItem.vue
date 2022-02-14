@@ -13,8 +13,8 @@
         @click.stop="SELECT_CHAT_AVATAR(id)"
       >
         <v-img
-          :src="profile"
-          :lazy-src="profile"
+          :src="ImgUrl(author.thumbnail)"
+          :lazy-src="ImgUrl(author.thumbnail)"
           class="pa-1"
         >
           <template v-slot:placeholder>
@@ -32,7 +32,7 @@
         </v-img>
       </v-avatar>
       <p class="font-3 ml-1 font-weight-bold">
-        {{ name }}
+        {{ author.name }}
       </p>
       <p
         v-if="!blocked"
@@ -87,14 +87,14 @@
           <v-btn
             block
             text
-            @click="followUser(id)"
+            @click="followUser(author.id)"
           >
             팔로우
           </v-btn>
           <v-btn
             block
             text
-            @click="showUserProfile(id)"
+            @click="showUserProfile(author.id)"
           >
             유저 프로필
           </v-btn>
@@ -102,7 +102,7 @@
             v-if="!blockedUser"
             block
             text
-            @click="blockUser(id)"
+            @click="blockUser(author.id)"
           >
             유저 차단
           </v-btn>
@@ -110,7 +110,7 @@
             v-else
             block
             text
-            @click="unblockUser(id)"
+            @click="unblockUser(author.id)"
           >
             유저 차단 해제
           </v-btn>
@@ -118,7 +118,7 @@
             v-if="userId == roomAuthorId"
             block
             text
-            @click="kickUser(id)"
+            @click="kickUser(author.id)"
           >
             유저 강퇴
           </v-btn>
@@ -130,13 +130,13 @@
 
 <script>
 import { mapActions, mapMutations, mapState } from 'vuex';
+import { getImage } from '../../utils/utils'
 
 export default {
   name: "ChatItem",
   props: {
     id: { type: String, default: '' },
-    name: { type: String, default: '' },
-    profile: { type: String, default: '' },
+    author: { type: Object, default() {} },
     content: { type: String, default: '' },
     timestamp: { type: Number, default: 0 },
     blockedUser: { type: Boolean, default: false },
@@ -164,12 +164,15 @@ export default {
     ...mapState(['userId'])
   },
   methods: {
+    ImgUrl: function(img) {
+      return getImage(img)
+    },
     showUserProfile(id) {
-      this.$router.push(`/profile/${this.id}`)
+      this.$router.push(`/profile/${this.author.id}`)
       this.DESELECT_CHAT_ITEM();
     },
     kickUser(id) {
-      this.$emit('kick-user', this.id);
+      this.$emit('kick-user', this.author.id);
     },
     ...mapMutations('playroom', ['SELECT_CHAT_ITEM', 'SELECT_CHAT_AVATAR', 'DESELECT_CHAT_ITEM']),
     ...mapActions('playroom', [ 'followUser', 'blockUser', 'blockMessage', 'unblockUser', 'unblockMessage'])

@@ -1,7 +1,7 @@
 /* eslint-disable vue/require-default-prop */
 <template>
   <v-bottom-navigation
-    v-if="selected != 0"
+    v-if="chosen != 0"
     absolute
     background-color="#5B5C9D"
     height="60px"
@@ -9,7 +9,7 @@
   >
     <div
       class="d-flex align-center"
-      @click="runSelectPlaylist"
+      @click="runChoosePlaylist"
     >
       <div>
         <v-icon color="white">
@@ -31,7 +31,7 @@ export default {
   components: {
   },
   props: {
-    selected: {
+    chosen: {
       type: Object, default() {}
     }
   },
@@ -45,18 +45,18 @@ export default {
   },
   methods: {
     ...mapActions('board', [
-      'selectPlaylist',
-      'selectPlayroom'
+      'choosePlaylist',
+      'choosePlayroom'
     ]),
-    runSelectPlaylist() {
+    runChoosePlaylist() {
       if(this.playlistOrPlayroom == "playlist") {
-        console.log("you selected", this.selected)
-        this.selectPlaylist(this.selected)
+        console.log("you chosen", this.chosen)
+        this.choosePlaylist(this.chosen)
         this.$router.push({ name: 'BoardForm'})
       }
       else if(this.playlistOrPlayroom == "playroom") {
-        console.log("you selected playroom, and ", this.selected)
-        this.selectPlayroom(this.selected)
+        console.log("you chosen playroom, and ", this.chosen)
+        this.choosePlayroom(this.chosen)
         this.$router.push({ name: 'BoardForm'})
       }
     }

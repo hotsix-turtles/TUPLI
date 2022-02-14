@@ -7,24 +7,30 @@
         <!-- 좋아요 -->
         <div>
           <div
-            v-if="isLiked"
-            @click="unlikeBoard(boardDetail.id)"
+            v-if="boardDetail.isLiked"
+            class="animate__animated animate__heartBeat"
+            @click="onClickUnlike"
           >
-            <v-icon>mdi-cards-heart</v-icon>
+            <v-icon color="#5B5C9D">
+              mdi-cards-heart
+            </v-icon>
           </div>
           <div
             v-else
-            @click="likeBoard(boardDetail.id)"
+            @click="onClickLike"
           >
             <v-icon>mdi-cards-heart-outline</v-icon>
           </div>
         </div>
         <!-- 댓글 -->
-        <div @click="$router.push({ name: 'BoardComment', params: { boardId: boardDetail.id }})">
+        <!-- <div @click="$router.push({ name: 'BoardComment', params: { boardId: boardDetail.id }})">
+          <v-icon>mdi-comment-outline</v-icon>
+        </div> -->
+        <div>
           <v-icon>mdi-comment-outline</v-icon>
         </div>
         <!-- 작성자일 경우, 수정하기 삭제하기 모달창 -->
-        <div v-if="userId === boardDetail.userId">
+        <div v-if="userId === boardDetail.user.userSeq">
           <v-icon @click="onClickModal">
             mdi-dots-vertical
           </v-icon>
@@ -38,50 +44,63 @@
       </div>
     </div><br><br>
     <!-- {{ BoardDetail }} -->
-    <div class="container">
+    <div class="container pt-0">
       <!-- 작성자 정보 -->
-      <div class="d-flex justify-center">
+      <div class="d-flex align-center">
         <div class="profileImg mx-1">
-          {{ boardDetail.userProfileImg }}
+          {{ boardDetail.user.profileImage }}
         </div>
-        <div class="">
-          {{ boardDetail.nickname }}
+        <div class="semi-bold">
+          {{ boardDetail.user.nickname }}
         </div>
-        <div class="mx-1">
-          팔로워 <span>{{ boardDetail.userFollowersCnt }}</span>
+        <div class="mx-1 font-3 color-dark-gray">
+          팔로워 <span>{{ boardDetail.user.followerCnt }}</span>
         </div>
       </div>
       <!-- 소개글 -->
-      <p>{{ boardDetail.content }}</p>
+      <p class="mx-3 mt-3">
+        {{ boardDetail.content }}
+      </p>
       <!-- 공유 게시물 -->
       <div
-        v-if="boardDetail.sharedContent"
         class="container"
       >
-        <div
-          v-if="boardDetail.sharedContent.type === 'playlist'"
-        >
+        <div>
           <div
+            v-if="boardDetail.playlist !== null"
             class="container added"
           >
             <playlist-item-big
-              :playlist="boardDetail.sharedContent"
+              :playlist="boardDetail.playlist"
             />
           </div>
-          <v-col />
-        </div>
-        <div
-          v-else
-        >
           <div
+            v-if="boardDetail.playroom !== null"
             class="container added"
           >
             <playroom-item-big
-              :playroom="boardDetail.sharedContent"
+              :playroom="boardDetail.playroom"
             />
           </div>
-          <v-col />
         </div>
+        <!-- 전체 선택 / 영상 리스트 -->
+        <div
+          v-if="boardDetail.playroom !== null || boardDetail.playroom !== null"
+          class="clickable my-3"
+          @click="onClickSelectAll"
+        >
+          <v-icon>mdi-check</v-icon>
+          <span>전체 선택</span>
+        </div>
+        <video-list-item-small
+          v-if="boardDetail.playlist !== null"
+          :videos="boardDetail.playlist.videos"
+        />
+        <video-list-item-small
+          v-if="boardDetail.playroom !== null"
+          :videos="boardDetail.playroom.videos"
+        />
+        <detail-button-bottom />
       </div>
     </div>
   </div>
@@ -95,16 +114,22 @@ import PlayroomItemBig from '../../components/playroom/PlayroomItemBig.vue'
 import PlaylistItemBig from '../../components/playlist/PlaylistItemBig.vue'
 import BackOnly from '../../components/common/BackOnly.vue'
 import Modal from '../../components/common/Modal.vue'
+import VideoListItemSmall from '../../components/video/VideoListItemSmall.vue';
+import DetailButtonBottom from '../../components/playlist/DetailButtonBottom.vue'
+
 export default {
-  name: 'BoardFormVideo',
+  name: 'BoardDetail',
   components: {
     BackOnly,
     Modal,
     PlayroomItemBig,
     PlaylistItemBig,
+    DetailButtonBottom,
+    VideoListItemSmall,
   },
   data: function() {
     return {
+      isSelectedAll: false,
       selectList: {
         '수정하기': 'update',
         '삭제하기': 'delete',
@@ -128,6 +153,13 @@ export default {
       'likeBoard',
       'unlikeBoard',
       'saveFormData',
+      'choosePlaylist',
+      'choosePlayroom',
+    ]),
+    ...mapActions('video', [
+      'deselectAllDetailVideos',
+      'selectAllDetailVideos',
+      'saveAddedVideos',
     ]),
     ...mapActions('common', [
       'onClickModal',
@@ -136,15 +168,24 @@ export default {
       if (item === 'update') {
         const formData = {
           content: this.boardDetail.content,
-          type: this.boardDetail.type
+          isBoard: false,
+          radioVal: 'playroom',
+        }
+        if (this.boardDetail.playlist !== null ) {
+          formData.isBoard = true
+          formData.radioVal = 'playlist'
+          this.choosePlaylist(this.boardDetail.playlist)
+        } else if (this.boardDetail.playroom !== null) {
+          formData.isBoard = true
+          this.choosePlayroom(this.boardDetail.playroom)
         }
         this.saveFormData(formData)
-        this.$router.push({ name: 'BoardUpdateForm', params: { BoardId: this.boardDetail.id } })
+        this.$router.push({ name: 'BoardUpdateForm', params: { boardId: this.boardDetail.id } })
       } else if (item === 'delete') {
         console.log('onSelect 삭제', item)
-        axiosConnector.delete(`/Board/${this.boardDetail.id}`
+        axiosConnector.delete(`/board/${this.boardDetail.id}`
         ).then((res) => {
-          console.log('삭제되었습니다', res)
+          console.log('게시글이 삭제되었습니다', res)
           this.$router.push({ name: 'Home' })
         }).catch((err) => {
           console.log(err)
@@ -153,13 +194,25 @@ export default {
     },
     onClickLike: function () {
       this.boardDetail.isLiked = true
-      this.boardDetail.likesCnt++
+      // this.boardDetail.likesCnt++
       this.likeBoard(this.boardDetail.id)
     },
     onClickUnlike: function () {
       this.boardDetail.isLiked = false
-      this.boardDetail.likesCnt--
+      // this.boardDetail.likesCnt--
       this.unlikeBoard(this.boardDetail.id)
+    },
+    onClickSelectAll: function () {
+      if (this.isSelectedAll) {
+        this.deselectAllDetailVideos()
+      } else {
+        if (this.boardDetail.playlist !== null) {
+          this.selectAllDetailVideos(this.boardDetail.playlist.videos)
+        } else {
+          this.selectAllDetailVideos(this.boardDetail.playroom.videos)
+        }
+      }
+      this.isSelectedAll = !this.isSelectedAll
     },
   },
 }

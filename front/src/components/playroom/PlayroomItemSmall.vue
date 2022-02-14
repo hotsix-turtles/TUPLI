@@ -25,7 +25,7 @@
             </div>
             <div
               v-else
-              @click.stop="select"
+              @click.stop="choose"
             >
               <v-icon>
                 mdi-radiobox-blank
@@ -129,11 +129,11 @@ export default {
   },
   methods: {
     ...mapActions('board', [
-      'selectPlayroom'
+      'choosePlayroom'
     ]),
-    select: function () {
-      console.log('selectPlayroom')
-      this.selectPlayroom(this.playroom)
+    choose: function () {
+      console.log('choosePlayroom')
+      this.choosePlayroom(this.playroom)
     }
   }
 }
