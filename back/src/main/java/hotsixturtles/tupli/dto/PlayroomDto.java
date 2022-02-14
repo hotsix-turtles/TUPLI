@@ -31,6 +31,7 @@ public class PlayroomDto {
     private List<Long> inviteIds;
     private OffsetDateTime startTime;
     private OffsetDateTime endTime;
+    private List<Long> guests;
 
     private Integer userCount;
     private Integer likesCnt;
@@ -58,6 +59,7 @@ public class PlayroomDto {
         this.inviteIds = inviteIds;
         this.startTime = playroom.getStartTime();
         this.endTime = playroom.getEndTime();
+        this.guests = playroom.getGuests();
         this.userCount = playroom.getUserCount();
         this.likesCnt = playroom.getLikesCnt();
         this.userCountMax = playroom.getUserCountMax();
@@ -77,6 +79,7 @@ public class PlayroomDto {
         this.inviteIds = inviteIds;
         this.startTime = playroom.getStartTime();
         this.endTime = playroom.getEndTime();
+        this.guests = playroom.getGuests();
         this.userCount = playroom.getUserCount();
         this.likesCnt = playroom.getLikesCnt();
         this.userCountMax = playroom.getUserCountMax();
