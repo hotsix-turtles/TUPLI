@@ -39,6 +39,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.IOException;
@@ -117,8 +118,8 @@ public class UserApiController {
 //        @Size(min=3, max=128, message = "{error.size.username}")
         private String username;
         @Size(min=3, max=128, message = "{error.size.email}")
-//        @Email(message = "{error.format.email}")
-//        @Email(message = "{email.notempty}")
+        @Email(message = "{error.format.email}")
+        @Email(message = "{email.notempty}")
         private String email;
         private String nickname;
         @Size(min=3, max=128, message = "{error.size.password}")
