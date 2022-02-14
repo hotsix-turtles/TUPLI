@@ -94,6 +94,7 @@ public class SimpleHomeBoardDto {
             this.userLikesYN = "N";
         }
         else{
+            this.userLikesYN = "N";
             for(BoardLikes nowBoardLikes : board.getBoardLikes()){
                 if(nowBoardLikes.getUser().getUserSeq() == user.getUserSeq()){
                     this.userLikesYN = "Y";

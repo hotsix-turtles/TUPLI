@@ -83,7 +83,6 @@ public class HomeApiController {
             return ResponseEntity.ok().body(homeInfos);
         } else {
             Long userSeq = jwtTokenProvider.getUserSeq(token);
-
             List<Object> homeInfos = homeInfoService.getHomeInfoList(userSeq, pageable);
             if (homeInfos.size() == 0) return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
 
