@@ -76,8 +76,8 @@
             @click="playroomLike"
           >
             <span>좋아요</span>
-            <v-icon :color="roomLiked ? 'blue' : undefined">
-              mdi-thumb-up
+            <v-icon :color="roomLiked ? 'red' : undefined">
+              mdi-heart
             </v-icon>
           </v-btn>
 
