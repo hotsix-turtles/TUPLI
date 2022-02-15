@@ -34,13 +34,13 @@
       </v-row>
       <v-container>
         <div class="d-flex flex-column align-center">
-          <img
-            class="py-3"
-            src="../../assets/logo_semi.png"
-            alt=""
-            width="45px"
-            fab
-          >
+          <div class="profile-img-medium">
+            <img
+              :src="ImgUrl(image)"
+              alt=""
+              fab
+            >
+          </div>
           <!-- 사진 업로드용 임시 -->
           <div class="update-modal mb-3">
             <label for="profile-photo" />
@@ -85,6 +85,7 @@
 import axios from 'axios'
 import SERVER from '@/api/server'
 import { mapState } from 'vuex'
+import { getImage } from '../../utils/utils'
 
 import axiosConnector from '@/utils/axios-connector'
 
@@ -136,6 +137,10 @@ export default {
     },
     getNewImage: function(event) {
       this.credentials.newImage = event.target.files[0]
+    },
+    // 이미지 조합
+    ImgUrl: function(img) {
+      return getImage(img)
     },
   }
 }

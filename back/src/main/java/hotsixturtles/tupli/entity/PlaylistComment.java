@@ -12,7 +12,7 @@ import java.time.OffsetDateTime;
 @Table(name = "playlist_comment")
 @Getter
 @Setter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor//(access = AccessLevel.PROTECTED)
 public class PlaylistComment {
 
     @Id

@@ -34,5 +34,10 @@ public class UserBadge {
         acquired = OffsetDateTime.now();
     }
 
+    public UserBadge(Long userSeq, Long badgeSeq){
+        this.userSeq = userSeq;
+        this.badgeSeq = badgeSeq;
+    }
+
 
 }

@@ -13,6 +13,7 @@ import hotsixturtles.tupli.service.YoutubeVideoService;
 import hotsixturtles.tupli.service.list.CategoryListWord;
 import hotsixturtles.tupli.service.token.JwtTokenProvider;
 import io.swagger.annotations.Api;
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -24,6 +25,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.constraints.Size;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -198,13 +201,12 @@ public class YoutubeVideoApiController {
     /**
      * 프론트 검색 종료 후, 검색 결과 중에 좋아요, 저장했는지 여부.
      * @param token
-     * @param urls
      * @return
      * 반환 코드 : 200, 403
      */
-    @GetMapping("/profile/video/isLikes")
+    @PutMapping("/profile/video/isLikes")
     public ResponseEntity getSearchResultInfo(@RequestHeader(value = "Authorization") String token,
-                                              @RequestPart(value = "urls") List<String> urls) {
+                                              @RequestBody UrlRequest urlRequest) {
         // 유저 정보
         if (!jwtTokenProvider.validateToken(token)) {
             return ResponseEntity
@@ -214,9 +216,16 @@ public class YoutubeVideoApiController {
         Long userSeq = jwtTokenProvider.getUserSeq(token);
 
         // 정보 담기
+        List<String> urls = urlRequest.getUrls();
         YoutubeVideoLikesSavedDto result = youtubeVideoService.getSearchResultInfo(userSeq, urls);
 
         return ResponseEntity.ok().body(result);
+    }
+
+    // 특수한 Library 없으면 @RequestBody List<String> urls로 못 받고 별도의 DTO 필요
+    @Data
+    static class UrlRequest {
+        List<String> urls;
     }
 
     /**

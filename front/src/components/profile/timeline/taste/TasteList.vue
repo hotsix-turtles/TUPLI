@@ -1,17 +1,33 @@
 <template>
-  <v-app>
-    <history-item />
-  </v-app>
+  <div>
+    <p
+      v-for="(value, name) in tastes"
+      :key="name"
+      :name="name"
+      :value="value"
+    >
+      {{ name }} : {{ value }}
+    </p>
+    <taste-item />
+  </div>
 </template>
 
 <script>
-import HistoryItem from '@/components/profile/history/HistoryItem.vue'
+
+import TasteItem from './TasteItem.vue'
 
 export default {
-  name: 'HistoryList',
+  name: 'TasteList',
   components: {
-    HistoryItem,
+    TasteItem,
   },
+  props: {
+    tastes: {type : Object, default() { {} } }
+  },
+  created: function() {
+    console.log('데이터 모양 보기', this.tastes)
+  }
+
 }
 </script>
 

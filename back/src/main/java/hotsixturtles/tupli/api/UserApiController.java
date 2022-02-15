@@ -39,14 +39,17 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.IOException;
+import java.net.URLDecoder;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -115,8 +118,8 @@ public class UserApiController {
 //        @Size(min=3, max=128, message = "{error.size.username}")
         private String username;
         @Size(min=3, max=128, message = "{error.size.email}")
-//        @Email(message = "{error.format.email}")
-//        @Email(message = "{email.notempty}")
+        @Email(message = "{error.format.email}")
+        @Email(message = "{email.notempty}")
         private String email;
         private String nickname;
         @Size(min=3, max=128, message = "{error.size.password}")
@@ -150,6 +153,30 @@ public class UserApiController {
 
         SecurityContextHolder.clearContext();
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+    }
+
+    /**
+     * 해당 유저의 취향(행동 분석결과) 상위 5개 정리해놓은것 가져가기
+     * @param userSeq
+     * @return
+     */
+    @GetMapping("/profile/taste/{userSeq}")
+    public ResponseEntity profileTaste(@PathVariable("userSeq") Long userSeq) {
+        // 해당 유저의 취향 가져가기
+        List<String> taste = userService.getProfileTaste(userSeq);
+        return ResponseEntity.ok().body(taste);
+    }
+
+    /**
+     * 해당 유저의 취향정보 통째로 가져가기
+     * @param userSeq
+     * @return
+     */
+    @GetMapping("/profile/tasteInfo/{userSeq}")
+    public ResponseEntity profileTasteInfo(@PathVariable("userSeq") Long userSeq) {
+        // 해당 유저의 취향 가져가기
+        ConcurrentHashMap<String, Integer> tasteInfo = userService.getProfileTasteInfo(userSeq);
+        return ResponseEntity.ok().body(tasteInfo);
     }
 
     /**
@@ -205,6 +232,56 @@ public class UserApiController {
         private String passwordChange;
     }
 
+    /**
+     * 비밀번호 변경(OUATH)
+     * @param token
+     * @return
+     */
+    @PutMapping("/account/password/oauth")
+    public ResponseEntity passwordOauthChange(@RequestHeader(value = "Authorization") String token,
+                                              @RequestBody passwordOauthChangeRequest request,
+                                              BindingResult bindingResult) {
+
+
+        if (bindingResult.hasErrors()) {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(new ErrorResponse(bindingResult.getAllErrors().get(0).getDefaultMessage()));
+        }
+
+        // 유저 인증 및 확인
+        if (!jwtTokenProvider.validateToken(token)) {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(new ErrorResponse(messageSource.getMessage("error.valid.jwt", null, LocaleContextHolder.getLocale())));
+        }
+        User user = jwtTokenProvider.getUser(token);
+
+        // Oauth유저 확인
+        if (!request.getPassword().equals("NO_PASS")) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new ErrorResponse(messageSource.getMessage("error.wrong.oauthpassword", null, LocaleContextHolder.getLocale())));
+        }
+
+        // 비밀번호 변경
+        try {
+            userService.changePassword(user, request.getPasswordChange());
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+        }
+        catch (IllegalStateException e) {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(new ErrorResponse(messageSource
+                            .getMessage("error", null, LocaleContextHolder.getLocale())));
+        }
+    }
+
+    @Data
+    static class passwordOauthChangeRequest {
+        private String password;
+        @Size(min=3, max=128, message = "{error.size.password}")
+        private String passwordChange;
+    }
 
     /**
      * 로그인 JWT 발급
@@ -307,17 +384,21 @@ public class UserApiController {
 
     /**
      * token 유효 확인, 자동 로그아웃 등에 활용
-     * @param token
+     * @param request (token)
      * @return
      */
     @GetMapping("/account/tokenvalidate")
-    public ResponseEntity<?> checkTokenValidate(@RequestHeader(value = "Authorization") String token){
+    public ResponseEntity<?> checkTokenValidate(HttpServletRequest request){
+
         // 인증 확인후 돌리기
-        if (!jwtTokenProvider.validateToken(token)) {
+        String token = request.getHeader("Authorization");
+
+        if (token == null || !jwtTokenProvider.validateToken(token)) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(new ErrorResponse(messageSource.
                             getMessage("error.valid.jwt", null, LocaleContextHolder.getLocale())));
         }
+
         return ResponseEntity.ok().body(null);
     }
 
@@ -326,8 +407,9 @@ public class UserApiController {
      * @param userSeq
      * @return
      */
-    @PutMapping("/account/passwordFind/{userSeq}")
-    public ResponseEntity passwordFind(@PathVariable("userSeq") Long userSeq) {
+    @PutMapping("/account/passwordFind/{userSeq}/nickname/{nickname}")
+    public ResponseEntity passwordFind(@PathVariable("userSeq") Long userSeq,
+                                       @PathVariable("nickname") String nickname) {
         // 임시 비밀번호
         mailSendService.sendTmpPassword(userSeq);
         return ResponseEntity.ok().body(null);
@@ -373,6 +455,11 @@ public class UserApiController {
                                            @RequestPart(value = "introduction", required = false) String introduction,
                                             @RequestPart(value = "nickname", required = false) String nickname,
                                            HttpServletRequest request) throws IOException {
+
+        //utf-8 내용 적용해서 DB에 넣기
+        introduction = URLDecoder.decode(introduction, "UTF-8");
+        nickname = URLDecoder.decode(nickname, "UTF-8");
+        
         // jwt 유효 확인 + 정보 빼기
         String token = request.getHeader("Authorization");
         if(!jwtTokenProvider.validateToken(token)) {
@@ -590,15 +677,14 @@ public class UserApiController {
                     .body(new ErrorResponse(messageSource.getMessage
                             ("error.valid.jwt", null, LocaleContextHolder.getLocale())));
         }
-        // user_likes 테이블에 to_user 에 otherUserSeq 이 들어간 리스트 반환하면 될듯
-        // 22.02.02 한길 - 미완성... 잘 될지 안될지 모름.
-        // 민구. 네 이대로는 안될겁니다. 이건 중간 테이블이고 가공을 해서 보내주셔야죠. 거의 다 오셨습니다.
-        // 반환은 Entity가 아니라 DTO로 해주세요. 이거 하다보면 눈치 채실겁니당b
+
         List<UserLikes> followerList = userService.getFollowers(userSeq);
-        return ResponseEntity.status(HttpStatus.OK).body(followerList);
+
+        List<SimpleUserDto> response = followerList.stream()
+                .map(x -> new SimpleUserDto(x.getFromUser())).collect(Collectors.toList());
+
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
-
-
 
     /**
      * 해당 유저의 팔로워(이 유저를 팔로우 한 사람) 수 보기
@@ -611,4 +697,74 @@ public class UserApiController {
         int followersCnt = userService.getFollowersCount(userSeq);
         return ResponseEntity.status(HttpStatus.OK).body(followersCnt);
     }
+
+    /**
+     * 내가 팔로우 한 유저 목록
+     * @param token
+     * @return
+     */
+    @GetMapping("/profile/followings/{userSeq}")
+    public ResponseEntity<?> getMyFollowees(
+            @ApiParam(value = "auth token")
+            @RequestHeader(value = "Authorization") String token,
+            @ApiParam(value = "path로 userSeq가 입력된다.")
+            @PathVariable("userSeq") Long userSeq) {
+        if (!jwtTokenProvider.validateToken(token)) {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(new ErrorResponse(messageSource.getMessage
+                            ("error.valid.jwt", null, LocaleContextHolder.getLocale())));
+        }
+
+        Long tokenUserSeq = jwtTokenProvider.getUserSeq(token);
+
+        List<UserLikes> followerList = userService.getFollowees(tokenUserSeq);
+
+        List<SimpleUserDto> response = followerList.stream()
+                .map(x -> new SimpleUserDto(x.getToUser())).collect(Collectors.toList());
+
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    /**
+     * 자신의 맞팔로워 목록
+     * @param token
+     * @return
+     */
+    @GetMapping("/profile/cofollowers/{userSeq}")
+    public ResponseEntity<?> getMyCoFollowers(
+            @ApiParam(value = "auth token")
+            @RequestHeader(value = "Authorization") String token,
+            @ApiParam(value = "path로 userSeq가 입력된다.")
+            @PathVariable("userSeq") Long userSeq) {
+        if (!jwtTokenProvider.validateToken(token)) {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(new ErrorResponse(messageSource.getMessage
+                            ("error.valid.jwt", null, LocaleContextHolder.getLocale())));
+        }
+
+        Long tokenUserSeq = jwtTokenProvider.getUserSeq(token);
+
+        List<UserLikes> followerList = userService.getFollowers(tokenUserSeq);
+        List<SimpleUserDto> result = new ArrayList<>();
+        List<User> followers = new ArrayList<>();
+        for(UserLikes userLikes : followerList){
+            followers.add(userLikes.getFromUser());
+        }
+
+        List<UserLikes> followeeList = userService.getFollowees(tokenUserSeq);
+        for(UserLikes userLikes : followeeList){
+            User myFollowee = userLikes.getToUser();
+            for(User myFollower : followers){
+                if(myFollower.getUserSeq() == myFollowee.getUserSeq() && !result.contains(new SimpleUserDto(myFollower))){
+                    result.add(new SimpleUserDto(myFollower));
+                    break;
+                }
+            }
+        }
+
+        return ResponseEntity.status(HttpStatus.OK).body(result);
+    }
+
 }

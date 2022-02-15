@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 
 
 @Service
@@ -38,7 +39,8 @@ public class UserService {
         validateDuplicateUser(user);
         user.setPassword(user.getPassword());
         user.encodePassword(passwordEncoder);
-
+        int randNum = (int)(Math.random()*20) + 1;
+        user.setProfileImage("#" + randNum);
         userRepository.save(user);
         UserInfo userInfo = new UserInfo();
         userInfo.setUserSeq(user.getUserSeq());
@@ -95,6 +97,10 @@ public class UserService {
     public User getUserByUserName(String userName) {
         User user = userRepository.findByUsername(userName);
         return user;
+    }
+
+    public User getUserByUserseq(Long userSeq){
+        return userRepository.findByUserSeq(userSeq);
     }
 
     // OAUTH용
@@ -204,6 +210,11 @@ public class UserService {
         return userlikes;
     }
 
+    public List<UserLikes> getFollowees(Long otherUserSeq) {
+        // to_user_id 가 otherUserSeq 로 이루어져있는 녀석들만 골라서 저장하고 리턴
+        List<UserLikes> userlikes = userLikesRepository.findByFromUser(otherUserSeq);
+        return userlikes;
+    }
 
     @Transactional
     public void rankUpPremium(String token) {
@@ -223,6 +234,26 @@ public class UserService {
 
     public int getFollowersCount(Long userSeq){
         return userLikesRepository.findFollowersCount(userSeq);
+    }
+
+    public List<String> getProfileTaste(Long userSeq) {
+        User user = userRepository.findByUserSeq(userSeq);
+        if (user != null) {
+            return user.getTaste();
+        } else {
+            throw new IllegalStateException("해당 유저 없음");
+        }
+    }
+
+
+    public ConcurrentHashMap<String, Integer> getProfileTasteInfo(Long userSeq) {
+        UserInfo userInfo = userInfoRepository.findOneByUserSeq(userSeq);
+        if (userInfo != null) {
+             return userInfo.getTasteInfo();
+        } else {
+            throw new IllegalStateException("해당 유저 없음");
+        }
+
     }
 }
 

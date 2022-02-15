@@ -205,6 +205,7 @@ public class BadgeService {
     }
 
     // 시청 시간 파악
+    @Transactional
     public List<Badge> checkWatchTime(Long userSeq, List<Long> badges){
         List<Badge> result = new ArrayList<>();
         int i = 1;
@@ -225,6 +226,7 @@ public class BadgeService {
     }
 
     // 게시한 게시글 수 파악
+    @Transactional
     public List<Badge> checkBoardUpload(Long userSeq, List<Long> badges){
         List<Badge> result = new ArrayList<>();
         int i = 4;
@@ -232,7 +234,7 @@ public class BadgeService {
         for(i = 4; i <= Badge2_increment; i++){
             if(boardUploadNum >= Badge2List.get(i-4)){
                 if(!badges.contains(Long.valueOf(i))){
-                    UserBadge userBadge = new UserBadge(null, userSeq, Long.valueOf(i), OffsetDateTime.now());
+                    UserBadge userBadge = new UserBadge(userSeq, Long.valueOf(i));
                     result.add(badgeRepository.findByBadgeSeq(Long.valueOf(i)));
                     userBadgeRepository.save(userBadge);
                 }
@@ -245,6 +247,7 @@ public class BadgeService {
     }
 
     // 프리미엄 유저 확인
+    @Transactional
     public List<Badge> checkPremium(Long userSeq, List<Long> badges){
         List<Badge> result = new ArrayList<>();
         int i = 7;
@@ -260,6 +263,7 @@ public class BadgeService {
     }
 
     // 좋아요 수 확인 ( 해당 유저 플레이 리스트 )
+    @Transactional
     public List<Badge> checkPlaylistLikes(Long userSeq, List<Long> badges){
         List<Badge> result = new ArrayList<>();
         int i = 8;
@@ -280,6 +284,7 @@ public class BadgeService {
     }
 
     // 자신이 팔로우 한 사람 수
+    @Transactional
     public List<Badge> checkFollowees(Long userSeq, List<Long> badges){
         List<Badge> result = new ArrayList<>();
         int i = 11;
@@ -301,6 +306,7 @@ public class BadgeService {
     }
 
     // 자신을 팔로우 한 사람 수
+    @Transactional
     public List<Badge> checkFollowers(Long userSeq, List<Long> badges){
         List<Badge> result = new ArrayList<>();
         int i = 14;
@@ -322,6 +328,7 @@ public class BadgeService {
     }
 
     // 만든 플레이리스트 수
+    @Transactional
     public List<Badge> checkPlaylistMake(Long userSeq, List<Long> badges){
         List<Badge> result = new ArrayList<>();
         int i = 17;
@@ -342,6 +349,7 @@ public class BadgeService {
     }
 
     // 만든 플레이룸 수
+    @Transactional
     public List<Badge> checkPlayroomMake(Long userSeq, List<Long> badges){
         List<Badge> result = new ArrayList<>();
         int i = 20;
@@ -362,6 +370,7 @@ public class BadgeService {
     }
 
     // 로그인 횟수
+    @Transactional
     public List<Badge> checkLoginNum(Long userSeq, List<Long> badges){
         List<Badge> result = new ArrayList<>();
         int i = 23;
@@ -383,6 +392,7 @@ public class BadgeService {
     }
 
     // 출석 일 수
+    @Transactional
     public List<Badge> checkDaily(Long userSeq, List<Long> badges){
         List<Badge> result = new ArrayList<>();
         int i = 26;
@@ -404,6 +414,7 @@ public class BadgeService {
     }
 
     // 플레이룸 최고 인원 수
+    @Transactional
     public List<Badge> checkPlayroomMaxUsers(Long userSeq, List<Long> badges){
         List<Badge> result = new ArrayList<>();
         int i = 29;
@@ -425,6 +436,7 @@ public class BadgeService {
     }
 
     // 장르별 시청 시간 계산
+    @Transactional
     public List<Badge> checkPlayroomWatchGenre(Long userSeq, List<Long> badges,
                                                Long watchTime, ConcurrentHashMap<Integer, Integer> videosCategory){
         List<Badge> result = new ArrayList<>();
@@ -490,10 +502,12 @@ public class BadgeService {
             }
             int addTime = nowTime + userTime;
             for(j = i + ((nowCategory-1) * 3) ; j < i + ((nowCategory-1) * 3) + 3; j++){
-                if(addTime >= Badge12List.get(j - i + ((nowCategory-1) * 3))){
-                    if(!badges.contains(Long.valueOf(i))){
-                        UserBadge userBadge = new UserBadge(null, userSeq, Long.valueOf(i), OffsetDateTime.now());
-                        result.add(badgeRepository.findByBadgeSeq(Long.valueOf(i)));
+                int k = 0;
+                if(addTime >= Badge12List.get(k++)){
+                    if(!badges.contains(Long.valueOf(j))){
+                        UserBadge userBadge = new UserBadge(null, userSeq, Long.valueOf(j), OffsetDateTime.now());
+                        result.add(badgeRepository.findByBadgeSeq(Long.valueOf(j)));
+                        badges.add(Long.valueOf(j));
                         userBadgeRepository.save(userBadge);
                     }
                 }

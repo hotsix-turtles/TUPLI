@@ -13,8 +13,10 @@ import javax.persistence.*;
 public class Badge {
 
     @Id
-    @Column(name = "BADGE_SEQ")
     @GeneratedValue
+    private Long id;
+
+    @Column(name = "BADGE_SEQ")
     private Long badgeSeq;
 
     @Column(name = "BADGE_NAME")

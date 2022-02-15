@@ -1,6 +1,10 @@
 <template>
   <v-app>
-    <followings-item />
+    <followings-item
+      v-for="following in followinglist"
+      :key="following.id"
+      :following="following"
+    />
   </v-app>
 </template>
 
@@ -11,6 +15,10 @@ export default {
   name: 'FollowingsList',
   components: {
     FollowingsItem,
+  },
+  props: {
+    // eslint-disable-next-line vue/require-default-prop
+    followinglist: { type: Array }
   },
 }
 </script>

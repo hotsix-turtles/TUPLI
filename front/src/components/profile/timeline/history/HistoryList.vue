@@ -1,21 +1,24 @@
 <template>
-  <v-app>
+  <div>
     <history-item
-      v-for="history in historys"
-      :key="history.id"
-      :history="history"
+      v-for="activity in activities"
+      :key="activity.id"
+      :activity="activity"
     />
-  </v-app>
+  </div>
 </template>
 
 <script>
-import HistoryItem from '@/components/profile/timeline/history/HistoryItem'
+import HistoryItem from '@/components/profile/timeline/history/HistoryItem.vue'
 import { mapState, mapActions } from 'vuex'
 
 export default {
   name: 'HistoryList',
   components: {
     HistoryItem,
+  },
+  props: {
+    activities: { type: Array, default() { [] } }
   },
   data: function() {
     return {
@@ -26,14 +29,15 @@ export default {
     ...mapState('account', ['historyList'])
   },
   created: function() {
-    this.getHistory()
-    this.historys = this.historyList
-    console.log('좋아요한 플레이룸', this.historyList)
+    // this.getHistory()
+    // this.historys = this.historyList
+    // console.log('좋아요한 플레이룸', this.historyList)
   },
   methods: {
     ...mapActions('account', [
       'getHistory'
-    ])
+    ]),
+
   }
 }
 </script>

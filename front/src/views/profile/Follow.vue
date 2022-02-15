@@ -30,7 +30,7 @@
               팔로워
             </p>
             <p class="mx-1 mb-0">
-              {{ profile.to_user.length }}
+              {{ followerlist.length }}
             </p>
           </div>
         </v-tab>
@@ -40,16 +40,20 @@
               팔로잉
             </p>
             <p class="mx-1 mb-0">
-              {{ profile.from_user.length }}
+              {{ followinglist.length }}
             </p>
           </div>
         </v-tab>
 
         <v-tab-item>
-          <followers-list />
+          <followers-list
+            :followerlist="followerlist"
+          />
         </v-tab-item>
         <v-tab-item>
-          <followings-list />
+          <followings-list
+            :followinglist="followinglist"
+          />
         </v-tab-item>
       </v-tabs>
     </div>
@@ -60,6 +64,7 @@
 import FollowersList from '@/components/profile/user/FollowersList.vue'
 import FollowingsList from '@/components/profile/user/FollowingsList.vue'
 
+import { mapActions } from 'vuex'
 import axiosConnector from '@/utils/axios-connector.js'
 
 export default {
@@ -71,15 +76,19 @@ export default {
   data: function() {
     return {
       profile: [],
-      followerList: [],
-      followingList: []
+      followerlist: [],
+      followinglist: [],
     }
   },
   created: function() {
-    this.getFollowList()
+    // this.getFollowers(this.profile.userSeq)
     this.getAccounts()
+    // this.getFollowerList()
   },
   methods: {
+    ...mapActions('account', [
+      'getFollowers'
+    ]),
     // [조회]
     getAccounts: function () {
       console.log('getAccounts params')
@@ -87,11 +96,34 @@ export default {
         .then((res) => {
           console.log('성공적', res.data)
           this.profile = res.data
+
+          console.log('팔로우 리스트 가져오기11', res.data.from_user)
+          this.followerlist = res.data.to_user
+          console.log('팔로우 리스트 가져오기2', this.followerlist)
+          this.followinglist = res.data.from_user
+          console.log('팔로우 리스트 가져오기3', this.followinglist)
+
+
         })
         .catch((err) => {
           console.log('에러', err)
         })
     },
+    // 팔로우 리스트 가져오기
+    // getFollowerList: function () {
+    //   console.log('팔로우 리스트 가져오기1')
+    //   axiosConnector.get(`userinfo/${this.$route.params.userId}`)
+    //     .then((res) => {
+    //       console.log('팔로우 리스트 가져오기11', res.data.from_user)
+    //       this.followerlist = res.data.to_user
+    //       console.log('팔로우 리스트 가져오기2', this.followerList)
+    //       this.followinglist = res.data.from_user
+    //       console.log('팔로우 리스트 가져오기3', this.followingList)
+    //     })
+    //     .catch((err) => {
+    //       console.log('에러', err)
+    //     })
+    // },
     // 팔로우. 팔로잉 리스트 조회
     getFollowList: function() {
       console.log('팔로우 리스트 조회 시도')

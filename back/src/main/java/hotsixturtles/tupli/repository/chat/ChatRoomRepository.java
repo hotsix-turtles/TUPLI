@@ -59,7 +59,7 @@ public class ChatRoomRepository {
     public ChatRoom createChatRoom(String name) {
         ChatRoom chatRoom = ChatRoom.create(name);
         hashOpsChatRoom.put(CHAT_ROOMS, chatRoom.getRoomId(), chatRoom);
-        roomTtl.set(chatRoom.getRoomId(), "Zzz",120, SECONDS);
+        roomTtl.set(chatRoom.getRoomId(), "Zzz",24000, SECONDS);
         return chatRoom;
     }
 

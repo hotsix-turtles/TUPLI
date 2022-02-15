@@ -1,5 +1,8 @@
 package hotsixturtles.tupli.service;
 
+import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.types.dsl.NumberPath;
+import com.querydsl.jpa.impl.JPAQueryFactory;
 import hotsixturtles.tupli.dto.PlayroomDto;
 import hotsixturtles.tupli.dto.request.RequestPlayroomDto;
 import hotsixturtles.tupli.dto.simple.SimpleHomeInfoDto;
@@ -7,9 +10,13 @@ import hotsixturtles.tupli.dto.simple.SimpleYoutubeVideoDto;
 import hotsixturtles.tupli.entity.*;
 import hotsixturtles.tupli.entity.likes.PlayroomLikes;
 import hotsixturtles.tupli.entity.likes.UserLikes;
+import hotsixturtles.tupli.entity.meta.UserInfo;
 import hotsixturtles.tupli.entity.youtube.YoutubeVideo;
 import hotsixturtles.tupli.repository.*;
 import hotsixturtles.tupli.repository.likes.PlayroomLikesRepository;
+import hotsixturtles.tupli.service.list.CategoryList;
+import hotsixturtles.tupli.service.list.TasteScore;
+import hotsixturtles.tupli.utils.TasteUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -19,12 +26,18 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
+import static hotsixturtles.tupli.entity.QPlaylist.playlist;
+import static hotsixturtles.tupli.entity.QPlayroom.*;
+import static hotsixturtles.tupli.entity.QUser.user;
+import static org.springframework.util.StringUtils.hasText;
+
 @Service
 @RequiredArgsConstructor
 public class PlayroomService {
 
     private final UserRepository userRepository;
     private final UserService userService;
+    private final UserInfoRepository userInfoRepository;
     private final PlayroomRepository playroomRepository;
     private final YoutubeVideoRepository youtubeVideoRepository;
     private final NotificationService notificationService;
@@ -32,6 +45,9 @@ public class PlayroomService {
     private final PlayroomLikesRepository playroomLikesRepository;
     private final CategoryRepository categoryRepository;
     private final HomeInfoRepository homeInfoRepository;
+
+    // 심플 querydsl
+    private final JPAQueryFactory jpaQueryFactory;
 
     public List<Playroom> getPlayroomList(){
 
@@ -66,12 +82,17 @@ public class PlayroomService {
         User maker = userRepository.findByUserSeq(userSeq);
         playroom.setUser(maker);
 
+        // 유저 취향 가져오기
+        UserInfo userInfo = userInfoRepository.findOneByUserSeq(userSeq);
+        ConcurrentHashMap<String, Integer> tasteInfo = userInfo.getTasteInfo();
+
         playroom.setTitle(playroomDto.getTitle());
         playroom.setContent(playroomDto.getContent());
         playroom.setIsPublic(playroomDto.getIsPublic());
         playroom.setTags(playroomDto.getTags());
         playroom.setEndTime(playroomDto.getEndTime());
         playroom.setStartTime(playroomDto.getStartTime());
+        playroom.setUserCountMax(playroomDto.getUserCountMax());
 
         // 플레이리스트 비디오 분리하고 저장 + ID만 저장
         ConcurrentHashMap<Long, List<Long>> playlists = new ConcurrentHashMap<>();
@@ -95,7 +116,7 @@ public class PlayroomService {
                     playroom.setImage(image);
                 }
                 video.setPlayroom(playroom);
-                video.setInit(existVideo);
+                video.copyVideo(existVideo);
                 youtubeVideoRepository.save(video);
                 YoutubeVideo nowVideo = youtubeVideoRepository.findFirstByVideoIdOrderByIdDesc(videoUrl);
                 playroomPlList.add(nowVideo.getId());
@@ -105,6 +126,13 @@ public class PlayroomService {
                 Integer categoryId = existVideo.getCategoryId();
                 Integer count = playroomInfo.getOrDefault(categoryId, 0);
                 playroomInfo.put(categoryId, count+1);
+
+                // 카테고리에 따른 분류
+                String category = CategoryList.CATEGORY_LIST.getOrDefault(categoryId, "기타");
+
+                // 취향 반영
+                Integer tasteScore = tasteInfo.getOrDefault(category, 0);
+                tasteInfo.put(category, tasteScore + TasteScore.SCORE_PLAYROOM_MAKE);
             }
             playlists.put(entry.getKey(), playroomPlList);
 
@@ -156,21 +184,31 @@ public class PlayroomService {
 
         // 플레이룸 개설 알림 보내기 (초청 유저)
         for (Long inviteId : playroomDto.getInviteIds()) {
-            notificationService.notiPlayroomMake(userSeq, inviteId);
+            notificationService.notiPlayroomMake(userSeq, inviteId, nowPlayroom.getId());
         }
 
         // 플레이룸 개설 알림 보내기 (로직짜고, 팔로우한 유저들에게, 유저 설정 부분 만들어지면 그 때 수정)
         if (false) {
             List<UserLikes> followers = userService.getFollowers(userSeq);
             for (UserLikes follower : followers) {
-                notificationService.notiInvite(userSeq, follower.getFromUser().getUserSeq());
+                notificationService.notiInvite(userSeq, follower.getFromUser().getUserSeq(), nowPlayroom.getId());
             }
 
         }
 
+        // 유저 정보 저장
+        userInfo.setTasteInfo(tasteInfo);
+        userInfoRepository.save(userInfo);
+
+        // 유저 취향 분석 후 저장
+        List<String> userTaste = TasteUtil.getTaste(tasteInfo);
+        maker.setTaste(userTaste);
+        userRepository.save(maker);
+
         HomeInfo homeInfo = new HomeInfo();
         homeInfo.setType("playroom");
         homeInfo.setInfoId(nowPlayroom.getId());
+        homeInfo.setUserSeq(userSeq);
         homeInfoRepository.save(homeInfo);
 
         return new PlayroomDto(playroom);
@@ -203,7 +241,8 @@ public class PlayroomService {
 
         Playroom playroom = playroomRepository.findById(playroomId).orElse(null);
 
-        if(playroom == null || playroom.getUser().getUserSeq() != userSeq){
+        //userSeq == -1L 이면 관리자
+        if(playroom == null || playroom.getUser().getUserSeq() != userSeq || userSeq != -1L){
             return null;
         }
 
@@ -226,18 +265,40 @@ public class PlayroomService {
     }
 
     @Transactional
-    public void addPlaylistLike(Long userSeq, Long playroomId){
+    public void addPlayroomLike(Long userSeq, Long playroomId){
         PlayroomLikes playroomlike = playroomLikesRepository.findExist(userSeq, playroomId);
         if(playroomlike == null) {
+            User user = userRepository.findByUserSeq(userSeq);
+
             PlayroomLikes playroomLikes = new PlayroomLikes();
             playroomLikes.setPlayroom(playroomRepository.findById(playroomId).orElse(null));
-            playroomLikes.setUser(userRepository.findByUserSeq(userSeq));
+            playroomLikes.setUser(user);
             playroomLikesRepository.save(playroomLikes);
 
             // 한길 : playroom 에 좋아요 눌렸을 때 +1 하기
             Playroom playroom = playroomRepository.getById(playroomId);
             playroom.setLikesCnt(playroom.getLikesCnt()+1);
             playroomRepository.save(playroom);
+
+            // 취향분석
+            // 유저 취향 가져오기
+            UserInfo userInfo = userInfoRepository.findOneByUserSeq(userSeq);
+            ConcurrentHashMap<String, Integer> tasteInfo = userInfo.getTasteInfo();
+            for (YoutubeVideo youtubeVideo : playroom.getVideos()) {
+                // 카테고리에 따른 분류
+                String category = CategoryList.CATEGORY_LIST.getOrDefault(youtubeVideo.getCategoryId(), "기타");
+                // 취향 반영
+                Integer tasteScore = tasteInfo.getOrDefault(category, 0);
+                tasteInfo.put(category, tasteScore + TasteScore.SCORE_PLAYROOM_LIKE);
+            }
+            // 유저 정보 저장
+            userInfo.setTasteInfo(tasteInfo);
+            userInfoRepository.save(userInfo);
+            // 유저 취향 분석 후 저장
+            List<String> userTaste = TasteUtil.getTaste(tasteInfo);
+            user.setTaste(userTaste);
+            userRepository.save(user);
+
         } else {
             // 익셉션 발생
         }
@@ -259,12 +320,33 @@ public class PlayroomService {
         }
     }
 
+    // 회원 입장시 발생
     @Transactional
     public void addGuest(Long userSeq, Playroom playroom) {
         List<Long> guests = playroom.getGuests();
         guests.add(userSeq);
         playroom.setGuests(guests);
         playroomRepository.save(playroom);
+
+        // 취향분석
+        User user = userRepository.findByUserSeq(userSeq);
+        // 유저 취향 가져오기
+        UserInfo userInfo = userInfoRepository.findOneByUserSeq(userSeq);
+        ConcurrentHashMap<String, Integer> tasteInfo = userInfo.getTasteInfo();
+        for (YoutubeVideo youtubeVideo : playroom.getVideos()) {
+            // 카테고리에 따른 분류
+            String category = CategoryList.CATEGORY_LIST.getOrDefault(youtubeVideo.getCategoryId(), "기타");
+            // 취향 반영
+            Integer tasteScore = tasteInfo.getOrDefault(category, 0);
+            tasteInfo.put(category, tasteScore + TasteScore.SCORE_PLAYROOM_VISIT);
+        }
+        // 유저 정보 저장
+        userInfo.setTasteInfo(tasteInfo);
+        userInfoRepository.save(userInfo);
+        // 유저 취향 분석 후 저장
+        List<String> userTaste = TasteUtil.getTaste(tasteInfo);
+        user.setTaste(userTaste);
+        userRepository.save(user);
     }
 
     @Transactional
@@ -272,9 +354,37 @@ public class PlayroomService {
         Playroom playroom = playroomRepository.findById(playroomId).orElse(null);
         if (playroom != null) {
             List<Long> guests = playroom.getGuests();
+//            if (guests.contains(userSeq)) {
             guests.remove(userSeq);
+//            }
             playroom.setGuests(guests);
             playroomRepository.save(playroom);
         }
     }
+
+    public List<Playroom> getMyPlayroom(Long userSeq, Pageable pageable) {
+        return jpaQueryFactory
+                .select(playroom)
+                .from(playroom)
+                .where(playroom.user.userSeq.eq(userSeq))
+                .orderBy(playroom.id.desc())
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+    }
+
+    // 해당 유저가 현재 시청하고있는 playroom list 가져오기 (최신 순 상위 10개)
+    // json column contains 해결을 못하겠어요 ㅜㅜ 최적화 너무 필요!!! $$$
+    public List<Playroom> getWatchingPlayroom(Long userSeq){
+        List<Playroom> playrooms = playroomRepository.findAll();
+        List<Playroom> result = new ArrayList<>();
+        for(Playroom playroom : playrooms){
+            if(playroom.getGuests().contains(userSeq)) {
+                result.add(playroom);
+                if(result.size() == 10) break;
+            }
+        }
+        return result;
+    }
+
 }

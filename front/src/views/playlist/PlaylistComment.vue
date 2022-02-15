@@ -14,28 +14,29 @@
             <img
               style="border-radius: 100px;"
               :src="ImgUrl(playlistComment.user.profileImage)"
-              alt="프로필 사진"
-              width="35px"
-              height="35px"
-              class=""
+              width="40px"
+              height="40px"
             >
           </v-col>
           <v-col :cols="10">
-            <v-row style="table-layout:fixed">
-              <!-- 유저닉네임 노출 -->
-              <span style="font-weight:bold">
-                {{ playlistComment.user.nickname }}
-              </span>
-              &nbsp;
-              <span>
-                <!-- 덧글내용 노출 -->
-                {{ playlistComment.content }}
-              </span>
+            <v-row
+              style="table-layout:fixed"
+            >
+              <div class="mt-2">
+                <!-- 유저닉네임 노출 -->
+                <span class="semi-bold">
+                  {{ playlistComment.user.nickname }}
+                </span>
+                <span>
+                  <!-- 덧글내용 노출 -->
+                  {{ playlistComment.content }}
+                </span>
+              </div>
             </v-row>
             <v-row>
               <!-- 날짜 표시 -->
-              <div class="mb-2">
-                <span style="color:gray">
+              <div class="">
+                <span style="color:gray;font-size:14px">
                   {{ playlistComment.created }}
                 </span>
                 <!-- 댓글삭제 버튼 -->
@@ -87,13 +88,11 @@ export default {
   data: function() {
     return {
       playlistId: 0,
-      convertedTime: [],
     }
   },
   computed: {
     ...mapState({
       userId: state => state.userId,
-      authToken: state => state.authToken
     }),
     ...mapState('playlist', {
       playlistComments: state => state.playlistComments,

@@ -46,10 +46,10 @@
         </v-tab>
 
         <v-tab-item>
-          <followers-list />
+          <my-followers-list />
         </v-tab-item>
         <v-tab-item>
-          <followings-list />
+          <my-followings-list />
         </v-tab-item>
       </v-tabs>
     </div>
@@ -57,19 +57,25 @@
 </template>
 
 <script>
-import FollowersList from '@/components/profile/user/FollowersList.vue'
-import FollowingsList from '@/components/profile/user/FollowingsList.vue'
+import MyFollowersList from '@/components/profile/user/MyFollowersList.vue'
+import MyFollowingsList from '@/components/profile/user/MyFollowingsList.vue'
 
 import { mapState } from 'vuex'
 
 export default {
-  name: 'Follow',
+  name: 'MyFollow',
   components: {
-    FollowersList,
-    FollowingsList,
+    MyFollowersList,
+    MyFollowingsList,
   },
   computed: {
     ...mapState(['authToken', 'userId', 'nickname', 'following', 'followers'])
+  },
+  created: function() {
+    console.log('팔로워 데이터 확인', this.following, this.followers)
+  },
+  methods: {
+
   }
 }
 </script>

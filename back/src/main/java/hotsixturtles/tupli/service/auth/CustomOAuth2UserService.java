@@ -82,12 +82,18 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             userInfoRepository.save(nowUserInfo);
         } else {
             savedUser = createUser(userInfo, providerType);
+            savedUser.setIs_vip("N");
+            savedUser.setNickname(savedUser.getUsername());
             UserInfo nowUserInfo = new UserInfo();
             nowUserInfo.setUserSeq(savedUser.getUserSeq());
             userInfoRepository.save(nowUserInfo);
             UserSetting userSetting = new UserSetting();
             userSetting.setUser(savedUser);
             userSettingRepository.save(userSetting);
+            if(savedUser.getProfileImage() == null || savedUser.getProfileImage() == ""){
+                int randNum = (int)(Math.random()*20) + 1;
+                savedUser.setProfileImage("#" + randNum);
+            }
         }
 
         return UserPrincipal.create(savedUser, user.getAttributes());
