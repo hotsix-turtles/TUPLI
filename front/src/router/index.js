@@ -19,7 +19,6 @@ import Setting from '../views/profile/Setting.vue'
 //setting
 import Admin from '../views/profile/setting/Admin.vue'
 import ChangePassword from '../views/profile/setting/ChangePassword.vue'
-import ChangePasswordOAUTH from '../views/profile/setting/ChangePasswordOAUTH.vue'
 import History from '../views/profile/setting/History.vue'
 import InviteNoticeAlert from '../views/profile/setting/InviteNoticeAlert.vue'
 import Like from '../views/profile/setting/Like.vue'
@@ -52,6 +51,7 @@ import BoardSelectPlaylist from '../views/board/BoardSelectPlaylist.vue'
 import PlayroomSearch from '@/views/board/PlayroomSearch.vue'
 import PlaylistSearch from '@/views/board/PlaylistSearch.vue'
 import BoardDetail from '@/views/board/BoardDetail.vue'
+import BoardComment from '@/views/board/BoardComment.vue'
 
 import AuthHandler from '../views/handler/AuthHandler.vue'
 import KakaoPaySuccess from '../views/handler/kakaoPay/KakaoPaySuccess.vue'
@@ -101,7 +101,7 @@ const routes = [
     component: PlaylistForm
   },
   {
-    path: '/playlist/create/video',
+    path: '/playlist/video',
     name: 'PlaylistFormVideo',
     component: PlaylistFormVideo
   },
@@ -129,7 +129,7 @@ const routes = [
     component: Search
   },
   {
-    path: '/search/detail/:tab/:keyword',
+    path: '/search/detail',
     name: 'SearchDetail',
     component: SearchDetail
   },
@@ -217,11 +217,6 @@ const routes = [
     path: '/changepassword',
     name: 'ChangePassword',
     component: ChangePassword
-  },
-  {
-    path: '/ChangePasswordOAUTH',
-    name: 'ChangePasswordOAUTH',
-    component: ChangePasswordOAUTH
   },
   {
     path: '/history',
@@ -317,6 +312,11 @@ const routes = [
     path: '/board/:boardId',
     name: 'BoardDetail',
     component: BoardDetail
+  },
+  {
+    path: '/board/:boardId/comment',
+    name: 'BoardComment',
+    component: BoardComment
   },
 
   //handler

@@ -180,9 +180,6 @@ const playlist = {
   },
   actions: {
     // [플레이리스트 생성]
-    resetFormData: function ({ commit }) {
-      commit('RESET_FORM_DATA')
-    },
     createPlaylist: function ({ commit }, formData) {
       axiosConnector.post('/playlist',
         formData
@@ -205,19 +202,6 @@ const playlist = {
       ).then((res) => {
         console.log(res)
         router.push({ name: 'PlaylistDetail', params: { playlistId: id } })
-        commit('RESET_FORM_DATA')
-      })
-        .catch((err) => {
-          console.log(err)
-        })
-    },
-    // 내 플레이리스트에 담기
-    addVideoInPlaylist: function ({ commit }, { formData, id } ) {
-      console.log('addVideoInPlaylist', formData)
-      axiosConnector.put(`/playlist/${id}`,
-        formData
-      ).then((res) => {
-        console.log(res)
         commit('RESET_FORM_DATA')
       })
         .catch((err) => {
@@ -286,7 +270,6 @@ const playlist = {
       axiosConnector.get(`/playlist/${playlistId}/comment`)
         .then((res) => {
           commit('GET_PLAYLIST_COMMENTS', res.data)
-          console.log("playlist.js : res.data", res.data)
         })
         .catch((err) => {
           console.log(err)
@@ -298,9 +281,6 @@ const playlist = {
         data
       )
         .then((res) => {
-          console.log('createPlaylistComment', res)
-          // commit('CREATE_PLAYLIST_COMMENT', res.data)
-          // 생성 성공. 아무 행동 안함.
           console.log("덧글 작성 완료.")
           axiosConnector.get(`/playlist/${playlistId}/comment`)
             .then((res) => {
