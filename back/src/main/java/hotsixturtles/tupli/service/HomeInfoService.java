@@ -46,19 +46,34 @@ public class HomeInfoService {
                Playlist nowPlaylist = playlistRepository.findById(nowHomeInfo.getInfoId()).orElse(null);
                if(nowPlaylist == null) continue;
                if(userSeq == -1L) infoResult.add(new SimpleHomePlaylistDto(nowPlaylist));
-               else infoResult.add(new SimpleHomePlaylistDto(nowPlaylist, user));
+               else {
+                   if(nowPlaylist.getUser().getUserSeq() == userSeq) continue;
+                   SimpleHomePlaylistDto simplePlaylist = new SimpleHomePlaylistDto(nowPlaylist, user);
+                   simplePlaylist.setIsRecommend(false);
+                   infoResult.add(simplePlaylist);
+               }
            }
            else if(type.equals("playroom")){
                Playroom nowPlayroom = playroomRepository.findById(nowHomeInfo.getInfoId()).orElse(null);
                if(nowPlayroom == null) continue;
                if(userSeq == -1L) infoResult.add(new SimpleHomePlayroomDto(nowPlayroom));
-               else infoResult.add(new SimpleHomePlayroomDto(nowPlayroom, user));
+               else {
+                   if(nowPlayroom.getUser().getUserSeq() == userSeq) continue;
+                   SimpleHomePlayroomDto simplePlayroom = new SimpleHomePlayroomDto(nowPlayroom, user);
+                   simplePlayroom.setIsRecommend(false);
+                   infoResult.add(simplePlayroom);
+               }
            }
            else{
                Board nowBoard = boardRepository.findById(nowHomeInfo.getInfoId()).orElse(null);
                if(nowBoard == null) continue;
                if(userSeq == -1L) infoResult.add(new SimpleHomeBoardDto(nowBoard));
-               else infoResult.add(new SimpleHomeBoardDto(nowBoard, user));
+               else {
+                   if(nowBoard.getUser().getUserSeq() == userSeq) continue;
+                   SimpleHomeBoardDto simpleBoard = new SimpleHomeBoardDto(nowBoard, user);
+                   simpleBoard.setIsRecommend(false);
+                   infoResult.add(simpleBoard);
+               }
            }
         }
 
@@ -85,7 +100,10 @@ public class HomeInfoService {
             for(String nowPlCate : nowPlaylist.getPlaylistCate().split(",")){
                 if(userTaste.contains(nowPlCate)){
                     SimpleHomePlaylistDto nowDto = new SimpleHomePlaylistDto(nowPlaylist, user);
-                    if(!homeInfos.contains(nowDto)) homeInfos.add(nowDto);
+                    if(!homeInfos.contains(nowDto)) {
+                        nowDto.setIsRecommend(true);
+                        homeInfos.add(nowDto);
+                    }
                     break;
                 }
             }
@@ -105,7 +123,10 @@ public class HomeInfoService {
             for(String nowPlayroomCate : nowPlayroom.getPlayroomCate().split(",")){
                 if(userTaste.contains(nowPlayroomCate)){
                     SimpleHomePlayroomDto nowDto = new SimpleHomePlayroomDto(nowPlayroom, user);
-                    if(!homeInfos.contains(nowDto)) homeInfos.add(nowDto);
+                    if(!homeInfos.contains(nowDto)) {
+                        nowDto.setIsRecommend(true);
+                        homeInfos.add(nowDto);
+                    }
                     break;
                 }
             }

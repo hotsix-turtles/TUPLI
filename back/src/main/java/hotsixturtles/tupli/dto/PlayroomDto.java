@@ -56,7 +56,7 @@ public class PlayroomDto {
         this.isPublic = playroom.getIsPublic();
         this.tags = playroom.getTags();
         this.playlists = playroom.getPlaylists();
-        this.inviteIds = inviteIds;
+        this.inviteIds = playroom.getInviteIds();
         this.startTime = playroom.getStartTime();
         this.endTime = playroom.getEndTime();
         this.guests = playroom.getGuests();
@@ -76,7 +76,7 @@ public class PlayroomDto {
         this.isPublic = playroom.getIsPublic();
         this.tags = playroom.getTags();
         this.playlists = playroom.getPlaylists();
-        this.inviteIds = inviteIds;
+        this.inviteIds = playroom.getInviteIds();
         this.startTime = playroom.getStartTime();
         this.endTime = playroom.getEndTime();
         this.guests = playroom.getGuests();

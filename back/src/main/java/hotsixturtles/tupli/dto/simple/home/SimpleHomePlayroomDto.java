@@ -39,6 +39,7 @@ public class SimpleHomePlayroomDto {
     // 특수변수
 //    private List<SimpleUserDto> guest;  // 참여자 정보 다 보내는 버전
     private String userLikesYN;
+    private Boolean isRecommend;
 
     public SimpleHomePlayroomDto(Playroom playroom) {
         this.id = playroom.getId();
