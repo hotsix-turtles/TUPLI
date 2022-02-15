@@ -93,9 +93,9 @@ np/* eslint-disable vue/require-default-prop */
         <div
           v-else-if="isLogin"
           class="clickable d-flex-column text-center"
-          @click="changeRouter('Login')"
+          @click="changeRouter('MyProfile')"
         >
-          <v-icon :class="{ 'font-size' : true, colored: selectedPage === 'Login' }">
+          <v-icon :class="{ 'font-size' : true, colored: selectedPage === 'MyProfile' }">
             mdi-account-circle-outline
           </v-icon>
         </div>
