@@ -17,7 +17,7 @@
         <div class="d-flex flex-column align-center">
           <div class="profile-img-large">
             <img
-              :src="image"
+              :src="ImgUrl(image)"
               alt=""
               fab
             >
@@ -32,16 +32,7 @@
           </div>
         </div>
         <!-- 팔로우/팔로잉 -->
-        <div class="d-flex justify-center pt-3">
-          <div
-            class="d-flex mx-3"
-            @click="$router.push({ name: 'MyFollow' })"
-          >
-            <p class="mr-2">
-              팔로잉
-            </p>
-            <p>{{ following.length }}</p>
-          </div>
+        <div class="d-flex justify-center pt-3 mb-3">
           <div
             class="d-flex mx-3"
             @click="$router.push({ name: 'MyFollow' })"
@@ -49,7 +40,16 @@
             <p class="mr-2">
               팔로워
             </p>
-            <p>{{ followers.length }}</p>
+            <p>{{ followerlist.length }}</p>
+          </div>
+          <div
+            class="d-flex mx-3"
+            @click="$router.push({ name: 'MyFollow' })"
+          >
+            <p class="mr-2">
+              팔로잉
+            </p>
+            <p>{{ followinglist.length }}</p>
           </div>
         </div>
         <!-- 프로필 편집 버튼 -->
@@ -62,6 +62,11 @@
             to="/editprofile"
           >
             프로필 편집하기
+          </v-btn>
+          <v-btn
+            @click="getBadge"
+          >
+            뱃지
           </v-btn>
         </div>
       </div>
@@ -78,10 +83,14 @@
         <v-tab>활동</v-tab>
         <v-tab>취향</v-tab>
         <v-tab-item>
-          <profile-playlist />
+          <my-profile-playlist
+            :activities="activities"
+          />
         </v-tab-item>
         <v-tab-item>
-          <profile-taste />
+          <my-profile-taste
+            :badges="badges"
+          />
         </v-tab-item>
       </v-tabs>
     </div>
@@ -89,18 +98,79 @@
 </template>
 
 <script>
-import ProfilePlaylist from '../../components/profile/timeline/ProfilePlaylist.vue'
-import ProfileTaste from '../../components/profile/timeline/ProfileTaste.vue'
+import MyProfilePlaylist from '../../components/profile/timeline/MyProfilePlaylist.vue'
+import MyProfileTaste from '../../components/profile/timeline/MyProfileTaste.vue'
 
+import axiosConnector from '@/utils/axios-connector.js'
+import { getImage } from '../../utils/utils'
 import { mapState } from 'vuex'
 
 export default {
-  components: { ProfilePlaylist, ProfileTaste, },
+  components: { MyProfilePlaylist, MyProfileTaste, },
+  data: function() {
+    return {
+      followerlist: [],
+      followinglist: [],
+      activities: [],
+      badges: '',
+    }
+  },
   computed: {
-    ...mapState(['authToken', 'nickname', 'image', 'introduction', 'following', 'followers'])
+    ...mapState(['authToken', 'userId', 'nickname', 'image', 'introduction', 'following', 'followers'])
+  },
+  created: function() {
+    this.getAccounts()
+    this.getFollowerList()
+    this.getBadge()
   },
   methods: {
+    // 이미지 조합
+    ImgUrl: function(img) {
+      return getImage(img)
+    },
+    // 팔로우 목록
+    getFollowerList: function() {
+      axiosConnector.get(`userinfo/${this.userId}`)
+        .then((res) => {
+          console.log('내 팔로우 리스트 가져오기11', res.data.to_user)
+          this.followerlist = res.data.to_user
+          console.log('내 팔로우 리스트 가져오기2', this.followerlist)
+          this.followinglist = res.data.from_user
+          console.log('내 팔로우 리스트 가져오기3', this.followinglist)
+        })
+        .catch((err) => {
+          console.log('에러', err)
+        })
+    },
 
+    // [조회]
+    getAccounts: function () {
+      console.log('getAccounts params 본인')
+      axiosConnector.get(`userinfo/${this.userId}`)
+        .then((res) => {
+          console.log('본인 프로필', res.data)
+          this.profile = res.data
+          this.activities = res.data.activities
+          console.log('액티비티22', this.activities)
+
+        })
+        .catch((err) => {
+          console.log('에러', err)
+        })
+    },
+    getBadge: function() {
+      console.log('뱃지')
+      axiosConnector.get('/badge/list')
+        .then((res) => {
+          console.log('뱃지 획득', res.data, typeof(res.data))
+          this.badges = res.data
+          console.log('뱃지 획득2', this.badges, typeof(this.badges))
+
+        })
+        .catch((err) => {
+          console.log('에러', err)
+        })
+    }
   },
 
 
@@ -108,5 +178,5 @@ export default {
 </script>
 
 <style>
-
+p { margin-bottom: 0px !important;}
 </style>

@@ -1,4 +1,4 @@
-package hotsixturtles.tupli.api.test;
+package hotsixturtles.tupli.api.dev;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -8,6 +8,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 
+/**
+ * 관리자 API 메아리(echo)
+ */
 @Controller
 @RequiredArgsConstructor
 public class TestApiController {

@@ -1,24 +1,12 @@
 <template>
-  <v-app>
+  <div>
     <post-item
       v-for="boardlist in boardlists"
       :key="boardlist.id"
       :boardlist="boardlist"
       :thumbnail="boardlist"
     />
-    <div class="d-flex">
-      <div class="d-flex">
-        <img
-          src="@/assets/tupli_logo2_dark.png"
-          alt=""
-        >
-      </div>
-      <div class="d-flex flex-column">
-        <p>이름</p>
-        <p>내용</p>
-      </div>
-    </div>
-  </v-app>
+  </div>
 </template>
 
 <script>

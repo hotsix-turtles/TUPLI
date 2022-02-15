@@ -1,19 +1,26 @@
 <template>
-  <v-app>
+  <div>
     <div class="d-flex justify-center mt-5 px-4">
       <img
         :src="thumbnail"
         alt="playroom img"
         style="width: 126px; height: 71px"
+        @click="goPlayroom"
       >
       <div
         class="d-flex flex-column align-start mx-2"
         style="width: 200px;"
       >
-        <p class="mb-0">
+        <p
+          class="mb-0"
+          @click="goPlayroom"
+        >
           {{ playroomlist.title }}
         </p>
-        <p class="mb-0">
+        <p
+          class="mb-0"
+          @click="setProfile"
+        >
           {{ playroomlist.user.nickname }}
         </p>
         <div class="d-flex">
@@ -56,7 +63,10 @@
           >
             게시글 작성
           </v-list-item>
-          <v-list-item dense>
+          <v-list-item
+            dense
+            @click="unLike"
+          >
             좋아요 취소
           </v-list-item>
         </v-list>
@@ -106,7 +116,7 @@
         </v-card>
       </v-dialog> -->
     </div>
-  </v-app>
+  </div>
 </template>
 
 <script>
@@ -136,13 +146,31 @@ export default {
   },
   methods: {
     ...mapActions( 'account',[
-      'makePlaylist', 'makeBoard', 'cancleLike'
+      'makePlaylist', 'makeBoard'
     ]),
+    ...mapActions(
+      'playroom', [
+        'unlikePlayroom',
+      ]),
     // 태그
     getTag: function() {
-      console.log('태그', this.playroomlist.tags)
+      // console.log('태그', this.playroomlist.tags)
       this.tags = this.playroomlist.tags.split(',')
-      console.log('태그2', this.tags)
+      // console.log('태그2', this.tags)
+    },
+    // 좋아요 취소
+    unLike: function() {
+      this.unlikePlayroom(this.playroomlist.id)
+    },
+    // 플레이룸 상세로 가기
+    goPlayroom: function() {
+      console.log( '플레이룸 상세', this.playroomlist.id )
+      this.$router.push({ name: 'PlayroomDetail', params: { id : this.playroomlist.id }})
+    },
+    // 타 유저 프로필로 가기
+    setProfile: function() {
+      console.log('타인 프로필')
+      this.$router.push({ name: 'Profile', params: { userId : this.playroomlist.user.userSeq }})
     },
   }
 }

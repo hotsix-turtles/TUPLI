@@ -312,6 +312,21 @@
   }
 }
 
+// 프로필 사진 Medium7
+.profile-img-small {
+  border-radius: 100%;
+  border: solid 1px;
+  border-color: $color-main;
+  width: 30px;
+  height: 30px;
+  align-items: center;
+  img {
+    border-radius: 100%;
+    width: 30px;
+    height: 30px;
+  }
+}
+
 
 //태그
 .tag {

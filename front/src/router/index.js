@@ -19,7 +19,6 @@ import Setting from '../views/profile/Setting.vue'
 //setting
 import Admin from '../views/profile/setting/Admin.vue'
 import ChangePassword from '../views/profile/setting/ChangePassword.vue'
-import History from '../views/profile/setting/History.vue'
 import InviteNoticeAlert from '../views/profile/setting/InviteNoticeAlert.vue'
 import Like from '../views/profile/setting/Like.vue'
 import Payment from '../views/profile/setting/Payment.vue'
@@ -218,11 +217,12 @@ const routes = [
     name: 'ChangePassword',
     component: ChangePassword
   },
-  {
-    path: '/history',
-    name: 'History',
-    component: History
-  },
+  // 일단 없앰.
+  // {
+  //   path: '/history',
+  //   name: 'History',
+  //   component: History
+  // },
   {
     path: '/invitenotice',
     name: 'InviteNoticeAlert',

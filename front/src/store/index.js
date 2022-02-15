@@ -97,9 +97,9 @@ export default new Vuex.Store({
       state.introduction = decodeURIComponent(res.introduction)
       // OAUTH 고려
       if (res.image) {
-        image = SERVER.ROUTES.image + res.image
+        state.image = res.image
       } else {
-        image = state.image
+        state.image = state.image
       }
     },
 

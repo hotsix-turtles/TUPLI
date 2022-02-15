@@ -1,6 +1,6 @@
 package hotsixturtles.tupli.api;
 
-import hotsixturtles.tupli.dto.BoardDto;
+import hotsixturtles.tupli.dto.response.BoardResponseDto;
 import hotsixturtles.tupli.dto.PlaylistDto;
 import hotsixturtles.tupli.dto.params.*;
 import hotsixturtles.tupli.dto.response.ResponsePlayroomDto;
@@ -8,9 +8,7 @@ import hotsixturtles.tupli.dto.simple.SimpleSearchHistoryDto;
 import hotsixturtles.tupli.dto.simple.SimpleUserDto;
 import hotsixturtles.tupli.dto.simple.SimpleYoutubeVideoDto;
 import hotsixturtles.tupli.entity.Board;
-import hotsixturtles.tupli.dto.PlayroomDto;
 import hotsixturtles.tupli.dto.params.UserSearchCondition;
-import hotsixturtles.tupli.dto.simple.SimpleUserDto;
 import hotsixturtles.tupli.entity.Playroom;
 import hotsixturtles.tupli.entity.SearchHistory;
 import hotsixturtles.tupli.entity.User;
@@ -27,11 +25,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 @Controller
@@ -56,7 +52,7 @@ public class SearchApiController {
     public ResponseEntity<?> searchUser(@RequestParam(value = "keyword") String keyword,
                                         @RequestParam(value = "order") String order,
                                         @PageableDefault(size = 1000) Pageable pageable ){
-        SearchHistory searchHistory = new SearchHistory(null, "유저",keyword.trim(),0);
+        SearchHistory searchHistory = new SearchHistory(null, "유저",keyword.trim(),0, 0);
         searchService.addScoreNum(searchHistory);
         UserSearchCondition userSearchCondition = new UserSearchCondition();
         userSearchCondition.setKeyword(keyword);
@@ -77,12 +73,12 @@ public class SearchApiController {
     @GetMapping("/board/search")
     public ResponseEntity<?> searchBoard(@RequestParam String keyword,
                                         @PageableDefault(size = 1000, sort ="title", direction = Sort.Direction.ASC) Pageable pageable ){
-        SearchHistory searchHistory = new SearchHistory(null, "게시글",keyword.trim(),0);
+        SearchHistory searchHistory = new SearchHistory(null, "게시글",keyword.trim(),0, 0);
         searchService.addScoreNum(searchHistory);
         BoardSearchCondition boardSearchCondition = new BoardSearchCondition();
         boardSearchCondition.setKeyword(keyword);
         List<Board> boardList = searchService.searchBoard(boardSearchCondition, pageable);
-        List<BoardDto> result = boardList.stream().map(b -> new BoardDto(b)).collect(Collectors.toList());
+        List<BoardResponseDto> result = boardList.stream().map(b -> new BoardResponseDto(b)).collect(Collectors.toList());
 
         return ResponseEntity.ok().body(result);
     }
@@ -99,7 +95,7 @@ public class SearchApiController {
     public ResponseEntity<?> searchPlayroom(@RequestParam String keyword,
                                         @RequestParam String order,
                                         @PageableDefault(size = 1000) Pageable pageable ){
-        SearchHistory searchHistory = new SearchHistory(null, "플레이룸",keyword.trim(),0);
+        SearchHistory searchHistory = new SearchHistory(null, "플레이룸",keyword.trim(),0, 0);
         searchService.addScoreNum(searchHistory);
         PlayroomSearchCondition playroomSearchCondition = new PlayroomSearchCondition();
         playroomSearchCondition.setKeyword(keyword);
@@ -130,7 +126,7 @@ public class SearchApiController {
     @GetMapping("/videos/search")
     public ResponseEntity<?> searchVideos(@RequestParam String keyword,
                                         @PageableDefault(size = 1000, sort ="title",  direction = Sort.Direction.ASC) Pageable pageable ){
-        SearchHistory searchHistory = new SearchHistory(null, "영상",keyword.trim(),0);
+        SearchHistory searchHistory = new SearchHistory(null, "영상",keyword.trim(),0,0);
         searchService.addScoreNum(searchHistory);
         VideoSearchCondition videoSearchCondition = new VideoSearchCondition();
         videoSearchCondition.setKeyword(keyword);

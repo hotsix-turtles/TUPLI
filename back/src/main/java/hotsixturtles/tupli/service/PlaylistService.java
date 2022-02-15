@@ -21,6 +21,7 @@ import hotsixturtles.tupli.repository.*;
 import hotsixturtles.tupli.repository.likes.PlaylistLikesRepository;
 import hotsixturtles.tupli.service.list.CategoryList;
 import hotsixturtles.tupli.service.list.TasteScore;
+import hotsixturtles.tupli.utils.TasteUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
@@ -52,6 +53,10 @@ public class PlaylistService {
     // 심플 querydsl
     private final JPAQueryFactory jpaQueryFactory;
 
+    // 전체 DB 플레이리스트 다 가져오기
+    public List<Playlist> getPlaylistList() {
+        return playlistRepository.findAll();
+    }
 
     // 단일 Playlist 추가
     @Transactional
@@ -86,7 +91,7 @@ public class PlaylistService {
 
             // 기존에 저장, 좋아요 해놓은것과 상관없이 별도로 제작
             YoutubeVideo video = new YoutubeVideo();
-            video.setInit(videoDto);
+            video.newVideo(videoDto);
             video.setPlaylist(playlist);  // 연결
             youtubeVideoRepository.save(video);
 
@@ -127,6 +132,7 @@ public class PlaylistService {
         HomeInfo homeInfo = new HomeInfo();
         homeInfo.setType("playlist");
         homeInfo.setInfoId(nowPlaylist.getId());
+        homeInfo.setUserSeq(userSeq);
         homeInfoRepository.save(homeInfo);
 
         return playlist;
@@ -138,7 +144,7 @@ public class PlaylistService {
         Map<String, Integer> topFour =
                 tasteInfo.entrySet().stream()
                         .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
-                        .limit(4)
+                        .limit(5)
                         .collect(Collectors.toMap(
                                 Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
         for (String category : topFour.keySet()) {
@@ -189,7 +195,7 @@ public class PlaylistService {
 
                 // 기존에 저장, 좋아요 해놓은것과 상관없이 별도로 제작
                 YoutubeVideo video = new YoutubeVideo();
-                video.setInit(videoDto);
+                video.newVideo(videoDto);
                 video.setPlaylist(playlistUpdate);  // 연결
                 youtubeVideoRepository.save(video);
 
@@ -236,8 +242,10 @@ public class PlaylistService {
     public void addPlaylistLike(Long userSeq, Long id) {
         PlaylistLikes playlistLikes = playlistLikesRepository.findExist(userSeq, id);
         if(playlistLikes == null) {
+            User user = userRepository.findByUserSeq(userSeq);
+
             playlistLikes = new PlaylistLikes();
-            playlistLikes.setUser(userRepository.findByUserSeq(userSeq));
+            playlistLikes.setUser(user);
             playlistLikes.setPlaylist(playlistRepository.findById(id).orElse(null));
             playlistLikesRepository.save(playlistLikes);
 
@@ -245,6 +253,25 @@ public class PlaylistService {
             Playlist playlist = playlistRepository.getById(id);
             playlist.setLikesCnt(playlist.getLikesCnt()+1);
             playlistRepository.save(playlist);
+
+            // 취향분석
+            // 유저 취향 가져오기
+            UserInfo userInfo = userInfoRepository.findOneByUserSeq(userSeq);
+            ConcurrentHashMap<String, Integer> tasteInfo = userInfo.getTasteInfo();
+            for (YoutubeVideo youtubeVideo : playlist.getYoutubeVideos()) {
+                // 카테고리에 따른 분류
+                String category = CategoryList.CATEGORY_LIST.getOrDefault(youtubeVideo.getCategoryId(), "기타");
+                // 취향 반영
+                Integer tasteScore = tasteInfo.getOrDefault(category, 0);
+                tasteInfo.put(category, tasteScore + TasteScore.SCORE_PLAYLIST_LIKE);
+            }
+            // 유저 정보 저장
+            userInfo.setTasteInfo(tasteInfo);
+            userInfoRepository.save(userInfo);
+            // 유저 취향 분석 후 저장
+            List<String> userTaste = TasteUtil.getTaste(tasteInfo);
+            user.setTaste(userTaste);
+            userRepository.save(user);
 
         } else {
             // exception 발생
@@ -384,4 +411,14 @@ public class PlaylistService {
         return hasText(keyword) ? playlist.tags.contains(keyword) : null;
     }
 
+    public List<Playlist> getMyPlaylist(Long userSeq, Pageable pageable) {
+        return jpaQueryFactory
+                .select(playlist)
+                .from(playlist)
+                .where(playlist.user.userSeq.eq(userSeq))
+                .orderBy(playlist.createdAt.desc())
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+    }
 }
