@@ -11,6 +11,17 @@ function timeConverter(UNIX_timestamp){
   return time;
 }
 
+function timeConverterShort(UNIX_timestamp){
+  var a = new Date(UNIX_timestamp * 1000);
+  var year = a.getFullYear();
+  var month = a.getMonth() + 1;
+  var date = a.getDate();
+  var hour = a.getHours();
+  var min = a.getMinutes();
+  var time = year + '-' + month + '-' + date ;
+  return time;
+}
+
 function playtimeConverter(UNIX_timestamp){
   var a = new Date(UNIX_timestamp * 1000);
   var hour = a.getHours();
@@ -52,6 +63,7 @@ function DurationChange(input){
   return H  + M + ':' + S ;
 }
 
+// 프로필 이미지
 function getImage(image) {
   // 내용물 비어있으면 startsWith 작동 안함
   if (image == null || image == "") {
@@ -115,4 +127,76 @@ function getImage(image) {
   }
 }
 
-export { timeConverter, playtimeConverter, DurationChange, getImage }
+// 뱃지 이미지
+function getBadgeImage(image) {
+  if (image === 1) {
+    return require(`@/assets/badges/badge_1.png`)
+  } else if (image === 2) {
+    return require(`@/assets/badges/badge_2.png`)
+  } else if (image === 3) {
+    return require(`@/assets/badges/badge_3.png`)
+  } else if (image === 4) {
+    return require(`@/assets/badges/badge_4.png`)
+  } else if (image === 5) {
+    return require(`@/assets/badges/badge_5.png`)
+  } else if (image === 6) {
+    return require(`@/assets/badges/badge_6.png`)
+  } else if (image === 7) {
+    return require(`@/assets/badges/badge_7.png`)
+  } else if (image === 8) {
+    return require(`@/assets/badges/badge_8.png`)
+  } else if (image === 9) {
+    return require(`@/assets/badges/badge_9.png`)
+  } else if (image === 10) {
+    return require(`@/assets/badges/badge_10.png`)
+  } else if (image === 11) {
+    return require(`@/assets/badges/badge_11.png`)
+  } else if (image === 12) {
+    return require(`@/assets/badges/badge_12.png`)
+  } else if (image === 13) {
+    return require(`@/assets/badges/badge_13.png`)
+  } else if (image === 14) {
+    return require(`@/assets/badges/badge_14.png`)
+  } else if (image === 15) {
+    return require(`@/assets/badges/badge_15.png`)
+  } else if (image === 16) {
+    return require(`@/assets/badges/badge_16.png`)
+  } else if (image === 17) {
+    return require(`@/assets/badges/badge_17.png`)
+  } else if (image === 18) {
+    return require(`@/assets/badges/badge_18.png`)
+  } else if (image === 19) {
+    return require(`@/assets/badges/badge_19.png`)
+  } else if (image === 20) {
+    return require(`@/assets/badges/badge_20.png`)
+  } else if (image === 21) {
+    return require(`@/assets/badges/badge_21.png`)
+  } else if (image === 22) {
+    return require(`@/assets/badges/badge_22.png`)
+  } else if (image === 23) {
+    return require(`@/assets/badges/badge_23.png`)
+  } else if (image === 24) {
+    return require(`@/assets/badges/badge_24.png`)
+  } else if (image === 25) {
+    return require(`@/assets/badges/badge_25.png`)
+  } else if (image === 26) {
+    return require(`@/assets/badges/badge_26.png`)
+  } else if (image === 27) {
+    return require(`@/assets/badges/badge_27.png`)
+  } else if (image === 28) {
+    return require(`@/assets/badges/badge_28.png`)
+  } else if (image === 29) {
+    return require(`@/assets/badges/badge_29.png`)
+  } else if (image === 30) {
+    return require(`@/assets/badges/badge_30.png`)
+  } else if (image === 31) {
+    return require(`@/assets/badges/badge_31.png`)
+  }
+
+  else {
+    return require(`@/assets/profile_basic.jpg`)
+  }
+
+}
+
+export { timeConverter, timeConverterShort, playtimeConverter, DurationChange, getImage, getBadgeImage }

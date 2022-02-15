@@ -1,46 +1,49 @@
 <template>
-  <v-app>
+  <div>
     <div>
-      <!-- 취향 분석 -->
-      <div class="d-flex flex-column">
-        <h3>지난 1주일 간 취향 분석</h3>
-        <p>{{ nickname }}님은 지난 1주일간 ???을 가장 즐겨보셨군요?</p>
-        <div class="d-flex align-center">
-          <p>예능</p>
-          <p>-------</p>
-        </div>
-        <div class="d-flex align-center">
-          <p>먹방</p>
-          <p>-------------------</p>
-        </div>
-        <div class="d-flex align-center">
-          <p>스포츠</p>
-          <p>---------</p>
-        </div>
-        <div class="d-flex align-center">
-          <p>음악</p>
-          <p>--------</p>
-        </div>
-        <div class="d-flex align-center">
-          <p>게임</p>
-          <p>--------</p>
-        </div>
-      </div>
-      <!-- 뱃지 -->
-      <div>
-        <h3>나의 튜플리 뱃지</h3>
-      </div>
+      <h2>{{ nickname }}님의 취향 분석</h2>
+      <taste-list
+        :tastes="tastes"
+      />
+      <badge-list
+        :badges="badges"
+      />
     </div>
-  </v-app>
+  </div>
 </template>
 
 <script>
-import { mapState } from 'vuex'
+
+import TasteList from '@/components/profile/timeline/taste/TasteList.vue'
+import axiosConnector from '../../../utils/axios-connector'
+
 
 export default {
   name: 'ProfileTaste',
-  computed: {
-    ...mapState(['nickname'])
+  components: {
+    TasteList,
+  },
+  props: {
+    tastes: {type : Object, default() { {} } },
+    badges: {type : Object, default() { {} } },
+    nickname: {type: String, default() { '' }},
+    userId:  {type : Number, default() { 0 } },
+  },
+  created: function() {
+    console.log('뱃지33ddd3', this.badges)
+    this.getBadge()
+  },
+  methods: {
+    // 뱃지 획득
+    getBadge: function() {
+      axiosConnector.get(`/badge/list/${this.$route.params.userSeq}`)
+        .then((res) => {
+          this.badges = res.data.badgeSeq
+        })
+        .catch((err) => {
+          console.log('에러', 'err')
+        })
+    }
   }
 }
 </script>

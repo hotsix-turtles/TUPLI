@@ -9,7 +9,7 @@ const account = {
     email: null,
     nickname: null,
     introduction: null,
-    image: '@/assets/tupli_logo2_dark',
+    image: '',
     is_vip: null,
     following: [],
     followers: [],

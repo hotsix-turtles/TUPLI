@@ -8,7 +8,7 @@
         <div class="d-flex flex-column align-center">
           <img
             class="my-3 profile-img-large"
-            src="https://yt3.ggpht.com/wb7A_9h1cIkVGNLQAjljyVzlFvYowycvJd_fM-1O3Ozp-0cpsjvkz16154jOIu-BORVWbLD7Nw=s176-c-k-c0x00ffffff-no-rj-mo"
+            :src="ImgUrl(profile.profileImage)"
             alt=""
           >
           <h3 class="text-center pt-2 pb-1">
@@ -20,7 +20,7 @@
             </p>
           </div>
         </div>
-        <div class="d-flex justify-center pt-3">
+        <div class="d-flex justify-center pt-3 mb-3">
           <div
             class="d-flex mx-3"
             @click="followList"
@@ -84,10 +84,17 @@
         </v-tab>
         <v-tab>취향</v-tab>
         <v-tab-item>
-          <profile-playlist />
+          <profile-playlist
+            :activities="activities"
+            :nickname="nickname"
+          />
         </v-tab-item>
         <v-tab-item>
-          <profile-taste />
+          <profile-taste
+            :tastes="tastes"
+            :nickname="nickname"
+            :user-id="userId"
+          />
         </v-tab-item>
       </v-tabs>
     </div>
@@ -95,12 +102,12 @@
 </template>
 
 <script>
-import ProfilePlaylist from '../../components/profile/timeline/ProfilePlaylist.vue'
-import ProfileTaste from '../../components/profile/timeline/ProfileTaste.vue'
+import ProfilePlaylist from '@/components/profile/timeline/ProfilePlaylist.vue'
+import ProfileTaste from '@/components/profile/timeline/ProfileTaste.vue'
 
+import { getImage } from '../../utils/utils'
 import axiosConnector from '@/utils/axios-connector.js'
 
-import SERVER from '@/api/server'
 import { mapActions, mapState } from 'vuex'
 
 export default {
@@ -111,6 +118,10 @@ export default {
       followText: '팔로우',
       follower_cnt: 0, // 팔로잉 하면 팔로워가 늘어남.
       userId: '',
+      activities: '',
+      tastes: '',
+      nickname: '',
+
       // followerList: [],
       // followingList: [],
     }
@@ -122,10 +133,12 @@ export default {
     console.log('타인 프로필 조회', this.profile)
     this.getAccounts()
     this.getFollowerList()
-    console.log('타인 프로필 조회', this.$route.params.userId)
-    console.log('팔로우리스트', this.following)
+    this.userId = this.$route.params.userId
+    // console.log('팔로우리스트', this.following)
     // console.log('팔로우리스트2', this.following.find(this.profile.userSeq))
-    this.followState()
+    // this.followState()
+    // console.log('액티비티', this.activities)
+
 
 
   },
@@ -138,6 +151,11 @@ export default {
         .then((res) => {
           console.log('성공적 프로필', res.data)
           this.profile = res.data
+          this.activities = res.data.activities
+          this.tastes = res.data.userInfo.tasteInfo
+          this.nickname = res.data.nickname
+          console.log('취향', this.tastes)
+
         })
         .catch((err) => {
           console.log('에러', err)
@@ -196,6 +214,10 @@ export default {
     followList: function() {
       console.log('팔로우 리스트로 이동', this.userId)
       this.$router.push({ name: 'Follow', params: { userId: this.$route.params.userId }})
+    },
+    // 이미지 조합
+    ImgUrl: function(img) {
+      return getImage(img)
     },
   },
 
