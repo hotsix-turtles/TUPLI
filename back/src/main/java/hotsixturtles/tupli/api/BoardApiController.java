@@ -1,16 +1,15 @@
 package hotsixturtles.tupli.api;
 
+import hotsixturtles.tupli.dto.CommentDto;
 import hotsixturtles.tupli.dto.PlayroomDto;
 import hotsixturtles.tupli.dto.request.BoardRequestDto;
 import hotsixturtles.tupli.dto.response.BoardResponseDto;
 import hotsixturtles.tupli.dto.response.ErrorResponse;
 import hotsixturtles.tupli.dto.simple.SimpleBadgeDto;
+import hotsixturtles.tupli.dto.simple.SimpleCommentDto;
 import hotsixturtles.tupli.entity.*;
 import hotsixturtles.tupli.entity.likes.BoardLikes;
-import hotsixturtles.tupli.service.BadgeService;
-import hotsixturtles.tupli.service.BoardService;
-import hotsixturtles.tupli.service.UserInfoService;
-import hotsixturtles.tupli.service.UserService;
+import hotsixturtles.tupli.service.*;
 import hotsixturtles.tupli.service.token.JwtTokenProvider;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -49,6 +48,8 @@ public class BoardApiController {
     private final UserInfoService userInfoService;
 
     private final UserService userService;
+
+    private final CommentService commentService;
 
 
     /**
@@ -297,6 +298,109 @@ public class BoardApiController {
         List<BoardResponseDto> result = boards.stream().map(b -> new BoardResponseDto(b,user)).collect(Collectors.toList());
 
         return ResponseEntity.ok().body(result);
+    }
+
+    /**
+     * 게시글의 덧글 리스트 출력
+     * @param boardId
+     * @return List<comment>
+     * 반환 코드 : 200, 204, 404
+     */
+    @GetMapping("/board/{boardId}/comment")
+    public ResponseEntity<List<CommentDto>> getCommentList(@PathVariable("boardId") Long boardId)
+    {
+
+        List<Comment> commentList = commentService.getCommentList(boardId);
+
+        if (commentList.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+        }
+
+        List<CommentDto> result = commentList.stream().map(b -> new CommentDto(b)).collect(Collectors.toList());
+
+        return ResponseEntity.ok().body(result);
+    }
+
+    /**
+     * 게시글 추가하기
+     * @param token
+     * @param boardId
+     * @param comment
+     * @return null
+     *반환 코드 : 201, 403, 404
+     */
+    @PostMapping("/board/{boardId}/comment")
+    public ResponseEntity<?> addComment(@RequestHeader(value = "Authorization") String token,
+                                        @PathVariable("boardId") Long boardId,
+                                        @RequestBody Comment comment){
+        if (!jwtTokenProvider.validateToken(token)) {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(new ErrorResponse(messageSource.getMessage("error.valid.jwt", null, LocaleContextHolder.getLocale())));
+        }
+
+        Long userSeq = jwtTokenProvider.getUserSeq(token);
+
+        Comment commentResult = commentService.addComment(userSeq, boardId, comment);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(new SimpleCommentDto(commentResult));
+    }
+
+    /**
+     * 게시글 댓글 갱신하기
+     * @param token
+     * @param boardId
+     * @param comment : {content}
+     * @return null
+     * 반환 코드 : 200, 401, 403, 404
+     */
+    @PutMapping("/board/{boardId}/comment")
+    public ResponseEntity<?> updateComment(@RequestHeader(value = "Authorization") String token,
+                                           @PathVariable("boardId") Long boardId,
+                                           @RequestBody Comment comment){
+
+        if (!jwtTokenProvider.validateToken(token)) {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(new ErrorResponse(messageSource.getMessage("error.valid.jwt", null, LocaleContextHolder.getLocale())));
+        }
+
+        Long userSeq = jwtTokenProvider.getUserSeq(token);
+
+        Comment commentSaved = commentService.updateComment(userSeq, boardId, comment);
+
+        if(commentSaved == null){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(null);
+    }
+
+    /**
+     * 게시글 댓글 지우기
+     * @param token
+     * @param boardId
+     * @param comment
+     * @return null
+     * 반환 코드 : 200, 401, 403, 404
+     */
+    @DeleteMapping("/board/{boardId}/comment")
+    public ResponseEntity<?> deleteComment(@RequestHeader(value = "Authorization") String token,
+                                           @PathVariable("boardId") Long boardId,
+                                           @RequestBody Comment comment){
+
+        if (!jwtTokenProvider.validateToken(token)) {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(new ErrorResponse(messageSource.getMessage("error.valid.jwt", null, LocaleContextHolder.getLocale())));
+        }
+        Long userSeq = jwtTokenProvider.getUserSeq(token);
+
+        Long result = commentService.deleteComment(comment.getId(), userSeq);
+
+        if(result == -1L){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(null);
     }
 
 }
