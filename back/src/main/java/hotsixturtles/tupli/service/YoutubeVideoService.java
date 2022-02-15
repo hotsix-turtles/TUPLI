@@ -149,6 +149,24 @@ public class YoutubeVideoService {
         return youtubeVideoLikesRepository.findByUserOrderByIdDesc(userRepository.findByUserSeq(userSeq));
     }
 
+    public YoutubeVideoLikesSavedDto getSearchResultInfoNoLogin(List<String> urls){
+        List<Boolean> is_userSaved =  new ArrayList<>();
+        List<Boolean> is_userLikes = new ArrayList<>();
+        List<Integer> is_LikesCount = new ArrayList<>();
+
+        for (String url : urls) {
+            is_userSaved.add(false);
+            is_userLikes.add(false);
+            is_LikesCount.add(youtubeVideoLikesRepository.isUserLikesCnt(url));
+        }
+
+        YoutubeVideoLikesSavedDto dto = new YoutubeVideoLikesSavedDto();
+        dto.setIsSavedList(is_userSaved);
+        dto.setIsLikesList(is_userLikes);
+        dto.setIsLikesCnt(is_LikesCount);
+
+        return dto;
+    }
     // 검색 결과를 기존에 저장, 좋아요 했는지 체크
     public YoutubeVideoLikesSavedDto getSearchResultInfo(Long userSeq, List<String> urls) {
         List<Boolean> is_userSaved = new ArrayList<>();
