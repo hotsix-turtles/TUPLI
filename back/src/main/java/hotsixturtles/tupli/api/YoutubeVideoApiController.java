@@ -1,12 +1,14 @@
 package hotsixturtles.tupli.api;
 
 import hotsixturtles.tupli.dto.PlayroomDto;
+import hotsixturtles.tupli.dto.response.BoardResponseDto;
 import hotsixturtles.tupli.dto.simple.SimplePlayroomCategoryDto;
 import hotsixturtles.tupli.dto.simple.SimpleVideoCategoryDto;
 import hotsixturtles.tupli.dto.simple.SimpleYoutubeVideoDto;
 import hotsixturtles.tupli.dto.response.ErrorResponse;
 import hotsixturtles.tupli.dto.simple.YoutubeVideoLikesSavedDto;
 import hotsixturtles.tupli.entity.Playroom;
+import hotsixturtles.tupli.entity.User;
 import hotsixturtles.tupli.entity.youtube.YoutubeVideo;
 import hotsixturtles.tupli.service.SearchService;
 import hotsixturtles.tupli.service.YoutubeVideoService;
@@ -200,26 +202,27 @@ public class YoutubeVideoApiController {
 
     /**
      * 프론트 검색 종료 후, 검색 결과 중에 좋아요, 저장했는지 여부.
-     * @param token
+     * @param request ( 회원 비회원 )
      * @return
      * 반환 코드 : 200, 403
      */
     @PutMapping("/profile/video/isLikes")
-    public ResponseEntity getSearchResultInfo(@RequestHeader(value = "Authorization") String token,
+    public ResponseEntity getSearchResultInfo(HttpServletRequest request,
                                               @RequestBody UrlRequest urlRequest) {
-        // 유저 정보
-        if (!jwtTokenProvider.validateToken(token)) {
-            return ResponseEntity
-                    .status(HttpStatus.BAD_REQUEST)
-                    .body(new ErrorResponse(messageSource.getMessage("error.valid.jwt", null, LocaleContextHolder.getLocale())));
+
+        String token = request.getHeader("Authorization");
+        if (token == null || !jwtTokenProvider.validateToken(token)) {
+            List<String> urls = urlRequest.getUrls();
+            YoutubeVideoLikesSavedDto result = youtubeVideoService.getSearchResultInfoNoLogin(urls);
+
+            return ResponseEntity.ok().body(result);
+        } else {
+            Long userSeq = jwtTokenProvider.getUserSeq(token);
+            List<String> urls = urlRequest.getUrls();
+            YoutubeVideoLikesSavedDto result = youtubeVideoService.getSearchResultInfo(userSeq, urls);
+
+            return ResponseEntity.ok().body(result);
         }
-        Long userSeq = jwtTokenProvider.getUserSeq(token);
-
-        // 정보 담기
-        List<String> urls = urlRequest.getUrls();
-        YoutubeVideoLikesSavedDto result = youtubeVideoService.getSearchResultInfo(userSeq, urls);
-
-        return ResponseEntity.ok().body(result);
     }
 
     // 특수한 Library 없으면 @RequestBody List<String> urls로 못 받고 별도의 DTO 필요
