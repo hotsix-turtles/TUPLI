@@ -3,6 +3,7 @@ package hotsixturtles.tupli.api;
 import hotsixturtles.tupli.dto.UserDto;
 import hotsixturtles.tupli.dto.UserProfileDto;
 import hotsixturtles.tupli.dto.UserSettingDto;
+import hotsixturtles.tupli.dto.request.UserSettingRequestDto;
 import hotsixturtles.tupli.dto.response.ErrorResponse;
 import hotsixturtles.tupli.dto.simple.SimpleBadgeDto;
 import hotsixturtles.tupli.dto.simple.SimpleUpdateProfileDto;
@@ -367,7 +368,7 @@ public class UserApiController {
      */
     @PutMapping("/account/setting")
     public ResponseEntity changeSetting(@RequestHeader(value = "Authorization") String token,
-                                        UserSettingDto userSettingDto) {
+                                        @RequestBody UserSettingRequestDto userSettingDto) {
         // 인증 및 대상
         if (!jwtTokenProvider.validateToken(token)) {
             return ResponseEntity
@@ -375,7 +376,6 @@ public class UserApiController {
                     .body(new ErrorResponse(messageSource.getMessage("error.valid.jwt", null, LocaleContextHolder.getLocale())));
         }
         Long userSeq = jwtTokenProvider.getUserSeq(token);
-
         userSettingService.changeSetting(userSeq, userSettingDto);
 
         return ResponseEntity.ok().body(null);
