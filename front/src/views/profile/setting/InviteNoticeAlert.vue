@@ -141,12 +141,12 @@ export default {
   methods: {
     // 기본 설정
     initSetting: function() {
-      this.newAlarmSetting = alarmSetting
-      this.newAlarmOnRealtime = alarmOnRealtime
-      this.newAlarmOnInvite = alarmOnInvite
-      this.newInviteDomain = inviteDomain
-      this.newAlarmOnPlayroomMake = alarmOnPlayroomMake
-      this.newAlarmOnBadge = alarmOnBadge
+      this.newAlarmSetting = this.alarmSetting
+      this.newAlarmOnRealtime = this.alarmOnRealtime
+      this.newAlarmOnInvite = this.alarmOnInvite
+      this.newInviteDomain = this.inviteDomain
+      this.newAlarmOnPlayroomMake = this.alarmOnPlayroomMake
+      this.newAlarmOnBadge = this.alarmOnBadge
     },
     // 설정 변경 여부와 상관없이 보내기
     sendSetting: function() {
