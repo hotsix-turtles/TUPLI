@@ -29,6 +29,7 @@ public class SimpleHomePlaylistDto {
 
     // 추가 정보
     private String userLikesYN;
+    private Boolean isRecommend;
 
     // 연결
     private Integer likesCnt;

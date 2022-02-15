@@ -217,6 +217,13 @@ public class PlayroomService {
     @Transactional
     public PlayroomDto updatePlayroom(Long playroomId, RequestPlayroomDto playroomDto, Long userSeq){
 
+        User maker = userRepository.findByUserSeq(userSeq);
+        youtubeVideoRepository.deleteVideos(playroomId);
+
+        // 유저 취향 가져오기
+        UserInfo userInfo = userInfoRepository.findOneByUserSeq(userSeq);
+        ConcurrentHashMap<String, Integer> tasteInfo = userInfo.getTasteInfo();
+
         Playroom playroom = playroomRepository.findById(playroomId).orElse(null);
 
         if(playroom == null || playroom.getUser().getUserSeq() != userSeq){
@@ -229,11 +236,121 @@ public class PlayroomService {
         if(playroomDto.getContent() != null){
             playroom.setContent(playroomDto.getContent());
         }
+        if(playroomDto.getIsPublic() != null){
+            playroom.setIsPublic(playroomDto.getIsPublic());
+        }
+        if(playroomDto.getTags() != null){
+            playroom.setTags(playroomDto.getTags());
+        }
+        if(playroomDto.getStartTime() != null){
+            playroom.setStartTime(playroomDto.getStartTime());
+        }
+        if(playroomDto.getEndTime() != null){
+            playroom.setEndTime(playroomDto.getEndTime());
+        }
+        if(playroom.getUserCountMax() != null){
+            playroom.setUserCountMax(playroomDto.getUserCountMax());
+        }
+        playroom.setInviteIds(playroomDto.getInviteIds());
+
+        // 플레이리스트 비디오 분리하고 저장 + ID만 저장
+        ConcurrentHashMap<Long, List<Long>> playlists = new ConcurrentHashMap<>();
+        ConcurrentHashMap<Integer, Integer> playroomInfo = new ConcurrentHashMap<Integer, Integer>();
+        List<YoutubeVideo> youtubeVideoList = new ArrayList<>();
+        for (Map.Entry<Long, List<String>> entry : playroomDto.getPlaylists().entrySet()) {
+            // 플레이리스트 ID만 저장
+//            playlists.add(entry.getKey());
+            List<Long> playroomPlList = new ArrayList<>();
 
 
-        playroomRepository.save(playroom);
+            String image = null;
 
-        return new PlayroomDto(playroom);
+            // 비디오 저장(플레이리스트 삭제 대비 및 편한 추가 삭제를 위해 DB 별도 저장) 최적화 반드시 필요!!!!! $$$
+            for (String videoUrl : entry.getValue()) {
+                YoutubeVideo video = new YoutubeVideo();
+                YoutubeVideo existVideo = youtubeVideoRepository.findFirstByVideoId(videoUrl);
+                // 첫 영상 이미지만 저장 (미리보기용)
+                if (image == null) {
+                    image = existVideo.getThumbnail();
+                    playroom.setImage(image);
+                }
+                video.setPlayroom(playroom);
+                video.copyVideo(existVideo);
+                youtubeVideoRepository.save(video);
+                YoutubeVideo nowVideo = youtubeVideoRepository.findFirstByVideoIdOrderByIdDesc(videoUrl);
+                playroomPlList.add(nowVideo.getId());
+                youtubeVideoList.add(nowVideo);
+
+                // 플레이룸 구성 비디오 정보로 메타 정보 구축
+                Integer categoryId = existVideo.getCategoryId();
+                Integer count = playroomInfo.getOrDefault(categoryId, 0);
+                playroomInfo.put(categoryId, count+1);
+
+                // 카테고리에 따른 분류
+                String category = CategoryList.CATEGORY_LIST.getOrDefault(categoryId, "기타");
+
+                // 취향 반영
+                Integer tasteScore = tasteInfo.getOrDefault(category, 0);
+                tasteInfo.put(category, tasteScore + TasteScore.SCORE_PLAYROOM_MAKE);
+            }
+            playlists.put(entry.getKey(), playroomPlList);
+
+        }
+        playroom.setPlayroomInfo(playroomInfo);
+        playroom.setPlaylists(playlists);
+
+        List<SimpleYoutubeVideoDto> youtubeVideoDtoList = youtubeVideoList
+                .stream().map(x -> new SimpleYoutubeVideoDto(x)).collect(Collectors.toList());
+        playroomDto.setVideos(youtubeVideoDtoList);
+
+        // 카테고리 정보
+        Map<Integer, String> categoryList = new HashMap<>();
+        List<Category> categories =  categoryRepository.findAll();
+        for(Category category : categories){
+            categoryList.put(category.getCategoryId().intValue(), category.getSort());
+        }
+
+        Set<String> categorys = new HashSet<>();
+
+        // Video 정보
+        ConcurrentHashMap<Integer, Integer> playroominfo = new ConcurrentHashMap<Integer, Integer>();
+        String image = null;
+        for (SimpleYoutubeVideoDto videoDto : playroomDto.getVideos()) {
+            // 첫 영상 이미지만 저장 (미리보기용)
+            if (image == null) {
+                image = videoDto.getThumbnail();
+                playroom.setImage(image);
+            }
+
+            // Playroominfo에 따라 갈림
+            Integer categoryId = videoDto.getCategoryId();
+            Integer count = playroominfo.getOrDefault(categoryId, 0);
+            playroominfo.put(categoryId, count+1);
+
+            // 카테고리에 따른 분류
+            String category = categoryList.getOrDefault(categoryId, "기타");
+            categorys.add(category);
+        }
+
+        // 검색을 위한 Stringify
+        String categorysString = "";
+        for (String category : categorys) {
+            categorysString = categorysString + category + ", ";
+        }
+
+        playroom.setPlayroomCate(categorysString);
+        Playroom nowPlayroom = playroomRepository.save(playroom);
+
+        // 유저 정보 저장
+        userInfo.setTasteInfo(tasteInfo);
+        userInfoRepository.save(userInfo);
+
+        // 유저 취향 분석 후 저장
+        List<String> userTaste = TasteUtil.getTaste(tasteInfo);
+        maker.setTaste(userTaste);
+        userRepository.save(maker);
+
+        return new PlayroomDto(nowPlayroom);
     }
 
     @Transactional
@@ -242,8 +359,10 @@ public class PlayroomService {
         Playroom playroom = playroomRepository.findById(playroomId).orElse(null);
 
         //userSeq == -1L 이면 관리자
-        if(playroom == null || playroom.getUser().getUserSeq() != userSeq || userSeq != -1L){
-            return null;
+        if(userSeq != -1L) {
+            if (playroom == null || playroom.getUser().getUserSeq() != userSeq) {
+                return null;
+            }
         }
 
         playroomRepository.deleteById(playroomId);
