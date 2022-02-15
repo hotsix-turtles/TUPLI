@@ -36,8 +36,8 @@ public class CommentService {
     }
 
     @Transactional
-    public Comment updateComment(Long userSeq, Long boardId, Comment comment){
-        Comment nowComment = commentRepository.findById(comment.getId()).orElse(null);
+    public Comment updateComment(Long userSeq, Long commentId, Comment comment){
+        Comment nowComment = commentRepository.findById(commentId).orElse(null);
         Long commentUserSeq = nowComment.getUser().getUserSeq();
 
         if(userSeq == commentUserSeq){
