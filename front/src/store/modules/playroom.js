@@ -189,6 +189,7 @@ const playroom = {
       commit('SET_ROOM_PLAYLISTS', data.playlists);
       commit('SET_ROOM_VIDEOS', data.videos);
       // commit('SET_ROOM_CURRENT_VIDEO_PLAYTIME', data.currentVideoPlaytime)
+      commit('SET_ROOM_CURRENT_PLAYLIST_ID', Object.keys(data.playlists)[0])
       commit('SET_ROOM_CHATROOM_ID', `playroom-${data.id}`);//'731f3b99-8257-4eae-86b2-ed38ea36ccff');//data.chatroomId);
     }),
     followUser: ({commit}, id) => {
