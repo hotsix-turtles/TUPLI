@@ -18,6 +18,7 @@ import axios from 'axios'
 import SERVER from '@/api/server'
 import createPersistedState from "vuex-persistedstate";
 import axiosConnector from '@/utils/axios-connector.js'
+import swal from 'sweetalert2'
 
 export default new Vuex.Store({
   // TODO: createPersistedState 사용시 사용 모듈 한정 필요 (playroom, playlist등엔 사용 x)
@@ -174,9 +175,9 @@ export default new Vuex.Store({
               icon: 'info',
               title: '토큰 만료',
               text: '토큰이 만료되어 자동 로그아웃 처리 되었습니다.',
-              // scrollbarPadding: false
+              scrollbarPadding: false
             })    
-            window.location.reload();
+            // window.location.reload();  // 버그 방지차원인데 필요한가?
           })
       }
       // commit('LOGIN')
