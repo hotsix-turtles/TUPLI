@@ -548,6 +548,7 @@ export default {
       'chatroomId',
       'chatBlockedId',
       'chatBlockedUid',
+      'roomLastSyncSender'
     ]),
     ...mapGetters('playroom', [
       'roomPublicLabel',
@@ -841,16 +842,19 @@ export default {
         const syncVideoId = syncData.videoId
         const syncVideoTime = syncData.videoPlaytime
         const syncPlayerState = syncData.playerState
-        const syncSender = syncData.sender
+        const syncSender = body.userSeq
 
-        if (!currentSyncSender) {
-          this.SET_ROOM_LAST_SYNC_SENDER(syncSender)
+        if (!currentSyncSender)
+        {
+          // console.log('currentSyncSender', currentSyncSender, 'syncSender', syncSender, syncData)
+          await this.SET_ROOM_LAST_SYNC_SENDER(syncSender)
         }
         else if (currentSyncSender != syncSender)
         {
+          // console.log('currentSyncSender', currentSyncSender, 'syncSender', syncSender)
           this.showInfoAuthorChanged()
-          await this.getRoomInfo()
           await this.SET_ROOM_LAST_SYNC_SENDER(syncSender)
+          await this.getRoomInfo2()
         }
 
         if (this.userId == this.roomAuthorId) return;
