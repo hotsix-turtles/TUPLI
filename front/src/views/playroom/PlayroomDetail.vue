@@ -706,7 +706,7 @@ export default {
       const userFollowerInfo = await axiosConnector.get(`/profile/followers/${this.roomAuthorId}/count`);
       this.SET_ROOM_AUTHOR({ follower: parseInt(userFollowerInfo.data) })
 
-      if (roomInfo.data.guests.filter(guestId => guestId == this.userId).length > 1)
+      if (roomInfo.data.guests.filter(guestId => guestId == this.userId).length)
       {
         this.isDuplicatedError = true
         return;
