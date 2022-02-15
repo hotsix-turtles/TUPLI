@@ -6,7 +6,8 @@
         :src="video.thumbnail"
         alt="썸네일"
         width="390px"
-        height="235px"
+        height="215px"
+        style="object-fit: cover;"
         @click="watchingVideo(video)"
       >
     </div>

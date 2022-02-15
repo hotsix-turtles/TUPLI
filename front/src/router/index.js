@@ -101,7 +101,7 @@ const routes = [
     component: PlaylistForm
   },
   {
-    path: '/playlist/video',
+    path: '/playlist/create/video',
     name: 'PlaylistFormVideo',
     component: PlaylistFormVideo
   },
@@ -129,7 +129,7 @@ const routes = [
     component: Search
   },
   {
-    path: '/search/detail',
+    path: '/search/detail/:tab/:keyword',
     name: 'SearchDetail',
     component: SearchDetail
   },

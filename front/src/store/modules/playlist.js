@@ -180,6 +180,9 @@ const playlist = {
   },
   actions: {
     // [플레이리스트 생성]
+    resetFormData: function ({ commit }) {
+      commit('RESET_FORM_DATA')
+    },
     createPlaylist: function ({ commit }, formData) {
       axiosConnector.post('/playlist',
         formData
@@ -202,6 +205,19 @@ const playlist = {
       ).then((res) => {
         console.log(res)
         router.push({ name: 'PlaylistDetail', params: { playlistId: id } })
+        commit('RESET_FORM_DATA')
+      })
+        .catch((err) => {
+          console.log(err)
+        })
+    },
+    // 내 플레이리스트에 담기
+    addVideoInPlaylist: function ({ commit }, { formData, id } ) {
+      console.log('addVideoInPlaylist', formData)
+      axiosConnector.put(`/playlist/${id}`,
+        formData
+      ).then((res) => {
+        console.log(res)
         commit('RESET_FORM_DATA')
       })
         .catch((err) => {

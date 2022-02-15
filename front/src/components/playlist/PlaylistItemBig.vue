@@ -6,7 +6,7 @@
         :thumbnail="playlist.image ? playlist.image : playlist.videos[0].thumbnail"
       />
     </div>
-    <div class="d-flex-column">
+    <div class="d-flex-column mt-4">
       <!-- 제목 -->
       <div
         class="txt-2 semi-bold"

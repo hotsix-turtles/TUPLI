@@ -1,20 +1,11 @@
 <template>
   <div class="">
-    <!-- 플레이룸 생성 -->
-    <normal-dialog
-      :title="'이 플레이리스트로 플레이룸 생성하기'"
-      :content-html="'이 플레이리스트를 넣어서 플레이룸을 생성하시겠습니까?'"
-      :max-width="350"
-      :buttons="[{ name: '확인', color: '#5B5C9D' }, { name: '취소', color: 'gray' }]"
-      :show="createPlayroom"
-      @button-click="onClickDialog"
-    />
     <!-- 상단 뒤로가기, 플레이룸생성, 좋아요, 점3 등 -->
     <div class="fixed-top d-flex justify-space-between light-background navbar-top">
       <back-only />
       <div class="d-flex me-5">
         <!-- 플레이룸 생성 -->
-        <div @click="createPlayroom = true">
+        <div @click="showCreatePlayroomDialog">
           <v-icon>mdi-youtube</v-icon>
         </div>
         <!-- 좋아요 -->
@@ -37,8 +28,6 @@
           <v-icon>mdi-comment-outline</v-icon>
         </div>
         <!-- 작성자일 경우, 수정하기 삭제하기 모달창 -->
-        {{ userId }}
-        {{ playlistDetail.userId }}
         <div v-if="userId === playlistDetail.userId">
           <v-icon @click="onClickModal">
             mdi-dots-vertical
@@ -54,6 +43,7 @@
     </div><br><br>
     <!-- {{ playlistDetail }} -->
     <div class="container">
+      {{ playlistDetail.createdAt }}
       <div class="text-center">
         <!-- 제목 공개여부 -->
         <div class="d-flex justify-center">
@@ -92,8 +82,19 @@
         :videos="playlistDetail.videos"
       /><br><br>
     </div>
+
     <!-- 플레이룸생성/내 플레이리스트에 넣기/저장하기 -->
     <detail-button-bottom />
+    <!-- 플레이룸 생성 -->
+    <normal-dialog
+      title="플레이룸 생성하기"
+      content-html="이 플레이리스트를 넣어서 플레이룸을 생성하시겠습니까?"
+      max-width="290"
+      persistent
+      :buttons="[{ name: '확인', color: '#5B5C9D' }, { name: '취소', color: 'gray' }]"
+      :show="createPlayroom"
+      @button-click="onClickDialog"
+    />
   </div>
 </template>
 
@@ -109,6 +110,8 @@ import PlaylistCd from '../../components/playlist/PlaylistCd.vue'
 
 import VideoListItemSmall from '../../components/video/VideoListItemSmall.vue'
 import Modal from '../../components/common/Modal.vue'
+import NormalDialog from '../../components/common/NormalDialog.vue';
+
 export default {
   name: 'PlaylistFormVideo',
   components: {
@@ -117,7 +120,8 @@ export default {
     VideoListItemSmall,
     PlaylistCd,
     Tags,
-    Modal
+    Modal,
+    NormalDialog,
   },
   data: function() {
     return {
@@ -190,10 +194,15 @@ export default {
     },
     onClickDialog: function (idx) {
       if (idx === 0) { // 확인
-        this.createPlayroom(this.playlistDetail)
+        console.log('확인')
+        // this.createPlayroom(this.playlistDetail)
       } else { // 취소
-
+        console.log('취소')
       }
+    },
+    showCreatePlayroomDialog: function () {
+      console.log('showCreatePlayroomDialog')
+      this.createPlayroom = true
     },
   },
 }
