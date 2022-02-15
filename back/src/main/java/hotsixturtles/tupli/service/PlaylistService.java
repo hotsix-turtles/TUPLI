@@ -6,10 +6,12 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.PathBuilder;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import hotsixturtles.tupli.dto.PlaylistDto;
 import hotsixturtles.tupli.dto.param.SimpleCondition;
 import hotsixturtles.tupli.dto.params.PlaylistSearchCondition;
 import hotsixturtles.tupli.dto.request.PlaylistRequest;
 import hotsixturtles.tupli.dto.simple.SimpleHomeInfoDto;
+import hotsixturtles.tupli.dto.simple.SimplePlaylistDto;
 import hotsixturtles.tupli.dto.simple.SimpleYoutubeVideoDto;
 import hotsixturtles.tupli.entity.HomeInfo;
 import hotsixturtles.tupli.entity.Playlist;
@@ -156,6 +158,16 @@ public class PlaylistService {
     // 단일 Playlist id로 검색
     public Playlist getPlaylist(Long playlistId) {
         return playlistRepository.findById(playlistId).orElse(null);
+    }
+
+    public List<SimplePlaylistDto> getRecommendPlaylist(List<Long> recommendPlaylist){
+        List<SimplePlaylistDto> recommendPlaylists = new ArrayList<>();
+        for(Long recommendPlaylistId : recommendPlaylist){
+            Playlist recommendPlaylistPL = playlistRepository.findById(recommendPlaylistId).orElse(null);
+            if(recommendPlaylistPL == null) continue;
+            recommendPlaylists.add(new SimplePlaylistDto(recommendPlaylistPL));
+        }
+        return recommendPlaylists;
     }
 
     public List<Playlist> getHomePlaylists(Pageable pageable){

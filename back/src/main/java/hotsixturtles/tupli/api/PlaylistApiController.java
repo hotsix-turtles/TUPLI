@@ -9,6 +9,7 @@ import hotsixturtles.tupli.dto.response.ErrorResponse;
 import hotsixturtles.tupli.dto.response.IdResponse;
 import hotsixturtles.tupli.dto.simple.SimpleBadgeDto;
 import hotsixturtles.tupli.dto.simple.SimplePlaylistCategoryDto;
+import hotsixturtles.tupli.dto.simple.SimplePlaylistDto;
 import hotsixturtles.tupli.entity.*;
 import hotsixturtles.tupli.entity.likes.PlaylistLikes;
 import hotsixturtles.tupli.service.*;
@@ -109,12 +110,18 @@ public class PlaylistApiController {
         String token = request.getHeader("Authorization");
         if (token == null || !jwtTokenProvider.validateToken(token)) {
             Playlist playlist = playlistService.getPlaylist(id);
-            return ResponseEntity.status(HttpStatus.OK).body(new PlaylistDto(playlist));
+            List<SimplePlaylistDto> recommendPlaylist = playlistService.getRecommendPlaylist(playlist.getRecommendPlaylists());
+            PlaylistDto result = new PlaylistDto(playlist);
+            result.setRecommendPlaylists(recommendPlaylist);
+            return ResponseEntity.status(HttpStatus.OK).body(result);
         } else {
             Long userSeq = jwtTokenProvider.getUserSeq(token);
             Playlist playlist = playlistService.getPlaylist(id);
+            List<SimplePlaylistDto> recommendPlaylist = playlistService.getRecommendPlaylist(playlist.getRecommendPlaylists());
             User user = userService.getUserByUserseq(userSeq);
-            return ResponseEntity.status(HttpStatus.OK).body(new PlaylistDto(playlist, user));
+            PlaylistDto result = new PlaylistDto(playlist, user);
+            result.setRecommendPlaylists(recommendPlaylist);
+            return ResponseEntity.status(HttpStatus.OK).body(result);
         }
     }
 
