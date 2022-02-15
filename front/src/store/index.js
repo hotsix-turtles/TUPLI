@@ -39,6 +39,10 @@ export default new Vuex.Store({
       state.isLogin = true
       state.authToken = token
     },
+    // OAUTH 유저 여부
+    OAUTH_LOGIN: function(state) {
+      state.is_oauth = true
+    },
     // 로그아웃
     DELETE_TOKEN: function (state) {
       state.isLogin = false
@@ -50,6 +54,7 @@ export default new Vuex.Store({
       state.introduction = null
       state.image = null
       state.is_vip = null
+      state.is_oauth = null
       state.following = null
       state.followers = null
       state.taste = null
@@ -159,11 +164,18 @@ export default new Vuex.Store({
         })
           .then(
             // 딱히 하는거 없음
-            console.log('토큰 유효함')
+            // console.log('토큰 유효함')
           )
           .catch(() => {
             // 토큰 유효기간 종료 >> 일단 자동 로그 아웃 이거 명시 해야되나...
             commit('DELETE_TOKEN')
+            // $$$ 발표전 혹시 모르니 주석화 필요
+            swal.fire ({
+              icon: 'info',
+              title: '토큰 만료',
+              text: '토큰이 만료되어 자동 로그아웃 처리 되었습니다.',
+              // scrollbarPadding: false
+            })    
             window.location.reload();
           })
       }

@@ -109,6 +109,18 @@
 
       <hr>
 
+      <!-- OAUTH유저 초회 비밀번호 변경 -->
+      <div
+        v-if="'is_oauth'"
+        class="d-flex justify-space-between setting-bar align-center"
+        @click="$router.push({ name: 'ChangePasswordOAUTH' })"
+      >
+        <p>OAUTH 유저 비밀번호 설정(초회)</p>
+        <v-icon>mdi-chevron-right</v-icon>
+      </div>
+      
+      <hr>
+
       <!-- 로그아웃 -->
       <div
         class="d-flex justify-space-between setting-bar align-center"
@@ -220,7 +232,7 @@ export default {
     }
   },
   computed: {
-    ...mapState(['authToken', 'email'])
+    ...mapState(['authToken', 'email', 'is_oauth'])
   },
   methods: {
     // 로그아웃
