@@ -103,6 +103,7 @@ export default {
         password: null,
         passwordCheck: null,
         nickname: null,
+        image: '@/assets/tupli_logo2_dark.png',
         // username: null,
       },
 

@@ -1,3 +1,6 @@
+import router from '@/router/index.js'
+import axiosConnector from '../../utils/axios-connector'
+
 const account = {
   namespaced: true,
   state: {
@@ -6,15 +9,153 @@ const account = {
     email: null,
     nickname: null,
     introduction: null,
-    image: null,
+    image: '@/assets/tupli_logo2_dark',
     is_vip: null,
-    // 팔로잉, 팔로워
-    following: null,
-    followers: null,
+    following: [],
+    followers: [],
+    taste: null,
+
+    // 좋아요한 게시물
+    likePlayroomList: [],
+    likePlaylistList: [],
+    likeBoardList: [],
+
+    // 시청 기록
+    historyList: [],
+
+
+    // [검색]
+    searchedAccounts: [],
+
+    // 사용자 설정
+    alarmSetting: true,  // 알림 여부
+    alarmOnRealtime: true,  // 실시간 알림 받기
+    alarmOnInvite: true, // 초대 받기
+    inviteDomain: 'everyone', //초대 가능한 사람
+    alarmOnPlayroomMake: true,  // 플레이룸 생성시 팔로워에게 알람 보낼지 여부
+    alarmOnBadge: true,  // 뱃지 알림 받을지
   },
   mutations: {
+    // [검색]
+    SEARCH_ACCOUNTS: function (state, accounts) {
+      state.searchedAccounts = accounts
+    },
+
+    // 좋아요한 게시물
+    LIKE_PLAYROOM: function (state, likePlayroomList) {
+      state.likePlayroomList = likePlayroomList
+    },
+    LIKE_PLAYLIST: function (state, likePlaylistList) {
+      state.likePlaylistList = likePlaylistList
+    },
+    LIKE_BOARD: function (state, likeBoardList) {
+      state.likeBoardList = likeBoardList
+    },
+
+    // 플레이룸 시청 기록
+    GET_HISTORY: function (state, historyList) {
+      state.historyList = historyList
+    },
+
+
+    // 팔로우
+    FOLLOW: function (state) {
+      console.log('ddd')
+    },
+
   },
   actions: {
+    async validateToken() {
+      try {
+        const { status } = await axiosConnector.get('/account/tokenvalidate');
+        return (status == 200);
+      } catch(err) {
+        return false;
+      }
+    },
+    // [검색]
+    searchAccounts: function ({ commit }, params) {
+      console.log('searchAccounts params', params)
+      axiosConnector.get(`/account/search`, {
+        params
+      }).then((res) => {
+        console.log(res)
+        commit('SEARCH_ACCOUNTS', res.data)
+      }).catch((err) => {
+        console.log(err)
+      })
+    },
+
+    // [좋아요한 게시물]
+    // 좋아요한 플레이룸 조회
+    getLikePlayroomList: function ({ commit }) {
+      // console.log('getListPlayroomList', '좋아요한 플레이룸')
+      axiosConnector.get(`playroom/likes`
+      )
+        .then((res) => {
+          // console.log('좋아요한 플룸')
+          commit('LIKE_PLAYROOM', res.data)
+        })
+        .catch((err) => {
+          console.log(err)
+        })
+    },
+    // 좋아요한 플레이리스트 조회
+    getLikePlaylistList: function ({ commit }) {
+      // console.log('getLikePlaylistList', '좋아요한 플레이리스트 2')
+      axiosConnector.get(`playlist/likes`
+      )
+        .then((res) => {
+          // console.log('getLikePlaylistList', '좋아요한 플레이리스트 3')
+          commit('LIKE_PLAYLIST', res.data)
+        })
+        .catch((err) => {
+          console.log(err)
+        })
+    },
+    // 좋아요한 게시글 조회
+    getLikeBoardList: function ({ commit }) {
+      // console.log('getLikeBoardList', '좋아요한 플레이룸')
+      axiosConnector.get(`board/likes`
+      )
+        .then((res) => {
+          // console.log('좋아요한 게시글')
+          commit('LIKE_BOARD', res.data)
+        })
+        .catch((err) => {
+          console.log(err)
+        })
+    },
+    // 플레이룸 시청 기록
+    getHistory: function ({ commit }) {
+      axiosConnector.get(`userInfo/playroom`
+      )
+        .then((res) => {
+          console.log('플레이룸 시청 기록', res.data)
+          commit('GET_HISTORY', res.data)
+        })
+        .catch((err) => {
+          console.log(err)
+        })
+    },
+
+    // 플레이룸 생성
+    makePlayroom: function(params) {
+      router.push({ name: 'PlayroomForm', params: params })
+    },
+    // 플레이리스트 생성
+    makePlaylist: function(params) {
+      router.push({ name: 'PlaylistForm', params: params })
+    },
+    // 게시글 생성
+    makeBoard: function(params) {
+      router.push({ name: 'BoardForm', params: params })
+    },
+    // 좋아요 취소
+    cancelLike: function() {
+      console.log('좋아요 취소')
+    },
+
   },
   modules: {
   }

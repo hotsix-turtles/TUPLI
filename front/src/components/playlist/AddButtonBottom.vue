@@ -4,29 +4,49 @@
     v-if="selectedVideos.length"
     absolute
     background-color="#5B5C9D"
-    height="50px"
+    height="60px"
     :input-value="selectedVideos.length > 0"
-    class="fixed-bottom"
+    class="fixed-bottom animate__animated animate__slideInUp"
   >
     <v-badge
       :content="selectedVideos.length"
       color="#F6F7FF"
-      offset-x="120"
+      offset-x="60"
       offset-y="10"
       overlap
       class="videoCounter shadow-s"
     />
-    <div
-      class="d-flex align-center"
-      @click="addVideos"
-    >
-      <div>
-        <v-icon color="white">
-          mdi-plus-box
-        </v-icon>
+    <div class="d-flex text-center align-center">
+      <div
+        class="d-flex-column justify-center mx-5 font-3 clickable"
+      >
+        <div>
+          <v-icon
+            color="white"
+            @click="addVideos"
+          >
+            mdi-plus-box
+          </v-icon>
+        </div>
+        <div style="color: white;">
+          추가
+        </div>
       </div>
-      <div style="color: white;">
-        추가
+      <div class="mx-5" />
+      <div
+        class="d-flex-column justify-center mx-5 font-3 clickable"
+      >
+        <div>
+          <v-icon
+            color="white"
+            @click="watchingVideos(selectedVideos)"
+          >
+            mdi-play-circle
+          </v-icon>
+        </div>
+        <div style="color: white;">
+          영상보기
+        </div>
       </div>
     </div>
   </v-bottom-navigation>
@@ -48,7 +68,8 @@ export default {
   },
   methods: {
     ...mapActions('video', [
-      'addVideos'
+      'addVideos',
+      'watchingVideos',
     ])
   }
 }

@@ -1,78 +1,73 @@
 <template>
-  <div class="container">
+  <div>
     <search-bar
       :label="'검색어를 입력해주세요'"
       :router-page="'SearchDetail'"
     />
-    <p>실시간 검색어 트렌드</p>
-    <div
-      v-for="(keyword, idx) in keywords"
-      :key="idx"
-    >
-      <div class="font-4">
-        {{ keyword.keywordType }}
-      </div>
-      <div class="font-2">
-        {{ idx + 1 }} {{ keyword.keyword }}
-      </div>
-      <hr
-        v-if="idx !== 9"
-        class="mt-3"
+    <div class="mx-5 my-2">
+      <p class="font-1 bold color-main mb-5">
+        실시간 검색어 트렌드
+      </p>
+      <div
+        v-for="(keyword, idx) in keywords"
+        :key="idx"
       >
+        <div class="font-4 color-dark-gray ml-1">
+          {{ keyword.type }}
+        </div>
+        <div class="font-2">
+          <span class="color-main bold ml-1 mr-2">{{ idx + 1 }}</span>
+          <span>{{ keyword.keyword }}</span>
+        </div>
+        <hr
+          v-if="idx !== 9"
+          class="my-2"
+        >
+      </div>
+    </div>
+    <!-- 로그아웃 -->
+    <div
+      class="d-flex justify-space-between setting-bar align-center"
+      @click="logoutUser"
+    >
+      <p>로그아웃</p>
     </div>
   </div>
 </template>
 
 <script>
 import SearchBar from '../../components/common/SearchBar.vue'
+import axiosConnector from '../../utils/axios-connector';
+
 export default {
   name: 'Search',
   components: { SearchBar },
   data: function () {
     return {
-      keywords: [
-        {
-          keywordType: '플레이리스트',
-          keyword: '춘식이',
-        },
-        {
-          keywordType: '플레이룸',
-          keyword: '먹방',
-        },
-        {
-          keywordType: '플레이리스트',
-          keyword: '춘식이',
-        },
-        {
-          keywordType: '플레이룸',
-          keyword: '먹방',
-        },
-        {
-          keywordType: '플레이리스트',
-          keyword: '춘식이',
-        },
-        {
-          keywordType: '플레이룸',
-          keyword: '먹방',
-        },
-        {
-          keywordType: '플레이리스트',
-          keyword: '춘식이',
-        },
-        {
-          keywordType: '플레이룸',
-          keyword: '먹방',
-        },
-        {
-          keywordType: '플레이리스트',
-          keyword: '춘식이',
-        },
-        {
-          keywordType: '플레이룸',
-          keyword: '먹방',
-        },
-      ]
+      keywords: [],
     }
+  },
+  created: function () {
+    axiosConnector.get(`/search/realtime`
+    ).then((res) => {
+      console.log('실검', res)
+      this.keywords = res.data
+    }).catch((err) => {
+      console.log(err)
+    })
+  },
+  methods: {
+    // 로그아웃
+    logoutUser: function() {
+      this.$store.dispatch('logout')
+      this.$router.push({ name: 'Home' })
+      swal.fire ({
+        icon: 'info',
+        title: '로그아웃',
+        text: '로그아웃되었습니다.',
+        // width: '200px'
+      })
+    },
   }
 }
 </script>

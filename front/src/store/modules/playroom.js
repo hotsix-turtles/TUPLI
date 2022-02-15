@@ -1,4 +1,6 @@
 import Vue from 'vue'
+import axiosConnector from '../../utils/axios-connector';
+import { playtimeConverter } from '../../utils/utils'
 
 const playroom = {
   namespaced: true,
@@ -7,14 +9,17 @@ const playroom = {
     roomTitle: '',
     roomPublic: false,
     roomLiked: false,
+    roomRepeat: false,
     roomAuthorId: -1,
     roomAuthorProfilePic: '',
     roomAuthorName: '',
     roomAuthorFollowerCount: 0,
     roomStartTime: new Date(),
     roomEndTime: new Date(),
+    roomUserStartTime: new Date(),
+    roomUserEndTime: new Date(),
     roomContent: '',
-    roomTags: [],
+    roomTags: '',
     roomPlaylists: [],
     roomVideos: [],
     roomCurrentPlaylistId: 0,
@@ -27,9 +32,44 @@ const playroom = {
     chatBlockedId: [],
     chatBlockedUid: [],
     savedFormData: '',
-    roomLastSyncSender: 0
+    roomLastSyncSender: 0,
+
+    // [검색]
+    searchedPlayrooms: [],
+
+    // [둘러보기]
+    categoryPlayrooms: [],
   },
   mutations: {
+    RESET_VUEX_DATA: function (state) {
+      state = {
+        roomId: -1,
+        roomTitle: '',
+        roomPublic: false,
+        roomLiked: false,
+        roomAuthorId: -1,
+        roomAuthorProfilePic: '',
+        roomAuthorName: '',
+        roomAuthorFollowerCount: 0,
+        roomStartTime: new Date(),
+        roomEndTime: new Date(),
+        roomContent: '',
+        roomTags: '',
+        roomPlaylists: [],
+        roomVideos: [],
+        roomCurrentPlaylistId: 0,
+        roomCurrentVideoId: 0,
+        roomCurrentVideoPlaytime: 0,
+        roomPlayerState: 0,
+        roomSelectedChatItem: { id: '', type: null },
+        roomChats: [],
+        chatroomId: '',
+        chatBlockedId: [],
+        chatBlockedUid: [],
+        savedFormData: '',
+        roomLastSyncSender: 0
+      };
+    },
     RESET_FORM_DATA: function (state) {
       state.savedFormData = ''
       console.log('RESET_FORM_DATA', state.savedFormData)
@@ -42,12 +82,15 @@ const playroom = {
     SET_ROOM_TITLE: ( state, value ) => state.roomTitle = value ? value : state.roomTitle,
     SET_ROOM_PUBLIC: ( state, value ) => state.roomPublic = value ? value : state.roomPublic,
     SET_ROOM_LIKED: ( state, value ) => state.roomLiked = value != undefined ? value : state.roomLiked,
+    SET_ROOM_REPEAT: ( state, value ) => state.roomRepeat = value != undefined ? value : state.roomRepeat,
     SET_ROOM_AUTHOR: ( state, value ) => {
       state.roomAuthorId = value.id != undefined ? parseInt(value.id) : state.roomAuthorId;
       state.roomAuthorName = value.name ? value.name : state.roomAuthorName;
       state.roomAuthorProfilePic = value.profileImage ? value.profileImage : state.roomAuthorProfilePic;
       state.roomAuthorFollowerCount = value.follower != undefined ? parseInt(value.follower) : state.roomAuthorFollowerCount
     },
+    SET_USER_START_TIME: ( state, value ) => state.roomUserStartTime = value ? new Date(value * 1000) : new Date(),
+    SET_USER_END_TIME: ( state, value ) => state.roomUserEndTime = value ? new Date(value * 1000) : new Date(),
     SET_ROOM_START_TIME: ( state, value ) => state.roomStartTime = value ? new Date(value * 1000) : new Date(),
     SET_ROOM_END_TIME: ( state, value ) => state.roomEndTime = value ? new Date(value * 1000) : new Date(),
     SET_ROOM_CONTENT: ( state, value ) => state.roomContent = value ? value : state.roomContent,
@@ -101,7 +144,36 @@ const playroom = {
     },
     RECEIVE_MESSAGE: ( { roomChats }, payload ) => {
       roomChats.push(payload);
-    }
+    },
+    // [검색]
+    SEARCH_PLAYROOMS: function (state, playrooms) {
+      let today = new Date()
+      playrooms.forEach((playroom) => {
+        if (playroom.startTime <= today && playroom.endTime >= today) {
+          playroom.onPlay = true
+        } else {
+          playroom.onPlay = false
+        }
+        playroom.startTime = playtimeConverter(playroom.startTime)
+        playroom.endTime = playtimeConverter(playroom.endTime)
+      })
+      state.searchedPlayrooms = playrooms
+    },
+    // [둘러보기]
+    GET_CATEGORY_PLAYROOMS: function (state, playrooms) {
+      let today = new Date()
+      playrooms.forEach((playroom) => {
+        if (playroom.startTime <= today && playroom.endTime >= today) {
+          playroom.onPlay = true
+        } else {
+          playroom.onPlay = false
+        }
+        playroom.startTime = playtimeConverter(playroom.startTime)
+        playroom.endTime = playtimeConverter(playroom.endTime)
+      })
+      state.categoryPlayrooms = playrooms
+      console.log(state.categoryPlayrooms)
+    },
   },
   actions: {
     setRoomInfo: (({state, commit}, {data}) => {
@@ -114,10 +186,8 @@ const playroom = {
       commit('SET_ROOM_CONTENT', data.content);
       commit('SET_ROOM_INVITE_IDS', data.inviteIds);
       commit('SET_ROOM_TAGS', data.tags);
-      commit('SET_ROOM_CURRENT_PLAYLIST_ID', Object.keys(data.playlists).length ? Object.keys(data.playlists)[0] : 0)
       commit('SET_ROOM_PLAYLISTS', data.playlists);
       commit('SET_ROOM_VIDEOS', data.videos);
-      commit('SET_ROOM_CURRENT_VIDEO_ID', data.playlists.length ? data.playlists[0] : 0)
       // commit('SET_ROOM_CURRENT_VIDEO_PLAYTIME', data.currentVideoPlaytime)
       commit('SET_ROOM_CHATROOM_ID', `playroom-${data.id}`);//'731f3b99-8257-4eae-86b2-ed38ea36ccff');//data.chatroomId);
     }),
@@ -161,13 +231,54 @@ const playroom = {
       console.log('saveFormData', formData)
       commit('SAVE_FORM_DATA', formData)
     },
+    // [검색]
+    searchPlayrooms: function ({ commit }, params) {
+      console.log('searchPlayrooms params', params)
+      axiosConnector.get(`/playroom/search`, {
+        params
+      }).then((res) => {
+        console.log('searchPlayroom', res)
+        commit('SEARCH_PLAYROOMS', res.data)
+      }).catch((err) => {
+        console.log(err)
+      })
+    },
+    // [둘러보기]
+    getCategoryPlayrooms: function ({ commit }, categoryName) {
+      console.log('playroom.js 245 getCategoryPlayrooms')
+      axiosConnector.get(`/playroom/category/${categoryName}`,
+      ).then((res) => {
+        console.log(res)
+        console.log(`/playroom/category/${categoryName}`, categoryName)
+        commit('GET_CATEGORY_PLAYROOMS', res.data)
+      })
+        .catch((err) => {
+          console.log(err)
+        })
+    },
+    // [좋아요]
+    // 플레이룸 좋아요
+    likePlayroom: function ({}, playroomId) {
+      axiosConnector.post(`/playroom/${playroomId}/like`,
+      ).then((res) => {
+        console.log('playroom.js 259 likePlayroom', res)
+      })
+        .catch((err) => {
+          console.log(err)
+        })
+    },
+    // 플레이룸 좋아요 취소
+    unlikePlayroom: function ({}, playroomId) {
+      axiosConnector.delete(`/playroom/${playroomId}/like`,
+      ).then((res) => {
+        console.log('playroom.js 259 unlikePlayroom', res)
+      })
+        .catch((err) => {
+          console.log(err)
+        })
+    },
   },
   getters: {
-    roomPlayTime: ( {roomStartTime, roomEndTime} ) => {
-      const roomStartDate = new Date(roomStartTime);
-      const roomEndDate = new Date(roomEndTime);
-      return `${roomStartDate.getHours()}:${roomStartDate.getMinutes()} - ${roomEndDate.getHours()}:${roomEndDate.getMinutes()}`
-    },
     roomPublicLabel: ( {roomPublic} ) => roomPublic ? '공개' : '비공개',
     roomReducedContent: ( {roomContent} ) => roomContent.split(/\r?\n/).slice(0, 2).join('\n'),
     roomCurrentPlaylistVideos: ( {roomPlaylists, roomVideos, roomCurrentPlaylistId} ) => {
@@ -246,21 +357,7 @@ const playroom = {
       }
 
       return nextVideo;
-      // if (roomCurrentPlaylistVideos.filter(v => v.included).length < this.roomCurrentVideoId + 1)
-      // {
-      //   if (Object.keys(this.roomPlaylists).length <= this.roomCurrentPlaylistId + 1)
-      //     this.SET_ROOM_CURRENT_PLAYLIST_ID(0)
-      //   else
-      //     this.SET_ROOM_CURRENT_PLAYLIST_ID(this.roomCurrentPlaylistId + 1)
-      //   this.SET_ROOM_CURRENT_VIDEO_ID(0)
-      //   this.SET_ROOM_CURRENT_VIDEO_PLAYTIME(0)
-      // }
-      // else
-      // {
-      //   this.SET_ROOM_CURRENT_VIDEO_ID(this.roomCurrentVideoId + 1)
-      //   this.SET_ROOM_CURRENT_VIDEO_PLAYTIME(0)
-      // }
-    }
+    },
   }
 };
 

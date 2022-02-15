@@ -1,14 +1,14 @@
 <template>
   <v-card
-    class="playroom mx-auto overflow-hidden"
-    height="100vh"
-    max-width="640"
+    class="playroom mx-auto overflow-hidden mb-10"
+    height="100%"
   >
     <!-- 하단 네비게이션 (플레이리스트 조작) -->
     <v-bottom-navigation
       absolute
       background-color="#5B5C9D"
       height="65px"
+      class="fixed-bottom"
       :input-value="addedPlaylists.length > 0 || selectedPlaylists.length > 0"
     >
       <!-- 선택된 동영상 개수 뱃지 -->
@@ -34,8 +34,6 @@
     <v-sheet
       id="scroll-threshold-example"
       class="overflow-y-auto"
-      :class="{ 'pb-16': selectedPlaylists.length > 0 }"
-      max-height="100%"
     >
       <back :page-name="pageName" />
       <search-bar
@@ -59,11 +57,11 @@
       <!-- 탭에 따른 결과물 -->
       <v-tabs-items v-model="tab">
         <v-tab-item
-          v-for="item in items"
-          :key="item"
+          v-for="(item, idx) in items"
+          :key="idx"
         >
           <playlist-list-item-small
-            :playlists="item == '저장한 플레이리스트' ? savedPlaylists : likedPlaylists"
+            :playlists="idx ? likedPlaylists : myPlaylists"
             :playlist-readonly="false"
             :video-readonly="true"
           />
@@ -89,7 +87,7 @@ export default {
       pageName: "플레이리스트 추가하기",
       tab: null,
       items: [
-        '내 플레이리스트', '저장한 플레이리스트',
+        '내 플레이리스트', '좋아요한 플레이리스트',
       ],
     }
   },
@@ -111,16 +109,17 @@ export default {
     async getUserPlaylistInfo() {
       const token = localStorage.getItem('jwt')
 
+      const myPlaylists = await axiosConnector.get(`/playlist/my`);
       const likedPlaylists = await axiosConnector.get(`/playlist/likes`);
       //const savedPlaylists = await axiosConnector.get(`/playlist/saved`, { headers: { Authorization: token } });
-      console.log('liked', likedPlaylists.data)
+      this.setMyPlaylist(myPlaylists)
       this.setLikedPlaylist(likedPlaylists)
     },
     async requestAddPlaylists() {
       await this.addPlaylists()
       this.$router.go(-1)
     },
-    ...mapActions('playlist', ['setLikedPlaylist', 'setSavedPlaylist', 'addPlaylists', 'revokePlaylists'])
+    ...mapActions('playlist', ['setMyPlaylist','setLikedPlaylist', 'setSavedPlaylist', 'addPlaylists', 'revokePlaylists'])
   }
 }
 </script>
