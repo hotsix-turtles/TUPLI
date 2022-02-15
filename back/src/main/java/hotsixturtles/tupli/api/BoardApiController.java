@@ -349,14 +349,14 @@ public class BoardApiController {
     /**
      * 게시글 댓글 갱신하기
      * @param token
-     * @param boardId
+     * @param commentId
      * @param comment : {content}
      * @return null
      * 반환 코드 : 200, 401, 403, 404
      */
-    @PutMapping("/board/{boardId}/comment")
+    @PutMapping("/board/{commentId}/comment")
     public ResponseEntity<?> updateComment(@RequestHeader(value = "Authorization") String token,
-                                           @PathVariable("boardId") Long boardId,
+                                           @PathVariable("commentId") Long commentId,
                                            @RequestBody Comment comment){
 
         if (!jwtTokenProvider.validateToken(token)) {
@@ -367,7 +367,7 @@ public class BoardApiController {
 
         Long userSeq = jwtTokenProvider.getUserSeq(token);
 
-        Comment commentSaved = commentService.updateComment(userSeq, boardId, comment);
+        Comment commentSaved = commentService.updateComment(userSeq, commentId, comment);
 
         if(commentSaved == null){
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
@@ -378,14 +378,14 @@ public class BoardApiController {
     /**
      * 게시글 댓글 지우기
      * @param token
-     * @param boardId
+     * @param commentId
      * @param comment
      * @return null
      * 반환 코드 : 200, 401, 403, 404
      */
-    @DeleteMapping("/board/{boardId}/comment")
+    @DeleteMapping("/board/{commentId}/comment")
     public ResponseEntity<?> deleteComment(@RequestHeader(value = "Authorization") String token,
-                                           @PathVariable("boardId") Long boardId,
+                                           @PathVariable("commentId") Long commentId,
                                            @RequestBody Comment comment){
 
         if (!jwtTokenProvider.validateToken(token)) {
@@ -395,7 +395,7 @@ public class BoardApiController {
         }
         Long userSeq = jwtTokenProvider.getUserSeq(token);
 
-        Long result = commentService.deleteComment(comment.getId(), userSeq);
+        Long result = commentService.deleteComment(commentId, userSeq);
 
         if(result == -1L){
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
