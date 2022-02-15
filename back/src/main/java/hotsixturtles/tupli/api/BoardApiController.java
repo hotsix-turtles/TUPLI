@@ -379,14 +379,12 @@ public class BoardApiController {
      * 게시글 댓글 지우기
      * @param token
      * @param commentId
-     * @param comment
      * @return null
      * 반환 코드 : 200, 401, 403, 404
      */
     @DeleteMapping("/board/{commentId}/comment")
     public ResponseEntity<?> deleteComment(@RequestHeader(value = "Authorization") String token,
-                                           @PathVariable("commentId") Long commentId,
-                                           @RequestBody Comment comment){
+                                           @PathVariable("commentId") Long commentId) {
 
         if (!jwtTokenProvider.validateToken(token)) {
             return ResponseEntity
