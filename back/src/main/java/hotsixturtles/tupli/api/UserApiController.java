@@ -259,7 +259,7 @@ public class UserApiController {
         User user = jwtTokenProvider.getUser(token);
 
         // Oauth유저 확인
-        if (!request.getPassword().equals("NO_PASS")) {
+        if (!"NO_PASS".equals(user.getPassword())) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(new ErrorResponse(messageSource.getMessage("error.wrong.oauthpassword", null, LocaleContextHolder.getLocale())));
         }
