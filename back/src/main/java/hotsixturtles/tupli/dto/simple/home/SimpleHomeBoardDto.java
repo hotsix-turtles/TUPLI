@@ -41,6 +41,7 @@ public class SimpleHomeBoardDto {
     // 제작 변수
     private Integer likesCnt;
     private String userLikesYN;
+    private Boolean isRecommend;
 
     public SimpleHomeBoardDto(Board board) {
         this.id = board.getId();
