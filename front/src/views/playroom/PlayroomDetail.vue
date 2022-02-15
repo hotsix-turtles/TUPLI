@@ -240,7 +240,7 @@
         </div>
 
         <!-- 현재 플레이리스트 비디오 목록 -->
-        <div
+        <v-container
           v-if="roomPlaylists"
           class="playlistVideoItems d-flex flex-column overflow-y-auto"
         >
@@ -252,7 +252,7 @@
             :visible="video.included"
             @click="onPlaylistVideoSelected"
           />
-        </div>
+        </v-container>
       </div>
 
       <!-- 플레이룸 채팅창 -->
