@@ -1,9 +1,10 @@
 <template>
-  <div class="">
+  <div>
+    <!-- 뒤로가기와 제목 -->
     <back :page-name="'댓글'" />
     <!-- 댓글 노출 -->
     <div
-      v-for="(playlistComment, index) in playlistComments"
+      v-for="(boardComment, index) in boardComments"
       :key="index"
       class="ml-2"
     >
@@ -13,38 +14,36 @@
             <!-- 프로필사진 노출 -->
             <img
               style="border-radius: 100px;"
-              :src="ImgUrl(playlistComment.user.profileImage)"
+              :src="ImgUrl(boardComment.user.profileImage)"
               width="40px"
               height="40px"
             >
           </v-col>
           <v-col :cols="10">
-            <v-row
-              style="table-layout:fixed"
-            >
+            <v-row style="table-layout:fixed">
               <div class="mt-2">
                 <!-- 유저닉네임 노출 -->
                 <span class="semi-bold">
-                  {{ playlistComment.user.nickname }}
+                  {{ boardComment.user.nickname }}
                 </span>
                 <span>
                   <!-- 덧글내용 노출 -->
-                  {{ playlistComment.content }}
+                  {{ boardComment.content }}
                 </span>
               </div>
             </v-row>
             <v-row>
               <!-- 날짜 표시 -->
-              <div class="">
+              <div>
                 <span style="color:gray;font-size:14px">
-                  {{ playlistComment.created }}
+                  {{ boardComment.created }}
                 </span>
                 <!-- 댓글삭제 버튼 -->
                 <span
-                  v-if="userId == playlistComment.user.userSeq"
+                  v-if="userId == boardComment.user.userSeq"
                   style="color:gray;font-size:13px"
                   class="ml-1"
-                  @click.stop="deleteComment(playlistComment.id)"
+                  @click.stop="deleteComment(boardComment.id)"
                 >
                   삭제
                 </span>
@@ -57,7 +56,7 @@
 
     <!-- 덧글이 한개도 없을때 나오는 출력창 -->
     <div
-      v-if="playlistComments.length == 0"
+      v-if="boardComments.length == 0"
       class="text-center text--secondary"
     >
       덧글이 없습니다.
@@ -76,50 +75,50 @@
 <script>
 import { mapActions, mapState } from 'vuex'
 import Back from '../../components/common/Back.vue'
-import CommentInput from '../../components/playlist/CommentInput.vue'
+import CommentInput from '../../components/board/CommentInput.vue'
 import { getImage } from '../../utils/utils'
 
+
 export default {
-  name: 'PlaylistComment',
+  name: 'BoardComment',
   components: {
     Back,
     CommentInput
   },
   data: function() {
     return {
-      playlistId: 0,
+      boardId: 0,
     }
   },
   computed: {
     ...mapState({
       userId: state => state.userId,
     }),
-    ...mapState('playlist', {
-      playlistComments: state => state.playlistComments,
+    ...mapState('board', {
+      boardComments: state => state.boardComments,
     }),
   },
   created: function() {
-    this.playlistId = this.$route.params.playlistId
-    this.getPlaylistComments(this.playlistId)
+    this.boardId = this.$route.params.boardId
+    this.getBoardComments(this.boardId)
   },
   methods: {
-    ...mapActions('playlist', [
-      'getPlaylistComments',
-      'createPlaylistComment',
-      'deletePlaylistComment',
+    ...mapActions('board', [
+      'getBoardComments',
+      'createBoardComment',
+      'deleteBoardComment',
     ]),
     sendComment: function (comment) {
-      const playlistId = this.playlistId
+      const boardId = this.boardId
       const data = {
         content: comment,
         emoticon: null,
       }
-      this.createPlaylistComment({ playlistId, data })
+      this.createBoardComment({ boardId, data })
     },
     deleteComment: function(commentId) {
-      const playlistId = this.playlistId
-      console.log("playlistComment.vue : playlistId", playlistId)
-      this.deletePlaylistComment({commentId, playlistId})
+      const boardId = this.boardId
+      this.deleteBoardComment({commentId, boardId})
     },
     ImgUrl: function(img) {
       return getImage(img)
@@ -128,6 +127,6 @@ export default {
 }
 </script>
 
-<style>
+ <style>
 
-</style>
+ </style>
