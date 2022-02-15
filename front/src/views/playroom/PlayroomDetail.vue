@@ -462,7 +462,7 @@ import Stomp from "webstomp-client"
 import SockJS from "sockjs-client"
 import Tags from '../../components/common/Tags.vue';
 import NormalDialog from '../../components/common/NormalDialog.vue';
-import { getImage } from '../../utils/utils'
+import { getImage, playtimeConverter } from '../../utils/utils'
 
 Vue.use(VueYoutube)
 
@@ -679,21 +679,7 @@ export default {
       this.exitPrompt = false;
     },
     loadRoomPlaytime() {
-      const roomStartTime = this.roomStartTime
-      const roomEndTime = this.roomEndTime
-      const timezoneOffset = new Date().getTimezoneOffset() * 60 * 1000;
-
-      const roomStartDate = new Date(roomStartTime - timezoneOffset);
-      const roomEndDate = new Date(roomEndTime - timezoneOffset);
-
-      if (roomStartDate.getDate() == roomEndDate.getDate())
-        this.roomPlaytime = `${roomStartDate.toISOString().substr(11, 5)} - ${roomEndDate.toISOString().substr(11, 5)}`
-      else if (roomStartDate.getMonth() == roomEndDate.getMonth())
-        this.roomPlaytime = `${roomStartDate.getDate()}일 ${roomStartDate.toISOString().substr(11, 5)} - ${roomEndDate.getDate()}일 ${roomEndDate.toISOString().substr(11, 5)}`
-      else if (roomStartDate.getFullYear() == roomEndDate.getFullYear())
-        this.roomPlaytime = `${roomStartDate.getMonth()}월 ${roomStartDate.getDate()}일 ${roomStartDate.toISOString().substr(11, 5)} - ${roomEndDate.getMonth()}월 ${roomEndDate.getDate()}일 ${roomEndDate.toISOString().substr(11, 5)}`
-
-      this.roomPlaytime = this.roomPlaytime ? this.roomPlaytime : null;
+      this.roomPlaytime = playtimeConverter(this.roomStartTime, this.roomEndTime);
     },
     closeChatting() {
       this.isChatting = false;
