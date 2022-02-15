@@ -109,18 +109,6 @@
 
       <hr>
 
-      <!-- OAUTH유저 초회 비밀번호 변경 -->
-      <div
-        v-if="'is_oauth'"
-        class="d-flex justify-space-between setting-bar align-center"
-        @click="$router.push({ name: 'ChangePasswordOAUTH' })"
-      >
-        <p>OAUTH 유저 비밀번호 설정(초회)</p>
-        <v-icon>mdi-chevron-right</v-icon>
-      </div>
-      
-      <hr>
-
       <!-- 로그아웃 -->
       <div
         class="d-flex justify-space-between setting-bar align-center"
@@ -213,6 +201,18 @@
       </div>
 
       <hr>
+
+      <!-- OAUTH유저 초회 비밀번호 변경 -->
+      <div
+        v-if="is_oauth"
+        class="d-flex justify-space-between setting-bar align-center"
+        @click="$router.push({ name: 'ChangePasswordOAUTH' })"
+      >
+        <p>구글 유저 비밀번호 설정(초회)</p>
+        <v-icon>mdi-chevron-right</v-icon>
+      </div>
+      
+      <hr>
     </div>
   </v-app>
 </template>
@@ -262,7 +262,7 @@ export default {
             icon: 'info',
             title: '탈퇴 성공',
             text: '지금까지 튜플리와 함께해주셔서 감사합니다.',
-            width: '200px'
+            // width: '200px'
           })
         })
         .catch (() => {
