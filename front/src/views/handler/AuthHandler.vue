@@ -15,12 +15,13 @@ export default {
       this.TOKEN(token)
       this.getUserInfo(token)
       this.getSetting(token)
+      this.OAUTH_LOGIN()
     }
     this.$router.push('/')
   },
   methods: {
     ...mapActions(['getUserInfo', 'getSetting']),
-    ...mapMutations(['TOKEN'])
+    ...mapMutations(['TOKEN', 'OAUTH_LOGIN'])
   }
 }
 </script>

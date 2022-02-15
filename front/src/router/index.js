@@ -19,6 +19,7 @@ import Setting from '../views/profile/Setting.vue'
 //setting
 import Admin from '../views/profile/setting/Admin.vue'
 import ChangePassword from '../views/profile/setting/ChangePassword.vue'
+import ChangePasswordOAUTH from '../views/profile/setting/ChangePasswordOAUTH.vue'
 import History from '../views/profile/setting/History.vue'
 import InviteNoticeAlert from '../views/profile/setting/InviteNoticeAlert.vue'
 import Like from '../views/profile/setting/Like.vue'
@@ -216,6 +217,11 @@ const routes = [
     path: '/changepassword',
     name: 'ChangePassword',
     component: ChangePassword
+  },
+  {
+    path: '/ChangePasswordOAUTH',
+    name: 'ChangePasswordOAUTH',
+    component: ChangePasswordOAUTH
   },
   {
     path: '/history',

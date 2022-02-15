@@ -11,6 +11,7 @@ const account = {
     introduction: null,
     image: '@/assets/tupli_logo2_dark',
     is_vip: null,
+    is_oauth: null,
     following: [],
     followers: [],
     taste: null,
