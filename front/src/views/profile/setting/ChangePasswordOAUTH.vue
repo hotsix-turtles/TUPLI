@@ -12,25 +12,14 @@
           mdi-chevron-left
         </v-icon>
         <h3>
-          비밀번호 변경
+          비밀번호 설정(구글유저, 초회)
         </h3>
       </v-row>
     </v-container>
     <div class="mx-10 mt-3">
       <div class="my-2">
         <h4>
-          현재 비밀번호
-        </h4>
-        <v-text-field
-          v-model="credentials_password.nowPassword"
-          type="password"
-          required
-          dense
-        />
-      </div>
-      <div class="my-2">
-        <h4>
-          변경 비밀번호
+          설정 비밀번호
         </h4>
         <v-text-field
           v-model="credentials_password.newPassword"
@@ -41,7 +30,7 @@
       </div>
       <div class="my-2">
         <h4>
-          변경할 비밀번호 확인
+          설정할 비밀번호 확인
         </h4>
         <v-text-field
           v-model="credentials_password.newCheckPassword"
@@ -59,7 +48,7 @@
       depressed
       @click="changePassword"
     >
-      비밀번호 변경하기
+      비밀번호 설정하기
     </v-btn>
   </v-app>
 </template>
@@ -75,7 +64,6 @@ export default {
   data: function() {
     return {
       credentials_password: {
-        nowPassword: '',
         newPassword: '',
         newCheckPassword: '',  // 일치 체크는 프론트에서 해주세요.
       },
@@ -96,10 +84,11 @@ export default {
       } else {
         axios({
           method: 'PUT', 
-          url: SERVER.URL + '/account/password',
+          url: SERVER.URL + '/account/password/oauth',
           headers: {Authorization: this.authToken},
           data: {
-            password: this.credentials_password.nowPassword,
+            // password: this.credentials_password.nowPassword,
+            // password: 'NO_PASS',
             passwordChange: this.credentials_password.newPassword
           }
         })
@@ -107,17 +96,17 @@ export default {
             this.$router.push({ name: 'Setting' })
             swal.fire ({
               icon: 'success',
-              title: '비밀번호 변경 성공',
-              text: '요청하신 비밀번호로 변경되었습니다.',
+              title: '비밀번호 설정 성공',
+              text: '요청하신 비밀번호로 설정되었습니다.',
               // scrollbarPadding: false  // 모바일 환경은 알아서 체크해야
             })
           })
           .catch ((err) => {
-            console.log(err.response.data)
+            // console.log(err.response.data)
             swal.fire ({
               icon: 'error',
               title: '변경 실패',
-              text: '서버가 혼잡합니다. 다시 시도해 주세요.'
+              text: '이미 변경하셨거나 구글 유저가 아니십니다.'
             })
           })
       }
