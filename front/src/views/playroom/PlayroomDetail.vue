@@ -218,6 +218,7 @@
         <!-- 현재 플레이리스트 비디오 목록 상단 메뉴 -->
         <div class="playlistVideoNav d-flex justify-space-between align-center mx-3">
           <v-btn
+            v-if="userId != roomAuthorId"
             small
             elevation="0"
             color="white"
