@@ -148,7 +148,16 @@ export default {
   },
   computed: {
     renderContent() {
-      return [...this.content.matchAll(new RegExp(/\#\d+/g))].map(a => a[0]).reduce((prev,cur) => prev = prev.replace(cur, `<img :src="${this.getImoticon(cur)}" />`), this.content)
+      const tagsToReplace = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;'
+      };
+      const escapedContent = this.content.replace(/[&<>]/g, (tag) => tagsToReplace[tag] || tag);
+
+      return [...this.content.matchAll(new RegExp(/\#\d+/g))]
+        .map(a => a[0])
+        .reduce((prev,cur) => prev = prev.replace(cur, `<img class="chat-emoticon" src="${this.getImoticon(cur)}" />`), escapedContent)
     },
     timeLabel () {
       //const dt = new Date(this.timestamp);
@@ -226,8 +235,8 @@ export default {
         return require(`@/assets/emoticons/basic/23_laughter.png`)
       } else if (content == '#24') {
         return require(`@/assets/emoticons/basic/24_suspicious.png`)
-      } else {
-        return require(`@/assets/emoticons/basic/25_basic.png`)
+      } else if (content == '#25') {
+        return null
       }
     },
     ...mapMutations('playroom', ['SELECT_CHAT_ITEM', 'SELECT_CHAT_AVATAR', 'DESELECT_CHAT_ITEM']),
@@ -239,5 +248,9 @@ export default {
 <style>
 .blocked {
   color: #bbb
+}
+.chat-emoticon {
+  width: 20px;
+  height: 20px;
 }
 </style>
