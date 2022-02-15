@@ -132,7 +132,7 @@ public class PlayroomApiController {
     }
 
     /**
-     * 플레이룸 정보 가져오기
+     * 입장 전, 플레이룸 정보 가져오기
      * @param playroomId
      * @return
      * 반환 코드: 200, 404
@@ -158,13 +158,34 @@ public class PlayroomApiController {
             }
 
             PlayroomDto result = new PlayroomDto(playroom, user);  // 혹시 모르니 미리 DTO 짜놓고
-            // 게스트 추가
-            if (!playroom.getGuests().contains(userSeq)) {
-                playroomService.addGuest(userSeq, playroom);
-            }
             return ResponseEntity.status(HttpStatus.OK).body(result);
         }
     }
+
+    /**
+     * 입장 완료시 도는 로직, 게스트 추가
+     * @param playroomId
+     * @param token
+     * @return
+     */
+    @PostMapping("/playroom/in/{playroomId}")
+    public ResponseEntity<?> addGuest(@PathVariable("playroomId") Long playroomId,
+                                      @RequestHeader(value = "Authorization") String token){
+        if (!jwtTokenProvider.validateToken(token)) {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(new ErrorResponse(messageSource.getMessage("error.valid.jwt", null, LocaleContextHolder.getLocale())));
+        }
+        Long userSeq = jwtTokenProvider.getUserSeq(token);
+
+
+        Playroom playroom = playroomService.getPlayroom(playroomId);
+        if (!playroom.getGuests().contains(userSeq)) {
+            playroomService.addGuest(userSeq, playroom);
+        }
+        return ResponseEntity.status(HttpStatus.CREATED).body(null);
+    }
+
 
     /**
      * 플레이룸 방장 변경시 정보 가져오기
