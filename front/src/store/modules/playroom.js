@@ -2,9 +2,8 @@ import Vue from 'vue'
 import axiosConnector from '../../utils/axios-connector';
 import { playtimeConverter } from '../../utils/utils'
 
-const playroom = {
-  namespaced: true,
-  state: {
+const defaultState = () => {
+  return {
     roomId: -1,
     roomTitle: '',
     roomPublic: false,
@@ -39,36 +38,15 @@ const playroom = {
 
     // [둘러보기]
     categoryPlayrooms: [],
-  },
+  }
+}
+
+const playroom = {
+  namespaced: true,
+  state: defaultState(),
   mutations: {
     RESET_VUEX_DATA: function (state) {
-      state = {
-        roomId: -1,
-        roomTitle: '',
-        roomPublic: false,
-        roomLiked: false,
-        roomAuthorId: -1,
-        roomAuthorProfilePic: '',
-        roomAuthorName: '',
-        roomAuthorFollowerCount: 0,
-        roomStartTime: new Date(),
-        roomEndTime: new Date(),
-        roomContent: '',
-        roomTags: '',
-        roomPlaylists: [],
-        roomVideos: [],
-        roomCurrentPlaylistId: 0,
-        roomCurrentVideoId: 0,
-        roomCurrentVideoPlaytime: 0,
-        roomPlayerState: 0,
-        roomSelectedChatItem: { id: '', type: null },
-        roomChats: [],
-        chatroomId: '',
-        chatBlockedId: [],
-        chatBlockedUid: [],
-        savedFormData: '',
-        roomLastSyncSender: 0
-      };
+      Object.assign(state, defaultState())
     },
     RESET_FORM_DATA: function (state) {
       state.savedFormData = ''

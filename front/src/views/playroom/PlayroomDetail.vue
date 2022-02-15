@@ -571,11 +571,10 @@ export default {
       this.certification = true;
       this.$router.push('/login')
     }
+    this.RESET_VUEX_DATA();
   },
   mounted() {
     this.$nextTick(async () => {
-      await this.RESET_VUEX_DATA();
-
       this.player = this.$refs.youtube.player;
       await this.getRoomInfo();
     });
