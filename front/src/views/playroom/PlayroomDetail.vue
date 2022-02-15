@@ -103,7 +103,9 @@
             @click="playroomRepeat"
           >
             <span>반복</span>
-            <v-icon :color="roomRepeat ? 'blue' : undefined">mdi-repeat</v-icon>
+            <v-icon :color="roomRepeat ? 'blue' : undefined">
+              mdi-repeat
+            </v-icon>
           </v-btn>
 
           <!-- 플레이룸 신고 -->

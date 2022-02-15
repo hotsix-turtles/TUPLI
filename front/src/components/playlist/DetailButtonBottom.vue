@@ -106,15 +106,21 @@
         </v-card>
       </v-dialog>
     </v-row>
+    <login-dialog
+      :show="showLoginDialog"
+      @on-click="showLoginDialog = false"
+    />
   </div>
 </template>
 
 <script>
 import { mapActions, mapState } from 'vuex'
+import LoginDialog from '../../components/common/LoginDialog.vue';
 
 export default {
   name: 'DetailButtonBottom',
   components: {
+    LoginDialog,
   },
   props: {
   },
@@ -122,9 +128,13 @@ export default {
     return {
       selectedPlaylist: '',
       dialog: false,
+      showLoginDialog: false,
     }
   },
   computed: {
+    ...mapState({
+      isLogin: state => state.isLogin,
+    }),
     ...mapState('video', {
       selectedVideos: state => state.selectedVideos,
     }),
@@ -146,8 +156,13 @@ export default {
       'getMyPlaylists',
     ]),
     onClickMyPlaylists: function () {
-      this.getMyPlaylists()
-      this.dialog = true
+      console.log(this.isLogin)
+      if (this.isLogin) {
+        this.getMyPlaylists()
+        this.dialog = true
+      } else {
+        this.showLoginDialog = true
+      }
     },
     onClickSelect: function () {
       const formData = this.selectedPlaylist

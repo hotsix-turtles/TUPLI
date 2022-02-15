@@ -8,7 +8,7 @@
       dense
       :disabled="!isLogin"
       @keydown.enter="sendComment"
-      @click:append-outer="sendComment"
+      @click.stop="sendComment"
     >
       <template v-slot:append>
         <v-menu
@@ -48,27 +48,36 @@
       </template>
       <template v-slot:append-outer>
         <v-icon
-          @click="sendComment"
+          @click.stop="sendComment"
         >
           mdi-send
         </v-icon>
       </template>
     </v-text-field>
-    <div />
+    <div @click.stop />
+    <login-dialog
+      :show="showLoginDialog"
+      @on-click="showLoginDialog = false"
+    />
   </div>
 </template>
 
 <script>
 import { mapActions, mapState } from 'vuex'
+import LoginDialog from '@/components/common/LoginDialog.vue'
 
 export default {
   name: 'CommentInput',
+  components: {
+    LoginDialog,
+  },
   props: {
   },
   data: function () {
     return {
       showEmoji: false,
       inputVal: '',
+      showLoginDialog: false,
     }
   },
   computed: {
@@ -78,14 +87,18 @@ export default {
   },
   methods: {
     sendComment: function (event) {
-      if(this.inputVal == '') {
-        console.log("CommentInput.vue : 덧글 내용 입력을 해주세요")
-        return
-      }
-      else {
-        // console.log("CommentInput.vue 로 왔씁니까?")
-        this.$emit('send-comment', this.inputVal)
-        this.inputVal = ''
+      if (this.isLogin) {
+        if(this.inputVal == '') {
+          console.log("CommentInput.vue : 덧글 내용 입력을 해주세요")
+          return
+        }
+        else {
+          // console.log("CommentInput.vue 로 왔씁니까?")
+          this.$emit('send-comment', this.inputVal)
+          this.inputVal = ''
+        }
+      } else {
+        this.showLoginDialog = true
       }
     }
   }
@@ -107,5 +120,7 @@ export default {
     bottom: 0 !important;
     height: "20vh" !important;
     width: 100%;
+    /* 뒤에 있는거 클릭 안 되게 막음 */
+    pointer-events: none;
   }
 </style>

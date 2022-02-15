@@ -1,6 +1,6 @@
 /* eslint-disable vue/require-default-prop */
 <template>
-  <div class="d-flex mx-3 my-3">
+  <div class="d-flex px-3 py-3 light-background fixed-top">
     <div>
       <v-icon
         color="black"
