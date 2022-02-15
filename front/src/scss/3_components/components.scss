@@ -181,7 +181,6 @@
     transform: translate(-50%, -50%);
     box-shadow: 3px 3px 8px 3px rgba($color: #000000, $alpha: 0.2) inset;
     }
-
 }
 
 // 플레이리스트 CD Big
@@ -279,6 +278,15 @@
   border-color: lightgrey;
   width: 30px;
   height: 30px;
+}
+
+// 프로필 사진 small
+.profile-img-small {
+  border-radius: 100%;
+  border: solid 1px;
+  border-color: lightgrey;
+  width: 40px;
+  height: 40px;
 }
 
 // 프로필 사진 Large

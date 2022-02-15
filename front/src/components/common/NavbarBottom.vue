@@ -16,7 +16,6 @@ np/* eslint-disable vue/require-default-prop */
         <div class="my-5">
           <v-btn
             rounded
-
             @click="goPlaylistForm"
           >
             플레이리스트
@@ -25,7 +24,6 @@ np/* eslint-disable vue/require-default-prop */
         <div class="my-5">
           <v-btn
             rounded
-
             @click="goPlayroomForm"
           >
             플레이룸
@@ -121,6 +119,10 @@ np/* eslint-disable vue/require-default-prop */
       </div>
     </div>
 
+    <login-dialog
+      :show="showLoginDialog"
+      @on-click="showLoginDialog = false"
+    />
     <Alarm />
   </div>
 </template>
@@ -128,17 +130,20 @@ np/* eslint-disable vue/require-default-prop */
 <script>
 import { mapState } from 'vuex'
 import Alarm from '@/components/alarm/Alarm'
+import LoginDialog from './LoginDialog.vue'
 
 export default {
   name: 'NavbarBottom',
   components: {
-    Alarm
+    Alarm,
+    LoginDialog,
   },
   data: function() {
     return {
       value: 1,
       isClickedMakeBtn: false,
       selectedPage: '',
+      showLoginDialog: false,
     }
   },
   computed : {
@@ -157,16 +162,28 @@ export default {
       this.isClickedMakeBtn = !this.isClickedMakeBtn
     },
     goPlaylistForm: function() {
-      this.$router.push({ name: 'PlaylistForm' })
       this.toggle()
+      if (this.isLogin) {
+        this.$router.push({ name: 'PlaylistForm' })
+      } else {
+        this.showLoginDialog = true
+      }
     },
     goPlayroomForm: function() {
-      this.$router.push({ name: 'PlayroomForm' })
       this.toggle()
+      if (this.isLogin) {
+        this.$router.push({ name: 'PlayroomForm' })
+      } else {
+        this.showLoginDialog = true
+      }
     },
     goBoardForm: function() {
-      this.$router.push({ name: 'BoardForm' })
       this.toggle()
+      if (this.isLogin) {
+        this.$router.push({ name: 'BoardForm' })
+      } else {
+        this.showLoginDialog = true
+      }
     },
     changeRouter: function (pageName) {
       this.$router.push({ name: pageName })
