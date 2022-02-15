@@ -55,13 +55,19 @@
           class="ml-3"
         >
           <v-list-item-title
-            class="semi-bold"
+            class="semi-bold txt-2"
+            style="white-space: pre-line"
             @click="$router.push({ name: 'PlaylistDetail', params: { playlistId: playlist.id } })"
           >
             {{ playlist.title }}
           </v-list-item-title>
           <!-- 나중에 nickname으로 변경 -->
-          <v-list-item-subtitle>{{ playlist.nickname }}</v-list-item-subtitle>
+          <v-list-item-subtitle
+            style="white-space: pre-line"
+            class="txt-1"
+          >
+            {{ playlist.nickName }}
+          </v-list-item-subtitle>
           <div class="text-center d-flex align-center">
             <div class="mr-1">
               <v-icon
@@ -76,6 +82,7 @@
             </div>
           </div>
           <tags
+            v-if="playlist.tags"
             class="mt-2"
             :tags="playlist.tags.split(',').slice(0, 3)"
           />

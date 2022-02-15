@@ -4,6 +4,7 @@
       :label="'검색어를 입력해주세요'"
       :router-page="'SearchDetail'"
     />
+    <!-- @click="goSearchDetail" -->
     <div class="mx-5 my-2">
       <p class="font-1 bold color-main mb-5">
         실시간 검색어 트렌드
@@ -15,7 +16,10 @@
         <div class="font-4 color-dark-gray ml-1">
           {{ keyword.type }}
         </div>
-        <div class="font-2">
+        <div
+          class="font-2 clickable"
+          @click="$router.push({ name: 'SearchDetail', params: { tab: tabMatch[keyword.type], keyword: keyword.keyword }})"
+        >
           <span class="color-main bold ml-1 mr-2">{{ idx + 1 }}</span>
           <span>{{ keyword.keyword }}</span>
         </div>
@@ -45,6 +49,11 @@ export default {
   data: function () {
     return {
       keywords: [],
+      tabMatch: {
+        '플레이리스트': 0,
+        '플레이룸': 1,
+        '유저': 2,
+      }
     }
   },
   created: function () {

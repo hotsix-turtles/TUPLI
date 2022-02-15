@@ -265,6 +265,11 @@ export default {
     if (this.searchedVideos) {
       this.resetVideoSearchState()
     }
+    if (this.$route.params.tab !== undefined && this.$route.params.keyword) {
+      this.tab = this.$route.params.tab
+      this.tabName = this.items[this.$route.params.tab]
+      this.search(this.$route.params.keyword)
+    }
   },
   methods: {
     ...mapActions('playlist', [

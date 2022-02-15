@@ -14,10 +14,10 @@
         @input-change="search"
       />
     </div><br><br><br>
-    <div class="container">
+    <div class="">
       <!-- 정렬 필터 -->
       <div
-        class="text-right clickable"
+        class="text-right clickable mt-3 mb-4"
         @click="onClickModal"
       >
         <span>

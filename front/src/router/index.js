@@ -128,7 +128,7 @@ const routes = [
     component: Search
   },
   {
-    path: '/search/detail',
+    path: '/search/detail/:tab/:keyword',
     name: 'SearchDetail',
     component: SearchDetail
   },

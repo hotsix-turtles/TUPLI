@@ -29,8 +29,6 @@ export default {
 
 
 <style>
-@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
-
 * {
   font-family: 'SUIT';
 }

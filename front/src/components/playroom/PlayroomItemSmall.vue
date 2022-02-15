@@ -35,15 +35,12 @@
           <div class="video-thumbnail">
             <img
               :src="playroom.videos[0].thumbnail"
-              style="width: 35vw; height: 100px; object-fit: cover;"
+              style="width: 30vw; height: 100px; object-fit: cover;"
               class=""
               @click="$router.push({ name: 'PlayroomDetail', params: { id: playroom.id } })"
             >
-            <!-- <div
-              v-if="playroom.onPlay"
-              class="on-play"
-            > 나중에 이걸로 변경-->
             <div
+              v-if="playroom.onPlay"
               class="on-play"
             >
               ON PLAY
@@ -58,21 +55,29 @@
                   mdi-account-multiple
                 </v-icon>
               </div>
-              <div>132</div>
-            <!-- {{ playroom.userCount }} 나중에 바꿀 부분 -->
+              <div>{{ playroom.userCount }}</div>
             </span>
           </div>
-          <div class="d-flex-column ml-2">
-            <v-list-item-title class="semi-bold">
+          <div
+            class="d-flex-column ml-2"
+          >
+            <!-- 줄바꿈 설정 (white-space: pre-line) -->
+            <div
+              class="semi-bold txt-2"
+              style="white-space: pre-line"
+            >
               {{ playroom.title }}
-            </v-list-item-title>
-            <v-list-item-subtitle class="color-dark-gray mt-1">
-              {{ playroom.title }}
-            </v-list-item-subtitle>
-            <!-- <div class="color-dark-gray">
-              <span>{{ playroom.user.nickname }}</span>
-            </div> 나중 -->
-            <div class="font-4 color-dark-gray mt-1 mb-2">
+            </div>
+            <div
+              class="color-dark-gray mt-1 txt-1"
+              style="white-space: pre-line"
+            >
+              {{ playroom.user.nickname }}
+            </div>
+            <div
+              class="font-4 color-dark-gray mt-1 mb-2 txt-1"
+              style="white-space: pre-line"
+            >
               <span>
                 <span class="semi-bold">
                   PLAY TIME
@@ -82,6 +87,7 @@
             </div>
             <tags
               v-if="playroom.tags"
+              style="white-space: pre-line"
               :tags="playroom.tags.split(',').slice(0, 3)"
               class="mt-3"
             />

@@ -43,6 +43,7 @@
     </div><br><br>
     <!-- {{ playlistDetail }} -->
     <div class="container">
+      {{ playlistDetail.createdAt }}
       <div class="text-center">
         <!-- 제목 공개여부 -->
         <div class="d-flex justify-center">

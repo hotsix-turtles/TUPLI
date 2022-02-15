@@ -1,6 +1,6 @@
 <template>
   <div>
-    <!-- 뒤로가기/완료 or 생성 -->
+    <!-- 뒤로가기/완료 or 수정 -->
     <div class="d-flex justify-space-between fixed-top light-background">
       <div class="d-flex mx-3 my-3">
         <div>
@@ -16,7 +16,6 @@
         v-if="formType === 'create'"
         class="clickable font-2 semi-bold mt-3 mr-3 color-dark-gray"
         :class="{ 'color-main': valid && addedVideos.length > 0 }"
-        color="red"
         @click="onClickCompletion"
       >
         완료
@@ -49,6 +48,7 @@
               :counter="30"
               label="플레이리스트 제목"
               required
+              color="accent"
             />
           </v-col>
 
@@ -63,6 +63,7 @@
               :rules="[rules.counterMax80]"
               :counter="80"
               label="플레이리스트 소개글"
+              color="accent"
             />
           </v-col>
 
@@ -115,6 +116,7 @@
           </div>
         </div>
         <div class="d-flex justify-space-between">
+          <!-- 전체 선택 -->
           <div
             class="mt-5 mb-3"
             @click="onClickSelectAll"
@@ -135,9 +137,9 @@
 
     <!-- 하단 리스트에 삭제하기 버튼 -->
     <remove-button-bottom />
-    <!-- 플레이리스트 데이터 저장 여부 확인 모달 -->
+    <!-- 데이터 저장 여부 확인 모달 -->
     <normal-dialog
-      title="플레이리스트 입력값"
+      title="입력값"
       content-html="기존 입력 데이터가 사라집니다."
       max-width="290"
       persistent
@@ -147,11 +149,11 @@
     />
     <!-- 플레이룸 생성 모달 -->
     <normal-dialog
-      title="플레이룸 생성하기"
-      content-html="이 플레이리스트를 넣어서 플레이룸을 생성하시겠습니까?"
+      title="생성하기"
+      content-html="이 플레이리스트로 플레이룸을 생성하시겠습니까?"
       max-width="290"
       persistent
-      :buttons="[{ name: '확인', color: '#5B5C9D' }, { name: '취소', color: 'gray' }]"
+      :buttons="[{ name: '플레이룸 생성', color: 'black' }, { name: '플레이리스트만 생성', color: 'black' }]"
       :show="createPlayroom"
       @button-click="onClickCreatePlayroomDialog"
     />
