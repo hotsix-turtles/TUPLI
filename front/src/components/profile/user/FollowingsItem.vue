@@ -76,7 +76,7 @@ export default {
     // 해당 유저 프로필로 가기
     goProfile: function() {
       // 만약 클릭한 사람이 나라면
-      axiosConnector.get(`userinfo/${this.follower.userSeq}`)
+      axiosConnector.get(`userinfo/${this.following.userSeq}`)
         .then((res) => {
           if (res.data.meCheck === false) {  // 내가 아니라면, 프로필로 !
             // console.log('타인 프로필', res.data.meCheck)

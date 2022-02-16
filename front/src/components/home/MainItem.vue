@@ -15,24 +15,22 @@
       <!-- playroom 정보 -->
       <div
         class="d-flex flex-column justify-center mt-1"
-        style="width:98%;"
+        style="width:96%;"
       >
         <!-- 추천 -->
         <p v-if="content.isRecommend == true">
-          {{ nickname }}님을 위한 추천 플레이룸
+          추천
         </p>
         <div class="d-flex">
           <img
             class="profile-img-main"
             :src="ImgUrl(content.userProfileImg)"
             alt="프로필 사진"
-            width="50"
-            height="50"
             @click="setProfile"
           >
           <div
             class="d-flex flex-column align-start"
-            style="width:70%"
+            style="width:67%"
           >
             <p
               class="main-title"
@@ -141,10 +139,13 @@
       <!-- playlist 정보 -->
       <div
         class="d-flex flex-column justify-center mt-2"
-        style="width:98%;"
+        style="width:96%;"
       >
-        <p v-if="content.isRecommend == true">
-          {{ nickname }}님을 위한 추천 플레이리스트
+        <p
+          v-if="content.isRecommend == true"
+          class="main-recommend-icon"
+        >
+          추천
         </p>
         <!-- playlist 정보 -->
         <div class="d-flex">
@@ -156,7 +157,7 @@
           >
           <div
             class="d-flex flex-column align-start"
-            style="width:68%"
+            style="width:67%"
           >
             <p
               class="main-title"
