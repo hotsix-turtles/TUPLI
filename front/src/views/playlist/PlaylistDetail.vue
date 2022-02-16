@@ -157,7 +157,7 @@
       persistent
       :buttons="[{ name: '확인', color: '#5B5C9D' }, { name: '취소', color: 'gray' }]"
       :show="createPlayroom"
-      @button-click="onClickDialog"
+      @button-click="onClickCreatePlayroomDialog"
     />
     <login-dialog
       :show="showLoginDialog"
@@ -236,6 +236,9 @@ export default {
     ...mapActions('common', [
       'onClickModal',
     ]),
+    ...mapActions('playroom', [
+      'savePlaylistData',
+    ]),
     onClickSelectAll: function () {
       if (this.isSelectedAll) {
         this.deselectAllDetailVideos()
@@ -267,19 +270,33 @@ export default {
         })
       }
     },
-    onClickDialog: function (idx) {
-      if (idx === 0) { // 확인
-        console.log('확인')
-        // this.createPlayroom(this.playlistDetail)
-      } else { // 취소
-        console.log('취소')
-      }
-    },
     showCreatePlayroomDialog: function () {
       if (this.isLogin) {
         this.createPlayroom = true
       } else {
         this.showLoginDialog = true
+      }
+    },
+    onClickCreatePlayroomDialog: function (idx) {
+      if (idx === 0) { // 확인
+        console.log('onClickCreatePlayroomDialog')
+        this.createPlayroom = false
+        const videoIds = this.playlistDetail.videos.map((video) => {
+          return video.videoId
+        })
+        const playlists = {
+          [this.playlistDetail.id]: videoIds
+        }
+        const data = {
+          title: this.playlistDetail.title,
+          content: this.playlistDetail.content,
+          tags: this.playlistDetail.tags,
+          isPublic: this.playlistDetail.isPublic,
+          playlists: playlists,
+        }
+        this.savePlaylistData(data)
+      } else {
+        this.createPlayroom = false
       }
     },
     ImgUrl: function(img) {

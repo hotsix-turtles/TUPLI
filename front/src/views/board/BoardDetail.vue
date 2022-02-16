@@ -1,11 +1,11 @@
 <template>
   <div class="">
     <!-- 상단 뒤로가기, 좋아요, 댓글, 점3 등 -->
-    <div class="fixed-top d-flex justify-space-between light-background navbar-top">
+    <div class="fixed-top d-flex justify-space-between light-background navbar-top mx-3 py-3">
       <back-only />
       <div class="d-flex me-5">
         <!-- 좋아요 -->
-        <div>
+        <div class="mx-1">
           <div
             v-if="boardDetail.isLiked"
             class="animate__animated animate__heartBeat"
@@ -19,16 +19,23 @@
             v-else
             @click="onClickLike"
           >
-            <v-icon>mdi-cards-heart-outline</v-icon>
+            <v-icon color="black">
+              mdi-cards-heart-outline
+            </v-icon>
           </div>
         </div>
         <!-- 댓글 -->
         <div @click="$router.push({ name: 'BoardComment', params: { boardId: boardDetail.id }})">
-          <v-icon>mdi-comment-outline</v-icon>
+          <v-icon color="black">
+            mdi-comment-outline
+          </v-icon>
         </div>
         <!-- 작성자일 경우, 수정하기 삭제하기 모달창 -->
         <div v-if="userId === boardDetail.user.userSeq">
-          <v-icon @click="onClickModal">
+          <v-icon
+            color="black"
+            @click="onClickModal"
+          >
             mdi-dots-vertical
           </v-icon>
         </div>
@@ -77,13 +84,12 @@
       <p class="mx-3 mt-3">
         {{ boardDetail.content }}
       </p>
-      <hr>
       <br>
       <!-- 공유 게시물 -->
       <div
         class="container"
       >
-        <div>
+        <div class="mb-5">
           <div
             v-if="boardDetail.playlist !== null"
             class="container added"
