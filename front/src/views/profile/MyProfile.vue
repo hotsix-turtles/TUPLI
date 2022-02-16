@@ -132,11 +132,8 @@ export default {
     getFollowerList: function() {
       axiosConnector.get(`userinfo/${this.userId}`)
         .then((res) => {
-          console.log('내 팔로우 리스트 가져오기11', res.data.to_user)
-          this.followerlist = res.data.to_user
-          console.log('내 팔로우 리스트 가져오기2', this.followerlist)
-          this.followinglist = res.data.from_user
-          console.log('내 팔로우 리스트 가져오기3', this.followinglist)
+          this.followerlist = res.data.from_user
+          this.followinglist = res.data.to_user
         })
         .catch((err) => {
           console.log('에러', err)
@@ -151,7 +148,7 @@ export default {
           console.log('본인 프로필', res.data)
           this.profile = res.data
           this.activities = res.data.activities
-          console.log('액티비티22', this.activities)
+          // console.log('액티비티22', this.activities)
 
         })
         .catch((err) => {

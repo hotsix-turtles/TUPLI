@@ -97,37 +97,21 @@ export default {
           console.log('성공적', res.data)
           this.profile = res.data
 
-          console.log('팔로우 리스트 가져오기11', res.data.from_user)
-          this.followerlist = res.data.to_user
-          console.log('팔로우 리스트 가져오기2', this.followerlist)
-          this.followinglist = res.data.from_user
-          console.log('팔로우 리스트 가져오기3', this.followinglist)
-
+          this.followerlist = res.data.from_user
+          this.followinglist = res.data.to_user
 
         })
         .catch((err) => {
           console.log('에러', err)
         })
     },
-    // 팔로우 리스트 가져오기
-    // getFollowerList: function () {
-    //   console.log('팔로우 리스트 가져오기1')
-    //   axiosConnector.get(`userinfo/${this.$route.params.userId}`)
-    //     .then((res) => {
-    //       console.log('팔로우 리스트 가져오기11', res.data.from_user)
-    //       this.followerlist = res.data.to_user
-    //       console.log('팔로우 리스트 가져오기2', this.followerList)
-    //       this.followinglist = res.data.from_user
-    //       console.log('팔로우 리스트 가져오기3', this.followingList)
-    //     })
-    //     .catch((err) => {
-    //       console.log('에러', err)
-    //     })
-    // },
+
     // 팔로우. 팔로잉 리스트 조회
     getFollowList: function() {
       console.log('팔로우 리스트 조회 시도')
-    }
+    },
+
+
   }
 }
 </script>

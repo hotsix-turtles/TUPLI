@@ -60,7 +60,7 @@
 import MyFollowersList from '@/components/profile/user/MyFollowersList.vue'
 import MyFollowingsList from '@/components/profile/user/MyFollowingsList.vue'
 
-import { mapState } from 'vuex'
+import { mapState, mapActions } from 'vuex'
 
 export default {
   name: 'MyFollow',
@@ -68,13 +68,21 @@ export default {
     MyFollowersList,
     MyFollowingsList,
   },
+  data: function() {
+    return{
+      followerlist: [],
+      followinglist: [],
+    }
+  },
   computed: {
     ...mapState(['authToken', 'userId', 'nickname', 'following', 'followers'])
   },
   created: function() {
-    console.log('팔로워 데이터 확인', this.following, this.followers)
+    this.getUserInfo()
+    console.log('팔로워 데이터 확인', this.following, this.followers, this.followers.length)
   },
   methods: {
+    ...mapActions(['getUserInfo']),
 
   }
 }
