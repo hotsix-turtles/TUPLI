@@ -49,6 +49,10 @@
         </div>
       </div>
     </div>
+    <login-dialog
+      :show="showLoginDialog"
+      @on-click="showLoginDialog = false"
+    />
   </div>
 </template>
 
@@ -56,19 +60,28 @@
 import Tags from '../common/Tags.vue'
 import { mapActions, mapState } from 'vuex'
 import PlaylistCdMedium from './PlaylistCdMedium.vue'
+import LoginDialog from '../../components/common/LoginDialog.vue';
 
 export default {
   name: 'PlaylistItemMedium',
-  components: { PlaylistCdMedium, Tags },
+  components: {
+    PlaylistCdMedium,
+    Tags,
+    LoginDialog,
+  },
   props: {
     playlist: { type: Object, default() { {} } },
   },
   data() {
     return {
+      showLoginDialog: false,
     }
   },
   computed: {
     ...mapState('playlist', {
+    }),
+    ...mapState({
+      isLogin: state => state.isLogin,
     }),
   },
   created() {
@@ -79,14 +92,22 @@ export default {
       'unlikePlaylist',
     ]),
     onClickLike: function () {
-      this.playlist.isLiked = true
-      this.playlist.likesCnt++
-      this.likePlaylist(this.playlist.id)
+      if (this.isLogin) {
+        this.playlist.isLiked = true
+        this.playlist.likesCnt++
+        this.likePlaylist(this.playlist.id)
+      } else {
+        this.showLoginDialog = true
+      }
     },
     onClickUnlike: function () {
-      this.playlist.isLiked = false
-      this.playlist.likesCnt--
-      this.unlikePlaylist(this.playlist.id)
+      if (this.isLogin) {
+        this.playlist.isLiked = false
+        this.playlist.likesCnt--
+        this.unlikePlaylist(this.playlist.id)
+      } else {
+        this.showLoginDialog = true
+      }
     },
   },
 }

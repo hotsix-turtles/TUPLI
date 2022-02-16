@@ -94,24 +94,36 @@
         </div>
       </div>
     </div>
+    <login-dialog
+      :show="showLoginDialog"
+      @on-click="showLoginDialog = false"
+    />
   </div>
 </template>
 
 <script>
-import { mapActions } from 'vuex'
+import { mapActions, mapState } from 'vuex'
 import Tags from '../common/Tags.vue'
+import LoginDialog from '../../components/common/LoginDialog.vue';
 
 export default {
   name: 'PlayroomItemBig',
-  components: { Tags },
+  components: {
+    Tags,
+    LoginDialog,
+  },
   props: {
     playroom: { type: Object, default() { {} } },
   },
   data() {
     return {
+      showLoginDialog: false,
     }
   },
   computed: {
+    ...mapState({
+      isLogin: state => state.isLogin,
+    }),
   },
   methods: {
     ...mapActions('playroom', [
@@ -119,14 +131,22 @@ export default {
       'unlikePlayroom',
     ]),
     onClickLike: function () {
-      this.playroom.isLiked = true
-      this.playroom.likesCnt++
-      this.likePlayroom(this.playroom.id)
+      if (this.isLogin) {
+        this.playroom.isLiked = true
+        this.playroom.likesCnt++
+        this.likePlayroom(this.playroom.id)
+      } else {
+        this.showLoginDialog = true
+      }
     },
     onClickUnlike: function () {
-      this.playroom.isLiked = false
-      this.playroom.likesCnt--
-      this.unlikePlayroom(this.playroom.id)
+      if (this.isLogin) {
+        this.playroom.isLiked = false
+        this.playroom.likesCnt--
+        this.unlikePlayroom(this.playroom.id)
+      } else {
+        this.showLoginDialog = true
+      }
     },
   }
 }

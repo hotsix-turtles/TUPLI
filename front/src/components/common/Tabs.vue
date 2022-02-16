@@ -4,6 +4,8 @@
     <div class="d-flex justify-space-between">
       <v-btn
         v-if="tabType !== 'video'"
+        tile
+        depressed
         height="7vh"
         width="29vw"
         class="my-1"
@@ -13,6 +15,8 @@
         전체
       </v-btn>
       <v-btn
+        tile
+        depressed
         height="7vh"
         width="29vw"
         class="my-1"
@@ -23,6 +27,8 @@
       </v-btn>
       <v-btn
         v-if="tabType === 'video'"
+        tile
+        depressed
         height="7vh"
         width="29vw"
         class="my-1"
@@ -32,6 +38,8 @@
         {{ tabs[4] }}
       </v-btn>
       <v-btn
+        tile
+        depressed
         height="7vh"
         width="29vw"
         class="my-1"
@@ -43,6 +51,8 @@
     </div>
     <div class="d-flex justify-space-between">
       <v-btn
+        tile
+        depressed
         height="7vh"
         width="29vw"
         class="my-1"
@@ -52,6 +62,8 @@
         {{ tabs[1] }}
       </v-btn>
       <v-btn
+        tile
+        depressed
         height="7vh"
         width="29vw"
         class="my-1"
@@ -61,6 +73,8 @@
         {{ tabs[2] }}
       </v-btn>
       <v-btn
+        tile
+        depressed
         height="7vh"
         width="29vw"
         class="my-1"

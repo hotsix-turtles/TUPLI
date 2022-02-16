@@ -38,7 +38,10 @@
         </div>
         <!-- 작성자일 경우, 수정하기 삭제하기 모달창 -->
         <div v-if="userId === playlistDetail.userId">
-          <v-icon @click="onClickModal">
+          <v-icon
+            color="black"
+            @click="onClickModal"
+          >
             mdi-dots-vertical
           </v-icon>
         </div>
@@ -50,11 +53,14 @@
         />
       </div>
     </div><br><br>
-    <div class="container">
+    <div class="container mt-2">
       <div class="d-flex-column justify-center">
         <!-- 제목 공개여부 -->
         <div class="d-flex justify-center semi-bold">
-          <div class="font-1">
+          <div
+            class=""
+            style="font-size: 20px;"
+          >
             {{ playlistDetail.title }}
           </div>
           <div v-if="!playlistDetail.isPublic">
@@ -62,7 +68,7 @@
           </div>
         </div>
         <!-- 작성자 정보 -->
-        <div class="d-flex justify-center ml-5 mt-1 mb-3">
+        <div class="d-flex justify-center mt-1 mb-3">
           <img
             class="profileImg mr-2 mb-2"
             :src="ImgUrl(playlistDetail.userProfileImg)"
@@ -97,15 +103,16 @@
         </div>
         <!-- 태그 -->
         <tags
+          v-if="playlistDetail.tags"
           class="mx-4"
           :tags="playlistDetail.tags"
-        />
+        /><br>
         <!-- 유사 플레이리스트 추천 -->
         <div
-          v-if="recommendedPlaylists !== null && recommendedPlaylists !== []"
+          v-if="playlistDetail.recommendPlaylists !== null && playlistDetail.recommendPlaylists !== []"
           class="mx-3"
         >
-          <div class="font-2 semi-bold color-main mt-5 mb-1">
+          <div class="font-2 semi-bold color-main mt-2 mb-2">
             유사 플레이리스트 추천
           </div>
           <v-card
@@ -114,16 +121,16 @@
             class="playlistThumbnailWrapper"
           >
             <PlaylistThumbnailItem
-              v-for="(playlist, idx) in recommendedPlaylists"
+              v-for="(playlist, idx) in playlistDetail.recommendPlaylists"
               :key="idx"
               :playlist-id="playlist.id"
-              :src="playlist.thumbnail"
+              :src="playlist.image"
             />
           </v-card>
-        </div>
+        </div><br>
         <!-- 전체 선택 / 영상 리스트 -->
         <div class="mx-3">
-          <div class="font-2 semi-bold color-main mt-5 mb-1">
+          <div class="font-2 semi-bold color-main mt-2 mb-1">
             재생 영상 목록
           </div>
           <div
@@ -201,7 +208,7 @@ export default {
   computed: {
     ...mapState('playlist', {
       playlistDetail: state => state.playlistDetail,
-      recommendedPlaylists: state => state.recommendedPlaylists,
+      recommendPlaylists: state => state.recommendPlaylists,
       isLiked: state => state.isLiked,
     }),
     ...mapState({
@@ -219,7 +226,7 @@ export default {
       'likePlaylist',
       'unlikePlaylist',
       'saveFormData',
-      'getRecommendedPlaylists'
+      'getRecommendPlaylists'
     ]),
     ...mapActions('video', [
       'deselectAllDetailVideos',
