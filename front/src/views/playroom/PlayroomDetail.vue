@@ -345,11 +345,11 @@
                         mdi-emoticon-outline
                       </v-icon>
                     </template>
-                    <v-card>
-                      <v-list>
-                        <v-list-item>
-                        </v-list-item>
-                      </v-list>
+                    <v-card
+                      width="250"
+                      height="250"
+                    >
+                      <emoji @click="clickEmoji"/>
                     </v-card>
                   </v-menu>
                 </template>
@@ -461,7 +461,7 @@ import Modal from '../../components/common/Modal.vue';
 import Stomp from 'webstomp-client';
 import SockJS from 'sockjs-client';
 import LoadingDialog from '../../components/common/LoadingDialog.vue';
-
+import Emoji from '../../components/common/Emoji.vue';
 
 Vue.use(VueYoutube)
 
@@ -476,6 +476,7 @@ export default {
     NormalDialog,
     Modal,
     LoadingDialog,
+    Emoji
   },
   data() {
     return {
@@ -1121,6 +1122,10 @@ export default {
     gotoAuthorProfile() {
       this.certification = true;
       this.$router.push(`/profile/${this.roomAuthorId}`);
+    },
+    clickEmoji: function({ idx, emoticon }) {
+      this.message += `#${idx}`;
+      this.$nextTick(() => this.$refs.chat_input.focus())
     },
     ...mapMutations('playroom', [
       'RESET_VUEX_DATA',
