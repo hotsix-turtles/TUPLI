@@ -31,9 +31,17 @@
           class="playroomLike"
           @click="togglePlayroomLike"
         >
-          <span>좋아요</span>
-          <v-icon :color="roomLiked ? 'red' : undefined">
+          <span v-text="roomCurrentLike"></span>
+          <v-icon
+            v-if="roomLiked"
+            color="accent"
+          >
             mdi-heart
+          </v-icon>
+          <v-icon
+            v-else
+          >
+            mdi-heart-outline
           </v-icon>
         </v-btn>
 
@@ -493,6 +501,9 @@ export default {
         '플레이리스트 반복 설정': 'repeat',
       }
     },
+    roomCurrentLike() {
+      return this.roomLikesCnt + (this.roomLiked ? 1 : 0);
+    },
     roomContentReduced() {
       return this.roomContent == this.roomReducedContent
     },
@@ -507,6 +518,7 @@ export default {
       'roomTitle',
       'roomPublic',
       'roomLiked',
+      'roomLikesCnt',
       'roomRepeat',
       'roomAuthorId',
       'roomAuthorProfilePic',

@@ -8,6 +8,7 @@ const defaultState = () => {
     roomTitle: '',
     roomPublic: false,
     roomLiked: false,
+    roomLikesCnt: 0,
     roomRepeat: false,
     roomAuthorId: -1,
     roomAuthorProfilePic: '',
@@ -66,6 +67,7 @@ const playroom = {
     SET_ROOM_TITLE: ( state, value ) => state.roomTitle = value ? value : state.roomTitle,
     SET_ROOM_PUBLIC: ( state, value ) => state.roomPublic = value ? value : state.roomPublic,
     SET_ROOM_LIKED: ( state, value ) => state.roomLiked = value != undefined ? value : state.roomLiked,
+    SET_ROOM_LIKES_CNT: ( state, value ) => state.roomLikesCnt = value != undefined ? value : state.roomLikesCnt,
     SET_ROOM_REPEAT: ( state, value ) => state.roomRepeat = value != undefined ? value : state.roomRepeat,
     SET_ROOM_AUTHOR: ( state, value ) => {
       state.roomAuthorId = value.id != undefined ? parseInt(value.id) : state.roomAuthorId;
@@ -188,6 +190,7 @@ const playroom = {
       commit('SET_ROOM_CHATROOM_ID', `playroom-${data.id}`);
       commit('SET_ROOM_USER_COUNT_MAX', data.userCountMax)
       commit('SET_ROOM_GUESTS', data.guests)
+      commit('SET_ROOM_LIKES_CNT', data.likesCnt);
     }),
     setRoomAuthor: ({commit}, author) => {
       commit('SET_ROOM_AUTHOR', author)
