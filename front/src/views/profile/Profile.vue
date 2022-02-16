@@ -28,7 +28,7 @@
             <p class="mr-2">
               팔로워
             </p>
-            <p>{{ profile.to_user.length }}</p>
+            <p>{{ follower_cnt }}</p>
           </div>
           <div
             class="d-flex mx-3"
@@ -37,28 +37,28 @@
             <p class="mr-2">
               팔로잉
             </p>
-            <p>{{ profile.from_user.length }}</p>
+            <p>{{ followingList.length }}</p>
           </div>
         </div>
         <div class="d-flex justify-center">
           <v-btn
-            v-if="followText === '팔로우'"
+            v-if="!follow"
             class="text-center mx-2 white--text"
             color="#5B5C9D"
             rounded
             @click="followBtn"
           >
-            &nbsp;{{ followText }}&nbsp;
+            &nbsp;팔로우&nbsp;
           </v-btn>
           <v-btn
-            v-else-if="followText === '팔로잉'"
+            v-else
             class="text-center mx-2 dark--text"
             color="#5B5C9D"
             rounded
             outlined
             @click="unfollowBtn"
           >
-            &nbsp;{{ followText }}&nbsp;
+            &nbsp;팔로잉&nbsp;
           </v-btn>
           <v-btn
             class="text-center mx-2"
@@ -115,32 +115,25 @@ export default {
   data: function() {
     return {
       profile: [],
-      followText: '팔로우',
-      follower_cnt: 0, // 팔로잉 하면 팔로워가 늘어남.
+      follow: false,
+      followerList: [], // 팔로잉 하면 팔로워가 늘어남.
+      followingList: [],
       userId: '',
       activities: '',
       tastes: '',
       nickname: '',
 
-      // followerList: [],
-      // followingList: [],
     }
   },
   computed: {
     ...mapState(['authToken', 'userId', 'following', 'followers'])
   },
   created: function() {
+    console.log('타인 프로필 조회', this.$route.params.userId)
     console.log('타인 프로필 조회', this.profile)
+    // this.userId = this.$route.params.userId
+    this.followState()
     this.getAccounts()
-    this.getFollowerList()
-    this.userId = this.$route.params.userId
-    // console.log('팔로우리스트', this.following)
-    // console.log('팔로우리스트2', this.following.find(this.profile.userSeq))
-    // this.followState()
-    // console.log('액티비티', this.activities)
-
-
-
   },
   methods: {
     ...mapActions('account', ['follow', 'unfollow', 'getAccounts']),
@@ -154,7 +147,10 @@ export default {
           this.activities = res.data.activities
           this.tastes = res.data.userInfo.tasteInfo
           this.nickname = res.data.nickname
-          console.log('취향', this.tastes)
+          // this.followerList = res.data.from_user
+          this.follower_cnt = res.data.from_user.length
+          this.followingList = res.data.to_user
+          console.log('취향', this.followerList)
 
         })
         .catch((err) => {
@@ -173,38 +169,50 @@ export default {
     //       console.log('에러', err)
     //     })
     // },
-    // [팔로우]
-    followBtn: function() {
-      if (this.followText === '팔로우') {
-        console.log('follow')
-        this.followText = '팔로잉'
-        this.follow(this.profile.userSeq)
-        this.profile.from_user.unshift("userId");
-      }
-    },
-    // [언팔로우]
-    unfollowBtn: function() {
-      if (this.followText === '팔로잉') {
-        console.log('unfollow')
-        this.followText = '팔로우'
-        console.log('unfollow222', this.profile.userSeq)
-        this.unfollow(this.profile.userSeq)
-        console.log('unfollow3')
-        // this.profile.from_user.unshift("userId");
-        console.log('unfollow4')
-      }
-    },
+
     // 팔로우 상태 확인
     followState: function() {
       console.log('팔로우리스트3', this.following)
-      if (this.following.find(this.profile.userSeq)) {
-        console.log('팔로잉 리스트', this.following)
-        this.followText = '팔로잉'
-      }  // 내가 팔로우한 사람이면 -> 내 followings 목록에 있으면 // followText = '팔로잉'
-      else {
-        this.followText = '팔로우'
-      }  // 팔로우 안했으면 followText = '팔로우'
+      axiosConnector.get(`account/follow/${this.$route.params.userId}`)
+        .then((res) => {
+          console.log('체크', res.data)
+          if (res.data === 'ok') {
+            this.follow = true
+          }
+          else {
+            this.follow = false
+          }
+        })
+        .catch((err) => {
+          console.log('에러1')
+        })
     },
+
+
+    // [팔로우]
+    followBtn: function() {
+      axiosConnector.post(`account/follow/${this.$route.params.userId}`)
+        .then(() => {
+          this.follow = true
+          this.follower_cnt++
+        })
+        .catch((err) => {
+          console.log('에러111', err)
+        })
+    },
+
+    // [언팔로우]
+    unfollowBtn: function() {
+      axiosConnector.delete(`account/follow/${this.$route.params.userId}`)
+        .then(() => {
+          this.follow = false
+          this.follower_cnt--
+        })
+        .catch((err) => {
+          console.log('에러222', err)
+        })
+    },
+
     // 같이 시청하기
     wacthTogether: function() {
       console.log('함께 보기', this.profile.activities[0].id)

@@ -41,12 +41,28 @@ function timeConverterShort(UNIX_timestamp){
   return time;
 }
 
-function playtimeConverter(UNIX_timestamp){
-  var a = new Date(UNIX_timestamp * 1000);
-  var hour = a.getHours();
-  var min = a.getMinutes();
-  var time = hour + ':' + min ;
-  return time;
+// function playtimeConverter(UNIX_timestamp){
+//   var a = new Date(UNIX_timestamp * 1000);
+//   var hour = a.getHours();
+//   var min = a.getMinutes();
+//   var time = hour + ':' + min ;
+//   return time;
+// }
+
+function playtimeConverter(startTime, endTime){
+  const timezoneOffset = new Date().getTimezoneOffset() * 60 * 1000;
+
+  const localStartTime = new Date(startTime - timezoneOffset);
+  const localEndTime = new Date(endTime - timezoneOffset);
+
+  if (localStartTime.getDate() == localEndTime.getDate())
+    return `${localStartTime.toISOString().substr(11, 5)} - ${localEndTime.toISOString().substr(11, 5)}`
+  else if (localStartTime.getMonth() == localEndTime.getMonth())
+    return `${localStartTime.getDate()}일 ${localStartTime.toISOString().substr(11, 5)} - ${localEndTime.getDate()}일 ${localEndTime.toISOString().substr(11, 5)}`
+  else if (localStartTime.getFullYear() == localEndTime.getFullYear())
+    return `${localStartTime.getMonth()}월 ${localStartTime.getDate()}일 ${localStartTime.toISOString().substr(11, 5)} - ${localEndTime.getMonth()}월 ${localEndTime.getDate()}일 ${localEndTime.toISOString().substr(11, 5)}`
+
+  return null;
 }
 
 

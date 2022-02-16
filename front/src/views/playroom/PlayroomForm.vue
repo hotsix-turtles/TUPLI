@@ -25,6 +25,7 @@
               v-model="formData.title"
               :rules="titleRules"
               :counter="30"
+              color="accent"
               label="플레이룸 제목을 입력해주세요."
               required
             />
@@ -41,6 +42,7 @@
               v-model="formData.content"
               :counter="80"
               label="플레이룸 소개글을 입력해주세요."
+              color="accent"
             />
           </v-col>
         </v-row>
@@ -59,7 +61,9 @@
         </v-row>
 
         <!-- 공개 여부 -->
-        <v-row>
+        <v-row
+          v-if="formType=='create'"
+        >
           <v-col
             cols="12"
             md="4"
@@ -78,7 +82,9 @@
         </v-row>
 
         <!-- 친구 초대 레이블 -->
-        <v-row>
+        <v-row
+          v-if="formType=='create'"
+        >
           <v-col
             cols="12"
             md="12"
@@ -111,7 +117,9 @@
         </v-row>
 
         <!-- 친구 초대 리스트 조작 버튼 -->
-        <v-row>
+        <v-row
+          v-if="formType=='create'"
+        >
           <v-col
             cols="12"
             md="12"
@@ -134,7 +142,9 @@
         </v-row>
 
         <!-- 친구 초대 리스트 -->
-        <v-row>
+        <v-row
+          v-if="formType=='create'"
+        >
           <v-col
             cols="12"
             md="12"
@@ -450,7 +460,7 @@ import axiosConnector from '../../utils/axios-connector';
 import AccountListItemSmall from '../../components/account/AccountListItemSmall.vue'
 
 export default {
-  name: 'PlaylistForm',
+  name: 'PlayroomForm',
   components: {
     Back,
     TagInput,
@@ -459,7 +469,6 @@ export default {
   },
   data: function() {
     return {
-      pageName: "내 플레이룸 만들기",
       titleRules: [
         v => !!v || '제목은 필수입니다.',
         v => v.length > 2 || '제목은 3글자 이상 작성해야 합니다.',
@@ -483,6 +492,7 @@ export default {
       isValid: false,
       isShuffle: false,
       // Create할 때 넘길 데이터
+      formType: '',
       formData: {
         title: '',
         content: '',
@@ -512,6 +522,10 @@ export default {
     }
   },
   computed: {
+    pageName () {
+      return this.formType == 'create' ? "플레이룸 생성" :
+        this.formType == 'update' ? "플레이룸 정보 변경" : null
+    },
     computedDateFormatted () {
       return this.formatDate(this.startDate)
     },
@@ -582,12 +596,42 @@ export default {
       this.$router.push('/login')
     }
 
+    if (this.$route.name == 'PlayroomForm') this.formType = 'create'
+    if (this.$route.name == 'PlayroomUpdateForm') this.formType = 'update'
+
     if (this.savedFormData) {
-      console.log('restoreData', this.savedFormData)
       this.formData = this.savedFormData
+      this.RESET_FORM_DATA()
+
+      if (this.formType == 'create') return;
+      if (!Object.keys(this.formData.playlists).length) return;
+
+      const promiseArray = [
+        ...Object.keys(this.formData.playlists).map(
+          async playlistId => {
+            const {data} = await this.getPlaylistInfo(playlistId);
+            this.selectPlaylist2(data);
+          }
+        )
+      ]
+
+      Promise.all(promiseArray).then(
+        () => {
+          this.addPlaylists();
+          this.deselectAllPlaylistVideo();
+          Object.keys(this.formData.playlists).map(
+            playlistId => {
+              this.formData.playlists[playlistId].map(videoId => this.selectPlaylistVideo(videoId));
+            }
+          );
+        }
+      );
     }
   },
   methods: {
+    async getPlaylistInfo(playlistId) {
+      return await axiosConnector.get(`/playlist/${playlistId}`)
+    },
     updateTags: function (tags) {
       this.formData.tags = tags
     },
@@ -649,19 +693,40 @@ export default {
       //inviteIds
       this.formData.inviteIds = this.addedFriends.map(addedFriend => addedFriend.userSeq)
 
-      this.createPlayroom({ formData: this.formData, token })
-        .then((res) => {
-          console.log(res)
+      console.log('보내기 전', this.formData)
 
-          this.clearForm()
-          this.RESET_FORM_DATA()
+      if (this.$route.params && this.$route.params.id)
+      {
+        this.updatePlayroom({ formData: this.formData, token })
+          .then((res) => {
+            console.log(res)
 
-          this.$router.push('/playroom/' + res.data.id)
-        })
-        .catch((err) => {
-          console.log(err)
-          return null
-        })
+            this.clearForm()
+            this.RESET_FORM_DATA()
+
+            this.$router.push('/playroom/' + res.data.id)
+          })
+          .catch((err) => {
+            console.log(err)
+            return null
+          })
+      }
+      else
+      {
+        this.createPlayroom({ formData: this.formData, token })
+          .then((res) => {
+            console.log(res)
+
+            this.clearForm()
+            this.RESET_FORM_DATA()
+
+            this.$router.push('/playroom/' + res.data.id)
+          })
+          .catch((err) => {
+            console.log(err)
+            return null
+          })
+      }
     },
     clearForm() {
       this.formData = {
@@ -676,10 +741,12 @@ export default {
       this.resetAddedFriends();
     },
     saveAndGoPlaylist: function () {
+      this.formData.playlists = {}
       this.saveFormData(this.formData)
       this.$router.push({ name: 'PlayroomFormPlaylist'})
     },
     saveAndGoFriend: function () {
+      this.formData.playlists = {}
       this.saveFormData(this.formData)
       this.$router.push({ name: 'PlayroomFormFriend'})
     },
@@ -692,9 +759,12 @@ export default {
     createPlayroom: function ({formData}) {
       return axiosConnector.post('/playroom', formData)
     },
+    updatePlayroom: function ({formData}) {
+      return axiosConnector.put(`/playroom/${this.$route.params.id}`, formData)
+    },
     ...mapMutations('playroom', ['RESET_FORM_DATA']),
     ...mapActions('playroom', ['saveFormData']),
-    ...mapActions('playlist', ['selectAllPlaylistVideo', 'deselectAllPlaylistVideo', 'resetAddedPlaylists']),
+    ...mapActions('playlist', ['selectPlaylist2', 'addPlaylists', 'selectPlaylistVideo', 'selectAllPlaylistVideo', 'deselectAllPlaylistVideo', 'resetAddedPlaylists']),
     ...mapActions('account', ['validateToken']),
     ...mapActions('friend', ['resetAddedFriends'])
   },

@@ -31,7 +31,7 @@ export default new Vuex.Store({
   state: {
     authToken: null,
     isLogin: false,
-    // userInfo: null
+    userSeq: null
   },
   mutations: {
     // 로그인
@@ -63,6 +63,7 @@ export default new Vuex.Store({
     // 유저 정보 갱신
     GET_USER_INFO(state, res) {
       state.userId = res.userSeq
+      // state.userSeq = res.userSeq
       state.email = res.email
       state.nickname = res.nickname
       state.introduction = res.introduction
@@ -176,7 +177,7 @@ export default new Vuex.Store({
               title: '토큰 만료',
               text: '토큰이 만료되어 자동 로그아웃 처리 되었습니다.',
               scrollbarPadding: false
-            })    
+            })
             // window.location.reload();  // 버그 방지차원인데 필요한가?
           })
       }
@@ -196,13 +197,22 @@ export default new Vuex.Store({
         })
     },
     // 사용자 정보 얻기
-    getUserInfo({commit}, token) {
-      axios({
-        method: 'GET',
-        url: SERVER.URL + '/account/userInfo',
-        headers: {Authorization: token}
-      })
+    // getUserInfo({commit}, token) {
+    //   axios({
+    //     method: 'GET',
+    //     url: SERVER.URL + '/account/userInfo',
+    //     headers: {Authorization: token}
+    //   })
+    //     .then(res => {
+    //       commit('GET_USER_INFO', res.data)
+    //     })
+    //     .catch(err => console.log(err.response.data))
+    // },
+    getUserInfo({commit}) {
+      axiosConnector.get('/account/userInfo')
         .then(res => {
+          this.state.userSeq = res.data.userSeq
+          console.log('내프로필아이이', this.state.userSeq)
           commit('GET_USER_INFO', res.data)
         })
         .catch(err => console.log(err.response.data))
