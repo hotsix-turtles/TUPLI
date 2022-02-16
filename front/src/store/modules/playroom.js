@@ -288,6 +288,7 @@ const playroom = {
       commit('SET_ROOM_REPEAT', !state.roomRepeat);
     },
     loadRoomInfo: async function ( {dispatch}, roomId ) {
+      if (!roomId) return;
       const roomInfo = await axiosConnector.get(`/playroom/${roomId}`);
       dispatch('setRoomInfo', roomInfo);
     },
