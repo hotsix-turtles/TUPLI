@@ -244,8 +244,7 @@ public class PlayroomApiController {
 
         badgeResult.addAll(badgeService.checkPlayroomMake(userSeq, badges));
 
-        if(badgeResult.size() == 0) {
-            badgeResult = null;
+        if(badgeResult == null || badgeResult.size() == 0) {
             return ResponseEntity.status(HttpStatus.CREATED).body(playroomResult);
         }
 
