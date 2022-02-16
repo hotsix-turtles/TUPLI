@@ -1,0 +1,43 @@
+version: "3"
+services:
+    web:
+        image: nginx:latest
+        build: /mnt/c/hotsixturtles/nginx
+        ports:
+          - 80:80
+        volumes:
+          - ./nginx/conf.d:/etc/nginx/conf.d
+          - ./front/dist
+        depends_on:
+          - application
+
+    database:
+        image: mariadb
+        volumes:
+            - ~/docker/mariadb/etc/mysql/conf.d:/etc/mysql/conf.d:ro
+            - ~/docker/mariadb/var/lib/mysql:/var/lib/mysql
+            - ~/docker/mariadb/var/log/maria:/var/log/maria
+        environment:
+            - MYSQL_DATABASE=tupli
+            - MYSQL_ROOT_PASSWORD=p1a2s3s4
+            - MYSQL_ROOT_HOST='%'
+        command: ['--character-set-server=utf8mb4', '--collation-server=utf8mb4_unicode_ci']
+        ports:
+          - 3306:3306
+
+    application:
+        build: ./back
+        environment:
+              SPRING_DATASOURCE_URL: jdbc:mariadb://stg-yswa-kr-practice-db-master.mariadb.database.azure.com:3306/S06P12A102?useUnicode=true
+              SPRING_DATASOURCE_USERNAME: S06P12A102
+              SPRING_DATASOURCE_PASSWORD: vVXyuOaeMc
+        ports:
+          - 8080:8080
+        depends_on:
+          - database
+
+    flask:
+        image: python:latest
+        volumes:
+          - /mnt/c/hotsixturtles/back-flask:/app
+        working_dir: /app
