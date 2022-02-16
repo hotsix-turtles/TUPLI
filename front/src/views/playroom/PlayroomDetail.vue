@@ -676,6 +676,8 @@ export default {
       this.$router.push({ name: 'PlayroomUpdateForm', params: { id: this.roomId } })
     },
     async requestDeletePlayroom() {
+      await this.loadRoomInfo(this.roomId);
+      this.roomGuests.map(async (roomGuest) => await this.sendKick(roomGuest));
       await this.deletePlayroom();
       await this.RESET_VUEX_DATA();
       this.certification = true;
@@ -733,12 +735,18 @@ export default {
         switch (err) {
         case 'duplcated-access':
           this.showErrorDuplicatedAccess();
+          this.stopHeartbeat();
+          await this.destroyWsConnector();
           break;
         case 'not-operation-time':
           this.showErrorOperationTime();
+          this.stopHeartbeat();
+          await this.destroyWsConnector();
           break;
         case 'not-invited':
           this.showErrorNotInvited();
+          this.stopHeartbeat();
+          await this.destroyWsConnector();
           break;
         default:
           break;
@@ -940,9 +948,10 @@ export default {
     loadNextVideo() {
       if (this.roomNextVideo)
       {
-        this.SET_ROOM_CURRENT_PLAYLIST_ID(this.roomNextVideo.playlistId)
-        this.SET_ROOM_CURRENT_VIDEO_ID(this.roomNextVideo.videoId)
-        this.SET_ROOM_CURRENT_VIDEO_PLAYTIME(0)
+        this.SET_ROOM_CURRENT_PLAYLIST_ID(this.roomNextVideo.playlistId);
+        this.SET_ROOM_CURRENT_VIDEO_ID(this.roomNextVideo.videoId);
+        this.SET_ROOM_CURRENT_VIDEO_PLAYTIME(0);
+        this.updateVideoId();
       } else if (this.roomRepeat) {
         this.loadFirstVideo();
       }
@@ -963,15 +972,10 @@ export default {
     },
     playThisVideo() {
       if (this.roomCurrentVideoId != this.selectedVideoItem[0])
-      {
         this.SET_ROOM_CURRENT_VIDEO_ID(this.selectedVideoItem[0])
-        this.SET_ROOM_CURRENT_VIDEO_PLAYTIME(0)
-        this.updateVideoId();
-      }
-      else
-      {
-        this.SET_ROOM_CURRENT_VIDEO_PLAYTIME(0)
-      }
+
+      this.SET_ROOM_CURRENT_VIDEO_PLAYTIME(0)
+      this.updateVideoId();
 
       this.selectedVideoItem = []
       console.log('playThisVideo')
@@ -1001,7 +1005,7 @@ export default {
       if (!token) return;
       if (this.userId != this.roomAuthorId) return;
 
-      this.sendMessage({ type: 'KICK', message: JSON.stringify(kickData), token })
+      await this.sendMessage({ type: 'KICK', message: JSON.stringify(kickData), token })
     },
     async sendSync() {
       const token = localStorage.getItem('jwt')
@@ -1020,14 +1024,14 @@ export default {
       if (this.roomLastSyncSender != this.userId) await this.loadRoomInfo(this.$route.params.id);
       if (this.userId != this.roomAuthorId) return;
 
-      this.sendMessage({ type: 'SYNC', message: JSON.stringify(syncData), token })
+      await this.sendMessage({ type: 'SYNC', message: JSON.stringify(syncData), token })
     },
-    sendChat() {
+    async sendChat() {
       const token = localStorage.getItem('jwt')
 
       this.disableChatbox()
       this.pendingToSendMessage()
-      this.sendMessage({ type: 'TALK', message: this.message, token })
+      await this.sendMessage({ type: 'TALK', message: this.message, token })
         .then(() => {
           this.clearMessage()
         })
