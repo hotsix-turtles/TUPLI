@@ -35,7 +35,8 @@ axiosConnector.interceptors.response.use(
   },
   (error) => {
     const { data, status } = error.response;
-    if (status == 500) router.push({ name: 'Error' })
+    //TODO: 개발기간엔 뺴놓자는 의견 수렴
+    //if (status == 500) router.push({ name: 'Error' })
     return Promise.reject(error);
   }
 );
