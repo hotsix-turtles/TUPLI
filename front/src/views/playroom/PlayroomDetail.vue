@@ -676,6 +676,8 @@ export default {
       this.$router.push({ name: 'PlayroomUpdateForm', params: { id: this.roomId } })
     },
     async requestDeletePlayroom() {
+      await this.loadRoomInfo(this.roomId);
+      this.roomGuests.map(async (roomGuest) => await this.sendKick(roomGuest));
       await this.deletePlayroom();
       await this.RESET_VUEX_DATA();
       this.certification = true;
@@ -1001,7 +1003,7 @@ export default {
       if (!token) return;
       if (this.userId != this.roomAuthorId) return;
 
-      this.sendMessage({ type: 'KICK', message: JSON.stringify(kickData), token })
+      await this.sendMessage({ type: 'KICK', message: JSON.stringify(kickData), token })
     },
     async sendSync() {
       const token = localStorage.getItem('jwt')
@@ -1020,14 +1022,14 @@ export default {
       if (this.roomLastSyncSender != this.userId) await this.loadRoomInfo(this.$route.params.id);
       if (this.userId != this.roomAuthorId) return;
 
-      this.sendMessage({ type: 'SYNC', message: JSON.stringify(syncData), token })
+      await this.sendMessage({ type: 'SYNC', message: JSON.stringify(syncData), token })
     },
-    sendChat() {
+    async sendChat() {
       const token = localStorage.getItem('jwt')
 
       this.disableChatbox()
       this.pendingToSendMessage()
-      this.sendMessage({ type: 'TALK', message: this.message, token })
+      await this.sendMessage({ type: 'TALK', message: this.message, token })
         .then(() => {
           this.clearMessage()
         })
