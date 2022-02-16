@@ -44,11 +44,12 @@ const playlist = {
     },
 
     // [플레이리스트 디테일]
-    GET_PLAYLIST_DETAIL: function (state, { playlistDetail, recommendedPlaylists }) {
+    GET_PLAYLIST_DETAIL: function (state, playlistDetail) {
+      console.log('GET_PLAYLIST_DETAIL', playlistDetail)
       playlistDetail.tags = playlistDetail.tags.split(',')
       playlistDetail.createdAt = timeConverter(playlistDetail.createdAt)
       state.playlistDetail = playlistDetail
-      state.recommendedPlaylists = recommendedPlaylists
+      state.recommendedPlaylists = playlistDetail.recommendedPlaylists
 
       console.log(state.playlistDetail)
     },
@@ -180,6 +181,10 @@ const playlist = {
     },
     SET_LIKED_PLAYLISTS: function (state, value) {
       state.likedPlaylists = value ? value : state.likedPlaylists;
+    },
+    // 플레이리스트로 플레이룸 생성하기
+    SET_PLAYLIST_FOR_PLAYROOM: function (state, playlist) {
+      state.addedPlaylist.push(playlist)
     }
   },
   actions: {
@@ -234,10 +239,9 @@ const playlist = {
       axiosConnector.get(`/playlist/${playlistId}`,
       )
         .then((res) => {
-          console.log(res)
+          console.log('getPlaylistDetail', res)
           commit('GET_PLAYLIST_DETAIL', res.data)
           console.log('playlistId', playlistId)
-          dispatch('isLiked', playlistId)
         })
         .catch((err) => {
           console.log(err)
@@ -246,19 +250,6 @@ const playlist = {
     saveFormData: function ({ commit }, formData) {
       console.log('saveFormData', formData)
       commit('SAVE_FORM_DATA', formData)
-    },
-    // 플레이리스트 좋아요 여부 확인
-    isLiked: function ({ commit }, playlistId) {
-      console.log('isLiked', playlistId)
-      axiosConnector.get(`/playlist/${playlistId}/like`,
-      )
-        .then((res) => {
-          console.log('isLiked 197', res)
-          commit('IS_LIKED', res.data)
-        })
-        .catch((err) => {
-          console.log(err)
-        })
     },
     // 플레이리스트 좋아요
     likePlaylist: function ({ commit }, playlistId) {

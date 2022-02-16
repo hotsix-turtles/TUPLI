@@ -1,6 +1,5 @@
 <template>
   <v-app>
-    <h1>프로필 편집</h1>
     <v-container class="mb-5">
       <v-row
         class="align-center mt-5 justify-space-between"
@@ -9,7 +8,7 @@
           <v-icon
             size="30"
             color="#5B5C9D"
-            @click="$router.push({ name: 'Profile' })"
+            @click="$router.push({ name: 'MyProfile' })"
           >
             mdi-chevron-left
           </v-icon>

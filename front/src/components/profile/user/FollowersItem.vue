@@ -23,25 +23,27 @@
             {{ follower.nickname }}&nbsp;
           </p>
         </div>
-        <v-btn
-          v-if="!follow"
-          class="text-center mx-2 white--text"
-          color="#5B5C9D"
-          rounded
-          @click="followBtn"
-        >
-          &nbsp;팔로우&nbsp;
-        </v-btn>
-        <v-btn
-          v-else
-          class="text-center mx-2 dark--text"
-          color="#5B5C9D"
-          rounded
-          outlined
-          @click="unfollowBtn"
-        >
-          &nbsp;팔로잉&nbsp;
-        </v-btn>
+        <div v-if="!meCheck">
+          <v-btn
+            v-if="!follow"
+            class="text-center mx-2 white--text"
+            color="#5B5C9D"
+            rounded
+            @click="followBtn"
+          >
+            &nbsp;팔로우&nbsp;
+          </v-btn>
+          <v-btn
+            v-else
+            class="text-center mx-2 dark--text"
+            color="#5B5C9D"
+            rounded
+            outlined
+            @click="unfollowBtn"
+          >
+            &nbsp;팔로잉&nbsp;
+          </v-btn>
+        </div>
       </div>
     </div>
   </div>
@@ -62,12 +64,12 @@ export default {
     return {
       ...mapState(['authToken', 'userSeq']),
       follow: false,
+      meCheck: false,
     }
   },
   created: function() {
-    this.getUserInfo(this.authToken)
+    // this.getUserInfo(this.authToken)
     this.checkFollow()
-    console.log('adafasfasdfss', this.userSeq)
   },
   methods: {
     ...mapActions(['getUserInfo']),
@@ -77,13 +79,24 @@ export default {
     },
     // 해당 유저 프로필로 가기
     goProfile: function() {
-      console.log( '타인 프로필', this.follower.userSeq )
-      if (this.userId === this.follower.userSeq) {
-        this.$router.push({ name: 'MyProfile'})
-      }
-      else {
-        this.$router.push({ name: 'Profile', params: { userId : this.follower.userSeq }})
-      }
+      // 만약 클릭한 사람이 나라면
+      axiosConnector.get(`userinfo/${this.follower.userSeq}`)
+        .then((res) => {
+          if (res.data.meCheck === false) {  // 내가 아니라면, 프로필로 !
+            // console.log('타인 프로필', res.data.meCheck)
+            this.$router.push({ name: 'Profile', params: { userId : this.userSeq }})
+          }
+          else if (res.data.meCheck === true) {  // 나라면
+            // console.log('내 프로필', res.data.meCheck)
+            this.$router.push({ name: 'MyProfile'})
+          }
+          else {  // 로그인
+            this.$router.push({ name: 'Login'})
+          }
+        })
+        .catch((err) => {
+          console.log('에러', err)
+        })
     },
 
     // 팔로우 여부
@@ -93,6 +106,9 @@ export default {
           console.log('체크', res.data)
           if (res.data === 'ok') {
             this.follow = true
+          }
+          else if (res.data === 'me') {
+            this.meCheck = true
           }
           else {
             this.follow = false

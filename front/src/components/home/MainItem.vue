@@ -15,30 +15,28 @@
       <!-- playroom 정보 -->
       <div
         class="d-flex flex-column justify-center mt-1"
-        style="width:98%;"
+        style="width:96%;"
       >
         <!-- 추천 -->
         <p v-if="content.isRecommend == true">
-          {{ nickname }}님을 위한 추천 플레이룸
+          추천
         </p>
         <div class="d-flex">
           <img
             class="profile-img-main"
             :src="ImgUrl(content.userProfileImg)"
             alt="프로필 사진"
-            width="50"
-            height="50"
             @click="setProfile"
           >
           <div
             class="d-flex flex-column align-start"
-            style="width:70%"
+            style="width:67%"
           >
             <p
               class="main-title"
               @click="goPlayroom"
             >
-              {{ content.videos.title }}
+              {{ content.title }}
             </p>
             <p
               class="mb-0 main-username"
@@ -76,6 +74,7 @@
             </div>
             <div
               v-else-if="content.userLikesYN === 'N'"
+              class="d-flex flex-column align-center mx-1"
               @click="onClickPlayroomLike"
             >
               <v-icon color="#000000">
@@ -87,6 +86,7 @@
             </div>
             <div
               v-else
+              class="d-flex flex-column align-center mx-1"
               @click="goLogin"
             >
               <v-icon color="#000000">
@@ -139,10 +139,13 @@
       <!-- playlist 정보 -->
       <div
         class="d-flex flex-column justify-center mt-2"
-        style="width:98%;"
+        style="width:96%;"
       >
-        <p v-if="content.isRecommend == true">
-          {{ nickname }}님을 위한 추천 플레이리스트
+        <p
+          v-if="content.isRecommend == true"
+          class="main-recommend-icon"
+        >
+          추천
         </p>
         <!-- playlist 정보 -->
         <div class="d-flex">
@@ -154,7 +157,7 @@
           >
           <div
             class="d-flex flex-column align-start"
-            style="width:70%"
+            style="width:67%"
           >
             <p
               class="main-title"
@@ -297,6 +300,8 @@
 </template>
 
 <script>
+import axiosConnector from '@/utils/axios-connector.js'
+
 import { mapActions, mapState } from 'vuex'
 import { getImage } from '../../utils/utils'
 
@@ -385,9 +390,27 @@ export default {
     },
     // 타 유저 프로필로 가기
     setProfile: function() {
-      console.log( '타인 프로필', this.content.userId )
-      this.$router.push({ name: 'Profile', params: { userId : this.content.userId }})
+      // 만약 클릭한 사람이 나라면
+      console.log('니니니니니', this.content)
+      axiosConnector.get(`userinfo/${this.content.userId}`)
+        .then((res) => {
+          if (res.data.meCheck === false) {  // 내가 아니라면, 프로필로 !
+            console.log( '타인 프로필')
+            this.$router.push({ name: 'Profile', params: { userId : this.content.userId }})
+          }
+          else if (res.data.meCheck === true) {  // 나라면
+            console.log( '내 프로필')
+            this.$router.push({ name: 'MyProfile'})
+          }
+          else {  // 로그인
+            this.$router.push({ name: 'Login'})
+          }
+        })
+        .catch((err) => {
+          console.log('에러', err)
+        })
     },
+
     // 플레이룸 상세로 가기
     goPlayroom: function() {
       console.log( '플레이룸 상세', this.content.id )

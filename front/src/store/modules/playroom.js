@@ -1,4 +1,5 @@
 import Vue from 'vue';
+import router from '@/router/index.js'
 import axiosConnector from '../../utils/axios-connector';
 import { playtimeConverter } from '../../utils/utils';
 
@@ -45,6 +46,8 @@ const defaultState = () => {
 
     // [둘러보기]
     categoryPlayrooms: [],
+
+    // [플레이리스트]
   }
 }
 
@@ -149,8 +152,7 @@ const playroom = {
         } else {
           playroom.onPlay = false
         }
-        playroom.startTime = playtimeConverter(playroom.startTime)
-        playroom.endTime = playtimeConverter(playroom.endTime)
+        playroom.playTime = playtimeConverter(playroom.startTime, playroom.endTime)
       })
       state.searchedPlayrooms = playrooms
     },
@@ -166,8 +168,7 @@ const playroom = {
         } else {
           playroom.onPlay = false
         }
-        playroom.startTime = playtimeConverter(playroom.startTime)
-        playroom.endTime = playtimeConverter(playroom.endTime)
+        playroom.playTime = playtimeConverter(playroom.startTime, playroom.endTime)
       })
       state.categoryPlayrooms = playrooms
       console.log(state.categoryPlayrooms)
@@ -345,7 +346,22 @@ const playroom = {
     },
     resetWsConnector: function ( {commit} ) {
       commit('CLR_WS_CONNECTOR');
-    }
+    },
+    // 플레이리스트로 플레이룸 생성하기
+    savePlaylistData: async function ( {dispatch}, data ) {
+      const formData = {
+        title: data.title,
+        content: data.content,
+        tags: data.tags,
+        isPublic: data.isPublic,
+        inviteIds: [],
+        playlists: data.playlists,
+        userCountMax: 5,
+      }
+      console.log(formData)
+      dispatch('saveFormData', formData)
+      router.push({ name: 'PlayroomByPlaylist' })
+    },
   },
   getters: {
     isAuthor: ( {roomAuthorId}, {}, {userId} ) => userId && roomAuthorId && userId == roomAuthorId,

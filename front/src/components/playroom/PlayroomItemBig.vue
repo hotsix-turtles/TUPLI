@@ -61,7 +61,7 @@
                 mdi-circle-small
               </v-icon>
               <div>
-                {{ playroom.startTime }} ~ {{ playroom.endTime }}
+                {{ playroom.playTime }}
               </div>
             </div>
             <!-- 태그 -->
