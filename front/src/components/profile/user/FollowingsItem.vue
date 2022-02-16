@@ -24,7 +24,7 @@
           </p>
         </div>
         <!-- 팔로우 버튼 -->
-        <div>
+        <div v-if="!meCheck">
           <v-btn
             v-if="!follow"
             class="text-center mx-2 white--text"
@@ -45,9 +45,6 @@
             &nbsp;팔로잉&nbsp;
           </v-btn>
         </div>
-        <div>
-          내가 팔로워일 때 팔로워 버튼 없애기
-        </div>
       </div>
     </div>
   </div>
@@ -65,6 +62,7 @@ export default {
   data: function() {
     return {
       follow: false,
+      meCheck: false,
     }
   },
   created: function() {
@@ -77,25 +75,38 @@ export default {
     },
     // 해당 유저 프로필로 가기
     goProfile: function() {
-      console.log( '타인 프로필', this.following.userSeq )
-      if (this.userId === this.following.userSeq) {
-        this.$router.push({ name: 'MyProfile'})
-      }
-      else {
-        this.$router.push({ name: 'Profile', params: { userId : this.following.userSeq }})
-      }
+      // 만약 클릭한 사람이 나라면
+      axiosConnector.get(`userinfo/${this.following.userSeq}`)
+        .then((res) => {
+          if (res.data.meCheck === false) {  // 내가 아니라면, 프로필로 !
+            // console.log('타인 프로필', res.data.meCheck)
+            this.$router.push({ name: 'Profile', params: { userId : this.userSeq }})
+          }
+          else if (res.data.meCheck === true) {  // 나라면
+            // console.log('내 프로필', res.data.meCheck)
+            this.$router.push({ name: 'MyProfile'})
+          }
+          else {  // 로그인
+            this.$router.push({ name: 'Login'})
+          }
+        })
+        .catch((err) => {
+          console.log('에러', err)
+        })
     },
 
     // 팔로우 여부
     checkFollow: function() {
     // 팔로워가 본인일 때
-
       axiosConnector.get(`account/follow/${this.following.userSeq}`)
         .then((res) => {
           console.log('체크', res.data)
           // 팔로워 상태일 때
           if (res.data === 'ok') {
             this.follow = true
+          }
+          else if (res.data === 'me') {
+            this.meCheck = true
           }
           else {
             this.follow = false

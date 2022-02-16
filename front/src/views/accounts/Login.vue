@@ -1,8 +1,12 @@
 <template>
   <v-app>
     <div class="background-login px-5">
-      <h1>로그인 페이지</h1>
       <v-container>
+        <img
+          src=""
+          alt=""
+        >
+        <h1>youTUve PlayList</h1>
         <h2 class="mt-5">
           튜플리에서
         </h2>
