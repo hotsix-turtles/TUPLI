@@ -337,6 +337,11 @@ const routes = [
     component: NotFound,
   },
   {
+    path: "/500",
+    name: "Error",
+    component: NotFound,
+  },
+  {
     path: "*",
     redirect: "/404",
   },
