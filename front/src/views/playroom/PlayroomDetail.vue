@@ -377,27 +377,10 @@
       <!--
         방장 전환시 팝업
       -->
-      <v-dialog
-        v-model="isAuthorChangedInfo"
-        persistent
-        width="300"
-      >
-        <v-card
-          color="#5B5C9D"
-          dark
-          height="100%"
-          class="py-1"
-        >
-          <v-card-text>
-            방장 전환 중...
-            <v-progress-linear
-              indeterminate
-              color="white"
-              class="mb-0"
-            />
-          </v-card-text>
-        </v-card>
-      </v-dialog>
+      <loading-dialog
+        title="방장 전환중..."
+        :show="isAuthorChangedInfo"
+      />
 
       <normal-dialog
         title="오류"
@@ -477,6 +460,7 @@ import { getImage, playtimeConverter } from '../../utils/utils'
 import Modal from '../../components/common/Modal.vue';
 import Stomp from 'webstomp-client';
 import SockJS from 'sockjs-client';
+import LoadingDialog from '../../components/common/LoadingDialog.vue';
 
 
 Vue.use(VueYoutube)
@@ -491,6 +475,7 @@ export default {
     Tags,
     NormalDialog,
     Modal,
+    LoadingDialog,
   },
   data() {
     return {
@@ -511,7 +496,7 @@ export default {
       playlistThumbnails: [],
       isOperationTimeError: false,
       isNotInvitedError: false,
-      isAuthorChangedInfo: false,
+      isAuthorChangedInfo: true,
       isDuplicatedError: false,
       isKickedError: false,
       isKickedDupError: false,
