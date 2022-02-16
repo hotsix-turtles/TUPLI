@@ -28,6 +28,7 @@
             alt="썸네일"
             width="390"
             height="219"
+            @click="playroomClick"
           >
           <!-- playroom 정보 -->
           <div class="d-flex justify-space-between">
@@ -203,6 +204,11 @@ export default {
       else {
         this.allTags = []
       }
+    },
+    // 플레이룸 상세로 가기
+    playroomClick: function() {
+      // if 이미 끝났으면, 알림만 주기
+      // 아직 안끝났으면 접속
     },
     // 플레이리스트 상세로 가기
     goPlaylist: function() {

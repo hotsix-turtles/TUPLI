@@ -10,23 +10,25 @@
       >
       <!-- 알림 아이콘 -->
       <v-icon
+        color="#000000"
         @click="$router.push({ name: 'Notice' })"
       >
         mdi-bell
       </v-icon>
     </div>
-    <div>
-      <div class="d-flex mx-4 my-4">
+    <div class="d-flex-column">
+      <hr style="width: 100%; height: 1px; background-color: #f1f1f4 !important; ">
+      <div class="d-flex mx-4 mt-3 mb-3">
         <p
-          class="deep-purple--text font-weight-bold mb-0"
+          class="font-weight-bold color-main"
           bold
         >
           {{ nickname }}
         </p>
-        <p class="mb-0">
+        <p class="">
           님이 좋아하는&nbsp;
         </p>
-        <p class="mb-0 deep-purple--text">
+        <p class="color-main">
           오늘의 추천 컨텐츠
         </p>
       </div>

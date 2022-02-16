@@ -3,23 +3,27 @@
     <!-- 플레이룸 -->
     <div
       v-if="content.type == 'playroom'"
+      class="d-flex flex-column align-center"
     >
       <!-- playroom 썸네일 -->
       <img
         :src="thumbnailImage"
         alt="썸네일"
-        width="390"
-        height="219"
+        width="100%"
         @click="goPlayroom"
       >
       <!-- playroom 정보 -->
-      <div class="d-flex flex-column">
+      <div
+        class="d-flex flex-column justify-center mt-1"
+        style="width:98%;"
+      >
+        <!-- 추천 -->
         <p v-if="content.isRecommend == true">
           {{ nickname }}님을 위한 추천 플레이룸
         </p>
         <div class="d-flex">
           <img
-            style="border-radius: 100px; margin: 10px;"
+            class="profile-img-main"
             :src="ImgUrl(content.userProfileImg)"
             alt="프로필 사진"
             width="50"
@@ -28,15 +32,16 @@
           >
           <div
             class="d-flex flex-column align-start"
+            style="width:70%"
           >
-            <h4
-              class="mb-0 mt-2"
+            <p
+              class="main-title"
               @click="goPlayroom"
             >
               {{ content.videos.title }}
-            </h4>
+            </p>
             <p
-              class="mb-0"
+              class="mb-0 main-username"
               @click="setProfile"
             >
               {{ content.nickName }}
@@ -55,40 +60,58 @@
             </div>
           </div>
           <!-- 리액션 아이콘 -->
-          <div class="d-flex mr-2 align-center">
-            <div class="d-flex flex-column align-center mx-1">
-              <!-- 좋아요 -->
-              <div
-                v-if="content.userLikesYN === 'Y'"
-                @click="onClickPlayroomUnLike"
-              >
-                <v-icon color="#5B5C9D">
-                  mdi-cards-heart
-                </v-icon>
-              </div>
-              <div
-                v-else-if="content.userLikesYN === 'N'"
-                @click="onClickPlayroomLike"
-              >
-                <v-icon color="#5B5C9D">
-                  mdi-cards-heart-outline
-                </v-icon>
-              </div>
-              <div
-                v-else
-                @click="goLogin"
-              >
-                <v-icon color="#5B5C9D">
-                  mdi-cards-heart-outline
-                </v-icon>
-              </div>
-              <p>{{ content.likesCnt }}</p>
+          <div class="d-flex mr-2 align-start mt-4">
+            <!-- 좋아요 -->
+            <div
+              v-if="content.userLikesYN === 'Y'"
+              class="d-flex flex-column align-center mx-1"
+              @click="onClickPlayroomUnLike"
+            >
+              <v-icon color="#5B5C9D">
+                mdi-cards-heart
+              </v-icon>
+              <p class="main-icon-text">
+                {{ content.likesCnt }}
+              </p>
             </div>
-            <div class="d-flex flex-column align-center mx-1">
-              <v-icon>
+            <div
+              v-else-if="content.userLikesYN === 'N'"
+              @click="onClickPlayroomLike"
+            >
+              <v-icon color="#000000">
+                mdi-cards-heart-outline
+              </v-icon>
+              <p class="main-icon-text">
+                {{ content.likesCnt }}
+              </p>
+            </div>
+            <div
+              v-else
+              @click="goLogin"
+            >
+              <v-icon color="#000000">
+                mdi-cards-heart-outline
+              </v-icon>
+              <p class="main-icon-text">
+                {{ content.likesCnt }}
+              </p>
+            </div>
+
+            <div
+              class="d-flex flex-column align-center mx-1"
+            >
+              <v-icon
+                color="#000000"
+                style="padding-top: 1px;"
+              >
                 mdi-album
               </v-icon>
-              <p>PLI</p>
+              <p
+                class="main-icon-text"
+                style="padding-left: 1px;"
+              >
+                PLI
+              </p>
             </div>
           </div>
         </div>
@@ -99,7 +122,7 @@
     <!-- 플레이리스트 -->
     <div
       v-else-if="content.type == 'playlist'"
-      class="mt-5"
+      class="d-flex flex-column align-center mt-5"
     >
       <!-- playlist 썸네일 -->
       <span
@@ -113,29 +136,34 @@
         >
         <div />
       </span>
-      <div class="d-flex flex-column">
+      <!-- playlist 정보 -->
+      <div
+        class="d-flex flex-column justify-center mt-2"
+        style="width:98%;"
+      >
         <p v-if="content.isRecommend == true">
           {{ nickname }}님을 위한 추천 플레이리스트
         </p>
         <!-- playlist 정보 -->
         <div class="d-flex">
           <img
-            style="border-radius: 100px; margin: 10px;"
+            class="profile-img-main"
             :src="ImgUrl(content.userProfileImg)"
             alt="프로필 사진"
-            width="50"
-            height="50"
             @click="setProfile"
           >
-          <div class="d-flex flex-column align-start">
-            <h4
-              class="mb-0 mt-2"
+          <div
+            class="d-flex flex-column align-start"
+            style="width:70%"
+          >
+            <p
+              class="main-title"
               @click="goPlaylist"
             >
               {{ content.title }}
-            </h4>
+            </p>
             <p
-              class="mb-0"
+              class="mb-0 main-username"
               @click="setProfile"
             >
               {{ content.nickName }}
@@ -161,36 +189,44 @@
               <v-icon color="#5B5C9D">
                 mdi-cards-heart
               </v-icon>
-              <p>{{ content.likesCnt }}</p>
+              <p class="main-icon-text">
+                {{ content.likesCnt }}
+              </p>
             </div>
             <div
               v-else-if="content.userLikesYN === 'N'"
               class="d-flex flex-column align-center mx-1"
               @click="onClickPlaylistLike"
             >
-              <v-icon>
+              <v-icon color="#000000">
                 mdi-cards-heart-outline
               </v-icon>
-              <p>{{ content.likesCnt }}</p>
+              <p class="main-icon-text">
+                {{ content.likesCnt }}
+              </p>
             </div>
             <div
               v-else-if="content.userLikesYN === null"
               class="d-flex flex-column align-center mx-1"
               @click="goLogin"
             >
-              <v-icon>
+              <v-icon color="#000000">
                 mdi-cards-heart-outline
               </v-icon>
-              <p>{{ content.likesCnt }}</p>
+              <p class="main-icon-text">
+                {{ content.likesCnt }}
+              </p>
             </div>
             <div
               class="d-flex flex-column align-center mx-1"
               @click="addPlayroom"
             >
-              <v-icon>
+              <v-icon color="#000000">
                 mdi-video-plus-outline
               </v-icon>
-              <p>PRM</p>
+              <p class="main-icon-text">
+                PRM
+              </p>
             </div>
           </div>
         </div>
@@ -216,11 +252,11 @@
           >
         </div>
         <div class="d-flex flex-column align-start">
-          <p class="mb-0">
+          <p class="main-content">
             {{ content.content }}
           </p>
           <p
-            class="mb-0"
+            class="main-username"
             @click="setProfile"
           >
             {{ content.nickName }}
