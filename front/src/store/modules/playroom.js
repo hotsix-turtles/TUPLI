@@ -80,7 +80,7 @@ const playroom = {
     SET_ROOM_CONTENT: ( state, value ) => state.roomContent = value ? value : state.roomContent,
     SET_ROOM_INVITE_IDS: ( state, value ) => state.roomInviteIds = value ? value : state.roomInviteIds,
     SET_ROOM_TAGS: ( state, value ) => state.roomTags = value ? value : state.roomTags,
-    SET_ROOM_CURRENT_PLAYLIST_ID: ( state, value ) => state.roomCurrentPlaylistId = value != undefined ? parseInt(value) : roomCurrentPlaylistId,
+    SET_ROOM_CURRENT_PLAYLIST_ID: ( state, value ) => state.roomCurrentPlaylistId = value != undefined ? parseInt(value) : state.roomCurrentPlaylistId,
     SET_ROOM_PLAYLISTS: ( state, value ) => state.roomPlaylists = value ? value : state.roomPlaylists,
     SET_ROOM_VIDEOS: ( state, value ) => state.roomVideos = value ? value : state.roomVideos,
     SET_ROOM_CURRENT_VIDEO_ID: ( state, value ) => state.roomCurrentVideoId = value != undefined ? parseInt(value) : state.roomCurrentVideoId,
