@@ -136,7 +136,7 @@ export default {
     ...mapActions('video', [
       'removeVideos',
       'watchingVideos',
-      'selectedVideos',
+      'selectVideos',
       'resetVideoSelectState',
     ]),
     ...mapActions('playlist', [
