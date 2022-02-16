@@ -15,6 +15,7 @@ import hotsixturtles.tupli.service.YoutubeVideoService;
 import hotsixturtles.tupli.service.list.CategoryListWord;
 import hotsixturtles.tupli.service.token.JwtTokenProvider;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
@@ -53,6 +54,7 @@ public class YoutubeVideoApiController {
      * 반환코드 : 201, 404
      */
     @PostMapping("/video")
+    @ApiOperation(value = "유튜브 영상 시청기록 남기기", notes = "")
     public ResponseEntity<?> saveVideo(@RequestHeader(value = "Authorization") String token,
                                       @RequestBody SimpleYoutubeVideoDto youtubeVideoDto){
         // 유저 정보
@@ -79,6 +81,7 @@ public class YoutubeVideoApiController {
      * 반환코드 : 204, 404
      */
     @DeleteMapping("/video/{url}")
+    @ApiOperation(value = "유튜브 영상 시청기록 지우기", notes = "")
     public ResponseEntity<?> forgotVideo(@RequestHeader(value = "Authorization") String token,
                                          @PathVariable("url") String url){
         // 유저 정보
@@ -104,6 +107,7 @@ public class YoutubeVideoApiController {
      * 반환코드 : 201, 404
      */
     @PostMapping("/video/likes")
+    @ApiOperation(value = "유튜브 영상에 좋아요 하기", notes = "")
     public ResponseEntity<?> likesVideo(@RequestHeader(value = "Authorization") String token,
                                        @RequestBody SimpleYoutubeVideoDto youtubeVideoDto){
         // 유저 정보
@@ -123,13 +127,14 @@ public class YoutubeVideoApiController {
     }
 
     /**
-     * 유튜브 영상 저장 취소
+     * 유튜브 영상 좋아요 취소
      * @param token
      * @param url
      * @return
      * 반환코드 : 204, 404
      */
     @DeleteMapping("/video/likes/{url}")
+    @ApiOperation(value = "유튜브 영상 좋아요 취소하기.", notes = "")
     public ResponseEntity<?> dislikesVideo(@RequestHeader(value = "Authorization") String token,
                                          @PathVariable("url") String url){
         // 유저 정보
@@ -155,6 +160,7 @@ public class YoutubeVideoApiController {
      * 반환코드 : 200, 404
      */
     @GetMapping("/profile/video/saved")
+    @ApiOperation(value = "해당 유저가 시청한 영상 리스트 목록을 리턴", notes = "")
     public ResponseEntity getAllSavedVideos(@RequestHeader(value = "Authorization") String token) {
         // 유저 정보
         if (!jwtTokenProvider.validateToken(token)) {
@@ -181,6 +187,7 @@ public class YoutubeVideoApiController {
      * 반환코드 : 200, 404
      */
     @GetMapping("/profile/video/likes")
+    @ApiOperation(value = "해당 유저가 좋아요한 영상 목록을 리턴", notes = "")
     public ResponseEntity getAllLikesVideos(@RequestHeader(value = "Authorization") String token) {
         // 유저 정보
         if (!jwtTokenProvider.validateToken(token)) {
@@ -207,6 +214,7 @@ public class YoutubeVideoApiController {
      * 반환 코드 : 200, 403
      */
     @PutMapping("/profile/video/isLikes")
+    @ApiOperation(value = "검색 결과 중 좋아요 여부와 시청했는지 여부를 리턴", notes = "")
     public ResponseEntity getSearchResultInfo(HttpServletRequest request,
                                               @RequestBody UrlRequest urlRequest) {
 
@@ -238,6 +246,7 @@ public class YoutubeVideoApiController {
      * * 반환코드 : 200, 403, 404
      */
     @GetMapping("/video/saved")
+    @ApiOperation(value = "사용자가 시청한 유튜브 영상 목록을 리턴", notes = "")
     public ResponseEntity<?> getVideoSaved(@RequestHeader(value = "Authorization") String token)
     {
         if (!jwtTokenProvider.validateToken(token)) {
@@ -261,6 +270,7 @@ public class YoutubeVideoApiController {
      * * 반환코드 : 200, 403, 404
      */
     @GetMapping("/video/likes")
+    @ApiOperation(value = "사용자가 좋아요 한 유튜브 영상 목록을 리턴", notes = "")
     public ResponseEntity<?> getVideoLiked(@RequestHeader(value = "Authorization") String token)
     {
         if (!jwtTokenProvider.validateToken(token)) {
@@ -285,6 +295,7 @@ public class YoutubeVideoApiController {
      * @return
      */
     @GetMapping("/videos/category/{categoryKeyword}")
+    @ApiOperation(value = "카테고리 키워드에 따른 영상 정보 목록 리턴", notes = "")
     public ResponseEntity categoryVideos(@PathVariable("categoryKeyword") String categoryKeyword,
                                            @PageableDefault(size = 50, sort ="id",  direction = Sort.Direction.ASC) Pageable pageable,
                                            HttpServletRequest request) {

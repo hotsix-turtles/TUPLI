@@ -4,6 +4,8 @@ import hotsixturtles.tupli.dto.response.ErrorResponse;
 import hotsixturtles.tupli.entity.UserBadge;
 import hotsixturtles.tupli.service.BadgeService;
 import hotsixturtles.tupli.service.token.JwtTokenProvider;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
@@ -17,6 +19,7 @@ import java.util.List;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
+@Api(tags = "뱃지 관련 API")
 public class BadgeApiController {
 
     private final BadgeService badgeService;
@@ -41,6 +44,7 @@ public class BadgeApiController {
 
     // Badge List
     @GetMapping("/badge/list")
+    @ApiOperation(value = "사용자의 뱃지 목록을 리턴", notes = "")
     public ResponseEntity<?> getBadgeList(@RequestHeader(value = "Authorization") String token){
         if (!jwtTokenProvider.validateToken(token)) {
             return ResponseEntity
@@ -57,6 +61,7 @@ public class BadgeApiController {
 
     // Badge List 타인
     @GetMapping("/badge/list/{userSeq}")
+    @ApiOperation(value = "userSeq에 해당하는 유저의 뱃지 목록을 리턴", notes = "")
     public ResponseEntity<?> getBadgeList(@PathVariable("userSeq") Long userSeq){
 
         List<UserBadge> badgeList = badgeService.getBadgeList(userSeq);
@@ -66,6 +71,7 @@ public class BadgeApiController {
 
     // POSTMAN 테스트 용
     @GetMapping("/badge/listtest")
+    @ApiOperation(value = "테스트용 API", notes = "")
     public ResponseEntity<?> getBadgeListTest(@RequestParam("userSeq") Long userSeq){
 
         List<UserBadge> updateBadges = badgeService.updateBadge(userSeq);
