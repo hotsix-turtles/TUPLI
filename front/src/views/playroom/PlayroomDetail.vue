@@ -440,6 +440,16 @@
         @button-click="errorPromptHandler"
       />
       <normal-dialog
+        title="오류"
+        content-html="중복 접속으로 인하여 연결이 끊어졌습니다."
+        max-width="290"
+        :show="isKickedDupError"
+        :buttons="[{name: '확인'}]"
+        button-spacing
+        persistent
+        @button-click="errorPromptHandler"
+      />
+      <normal-dialog
         content-html="플레이룸을 종료할까요?"
         max-width="290"
         :show="exitPrompt"
@@ -504,6 +514,7 @@ export default {
       isAuthorChangedInfo: false,
       isDuplicatedError: false,
       isKickedError: false,
+      isKickedDupError: false,
       exitPrompt: false,
       exitTo: null,
       roomPlaytime: null,
@@ -537,6 +548,9 @@ export default {
     roomContentReduced() {
       return this.roomContent == this.roomReducedContent
     },
+    isDialogOpened() {
+      return this.isDuplicatedError || this.isOperationTimeError || this.isNotInvitedError || this.isAuthorChangedInfo
+    },
     ...mapState([
       'userId'
     ]),
@@ -563,6 +577,7 @@ export default {
       'roomCurrentVideoId',
       'roomCurrentVideoPlaytime',
       'roomChats',
+      'roomGuests',
       'roomSendingMessage',
       'chatroomId',
       'chatBlockedId',
@@ -710,19 +725,34 @@ export default {
     },
     async initPlayroom() {
       await this.loadRoomInfo(this.$route.params.id);
-      this.checkPermission();
+      if (!this.checkPermission()) return;
       await this.loadLikeState();
       await this.loadFollowerCount();
       await this.loadFirstVideo();
       await this.loadRoomPlaytime();
       await this.initWsConnector();
+      if (!this.checkDuplicatedAccess()) return;
     },
-    async checkPermission() {
+    async checkDuplicatedAccess() {
       try {
         // 동일 방 중복 접속 체크
         if (this.roomGuests && this.roomGuests.filter(guestId => guestId == this.userId).length)
           throw 'duplcated-access';
-
+      } catch (err) {
+        console.log(err)
+        switch (err) {
+        case 'duplcated-access':
+          await this.sendKickDup();
+          this.showErrorDuplicatedAccess();
+          this.stopHeartbeat();
+          await this.destroyWsConnector();
+          return false;
+        }
+      }
+      return true;
+    },
+    async checkPermission() {
+      try {
         // 방장이 아니고 방 운영시간 외이면
         if (!this.isAuthor && (this.roomStartTime >= Date.now() || this.roomEndTime <= Date.now()))
           throw 'not-operation-time';
@@ -733,37 +763,42 @@ export default {
       } catch (err) {
         console.log(err)
         switch (err) {
-        case 'duplcated-access':
-          this.showErrorDuplicatedAccess();
-          this.stopHeartbeat();
-          await this.destroyWsConnector();
-          break;
         case 'not-operation-time':
           this.showErrorOperationTime();
           this.stopHeartbeat();
           await this.destroyWsConnector();
-          break;
+          return false;
         case 'not-invited':
           this.showErrorNotInvited();
           this.stopHeartbeat();
           await this.destroyWsConnector();
-          break;
+          return false;
         default:
           break;
         }
       }
+      return true;
     },
     showErrorDuplicatedAccess() {
-      if (this.isDuplicatedError) return;
+      if (this.isDialogOpened) return;
       this.isDuplicatedError = true;
     },
+    hideErrorDuplicatedAccess() {
+      this.isDuplicatedError = false;
+    },
     showErrorOperationTime() {
-      if (this.isOperationTimeError) return;
+      if (this.isDialogOpened) return;
       this.isOperationTimeError = true;
     },
+    hideErrorOperationTime() {
+      this.isOperationTimeError = false;
+    },
     showErrorNotInvited() {
-      if (this.isNotInvitedError) return;
+      if (this.isDialogOpened) return;
       this.isNotInvitedError = true;
+    },
+    hideErrorNotInvited() {
+      this.isNotInvitedError = false;
     },
     async checkConnection() {
       if (this.$router.currentRoute.name != 'PlayroomDetail') return;
@@ -787,7 +822,7 @@ export default {
       else this.setHeartbeat();
     },
     showInfoAuthorChanged() {
-      if (this.isAuthorChangedInfo) return;
+      if (this.isDialogOpened) return;
       this.isAuthorChangedInfo = true;
       setTimeout(this.hideInfoAuthorChanged, 3000)
     },
@@ -876,6 +911,11 @@ export default {
       {
         const { userId } = JSON.parse(body.message)
         if (this.userId == userId) this.isKickedError = true
+      }
+      else if (body.type == 'KICK_DUP')
+      {
+        const { userId } = JSON.parse(body.message)
+        if (this.userId == userId) this.isKickedDupError = true
       }
       else if (body.type == 'SYNC')
       {
@@ -985,8 +1025,6 @@ export default {
       if (!this.chatroomId) return;
       if (!payload || !payload.type || !payload.message || !payload.token) return;
 
-      await this.checkConnection();
-
       if (!this.wsConnector) return;
       return await this.wsConnector.send(
         "/pub/chat/message",
@@ -1006,6 +1044,19 @@ export default {
       if (this.userId != this.roomAuthorId) return;
 
       await this.sendMessage({ type: 'KICK', message: JSON.stringify(kickData), token })
+    },
+    async sendKickDup() {
+      const token = localStorage.getItem('jwt')
+
+      const kickData = {
+        timestamp: new Date().getTime(),
+        userId: this.userId
+      };
+
+      if (!token) return;
+      if (this.userId != this.roomAuthorId) return;
+
+      await this.sendMessage({ type: 'KICK_DUP', message: JSON.stringify(kickData), token })
     },
     async sendSync() {
       const token = localStorage.getItem('jwt')
