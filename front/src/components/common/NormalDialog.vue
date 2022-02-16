@@ -51,7 +51,7 @@ export default {
     content: { type: String, default: '' },
     contentHtml: { type: String, default: '' },
     width: { type: String, default: '' },
-    maxWidth: { type: String, default: '' },
+    maxWidth: { type: String, default: '290' },
     scrollable: { type: Boolean, default: false },
     persistent: { type: Boolean, default: false },
     buttonSpacing: { type: Boolean, default: false },

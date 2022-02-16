@@ -25,6 +25,7 @@
               v-model="formData.title"
               :rules="titleRules"
               :counter="30"
+              color="accent"
               label="플레이룸 제목을 입력해주세요."
               required
             />
@@ -41,6 +42,7 @@
               v-model="formData.content"
               :counter="80"
               label="플레이룸 소개글을 입력해주세요."
+              color="accent"
             />
           </v-col>
         </v-row>
@@ -583,11 +585,36 @@ export default {
     }
 
     if (this.savedFormData) {
-      console.log('restoreData', this.savedFormData)
       this.formData = this.savedFormData
+      this.savedFormData = {};
+
+      if (this.$route.name != 'PlayroomUpdateForm') return;
+      if (!this.formData.playlists.length) return;
+
+      const promiseArray = Object.keys(this.formData.playlists).map(
+        async playlistId => {
+          const {data} = await this.getPlaylistInfo(playlistId);
+          this.selectPlaylist2(data);
+        }
+      );
+
+      Promise.all(promiseArray).then(
+        () => {
+          this.addPlaylists();
+          this.deselectAllPlaylistVideo();
+          Object.keys(this.formData.playlists).map(
+            playlistId => {
+              this.formData.playlists[playlistId].map(videoId => this.selectPlaylistVideo(videoId));
+            }
+          );
+        }
+      );
     }
   },
   methods: {
+    async getPlaylistInfo(playlistId) {
+      return await axiosConnector.get(`/playlist/${playlistId}`)
+    },
     updateTags: function (tags) {
       this.formData.tags = tags
     },
@@ -649,19 +676,40 @@ export default {
       //inviteIds
       this.formData.inviteIds = this.addedFriends.map(addedFriend => addedFriend.userSeq)
 
-      this.createPlayroom({ formData: this.formData, token })
-        .then((res) => {
-          console.log(res)
+      console.log('보내기 전', this.formData)
 
-          this.clearForm()
-          this.RESET_FORM_DATA()
+      if (this.$route.params && this.$route.params.id)
+      {
+        this.updatePlayroom({ formData: this.formData, token })
+          .then((res) => {
+            console.log(res)
 
-          this.$router.push('/playroom/' + res.data.id)
-        })
-        .catch((err) => {
-          console.log(err)
-          return null
-        })
+            this.clearForm()
+            this.RESET_FORM_DATA()
+
+            this.$router.push('/playroom/' + res.data.id)
+          })
+          .catch((err) => {
+            console.log(err)
+            return null
+          })
+      }
+      else
+      {
+        this.createPlayroom({ formData: this.formData, token })
+          .then((res) => {
+            console.log(res)
+
+            this.clearForm()
+            this.RESET_FORM_DATA()
+
+            this.$router.push('/playroom/' + res.data.id)
+          })
+          .catch((err) => {
+            console.log(err)
+            return null
+          })
+      }
     },
     clearForm() {
       this.formData = {
@@ -676,10 +724,12 @@ export default {
       this.resetAddedFriends();
     },
     saveAndGoPlaylist: function () {
+      this.formData.playlists = {}
       this.saveFormData(this.formData)
       this.$router.push({ name: 'PlayroomFormPlaylist'})
     },
     saveAndGoFriend: function () {
+      this.formData.playlists = {}
       this.saveFormData(this.formData)
       this.$router.push({ name: 'PlayroomFormFriend'})
     },
@@ -692,9 +742,12 @@ export default {
     createPlayroom: function ({formData}) {
       return axiosConnector.post('/playroom', formData)
     },
+    updatePlayroom: function ({formData}) {
+      return axiosConnector.put(`/playroom/${this.$route.params.id}`, formData)
+    },
     ...mapMutations('playroom', ['RESET_FORM_DATA']),
     ...mapActions('playroom', ['saveFormData']),
-    ...mapActions('playlist', ['selectAllPlaylistVideo', 'deselectAllPlaylistVideo', 'resetAddedPlaylists']),
+    ...mapActions('playlist', ['selectPlaylist2', 'addPlaylists', 'selectPlaylistVideo', 'selectAllPlaylistVideo', 'deselectAllPlaylistVideo', 'resetAddedPlaylists']),
     ...mapActions('account', ['validateToken']),
     ...mapActions('friend', ['resetAddedFriends'])
   },
