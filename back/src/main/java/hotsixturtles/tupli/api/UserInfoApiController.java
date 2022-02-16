@@ -67,6 +67,9 @@ public class UserInfoApiController {
         }
 
         User user = userRepository.findByUserSeq(userSeq);
+        if(userSeq == user.getUserSeq()){
+            return ResponseEntity.ok().body("me");
+        }
         List<Object> activities = homeInfoService.getActivites(userSeq, pageable);
         List<Playroom> playrooms = playroomService.getWatchingPlayroom(userSeq);
         UserProfileDto result = new UserProfileDto(user, userInfo, playrooms, activities);
