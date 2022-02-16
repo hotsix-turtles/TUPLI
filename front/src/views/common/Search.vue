@@ -40,6 +40,7 @@
 </template>
 
 <script>
+import { mapActions } from 'vuex';
 import SearchBar from '../../components/common/SearchBar.vue'
 import axiosConnector from '../../utils/axios-connector';
 
@@ -64,8 +65,25 @@ export default {
     }).catch((err) => {
       console.log(err)
     })
+    // 검색 데이터 리셋
+    this.resetSearchPlaylists()
+    this.resetSearchPlayrooms()
+    this.resetSearchAccounts()
+    this.resetVideoSearchState()
   },
   methods: {
+    ...mapActions('playlist', [
+      'resetSearchPlaylists',
+    ]),
+    ...mapActions('playroom', [
+      'resetSearchPlayrooms',
+    ]),
+    ...mapActions('account', [
+      'resetSearchAccounts',
+    ]),
+    ...mapActions('video', [
+      'resetVideoSearchState',
+    ]),
     // 로그아웃
     logoutUser: function() {
       this.$store.dispatch('logout')
@@ -77,6 +95,7 @@ export default {
         // width: '200px'
       })
     },
+
   }
 }
 </script>

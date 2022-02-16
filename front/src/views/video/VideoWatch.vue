@@ -3,7 +3,7 @@
     <back
       :page-name="'영상 보기'"
       :cnt="cnt"
-    />
+    /><br><br>
     <video-iframe
       :key="cnt"
       :watching-video="video"

@@ -22,7 +22,8 @@
       </div>
       <div
         v-else
-        class="clickable"
+        class="clickable font-2 semi-bold mt-3 mr-3 color-dark-gray"
+        :class="{ 'color-main': valid && addedVideos.length > 0 }"
         @click="onClickCompletion"
       >
         수정
@@ -224,6 +225,7 @@ export default {
       },
       createPlayroom: false,
       isCreating: false,
+      isUpdating: false,
       isReset: false,
     }
   },

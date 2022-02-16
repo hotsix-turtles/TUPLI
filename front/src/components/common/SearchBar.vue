@@ -1,6 +1,7 @@
 <template>
   <div>
     <v-text-field
+      v-model="query"
       :label="label"
       filled
       rounded
@@ -25,6 +26,10 @@ export default {
     label: { type: String, default: '' },
     routerPage: { type: String, default: '' },
     isDetail: { type: Boolean, default: false },
+    query: { type: String, default: '' },
+  },
+  created: function () {
+
   },
   methods: {
     onInputKeyword: function (event) {
