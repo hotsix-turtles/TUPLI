@@ -61,7 +61,9 @@
         </v-row>
 
         <!-- 공개 여부 -->
-        <v-row>
+        <v-row
+          v-if="formType=='create'"
+        >
           <v-col
             cols="12"
             md="4"
@@ -80,7 +82,9 @@
         </v-row>
 
         <!-- 친구 초대 레이블 -->
-        <v-row>
+        <v-row
+          v-if="formType=='create'"
+        >
           <v-col
             cols="12"
             md="12"
@@ -113,7 +117,9 @@
         </v-row>
 
         <!-- 친구 초대 리스트 조작 버튼 -->
-        <v-row>
+        <v-row
+          v-if="formType=='create'"
+        >
           <v-col
             cols="12"
             md="12"
@@ -136,7 +142,9 @@
         </v-row>
 
         <!-- 친구 초대 리스트 -->
-        <v-row>
+        <v-row
+          v-if="formType=='create'"
+        >
           <v-col
             cols="12"
             md="12"
@@ -452,7 +460,7 @@ import axiosConnector from '../../utils/axios-connector';
 import AccountListItemSmall from '../../components/account/AccountListItemSmall.vue'
 
 export default {
-  name: 'PlaylistForm',
+  name: 'PlayroomForm',
   components: {
     Back,
     TagInput,
@@ -461,7 +469,6 @@ export default {
   },
   data: function() {
     return {
-      pageName: "내 플레이룸 만들기",
       titleRules: [
         v => !!v || '제목은 필수입니다.',
         v => v.length > 2 || '제목은 3글자 이상 작성해야 합니다.',
@@ -485,6 +492,7 @@ export default {
       isValid: false,
       isShuffle: false,
       // Create할 때 넘길 데이터
+      formType: '',
       formData: {
         title: '',
         content: '',
@@ -514,6 +522,10 @@ export default {
     }
   },
   computed: {
+    pageName () {
+      return this.formType == 'create' ? "플레이룸 생성" :
+        this.formType == 'update' ? "플레이룸 정보 변경" : null
+    },
     computedDateFormatted () {
       return this.formatDate(this.startDate)
     },
@@ -584,19 +596,24 @@ export default {
       this.$router.push('/login')
     }
 
+    if (this.$route.name == 'PlayroomForm') this.formType = 'create'
+    if (this.$route.name == 'PlayroomUpdateForm') this.formType = 'update'
+
     if (this.savedFormData) {
       this.formData = this.savedFormData
-      this.savedFormData = {};
+      this.RESET_FORM_DATA()
 
-      if (this.$route.name != 'PlayroomUpdateForm') return;
-      if (!this.formData.playlists.length) return;
+      if (this.formType == 'create') return;
+      if (!Object.keys(this.formData.playlists).length) return;
 
-      const promiseArray = Object.keys(this.formData.playlists).map(
-        async playlistId => {
-          const {data} = await this.getPlaylistInfo(playlistId);
-          this.selectPlaylist2(data);
-        }
-      );
+      const promiseArray = [
+        ...Object.keys(this.formData.playlists).map(
+          async playlistId => {
+            const {data} = await this.getPlaylistInfo(playlistId);
+            this.selectPlaylist2(data);
+          }
+        )
+      ]
 
       Promise.all(promiseArray).then(
         () => {

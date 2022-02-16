@@ -651,6 +651,14 @@ export default {
   //   await this.destroyWsConnector();
   // },
   async beforeRouteLeave(to, from, next) {
+    if (to.name == 'Error')
+    {
+      this.stopHeartbeat();
+      await this.destroyWsConnector();
+      next();
+      return;
+    }
+
     if (this.isChatting)
     {
       this.closeChatbox();
