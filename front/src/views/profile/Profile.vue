@@ -129,6 +129,7 @@ export default {
     ...mapState(['authToken', 'userId', 'following', 'followers'])
   },
   created: function() {
+    console.log('타인 프로필 조회', this.$route.params.userId)
     console.log('타인 프로필 조회', this.profile)
     // this.userId = this.$route.params.userId
     this.followState()

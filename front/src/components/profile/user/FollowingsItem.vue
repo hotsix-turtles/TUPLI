@@ -88,9 +88,12 @@ export default {
 
     // 팔로우 여부
     checkFollow: function() {
+    // 팔로워가 본인일 때
+
       axiosConnector.get(`account/follow/${this.following.userSeq}`)
         .then((res) => {
           console.log('체크', res.data)
+          // 팔로워 상태일 때
           if (res.data === 'ok') {
             this.follow = true
           }
@@ -101,6 +104,7 @@ export default {
         .catch((err) => {
           console.log('에러1')
         })
+
     },
 
     // [팔로우]

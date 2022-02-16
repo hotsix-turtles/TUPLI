@@ -39,7 +39,9 @@ export default {
     //   console.log('팔로우 리스트 받아오기2', this.followersList)
     // },
     getFollowerList: function() {
-      axiosConnector.get(`userinfo/${this.userId}`)
+      // axiosConnector.get(`userinfo/${this.userId}`)
+      axiosConnector.get(`/account/userInfo`)
+
         .then((res) => {
           console.log('내 팔로워 리스트 가져오기11', res.data.from_user)
           this.followerlist = res.data.from_user

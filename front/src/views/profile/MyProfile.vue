@@ -63,11 +63,6 @@
           >
             프로필 편집하기
           </v-btn>
-          <v-btn
-            @click="getBadge"
-          >
-            뱃지
-          </v-btn>
         </div>
       </div>
     </v-container>
@@ -130,7 +125,7 @@ export default {
     },
     // 팔로우 목록
     getFollowerList: function() {
-      axiosConnector.get(`userinfo/${this.userId}`)
+      axiosConnector.get(`/account/userInfo`)
         .then((res) => {
           this.followerlist = res.data.from_user
           this.followinglist = res.data.to_user
