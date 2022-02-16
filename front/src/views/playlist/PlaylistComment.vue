@@ -77,7 +77,7 @@
 <script>
 import { mapActions, mapState } from 'vuex'
 import Back from '../../components/common/Back.vue'
-import CommentInput from '../../components/playlist/CommentInput.vue'
+import CommentInput from '../../components/common/CommentInput.vue'
 import { getImage } from '../../utils/utils'
 
 
@@ -86,7 +86,6 @@ export default {
   components: {
     Back,
     CommentInput,
-
   },
   data: function() {
     return {
@@ -106,6 +105,7 @@ export default {
   created: function() {
     this.playlistId = this.$route.params.playlistId
     this.getPlaylistComments(this.playlistId)
+    document.body.scrollTop = document.body.scrollHeight;
     this.updateScroll()
   },
   methods: {

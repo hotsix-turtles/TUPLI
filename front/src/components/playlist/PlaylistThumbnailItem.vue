@@ -11,7 +11,6 @@
 </template>
 
 <script>
-import { mapMutations } from 'vuex'
 import PlaylistCdSmall from '../../components/playlist/PlaylistCdSmall.vue'
 
 export default {

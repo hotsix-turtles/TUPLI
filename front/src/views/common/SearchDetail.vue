@@ -11,6 +11,7 @@
       <search-bar
         :label="'검색어를 입력해주세요'"
         :is-detail="true"
+        :query="query"
         @input-change="search"
       />
     </div>
@@ -266,6 +267,7 @@ export default {
       this.resetVideoSearchState()
     }
     if (this.$route.params.tab !== undefined && this.$route.params.keyword) {
+      this.query = this.$route.params.keyword
       this.tab = this.$route.params.tab
       this.tabName = this.items[this.$route.params.tab]
       this.search(this.$route.params.keyword)

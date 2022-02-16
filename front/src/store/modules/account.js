@@ -43,7 +43,9 @@ const account = {
     SEARCH_ACCOUNTS: function (state, accounts) {
       state.searchedAccounts = accounts
     },
-
+    RESET_SEARCH_ACCOUNTS: function (state) {
+      state.searchedAccounts = []
+    },
     // 좋아요한 게시물
     LIKE_PLAYROOM: function (state, likePlayroomList) {
       state.likePlayroomList = likePlayroomList
@@ -100,6 +102,9 @@ const account = {
       }).catch((err) => {
         console.log(err)
       })
+    },
+    resetSearchAccounts: function ({ commit }) {
+      commit('RESET_SEARCH_ACCOUNTS')
     },
 
     // [좋아요한 게시물]

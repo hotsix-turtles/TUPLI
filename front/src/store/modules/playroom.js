@@ -159,6 +159,9 @@ const playroom = {
       })
       state.searchedPlayrooms = playrooms
     },
+    RESET_SEARCH_PLAYROOMS: function (state) {
+      state.searchedPlayrooms = []
+    },
     // [둘러보기]
     GET_CATEGORY_PLAYROOMS: function (state, playrooms) {
       let today = new Date()
@@ -242,6 +245,9 @@ const playroom = {
       }).catch((err) => {
         console.log(err)
       })
+    },
+    resetSearchPlayrooms: function ({ commit }) {
+      commit('RESET_SEARCH_PLAYROOMS')
     },
     // [둘러보기]
     getCategoryPlayrooms: function ({ commit }, categoryName) {
