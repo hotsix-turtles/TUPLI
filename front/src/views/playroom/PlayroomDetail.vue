@@ -721,8 +721,8 @@ export default {
         if (this.roomGuests && this.roomGuests.filter(guestId => guestId == this.userId).length)
           throw 'duplcated-access';
 
-        // 방 운영시간 외이면
-        if (this.roomStartTime >= Date.now() || this.roomEndTime <= Date.now())
+        // 방장이 아니고 방 운영시간 외이면
+        if (!this.isAuthor && (this.roomStartTime >= Date.now() || this.roomEndTime <= Date.now()))
           throw 'not-operation-time';
 
         // 비공개방이고 미초대 유저면
