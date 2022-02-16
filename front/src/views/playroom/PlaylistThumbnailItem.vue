@@ -1,12 +1,15 @@
 <template>
-  <v-avatar
-    size="80"
-    class="ml-2 my-2"
-    :class="{ selected: selected, not_selected: !selected }"
-    @click="SET_ROOM_CURRENT_PLAYLIST_ID(parseInt(id))"
+  <v-card
+    class="mx-1 my-1 px-1 py-1"
+    @click="$emit('click', id)"
   >
-    <playlist-cd-medium :thumbnail="src" />
-  </v-avatar>
+    <v-avatar
+      size="80"
+      :class="{ selected: selected, not_selected: !selected }"
+    >
+      <playlist-cd-medium :thumbnail="src" :playlist-id="parseInt(id)" readonly />
+    </v-avatar>
+  </v-card>
 </template>
 
 <script>
