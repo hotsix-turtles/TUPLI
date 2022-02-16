@@ -575,6 +575,9 @@ public class UserApiController {
                             getMessage("error.valid.jwt", null, LocaleContextHolder.getLocale())));
         }
         Long userSeq = jwtTokenProvider.getUserSeq(token);
+        if(userSeq == otherUserSeq){
+            return ResponseEntity.status(HttpStatus.OK).body("me");
+        }
         UserLikes userLikes = userService.getFollow(userSeq, otherUserSeq);
         if (userLikes == null) {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);  // 안했음
