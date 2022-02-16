@@ -1,4 +1,5 @@
 import Vue from 'vue';
+import router from '@/router/index.js'
 import axiosConnector from '../../utils/axios-connector';
 import { playtimeConverter } from '../../utils/utils';
 
@@ -8,6 +9,7 @@ const defaultState = () => {
     roomTitle: '',
     roomPublic: false,
     roomLiked: false,
+    roomLikesCnt: 0,
     roomRepeat: false,
     roomAuthorId: -1,
     roomAuthorProfilePic: '',
@@ -44,6 +46,8 @@ const defaultState = () => {
 
     // [둘러보기]
     categoryPlayrooms: [],
+
+    // [플레이리스트]
   }
 }
 
@@ -66,6 +70,7 @@ const playroom = {
     SET_ROOM_TITLE: ( state, value ) => state.roomTitle = value ? value : state.roomTitle,
     SET_ROOM_PUBLIC: ( state, value ) => state.roomPublic = value ? value : state.roomPublic,
     SET_ROOM_LIKED: ( state, value ) => state.roomLiked = value != undefined ? value : state.roomLiked,
+    SET_ROOM_LIKES_CNT: ( state, value ) => state.roomLikesCnt = value != undefined ? value : state.roomLikesCnt,
     SET_ROOM_REPEAT: ( state, value ) => state.roomRepeat = value != undefined ? value : state.roomRepeat,
     SET_ROOM_AUTHOR: ( state, value ) => {
       state.roomAuthorId = value.id != undefined ? parseInt(value.id) : state.roomAuthorId;
@@ -147,10 +152,12 @@ const playroom = {
         } else {
           playroom.onPlay = false
         }
-        playroom.startTime = playtimeConverter(playroom.startTime)
-        playroom.endTime = playtimeConverter(playroom.endTime)
+        playroom.playTime = playtimeConverter(playroom.startTime, playroom.endTime)
       })
       state.searchedPlayrooms = playrooms
+    },
+    RESET_SEARCH_PLAYROOMS: function (state) {
+      state.searchedPlayrooms = []
     },
     // [둘러보기]
     GET_CATEGORY_PLAYROOMS: function (state, playrooms) {
@@ -161,8 +168,7 @@ const playroom = {
         } else {
           playroom.onPlay = false
         }
-        playroom.startTime = playtimeConverter(playroom.startTime)
-        playroom.endTime = playtimeConverter(playroom.endTime)
+        playroom.playTime = playtimeConverter(playroom.startTime, playroom.endTime)
       })
       state.categoryPlayrooms = playrooms
       console.log(state.categoryPlayrooms)
@@ -185,6 +191,7 @@ const playroom = {
       commit('SET_ROOM_CHATROOM_ID', `playroom-${data.id}`);
       commit('SET_ROOM_USER_COUNT_MAX', data.userCountMax)
       commit('SET_ROOM_GUESTS', data.guests)
+      commit('SET_ROOM_LIKES_CNT', data.likesCnt);
     }),
     setRoomAuthor: ({commit}, author) => {
       commit('SET_ROOM_AUTHOR', author)
@@ -241,6 +248,9 @@ const playroom = {
         console.log(err)
       })
     },
+    resetSearchPlayrooms: function ({ commit }) {
+      commit('RESET_SEARCH_PLAYROOMS')
+    },
     // [둘러보기]
     getCategoryPlayrooms: function ({ commit }, categoryName) {
       console.log('playroom.js 245 getCategoryPlayrooms')
@@ -279,6 +289,7 @@ const playroom = {
       commit('SET_ROOM_REPEAT', !state.roomRepeat);
     },
     loadRoomInfo: async function ( {dispatch}, roomId ) {
+      if (!roomId) return;
       const roomInfo = await axiosConnector.get(`/playroom/${roomId}`);
       dispatch('setRoomInfo', roomInfo);
     },
@@ -335,7 +346,22 @@ const playroom = {
     },
     resetWsConnector: function ( {commit} ) {
       commit('CLR_WS_CONNECTOR');
-    }
+    },
+    // 플레이리스트로 플레이룸 생성하기
+    savePlaylistData: async function ( {dispatch}, data ) {
+      const formData = {
+        title: data.title,
+        content: data.content,
+        tags: data.tags,
+        isPublic: data.isPublic,
+        inviteIds: [],
+        playlists: data.playlists,
+        userCountMax: 5,
+      }
+      console.log(formData)
+      dispatch('saveFormData', formData)
+      router.push({ name: 'PlayroomByPlaylist' })
+    },
   },
   getters: {
     isAuthor: ( {roomAuthorId}, {}, {userId} ) => userId && roomAuthorId && userId == roomAuthorId,

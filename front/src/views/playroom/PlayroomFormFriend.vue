@@ -7,7 +7,7 @@
     <v-bottom-navigation
       absolute
       background-color="#5B5C9D"
-      height="65px"
+      height="80px"
       class="fixed-bottom"
       :input-value="addedFriends.length > 0 || selectedFriends.length > 0"
     >
@@ -36,17 +36,18 @@
       class="overflow-y-auto"
     >
       <back :page-name="pageName" />
-      <search-bar
+      <!-- <search-bar
         :label="'초대할 친구를 검색해주세요'"
         :is-detail="true"
         @input-change="onEnterSearch"
-      />
+      /> -->
 
       <!-- 탭 -->
       <v-tabs
         v-model="tab"
         background-color="transparent"
         grow
+        class="mt-14"
       >
         <v-tab
           v-for="item in items"
@@ -81,7 +82,7 @@
 <script>
 import { mapActions, mapState } from 'vuex'
 import Back from '../../components/common/Back.vue'
-import SearchBar from '../../components/common/SearchBar.vue'
+// import SearchBar from '../../components/common/SearchBar.vue'
 
 import NavButton from '../../components/common/NavButton.vue'
 import axiosConnector from '../../utils/axios-connector';
@@ -89,7 +90,7 @@ import AccountListItemSmall from '../../components/account/AccountListItemSmall.
 
 export default {
   name: 'PlayroomFormFriend',
-  components: { SearchBar, NavButton, Back, AccountListItemSmall },
+  components: { NavButton, Back, AccountListItemSmall },
   data() {
     return {
       pageName: "친구 추가하기",

@@ -28,7 +28,7 @@
         <span>{{ video.channelTitle }}</span>
       </div>
     </div>
-    <v-card-actions>
+    <!-- <v-card-actions>
       <v-menu bottom>
         <template v-slot:activator="{ on, attrs }">
           <v-btn
@@ -52,7 +52,7 @@
           </v-list-item>
         </v-list>
       </v-menu>
-    </v-card-actions>
+    </v-card-actions> -->
   </v-card>
 </template>
 

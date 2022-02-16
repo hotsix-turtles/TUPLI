@@ -5,9 +5,9 @@
     >
       <img
         :src="thumbnail"
-        @click="$router.push({ name: 'PlaylistDetail', params: { playlistId: playlistId } })"
+        @click="readonly ? undefined : $router.push({ name: 'PlaylistDetail', params: { playlistId: playlistId } })"
       >
-      <div @click="$router.push({ name: 'PlaylistDetail', params: { playlistId: playlistId } })" />
+      <div @click="readonly ? undefined : $router.push({ name: 'PlaylistDetail', params: { playlistId: playlistId } })" />
     </span>
   </div>
 </template>
@@ -18,7 +18,8 @@ export default {
   name: 'PlaylistCdSmall',
   props: {
     thumbnail: { type: String, default: '' },
-    playlistId: { type: Number, default: 0 }
+    playlistId: { type: Number, default: 0 },
+    readonly: { type: Boolean, default: false }
   },
 }
 </script>

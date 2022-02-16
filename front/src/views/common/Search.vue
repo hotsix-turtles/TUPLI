@@ -29,17 +29,11 @@
         >
       </div>
     </div>
-    <!-- 로그아웃 -->
-    <div
-      class="d-flex justify-space-between setting-bar align-center"
-      @click="logoutUser"
-    >
-      <p>로그아웃</p>
-    </div>
   </div>
 </template>
 
 <script>
+import { mapActions } from 'vuex';
 import SearchBar from '../../components/common/SearchBar.vue'
 import axiosConnector from '../../utils/axios-connector';
 
@@ -64,19 +58,26 @@ export default {
     }).catch((err) => {
       console.log(err)
     })
+    // 검색 데이터 리셋
+    this.resetSearchPlaylists()
+    this.resetSearchPlayrooms()
+    this.resetSearchAccounts()
+    this.resetVideoSearchState()
   },
   methods: {
-    // 로그아웃
-    logoutUser: function() {
-      this.$store.dispatch('logout')
-      this.$router.push({ name: 'Home' })
-      swal.fire ({
-        icon: 'info',
-        title: '로그아웃',
-        text: '로그아웃되었습니다.',
-        // width: '200px'
-      })
-    },
+    ...mapActions('playlist', [
+      'resetSearchPlaylists',
+    ]),
+    ...mapActions('playroom', [
+      'resetSearchPlayrooms',
+    ]),
+    ...mapActions('account', [
+      'resetSearchAccounts',
+    ]),
+    ...mapActions('video', [
+      'resetVideoSearchState',
+    ]),
+
   }
 }
 </script>

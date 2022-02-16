@@ -20,7 +20,7 @@ export default {
   },
   props: {
     // eslint-disable-next-line vue/require-default-prop
-    followerlist: { type: Array }
+    followerlist: { type: Array },
   },
   data: function() {
     return {

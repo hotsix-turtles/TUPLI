@@ -3,7 +3,7 @@
     size="80"
     class="ml-2 my-2"
   >
-    <playlist-cd-medium
+    <playlist-cd-small
       :thumbnail="src"
       :playlist-id="playlistId"
     />
@@ -11,14 +11,13 @@
 </template>
 
 <script>
-import { mapMutations } from 'vuex'
-import PlaylistCdMedium from '../../components/playlist/PlaylistCdMedium.vue'
+import PlaylistCdSmall from '../../components/playlist/PlaylistCdSmall.vue'
 
 export default {
   name: 'PlaylistThumbnailItem',
-  components: { PlaylistCdMedium },
+  components: { PlaylistCdSmall },
   props: {
-    playlistId: {type: String, default: ''},
+    playlistId: {type: Number, default: 0},
     src: {type: String, default: ''},
   },
   data() {

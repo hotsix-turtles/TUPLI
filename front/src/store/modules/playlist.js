@@ -45,9 +45,12 @@ const playlist = {
 
     // [플레이리스트 디테일]
     GET_PLAYLIST_DETAIL: function (state, playlistDetail) {
+      console.log('GET_PLAYLIST_DETAIL', playlistDetail)
       playlistDetail.tags = playlistDetail.tags.split(',')
       playlistDetail.createdAt = timeConverter(playlistDetail.createdAt)
       state.playlistDetail = playlistDetail
+      state.recommendedPlaylists = playlistDetail.recommendedPlaylists
+
       console.log(state.playlistDetail)
     },
     // 플레이리스트 좋아요 여부 조회
@@ -87,7 +90,9 @@ const playlist = {
       })
       state.searchedPlaylists = playlists
     },
-
+    RESET_SEARCH_PLAYLISTS: function (state) {
+      state.searchedPlaylists = []
+    },
     // [둘러보기]
     GET_CATEGORY_PLAYLISTS: function (state, playlists) {
       playlists.forEach((playlist) => {
@@ -176,10 +181,17 @@ const playlist = {
     },
     SET_LIKED_PLAYLISTS: function (state, value) {
       state.likedPlaylists = value ? value : state.likedPlaylists;
+    },
+    // 플레이리스트로 플레이룸 생성하기
+    SET_PLAYLIST_FOR_PLAYROOM: function (state, playlist) {
+      state.addedPlaylist.push(playlist)
     }
   },
   actions: {
     // [플레이리스트 생성]
+    resetFormData: function ({ commit }) {
+      commit('RESET_FORM_DATA')
+    },
     createPlaylist: function ({ commit }, formData) {
       axiosConnector.post('/playlist',
         formData
@@ -208,16 +220,28 @@ const playlist = {
           console.log(err)
         })
     },
+    // 내 플레이리스트에 담기
+    addVideoInPlaylist: function ({ commit }, { formData, id } ) {
+      console.log('addVideoInPlaylist', formData)
+      axiosConnector.put(`/playlist/${id}`,
+        formData
+      ).then((res) => {
+        console.log(res)
+        commit('RESET_FORM_DATA')
+      })
+        .catch((err) => {
+          console.log(err)
+        })
+    },
 
     // [플레이리스트 디테일]
     getPlaylistDetail: function ({ commit, dispatch }, playlistId) {
       axiosConnector.get(`/playlist/${playlistId}`,
       )
         .then((res) => {
-          console.log(res)
+          console.log('getPlaylistDetail', res)
           commit('GET_PLAYLIST_DETAIL', res.data)
           console.log('playlistId', playlistId)
-          dispatch('isLiked', playlistId)
         })
         .catch((err) => {
           console.log(err)
@@ -226,19 +250,6 @@ const playlist = {
     saveFormData: function ({ commit }, formData) {
       console.log('saveFormData', formData)
       commit('SAVE_FORM_DATA', formData)
-    },
-    // 플레이리스트 좋아요 여부 확인
-    isLiked: function ({ commit }, playlistId) {
-      console.log('isLiked', playlistId)
-      axiosConnector.get(`/playlist/${playlistId}/like`,
-      )
-        .then((res) => {
-          console.log('isLiked 197', res)
-          commit('IS_LIKED', res.data)
-        })
-        .catch((err) => {
-          console.log(err)
-        })
     },
     // 플레이리스트 좋아요
     likePlaylist: function ({ commit }, playlistId) {
@@ -270,6 +281,7 @@ const playlist = {
       axiosConnector.get(`/playlist/${playlistId}/comment`)
         .then((res) => {
           commit('GET_PLAYLIST_COMMENTS', res.data)
+          console.log("playlist.js : res.data", res.data)
         })
         .catch((err) => {
           console.log(err)
@@ -281,6 +293,9 @@ const playlist = {
         data
       )
         .then((res) => {
+          console.log('createPlaylistComment', res)
+          // commit('CREATE_PLAYLIST_COMMENT', res.data)
+          // 생성 성공. 아무 행동 안함.
           console.log("덧글 작성 완료.")
           axiosConnector.get(`/playlist/${playlistId}/comment`)
             .then((res) => {
@@ -325,6 +340,9 @@ const playlist = {
         }).catch((err) => {
           console.log(err)
         })
+    },
+    resetSearchPlaylists: function ({ commit }) {
+      commit('RESET_SEARCH_PLAYLISTS')
     },
 
     // [둘러보기]

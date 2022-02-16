@@ -9,6 +9,7 @@ import firebase from 'firebase/compat/app';
 
 Vue.config.productionTip = false
 
+Kakao.init(process.env.VUE_APP_KAKAO_API_KEY)
 
 var firebaseConfig = {
   apiKey: process.env.VUE_APP_FIREBASE_APIKEY,

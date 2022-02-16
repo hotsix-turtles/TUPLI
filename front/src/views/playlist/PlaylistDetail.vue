@@ -38,7 +38,10 @@
         </div>
         <!-- 작성자일 경우, 수정하기 삭제하기 모달창 -->
         <div v-if="userId === playlistDetail.userId">
-          <v-icon @click="onClickModal">
+          <v-icon
+            color="black"
+            @click="onClickModal"
+          >
             mdi-dots-vertical
           </v-icon>
         </div>
@@ -50,11 +53,14 @@
         />
       </div>
     </div><br><br>
-    <div class="container">
+    <div class="container mt-2">
       <div class="d-flex-column justify-center">
         <!-- 제목 공개여부 -->
         <div class="d-flex justify-center semi-bold">
-          <div class="font-1">
+          <div
+            class=""
+            style="font-size: 20px;"
+          >
             {{ playlistDetail.title }}
           </div>
           <div v-if="!playlistDetail.isPublic">
@@ -62,7 +68,7 @@
           </div>
         </div>
         <!-- 작성자 정보 -->
-        <div class="d-flex justify-center ml-5 mt-1 mb-3">
+        <div class="d-flex justify-center mt-1 mb-3">
           <img
             class="profileImg mr-2 mb-2"
             :src="ImgUrl(playlistDetail.userProfileImg)"
@@ -97,15 +103,16 @@
         </div>
         <!-- 태그 -->
         <tags
+          v-if="playlistDetail.tags"
           class="mx-4"
           :tags="playlistDetail.tags"
-        />
+        /><br>
         <!-- 유사 플레이리스트 추천 -->
         <div
-          v-if="recommendedPlaylists !== null && recommendedPlaylists !== []"
+          v-if="playlistDetail.recommendPlaylists !== null && playlistDetail.recommendPlaylists !== []"
           class="mx-3"
         >
-          <div class="font-2 semi-bold color-main mt-5 mb-1">
+          <div class="font-2 semi-bold color-main mt-2 mb-2">
             유사 플레이리스트 추천
           </div>
           <v-card
@@ -114,16 +121,16 @@
             class="playlistThumbnailWrapper"
           >
             <PlaylistThumbnailItem
-              v-for="(playlist, idx) in recommendedPlaylists"
+              v-for="(playlist, idx) in playlistDetail.recommendPlaylists"
               :key="idx"
               :playlist-id="playlist.id"
-              :src="playlist.thumbnail"
+              :src="playlist.image"
             />
           </v-card>
-        </div>
+        </div><br>
         <!-- 전체 선택 / 영상 리스트 -->
         <div class="mx-3">
-          <div class="font-2 semi-bold color-main mt-5 mb-1">
+          <div class="font-2 semi-bold color-main mt-2 mb-1">
             재생 영상 목록
           </div>
           <div
@@ -150,7 +157,7 @@
       persistent
       :buttons="[{ name: '확인', color: '#5B5C9D' }, { name: '취소', color: 'gray' }]"
       :show="createPlayroom"
-      @button-click="onClickDialog"
+      @button-click="onClickCreatePlayroomDialog"
     />
     <login-dialog
       :show="showLoginDialog"
@@ -201,7 +208,7 @@ export default {
   computed: {
     ...mapState('playlist', {
       playlistDetail: state => state.playlistDetail,
-      recommendedPlaylists: state => state.recommendedPlaylists,
+      recommendPlaylists: state => state.recommendPlaylists,
       isLiked: state => state.isLiked,
     }),
     ...mapState({
@@ -219,7 +226,7 @@ export default {
       'likePlaylist',
       'unlikePlaylist',
       'saveFormData',
-      'getRecommendedPlaylists'
+      'getRecommendPlaylists'
     ]),
     ...mapActions('video', [
       'deselectAllDetailVideos',
@@ -228,6 +235,9 @@ export default {
     ]),
     ...mapActions('common', [
       'onClickModal',
+    ]),
+    ...mapActions('playroom', [
+      'savePlaylistData',
     ]),
     onClickSelectAll: function () {
       if (this.isSelectedAll) {
@@ -260,19 +270,33 @@ export default {
         })
       }
     },
-    onClickDialog: function (idx) {
-      if (idx === 0) { // 확인
-        console.log('확인')
-        // this.createPlayroom(this.playlistDetail)
-      } else { // 취소
-        console.log('취소')
-      }
-    },
     showCreatePlayroomDialog: function () {
       if (this.isLogin) {
         this.createPlayroom = true
       } else {
         this.showLoginDialog = true
+      }
+    },
+    onClickCreatePlayroomDialog: function (idx) {
+      if (idx === 0) { // 확인
+        console.log('onClickCreatePlayroomDialog')
+        this.createPlayroom = false
+        const videoIds = this.playlistDetail.videos.map((video) => {
+          return video.videoId
+        })
+        const playlists = {
+          [this.playlistDetail.id]: videoIds
+        }
+        const data = {
+          title: this.playlistDetail.title,
+          content: this.playlistDetail.content,
+          tags: this.playlistDetail.tags,
+          isPublic: this.playlistDetail.isPublic,
+          playlists: playlists,
+        }
+        this.savePlaylistData(data)
+      } else {
+        this.createPlayroom = false
       }
     },
     ImgUrl: function(img) {

@@ -1,16 +1,25 @@
 <template>
   <div>
-    <!-- 뒤로가기/완료 -->
-    <div class="d-flex justify-space-between">
-      <back :page-name="pageName" />
-      <v-btn
-        class="clickable"
-        text
+    <!-- 뒤로가기/완료 or 수정 -->
+    <div class="d-flex justify-space-between fixed-top light-background">
+      <div class="d-flex mx-3 my-3">
+        <div>
+          <v-icon @click="$router.go(-1)">
+            mdi-arrow-left
+          </v-icon>
+        </div>
+        <div class="font-2 semi-bold center">
+          {{ pageName }}
+        </div>
+      </div>
+      <div
+        class="clickable font-2 semi-bold mt-3 mr-3 color-dark-gray"
+        :class="{ 'color-main': addedPlaylists.length > 0 }"
         @click="submit"
+        v-text="formType == 'create' ? '완료' : '수정'"
       >
-        완료
-      </v-btn>
-    </div>
+      </div>
+    </div><br><br>
 
     <!-- 플레이룸 생성 폼 -->
     <v-form v-model="isValid">
@@ -262,8 +271,7 @@
               v-model="autoTime"
               label="자동"
               class="mt-0"
-            >
-            </v-checkbox>
+            />
           </v-col>
         </v-row>
 
@@ -291,8 +299,8 @@
                   prepend-icon="mdi-calendar"
                   :rules="startDateRules"
                   v-bind="attrs"
-                  v-on="on"
                   :disabled="autoTime"
+                  v-on="on"
                 />
               </template>
               <v-date-picker
@@ -321,8 +329,8 @@
                   :rules="startTimeRules"
                   readonly
                   v-bind="attrs"
-                  v-on="on"
                   :disabled="autoTime"
+                  v-on="on"
                 />
               </template>
               <v-time-picker
@@ -359,8 +367,8 @@
                   prepend-icon="mdi-calendar"
                   :rules="endDateRules"
                   v-bind="attrs"
-                  v-on="on"
                   :disabled="autoTime"
+                  v-on="on"
                 />
               </template>
               <v-date-picker
@@ -389,8 +397,8 @@
                   :rules="endTimeRules"
                   readonly
                   v-bind="attrs"
-                  v-on="on"
                   :disabled="autoTime"
+                  v-on="on"
                 />
               </template>
               <v-time-picker
@@ -436,36 +444,37 @@
               참여할 최대 유저 수를 설정합니다.
             </p>
             <v-combobox
+              v-model="formData.userCountMax"
               class="ml-5"
               style="width: 50px;"
               dense
               solo
-              v-model="formData.userCountMax"
               :items="userCountMaxItems"
-            ></v-combobox>
+            />
           </v-col>
         </v-row>
       </v-container>
     </v-form>
+    <loading-dialog :title="formType == 'create' ? '플레이룸 생성중...' : '플레이룸 변경중...'" :show="isSending" />
   </div>
 </template>
 
 <script>
 import { mapGetters, mapState } from 'vuex'
-import Back from '../../components/common/Back.vue'
 import PlaylistListItemSmall from '../../components/playlist/PlaylistListItemSmall.vue'
 import TagInput from '../../components/common/TagInput.vue'
 import { mapMutations, mapActions } from 'vuex'
 import axiosConnector from '../../utils/axios-connector';
 import AccountListItemSmall from '../../components/account/AccountListItemSmall.vue'
+import LoadingDialog from '../../components/common/LoadingDialog.vue'
 
 export default {
   name: 'PlayroomForm',
   components: {
-    Back,
     TagInput,
     PlaylistListItemSmall,
-    AccountListItemSmall
+    AccountListItemSmall,
+    LoadingDialog
   },
   data: function() {
     return {
@@ -491,6 +500,7 @@ export default {
       ],
       isValid: false,
       isShuffle: false,
+      isSending: false,
       // Create할 때 넘길 데이터
       formType: '',
       formData: {
@@ -587,17 +597,18 @@ export default {
       }
     },
   },
-  async created() {
-    const isValid = await this.validateToken();
-    if (!isValid)
-    {
-      // 토큰 만료시 현재 vuex 정보를 초기화하고 로그인 페이지로 이동
-      localStorage.clear();
-      this.$router.push('/login')
-    }
+  created() {
+    // const isValid = await this.validateToken();
+    // if (!isValid)
+    // {
+    //   // 토큰 만료시 현재 vuex 정보를 초기화하고 로그인 페이지로 이동
+    //   localStorage.clear();
+    //   this.$router.push('/login')
+    // }
 
     if (this.$route.name == 'PlayroomForm') this.formType = 'create'
     if (this.$route.name == 'PlayroomUpdateForm') this.formType = 'update'
+    if (this.$route.name == 'PlayroomByPlaylist') this.formType = 'create'
 
     if (this.savedFormData) {
       this.formData = this.savedFormData
@@ -639,7 +650,8 @@ export default {
       return this.formData.playlists.map((playlist) => playlist.videos.map((v) => v.included = (v.id == id ? !selected : v.included)))
     },
     submit() {
-      // TODO: 원래 axiosConnector에서 알아서 갱신하고 보내야하지만...
+      this.isSending = true;
+
       const token = localStorage.getItem('jwt')
       let totalDuration = 0
 
@@ -688,26 +700,18 @@ export default {
         this.formData.endTime = `${this.endDate}T${this.endTime}:00.000+09:00`
       }
 
-      if (((this.endDateTime.getTime() - this.startDateTime.getTime()) / 1000) < totalDuration) console.log('이상한데?')
-
-      //inviteIds
       this.formData.inviteIds = this.addedFriends.map(addedFriend => addedFriend.userSeq)
-
-      console.log('보내기 전', this.formData)
 
       if (this.$route.params && this.$route.params.id)
       {
         this.updatePlayroom({ formData: this.formData, token })
           .then((res) => {
-            console.log(res)
-
             this.clearForm()
             this.RESET_FORM_DATA()
 
             this.$router.push('/playroom/' + res.data.id)
           })
           .catch((err) => {
-            console.log(err)
             return null
           })
       }

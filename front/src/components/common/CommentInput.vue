@@ -1,14 +1,16 @@
 <template>
   <div>
     <v-text-field
+      ref="comment_input"
       v-model="inputVal"
-      class="comment-input"
-      label="댓글 입력"
+      class="comment-input pt-5 pl-2"
+      style="width: 94vw !important;"
+      label="댓글을 입력하세요"
       solo
       dense
-      :disabled="!isLogin"
       @keydown.enter="sendComment"
       @click:append-outer="sendComment"
+      @click:append="checkIsLogin"
     >
       <template v-slot:append>
         <v-menu
@@ -18,6 +20,7 @@
           left
           offset-x
           offset-y
+          style="height: 100px;"
         >
           <template v-slot:activator="{ on, attrs }">
             <v-icon
@@ -37,12 +40,11 @@
               mdi-emoticon-outline
             </v-icon>
           </template>
-          <v-card>
-            <v-list>
-              <v-list-item>
-                이모지
-              </v-list-item>
-            </v-list>
+          <v-card
+            width="100%"
+            height="100%"
+          >
+            <emoji @click="clickEmoji" />
           </v-card>
         </v-menu>
       </template>
@@ -54,21 +56,32 @@
         </v-icon>
       </template>
     </v-text-field>
-    <div />
+    <div class="" />
+    <login-dialog
+      :show="showLoginDialog"
+      @on-click="showLoginDialog = false"
+    />
   </div>
 </template>
 
 <script>
 import { mapActions, mapState } from 'vuex'
+import LoginDialog from '@/components/common/LoginDialog.vue'
+import Emoji from '../../components/common/Emoji.vue';
 
 export default {
   name: 'CommentInput',
+  components: {
+    LoginDialog,
+    Emoji,
+  },
   props: {
   },
   data: function () {
     return {
       showEmoji: false,
       inputVal: '',
+      showLoginDialog: false,
     }
   },
   computed: {
@@ -78,16 +91,24 @@ export default {
   },
   methods: {
     sendComment: function (event) {
-      if(this.inputVal == '') {
-        console.log("CommentInput.vue : 덧글 내용 입력을 해주세요")
-        return
-      }
-      else {
-        // console.log("CommentInput.vue 로 왔씁니까?")
+      if (this.isLogin) {
         this.$emit('send-comment', this.inputVal)
         this.inputVal = ''
+      } else {
+        console.log("showLoginDialog")
+        this.showLoginDialog = true
       }
-    }
+    },
+    checkIsLogin: function () {
+      if (!this.isLogin) {
+        this.showLoginDialog = true
+      }
+    },
+    clickEmoji: function({ idx, emoticon }) {
+      console.log(idx, emoticon)
+      this.inputVal += `#${idx}`;
+      this.$nextTick(() => this.$refs.comment_input.focus())
+    },
   }
 }
 </script>

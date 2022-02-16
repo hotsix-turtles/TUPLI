@@ -58,8 +58,7 @@ const board = {
         } else {
           playroom.onPlay = false
         }
-        playroom.startTime = playtimeConverter(playroom.startTime)
-        playroom.endTime = playtimeConverter(playroom.endTime)
+        playroom.playTime = playtimeConverter(playroom.startTime, playroom.endTime)
       })
       state.myPlayrooms = playrooms
       console.log(state.myPlayrooms)
@@ -72,8 +71,7 @@ const board = {
         } else {
           playroom.onPlay = false
         }
-        playroom.startTime = playtimeConverter(playroom.startTime)
-        playroom.endTime = playtimeConverter(playroom.endTime)
+        playroom.playTime = playtimeConverter(playroom.startTime, playroom.endTime)
       })
       state.likedPlayrooms = playrooms
     },
@@ -87,8 +85,7 @@ const board = {
         } else {
           boardDetail.playroom.onPlay = false
         }
-        boardDetail.playroom.startTime = playtimeConverter(boardDetail.playroom.startTime)
-        boardDetail.playroom.endTime = playtimeConverter(boardDetail.playroom.endTime)
+        boardDetail.playroom.playTime = playtimeConverter(boardDetail.playroom.startTime, boardDetail.playroom.endTime)
       }
       state.boardDetail = boardDetail
       console.log('-------------------state.boardDetail', state.boardDetail)

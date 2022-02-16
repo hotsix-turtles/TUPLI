@@ -43,7 +43,9 @@ const account = {
     SEARCH_ACCOUNTS: function (state, accounts) {
       state.searchedAccounts = accounts
     },
-
+    RESET_SEARCH_ACCOUNTS: function (state) {
+      state.searchedAccounts = []
+    },
     // 좋아요한 게시물
     LIKE_PLAYROOM: function (state, likePlayroomList) {
       state.likePlayroomList = likePlayroomList
@@ -79,6 +81,12 @@ const account = {
       console.log('팔로우 뮤테이션2', state.following)
     },
 
+    UNFOLLOW: function (state, following) {
+      console.log('언팔로우 뮤테이션', following)
+      state.following = following
+      console.log('언팔로우 뮤테이션2', state.following)
+    },
+
   },
   actions: {
     async validateToken() {
@@ -100,6 +108,9 @@ const account = {
       }).catch((err) => {
         console.log(err)
       })
+    },
+    resetSearchAccounts: function ({ commit }) {
+      commit('RESET_SEARCH_ACCOUNTS')
     },
 
     // [좋아요한 게시물]
@@ -176,11 +187,10 @@ const account = {
     follow: function({ commit, dispatch }, userSeq) {
       console.log('팔로우 액션')
       axiosConnector.post(`account/follow/${userSeq}`)
-        .then((res) => {
+        .then(() => {
           console.log('팔로우 성공적', userSeq)
           // 팔로잉 리스트 업데이트
-          commit('FOLLOW', userSeq)
-          dispatch('getUserInfo', res.data.token)
+          // commit('FOLLOW', userSeq)
         })
         .catch((err) => {
           console.log('에러1')
@@ -188,17 +198,17 @@ const account = {
     },
 
     // 언팔로우
-    // unfollow: function({ commit }, userSeq) {
-    //   console.log('언팔로우 액션')
-    //   axiosConnector.delete(`account/follow/${userSeq}`)
-    //     .then((res) => {
-    //       console.log('언팔로우 성공적', res.data)
-    //       commit.FOLLOW(res.data)
-    //     })
-    //     .catch((err) => {
-    //       console.log('에러2')
-    //     })
-    // },
+    unfollow: function({ commit }, userSeq) {
+      console.log('언팔로우 액션')
+      axiosConnector.delete(`account/follow/${userSeq}`)
+        .then((res) => {
+          // console.log('언팔로우 성공적', res.data)
+          // commit('UNFOLLOW', userSeq)
+        })
+        .catch((err) => {
+          console.log('에러2')
+        })
+    },
 
     // [사용자 조회]
     // getAccounts: function ({ commit }, userSeq) {

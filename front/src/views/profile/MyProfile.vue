@@ -43,6 +43,9 @@
             <p>{{ followerlist.length }}</p>
           </div>
           <div
+            style="width: 1px; height: 6px;"
+          />
+          <div
             class="d-flex mx-3"
             @click="$router.push({ name: 'MyFollow' })"
           >
@@ -63,19 +66,14 @@
           >
             프로필 편집하기
           </v-btn>
-          <v-btn
-            @click="getBadge"
-          >
-            뱃지
-          </v-btn>
         </div>
       </div>
     </v-container>
 
     <!-- 유저 활동, 취향 탭 -->
-    <div class="d-flex justify-space-around mt-5">
+    <div class="d-flex justify-space-around mt-1">
       <v-tabs
-        v-model="activeTab"
+        fixed
         centered
         grow
         color="#5B5C9D"
@@ -130,13 +128,10 @@ export default {
     },
     // 팔로우 목록
     getFollowerList: function() {
-      axiosConnector.get(`userinfo/${this.userId}`)
+      axiosConnector.get(`/account/userInfo`)
         .then((res) => {
-          console.log('내 팔로우 리스트 가져오기11', res.data.to_user)
-          this.followerlist = res.data.to_user
-          console.log('내 팔로우 리스트 가져오기2', this.followerlist)
-          this.followinglist = res.data.from_user
-          console.log('내 팔로우 리스트 가져오기3', this.followinglist)
+          this.followerlist = res.data.from_user
+          this.followinglist = res.data.to_user
         })
         .catch((err) => {
           console.log('에러', err)
@@ -151,7 +146,7 @@ export default {
           console.log('본인 프로필', res.data)
           this.profile = res.data
           this.activities = res.data.activities
-          console.log('액티비티22', this.activities)
+          // console.log('액티비티22', this.activities)
 
         })
         .catch((err) => {
