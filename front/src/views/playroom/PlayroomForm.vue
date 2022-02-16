@@ -25,6 +25,7 @@
               v-model="formData.title"
               :rules="titleRules"
               :counter="30"
+              color="accent"
               label="플레이룸 제목을 입력해주세요."
               required
             />
@@ -41,6 +42,7 @@
               v-model="formData.content"
               :counter="80"
               label="플레이룸 소개글을 입력해주세요."
+              color="accent"
             />
           </v-col>
         </v-row>
