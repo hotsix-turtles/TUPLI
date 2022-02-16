@@ -735,12 +735,18 @@ export default {
         switch (err) {
         case 'duplcated-access':
           this.showErrorDuplicatedAccess();
+          this.stopHeartbeat();
+          await this.destroyWsConnector();
           break;
         case 'not-operation-time':
           this.showErrorOperationTime();
+          this.stopHeartbeat();
+          await this.destroyWsConnector();
           break;
         case 'not-invited':
           this.showErrorNotInvited();
+          this.stopHeartbeat();
+          await this.destroyWsConnector();
           break;
         default:
           break;
