@@ -277,6 +277,11 @@ const routes = [
     component: PlayroomForm
   },
   {
+    path: '/playroom/create',
+    name: 'PlayroomByPlaylist',
+    component: PlayroomForm
+  },
+  {
     path: '/playroom/:id',
     name: 'PlayroomDetail',
     component: PlayroomDetail

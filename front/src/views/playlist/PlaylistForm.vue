@@ -98,6 +98,7 @@
             />
           </v-col>
         </v-row>
+
         <!-- 플레이리스트 영상 리스트 조작 관련 -->
         <div class="d-flex justify-space-between">
           <v-btn
@@ -116,6 +117,7 @@
             >영상은 1개 이상 선택해주세요.</span>
           </div>
         </div>
+
         <div class="d-flex justify-space-between">
           <!-- 전체 선택 -->
           <div
@@ -182,6 +184,27 @@
         </v-card-text>
       </v-card>
     </v-dialog>
+    <v-dialog
+      v-model="isUpdating"
+      persistent
+      width="300"
+    >
+      <v-card
+        color="#5B5C9D"
+        dark
+        height="100%"
+        class="py-1"
+      >
+        <v-card-text>
+          플레이리스트 수정 중...
+          <v-progress-linear
+            indeterminate
+            color="white"
+            class="mb-0"
+          />
+        </v-card-text>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
@@ -193,6 +216,7 @@ import RemoveButtonBottom from '../../components/playlist/RemoveButtonBottom.vue
 import TagInput from '../../components/common/TagInput.vue'
 import VideoListItemSmall from '../../components/video/VideoListItemSmall.vue'
 import NormalDialog from '../../components/common/NormalDialog.vue';
+import axiosConnector from '../../utils/axios-connector';
 
 export default {
   name: 'PlaylistForm',
@@ -204,7 +228,6 @@ export default {
   },
   data: function() {
     return {
-      pageName: "내 플레이리스트 만들기",
       formType: 'create',  // 생성하기/수정하기
       isSelectedAll: false,
       // Create할 때 넘길 데이터
@@ -230,6 +253,10 @@ export default {
     }
   },
   computed: {
+    pageName () {
+      return this.formType == 'create' ? "플레이리스트 생성" :
+        this.formType == 'update' ? "플레이리스트 정보 변경" : null
+    },
     isPublicMsg () {
       return this.formData.isPublic ? "내 플레이리스트를 공개합니다." : "내 플레이리스트를 비공개합니다."
     },
@@ -264,11 +291,15 @@ export default {
       'updatePlaylist',
       'saveFormData',
       'resetFormData',
+      // 'createPlaylistBeforePlayroom',
     ]),
     ...mapActions('video', [
       'selectAllAddedVideos',
       'deselectAllAddedVideos',
       'resetVideoAddState',
+    ]),
+    ...mapActions('playroom', [
+      'savePlaylistData',
     ]),
     updateTags: function (tags) {
       this.formData.tags = tags
@@ -277,9 +308,8 @@ export default {
       if (this.valid && this.addedVideos.length > 0) {
         if (this.formType === 'create') {
           this.createPlayroom = true
-          // this.createPlaylist(data)
         } else {
-          this.isCreating = true
+          this.isUpdating = true
           const data = {
             title: this.formData.title,
             content: this.formData.content,
@@ -313,9 +343,32 @@ export default {
     },
     onClickCreatePlayroomDialog: function (idx) {
       if (idx === 0) { // 확인
+        console.log('onClickCreatePlayroomDialog')
         this.createPlayroom = false
+        const data = {
+          title: this.formData.title,
+          content: this.formData.content,
+          tags: this.formData.tags.join(),
+          isPublic: this.formData.isPublic,
+          videos: this.addedVideos,
+        }
+        axiosConnector.post('/playlist',
+          data
+        )
+          .then((res) => {
+            console.log('onClickCreatePlayroomDialog', res)
+            const playlistId = res.data.id
+            const videoIds = data.videos.map((video) => {
+              return video.videoId
+            })
+            const playlists = {
+              [playlistId]: videoIds
+            }
+            data.playlists = playlists
+            data.tags = data.tags.split(',')
+            this.savePlaylistData(data)
+          })
         console.log('확인')
-        // this.createPlayroom(this.playlistDetail)
       } else { // 취소
         this.isCreating = true
         this.createPlayroom = false

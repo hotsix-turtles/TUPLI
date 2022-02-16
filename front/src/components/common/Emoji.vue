@@ -10,14 +10,17 @@
             tile
             @click="$emit('click', { idx: n, emoticon: getImoticon(`#${n}`) })"
           >
-            <img class="chat-emoticon" :src="getImoticon(`#${n}`)" />
+            <img
+              class="chat-emoticon"
+              :src="getImoticon(`#${n}`)"
+            >
           </v-card>
         </v-col>
         <v-responsive
           v-if="n % 5 === 0"
           :key="`width-${n}`"
           width="100%"
-        ></v-responsive>
+        />
       </template>
     </v-row>
   </v-container>
