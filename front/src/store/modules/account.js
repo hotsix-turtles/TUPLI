@@ -9,8 +9,9 @@ const account = {
     email: null,
     nickname: null,
     introduction: null,
-    image: '@/assets/tupli_logo2_dark',
+    image: '',
     is_vip: null,
+    is_oauth: null,
     following: [],
     followers: [],
     taste: null,
@@ -34,6 +35,8 @@ const account = {
     inviteDomain: 'everyone', //초대 가능한 사람
     alarmOnPlayroomMake: true,  // 플레이룸 생성시 팔로워에게 알람 보낼지 여부
     alarmOnBadge: true,  // 뱃지 알림 받을지
+
+
   },
   mutations: {
     // [검색]
@@ -57,10 +60,23 @@ const account = {
       state.historyList = historyList
     },
 
+    // 유저 정보 얻기
+    GET_USER_ACCOUNTS_FOLLOWERS: function (state, followers) {
+      console.log('유저 정보 얻기', followers)
+      state.userFollowers = followers
+    },
+    GET_USER_ACCOUNTS_FOLLOWING: function (state, following) {
+      console.log('유저 정보 얻기', following)
+      state.userFollowing = following
+    },
+
 
     // 팔로우
-    FOLLOW: function (state) {
-      console.log('ddd')
+    FOLLOW: function (state, following) {
+      console.log('팔로우 뮤테이션', following)
+      // state.following.push(following)
+      state.following = following
+      console.log('팔로우 뮤테이션2', state.following)
     },
 
   },
@@ -155,6 +171,51 @@ const account = {
     cancelLike: function() {
       console.log('좋아요 취소')
     },
+
+    // 팔로우
+    follow: function({ commit, dispatch }, userSeq) {
+      console.log('팔로우 액션')
+      axiosConnector.post(`account/follow/${userSeq}`)
+        .then((res) => {
+          console.log('팔로우 성공적', userSeq)
+          // 팔로잉 리스트 업데이트
+          commit('FOLLOW', userSeq)
+          dispatch('getUserInfo', res.data.token)
+        })
+        .catch((err) => {
+          console.log('에러1')
+        })
+    },
+
+    // 언팔로우
+    // unfollow: function({ commit }, userSeq) {
+    //   console.log('언팔로우 액션')
+    //   axiosConnector.delete(`account/follow/${userSeq}`)
+    //     .then((res) => {
+    //       console.log('언팔로우 성공적', res.data)
+    //       commit.FOLLOW(res.data)
+    //     })
+    //     .catch((err) => {
+    //       console.log('에러2')
+    //     })
+    // },
+
+    // [사용자 조회]
+    // getAccounts: function ({ commit }, userSeq) {
+    //   console.log('getAccounts params')
+    //   axiosConnector.get(`userinfo/${userSeq}`)
+    //     .then((res) => {
+    //       console.log('성공적 프로필1', res.data.from_user)
+    //       console.log('성공적 프로필2', res.data.to_user)
+    //       commit(GET_USER_ACCOUNTS_FOLLOWERS, res.data.from_user)
+    //       commit(GET_USER_ACCOUNTS_FOLLOWING, res.data.to_user)
+    //       console.log('성공적 프로필3', state.userFollowers)
+
+    //     })
+    //     .catch((err) => {
+    //       console.log('에러', err)
+    //     })
+    // },
 
   },
   modules: {

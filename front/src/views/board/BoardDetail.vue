@@ -23,10 +23,7 @@
           </div>
         </div>
         <!-- 댓글 -->
-        <!-- <div @click="$router.push({ name: 'BoardComment', params: { boardId: boardDetail.id }})">
-          <v-icon>mdi-comment-outline</v-icon>
-        </div> -->
-        <div>
+        <div @click="$router.push({ name: 'BoardComment', params: { boardId: boardDetail.id }})">
           <v-icon>mdi-comment-outline</v-icon>
         </div>
         <!-- 작성자일 경우, 수정하기 삭제하기 모달창 -->
@@ -43,24 +40,45 @@
         />
       </div>
     </div><br><br>
-    <!-- {{ BoardDetail }} -->
     <div class="container pt-0">
-      <!-- 작성자 정보 -->
-      <div class="d-flex align-center">
-        <div class="profileImg mx-1">
-          {{ boardDetail.user.profileImage }}
-        </div>
-        <div class="semi-bold">
-          {{ boardDetail.user.nickname }}
-        </div>
-        <div class="mx-1 font-3 color-dark-gray">
-          팔로워 <span>{{ boardDetail.user.followerCnt }}</span>
-        </div>
-      </div>
+      <v-container>
+        <v-row>
+          <v-col :cols="2">
+            <!-- 프로필사진 -->
+            <img
+              style="border-radius: 100px;"
+              :src="ImgUrl( boardDetail.user.profileImage)"
+              width="40px"
+              height="40px"
+            >
+          </v-col>
+          <v-col :cols="10">
+            <v-row>
+              <!-- 작성자 정보 -->
+              <div class="semi-bold mt-2">
+                {{ boardDetail.user.nickname }}
+              </div>
+              <!-- 팔로우 수 -->
+              <div class="ml-1 mt-2 font-3 color-dark-gray">
+                팔로워 <span>{{ boardDetail.user.followerCnt }}</span>
+              </div>
+            </v-row>
+            <v-row>
+              <div
+                style="color:gray;font-size:14px"
+              >
+                {{ boardDetail.created }}
+              </div>
+            </v-row>
+          </v-col>
+        </v-row>
+      </v-container>
       <!-- 소개글 -->
       <p class="mx-3 mt-3">
         {{ boardDetail.content }}
       </p>
+      <hr>
+      <br>
       <!-- 공유 게시물 -->
       <div
         class="container"
@@ -109,6 +127,7 @@
 <script>
 import { mapActions, mapState } from 'vuex'
 import axiosConnector from '../../utils/axios-connector';
+import { timeConverter, getImage } from '../../utils/utils'
 
 import PlayroomItemBig from '../../components/playroom/PlayroomItemBig.vue'
 import PlaylistItemBig from '../../components/playlist/PlaylistItemBig.vue'
@@ -146,6 +165,7 @@ export default {
   },
   created: function() {
     this.getBoardDetail(this.$route.params.boardId)
+    console.log(this.getBoardDetail)
   },
   methods: {
     ...mapActions('board', [
@@ -214,6 +234,9 @@ export default {
       }
       this.isSelectedAll = !this.isSelectedAll
     },
+    ImgUrl: function(img) {
+      return getImage(img)
+    }
   },
 }
 </script>

@@ -19,7 +19,6 @@ import Setting from '../views/profile/Setting.vue'
 //setting
 import Admin from '../views/profile/setting/Admin.vue'
 import ChangePassword from '../views/profile/setting/ChangePassword.vue'
-import History from '../views/profile/setting/History.vue'
 import InviteNoticeAlert from '../views/profile/setting/InviteNoticeAlert.vue'
 import Like from '../views/profile/setting/Like.vue'
 import Payment from '../views/profile/setting/Payment.vue'
@@ -51,6 +50,7 @@ import BoardSelectPlaylist from '../views/board/BoardSelectPlaylist.vue'
 import PlayroomSearch from '@/views/board/PlayroomSearch.vue'
 import PlaylistSearch from '@/views/board/PlaylistSearch.vue'
 import BoardDetail from '@/views/board/BoardDetail.vue'
+import BoardComment from '@/views/board/BoardComment.vue'
 
 import AuthHandler from '../views/handler/AuthHandler.vue'
 import KakaoPaySuccess from '../views/handler/kakaoPay/KakaoPaySuccess.vue'
@@ -217,11 +217,12 @@ const routes = [
     name: 'ChangePassword',
     component: ChangePassword
   },
-  {
-    path: '/history',
-    name: 'History',
-    component: History
-  },
+  // 일단 없앰.
+  // {
+  //   path: '/history',
+  //   name: 'History',
+  //   component: History
+  // },
   {
     path: '/invitenotice',
     name: 'InviteNoticeAlert',
@@ -271,6 +272,11 @@ const routes = [
     component: PlayroomFormFriend
   },
   {
+    path: '/playroom/update/:id',
+    name: 'PlayroomUpdateForm',
+    component: PlayroomForm
+  },
+  {
     path: '/playroom/:id',
     name: 'PlayroomDetail',
     component: PlayroomDetail
@@ -311,6 +317,11 @@ const routes = [
     path: '/board/:boardId',
     name: 'BoardDetail',
     component: BoardDetail
+  },
+  {
+    path: '/board/:boardId/comment',
+    name: 'BoardComment',
+    component: BoardComment
   },
 
   //handler

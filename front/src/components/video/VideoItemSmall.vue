@@ -1,13 +1,13 @@
 <template>
   <v-card
-    height="13vh"
-    class="d-flex align-center"
+    height="12vh"
+    class="d-flex"
     outlined
     tile
     :color="color"
   >
     <div
-      class="d-flex justify-space-between"
+      class="d-flex justify-space-between align-center"
       width="100%"
       @click="selectVideo"
     >
@@ -16,14 +16,14 @@
           <img
             v-if="!isVideoList"
             :src="video.thumbnail"
-            style="width: 35vw; height: 100px; object-fit: cover;"
+            style="width: 35vw; height: 100%; object-fit: cover;"
             class=""
             @click="watchingVideo(video)"
           >
           <img
             v-else
             :src="video.thumbnail"
-            style="width: 35vw; height: 100px; object-fit: cover;"
+            style="width: 35vw; height: 100%; object-fit: cover;"
             class=""
             @click="changeVideo(video)"
           >

@@ -137,7 +137,7 @@ export default {
 
     // 플레이룸 수락
     acceptInvite: function() {
-      this.$router.push({ name: 'playroomDetail', params: { id: this.notice.id }})
+      this.$router.push({ name: 'PlayroomDetail', params: { id: this.notice.routeId }})
     }
   },
 }

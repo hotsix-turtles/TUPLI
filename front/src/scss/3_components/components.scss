@@ -38,7 +38,7 @@
 .fixed-top {
   display: inline-block;
   position: fixed !important;
-  z-index: 3;
+  z-index: 2;
   top: 0 !important;
   width: 100% !important;
 }
@@ -59,7 +59,9 @@
 }
 
 .navbar-background {
-  background-color: rgb(250, 250, 250);
+  background-color: white;
+  border-top: solid 0.5px;
+  border-color: #e2e2e2;
 }
 
 // 구분선
@@ -179,7 +181,6 @@
     transform: translate(-50%, -50%);
     box-shadow: 3px 3px 8px 3px rgba($color: #000000, $alpha: 0.2) inset;
     }
-
 }
 
 // 플레이리스트 CD Big
@@ -188,6 +189,7 @@
   position: relative;
   z-index: 1;
   img {
+    // transform:scale(1.5);
     border-radius: 100%;
     border: solid 4px;
     border-color: lightgray;
@@ -278,6 +280,15 @@
   height: 30px;
 }
 
+// 프로필 사진 small
+.profile-img-small {
+  border-radius: 100%;
+  border: solid 1px;
+  border-color: lightgrey;
+  width: 40px;
+  height: 40px;
+}
+
 // 프로필 사진 Large
 .profile-img-large {
   border-radius: 100%;
@@ -306,6 +317,21 @@
     border-radius: 100%;
     width: 60px;
     height: 60px;
+  }
+}
+
+// 프로필 사진 Medium7
+.profile-img-small {
+  border-radius: 100%;
+  border: solid 1px;
+  border-color: $color-main;
+  width: 30px;
+  height: 30px;
+  align-items: center;
+  img {
+    border-radius: 100%;
+    width: 30px;
+    height: 30px;
   }
 }
 

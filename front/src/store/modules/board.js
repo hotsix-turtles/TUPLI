@@ -18,6 +18,8 @@ const board = {
     likedPlayrooms: [],
     // [게시글 디테일]
     boardDetail: { 'id': 0 },
+    // [게시글 덧글]
+    boardComments: [],
   },
   mutations: {
     // [게시글 생성]
@@ -77,7 +79,7 @@ const board = {
     },
     // [게시글 디테일]
     GET_BOARD_DETAIL: function (state, boardDetail) {
-      boardDetail.createdAt = timeConverter(boardDetail.createdAt)
+      boardDetail.created = timeConverter(boardDetail.created)
       if (boardDetail.playroom !== null) {
         const today = new Date()
         if (boardDetail.playroom.startTime <= today && boardDetail.playroom.endTime >= today) {
@@ -90,6 +92,18 @@ const board = {
       }
       state.boardDetail = boardDetail
       console.log('-------------------state.boardDetail', state.boardDetail)
+    },
+    // 게시글 댓글 조회
+    GET_BOARD_COMMENTS: function (state, boardComments) {
+      if (boardComments.length != 0) {
+        boardComments.forEach((boardComment) => {
+          boardComment.created = timeConverter(boardComment.created)
+        })
+        state.boardComments = boardComments
+      }
+      else {
+        state.boardComments = []
+      }
     },
   },
   actions: {
@@ -206,6 +220,56 @@ const board = {
       )
         .then((res) => {
           console.log('Board.js 189 unlikeBoard', res)
+        })
+        .catch((err) => {
+          console.log(err)
+        })
+    },
+    // [게시글 댓글]
+    // 게시글 댓글 조회
+    getBoardComments: function ({ commit }, boardId) {
+      axiosConnector.get(`/board/${boardId}/comment`)
+        .then((res) => {
+          commit('GET_BOARD_COMMENTS', res.data)
+        })
+        .catch((err) => {
+          console.log(err)
+        })
+    },
+    // 게시글 댓글 생성
+    createBoardComment: function ({ commit }, { boardId, data }) {
+      axiosConnector.post(`/board/${boardId}/comment`,
+        data
+      )
+        .then((res) => {
+          // commit('CREATE_PLAYLIST_COMMENT', res.data)
+          // 생성 성공. 아무 행동 안함.
+          console.log("덧글 작성 완료.")
+          axiosConnector.get(`/board/${boardId}/comment`)
+            .then((res) => {
+              commit('GET_BOARD_COMMENTS', res.data)
+            })
+            .catch((err) => {
+              console.log(err)
+            })
+        })
+        .catch((err) => {
+          console.log(err)
+        })
+    },
+    // 게시글 댓글 삭제
+    deleteBoardComment: function ({ commit }, { commentId, boardId }) {
+      axiosConnector.delete(`/board/${ commentId }/comment`)
+        .then((res) => {
+          // 삭제 성공. 아무 행동 안함.
+          console.log(commentId + "번 덧글 삭제 완료.")
+          axiosConnector.get(`/board/${boardId}/comment`)
+            .then((res) => {
+              commit('GET_BOARD_COMMENTS', res.data)
+            })
+            .catch((err) => {
+              console.log(err)
+            })
         })
         .catch((err) => {
           console.log(err)

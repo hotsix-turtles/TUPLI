@@ -12,6 +12,7 @@
       background-color="transparent"
       grow
       color="#5B5C9D"
+      class=""
     >
       <v-tab
         v-for="item in items"
@@ -21,7 +22,7 @@
       </v-tab>
 
       <!-- 좋아한 영상 리스트 -->
-      <v-tab-item>
+      <v-tab-item class="mt-3">
         <video-list-item-small
           :videos="likedVideos"
           width="100vw"
@@ -29,7 +30,7 @@
       </v-tab-item>
 
       <!-- 시청한 영상 리스트 -->
-      <v-tab-item>
+      <v-tab-item class="mt-3">
         <video-list-item-small
           :videos="watchedVideos"
           width="100vw"

@@ -19,7 +19,6 @@ export default {
   components: { NavbarBottom },
   created() {
     this.getRealtimeAlarm();
-    this.$store.dispatch('checkLogin')  // 시점 조절 필요
   },
   methods: {
     ...mapActions(['getRealtimeAlarm']),
@@ -29,8 +28,6 @@ export default {
 
 
 <style>
-@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
-
 * {
   font-family: 'SUIT';
 }

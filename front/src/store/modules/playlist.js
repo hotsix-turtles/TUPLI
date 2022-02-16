@@ -100,7 +100,7 @@ const playlist = {
     ADD_PLAYLISTS: function (state) {
       state.addedPlaylists = []
       state.selectedPlaylists.map(selectedPlaylist => {
-        if (selectedPlaylist.videos)
+        if (selectedPlaylist && selectedPlaylist.videos)
           selectedPlaylist.videos
             .filter(video => !state.addedPlaylistVideoIds.find(addedPlaylistVideoId => addedPlaylistVideoId == video.videoId))
             .map(video => state.addedPlaylistVideoIds.push(video.videoId))
@@ -270,7 +270,6 @@ const playlist = {
       axiosConnector.get(`/playlist/${playlistId}/comment`)
         .then((res) => {
           commit('GET_PLAYLIST_COMMENTS', res.data)
-          console.log("playlist.js : res.data", res.data)
         })
         .catch((err) => {
           console.log(err)
@@ -282,9 +281,6 @@ const playlist = {
         data
       )
         .then((res) => {
-          console.log('createPlaylistComment', res)
-          // commit('CREATE_PLAYLIST_COMMENT', res.data)
-          // 생성 성공. 아무 행동 안함.
           console.log("덧글 작성 완료.")
           axiosConnector.get(`/playlist/${playlistId}/comment`)
             .then((res) => {
