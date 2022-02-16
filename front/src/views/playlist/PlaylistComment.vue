@@ -1,5 +1,5 @@
 <template>
-  <div id="">
+  <div id="comment">
     <back
       :page-name="'댓글'"
     /><br><br>
@@ -105,7 +105,11 @@ export default {
   created: function() {
     this.playlistId = this.$route.params.playlistId
     this.getPlaylistComments(this.playlistId)
-    document.body.scrollTop = document.body.scrollHeight;
+  },
+  mounted: function () {
+    this.updateScroll()
+  },
+  updated: function () {
     this.updateScroll()
   },
   methods: {
@@ -131,17 +135,8 @@ export default {
       return getImage(img)
     },
     updateScroll: function () {
-      // var element = document.getElementById("comment")
-      // console.log('element', element)
-      // element.scrollTop = element.scrollHeight
-      // element.scrollTo(0, element.scrollHeight)
-      // console.log('element.scrollHeight', element.scrollHeight)
-      // console.log('element.scrollTop', element.scrollTop)
-
-      // $("#comment").scrollTop($("#comment")[0].scrollHeight)
-      document.body.scrollTop = document.body.scrollHeight;
-      console.log('document.body.scrollTop', document.body.scrollTop)
-      console.log('document.body.scrollHeight', document.body.scrollHeight)
+      var element = document.getElementById('comment');
+      element.scrollTop = element.scrollHeight - element.clientHeight;
     }
   },
 }

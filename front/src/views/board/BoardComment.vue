@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div id="comment">
     <!-- 뒤로가기와 제목 -->
     <back :page-name="'댓글'" /><br><br>
     <!-- 댓글 노출 -->
@@ -102,6 +102,12 @@ export default {
     this.boardId = this.$route.params.boardId
     this.getBoardComments(this.boardId)
   },
+  mounted: function () {
+    this.updateScroll()
+  },
+  updated: function () {
+    this.updateScroll()
+  },
   methods: {
     ...mapActions('board', [
       'getBoardComments',
@@ -122,6 +128,10 @@ export default {
     },
     ImgUrl: function(img) {
       return getImage(img)
+    },
+    updateScroll: function () {
+      var element = document.getElementById('comment');
+      element.scrollTop = element.scrollHeight - element.clientHeight;
     }
   },
 }
