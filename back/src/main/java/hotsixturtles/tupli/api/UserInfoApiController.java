@@ -36,7 +36,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
-@Api(tags = "프로필 정보 API")
+@Api(tags = "유저 정보 관련 API")
 public class UserInfoApiController {
 
     private final UserInfoRepository userInfoRepository;
@@ -57,7 +57,7 @@ public class UserInfoApiController {
      * 반환 코드 : 200, 204, 404
      */
     @GetMapping("/userinfo/{userSeq}")
-    @ApiOperation(value = "유저의 프로필 정보 확인", notes = "uid 저장된 정보가 없을 시 204 반환, 성공 시 200[userInfo 값] 반환")
+    @ApiOperation(value = "유저의 프로필 정보를 리턴", notes = "")
     public ResponseEntity findUserInfo(@ApiParam(value = "path 로 uid 전달받는다.") @PathVariable("userSeq") Long userSeq,
                                        HttpServletRequest request,
                                        @PageableDefault(size = 30, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable ) {
@@ -98,6 +98,7 @@ public class UserInfoApiController {
      * 반환 코드 : 200, 403, 404
      */
     @PutMapping("/userinfo/watchtime")
+    @ApiOperation(value = "유저의 플레이룸 시청시간 갱신", notes = "")
     public ResponseEntity userInfoUpdate(@RequestParam("time") Long time,
                                          @RequestHeader(value = "Authorization") String token) {
         // 토큰 유효 확인 및 유저 정보(UseqSeq) 가져오기
@@ -128,6 +129,7 @@ public class UserInfoApiController {
      * 반환 코드 : 200, 403, 404
      */
     @PutMapping("/userinfo/board")
+    @ApiOperation(value = "유저가 게시글을 올린 횟수를 갱신", notes = "")
     public ResponseEntity userInfoUpdateBoard(@RequestHeader(value = "Authorization") String token) {
         // 토큰 유효 확인 및 유저 정보(UseqSeq) 가져오기
         if (!jwtTokenProvider.validateToken(token)) {

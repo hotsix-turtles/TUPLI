@@ -5,6 +5,8 @@ import hotsixturtles.tupli.dto.response.ErrorResponse;
 import hotsixturtles.tupli.entity.Playroom;
 import hotsixturtles.tupli.service.PlayroomRecommendService;
 import hotsixturtles.tupli.service.token.JwtTokenProvider;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -18,6 +20,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
+@Api(tags = "플레이룸 추천 관련 API")
 public class PlayroomRecommendApiController {
 
     private final PlayroomRecommendService playroomRecommendService;
@@ -34,6 +37,7 @@ public class PlayroomRecommendApiController {
      */
     // 2번
     @PostMapping("/recommend/playroomMake")
+    @ApiOperation(value = "자신을 팔로우한 사용자가 만든 플레이룸을 추천합니다.", notes = "")
     public ResponseEntity<?> findFolloweesMakePlayroom(@RequestHeader(value = "Authorization") String token){
 
         Long userSeq = jwtTokenProvider.getUserSeq(token);
@@ -81,6 +85,7 @@ public class PlayroomRecommendApiController {
      */
     // 1번
     @PostMapping("/recommend/playroomLike")
+    @ApiOperation(value = "자신이 팔로우한 사용자가 좋아요를 누른 플레이룸을 추천합니다.", notes = "")
     public ResponseEntity<?> findFollowersLikePlayroom(@RequestHeader(value = "Authorization") String token){
         Long userSeq = jwtTokenProvider.getUserSeq(token);
 
@@ -127,6 +132,7 @@ public class PlayroomRecommendApiController {
      */
     // 4번
     @GetMapping("/recommend/playroomPopular")
+    @ApiOperation(value = "플레이룸 인기순, 최신순으로 5개를 리턴", notes = "")
     public ResponseEntity<?> findPopularLikePlayroom(){
         List<Playroom> playrooms = playroomRecommendService.findPopularLikePlayroom(5);
         List<PlayroomDto> result = playrooms.stream().map(b -> new PlayroomDto(b)).collect(Collectors.toList());
@@ -143,6 +149,7 @@ public class PlayroomRecommendApiController {
      */
     // ??번 맘대루 만듬 일주일 내 인기순으로 한번 건드려봄
     @GetMapping("/recommend/playroomDate")
+    @ApiOperation(value = "플레이룸 현재로부터 1주일 내를 기준으로 인기순으로 5개를 리턴", notes = "")
     public ResponseEntity<?> findPopularLikePlaylist(){
         List<Playroom> playrooms = playroomRecommendService.findPopularLikePlayroomDate(5);
         List<PlayroomDto> result = playrooms.stream().map(b -> new PlayroomDto(b)).collect(Collectors.toList());

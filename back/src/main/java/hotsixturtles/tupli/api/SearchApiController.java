@@ -15,6 +15,8 @@ import hotsixturtles.tupli.entity.User;
 import hotsixturtles.tupli.entity.youtube.YoutubeVideo;
 import hotsixturtles.tupli.service.PlaylistService;
 import hotsixturtles.tupli.service.SearchService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -32,6 +34,7 @@ import java.util.stream.Collectors;
 
 @Controller
 @RequiredArgsConstructor
+@Api(tags = "검색 관련 API")
 public class SearchApiController {
 
     private final SearchService searchService;
@@ -49,6 +52,7 @@ public class SearchApiController {
      * 반환 코드 : 200, 204, 404
      */
     @GetMapping("/account/search")
+    @ApiOperation(value = "해당 키워드로 유저 검색하기", notes = "")
     public ResponseEntity<?> searchUser(@RequestParam(value = "keyword") String keyword,
                                         @RequestParam(value = "order") String order,
                                         @PageableDefault(size = 1000) Pageable pageable ){
@@ -71,6 +75,7 @@ public class SearchApiController {
      * 반환 코드 : 200, 404
      */
     @GetMapping("/board/search")
+    @ApiOperation(value = "해당 키워드로 게시글 검색하기", notes = "")
     public ResponseEntity<?> searchBoard(@RequestParam String keyword,
                                         @PageableDefault(size = 1000, sort ="title", direction = Sort.Direction.ASC) Pageable pageable ){
         SearchHistory searchHistory = new SearchHistory(null, "게시글",keyword.trim(),0, 0);
@@ -92,6 +97,7 @@ public class SearchApiController {
      */
 
     @GetMapping("/playroom/search")
+    @ApiOperation(value = "해당 키워드로 플레이룸 검색하기", notes = "")
     public ResponseEntity<?> searchPlayroom(@RequestParam String keyword,
                                         @RequestParam String order,
                                         @PageableDefault(size = 1000) Pageable pageable ){
@@ -124,6 +130,7 @@ public class SearchApiController {
      */
 
     @GetMapping("/videos/search")
+    @ApiOperation(value = "해당 키워드로 영상 검색하기", notes = "")
     public ResponseEntity<?> searchVideos(@RequestParam String keyword,
                                         @PageableDefault(size = 1000, sort ="title",  direction = Sort.Direction.ASC) Pageable pageable ){
         SearchHistory searchHistory = new SearchHistory(null, "영상",keyword.trim(),0,0);
@@ -144,6 +151,7 @@ public class SearchApiController {
      * 반환 코드 : 200, 404
      */
     @GetMapping("/search/realtime")
+    @ApiOperation(value = "실시간 검색어 트렌드 Top10 리턴하기", notes = "")
     public ResponseEntity<?> getSearchRankList(){
         List<SearchHistory> histories = searchService.searchRankList();
         List<SimpleSearchHistoryDto> result = histories.stream().map(b -> new SimpleSearchHistoryDto(b)).collect(Collectors.toList());
