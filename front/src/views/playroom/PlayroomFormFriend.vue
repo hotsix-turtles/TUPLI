@@ -7,7 +7,7 @@
     <v-bottom-navigation
       absolute
       background-color="#5B5C9D"
-      height="80px"
+      height="75px"
       class="fixed-bottom"
       :input-value="addedFriends.length > 0 || selectedFriends.length > 0"
     >

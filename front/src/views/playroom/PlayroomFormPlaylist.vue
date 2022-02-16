@@ -7,7 +7,7 @@
     <v-bottom-navigation
       absolute
       background-color="#5B5C9D"
-      height="80px"
+      height="75px"
       class="fixed-bottom"
       :input-value="addedPlaylists.length > 0 || selectedPlaylists.length > 0"
     >
