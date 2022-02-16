@@ -1,6 +1,6 @@
-import Vue from 'vue'
+import Vue from 'vue';
 import axiosConnector from '../../utils/axios-connector';
-import { playtimeConverter } from '../../utils/utils'
+import { playtimeConverter } from '../../utils/utils';
 
 const defaultState = () => {
   return {
@@ -27,11 +27,17 @@ const defaultState = () => {
     roomPlayerState: 0,
     roomSelectedChatItem: { id: '', type: null },
     roomChats: [],
+    roomGuests: [],
+    roomUserCountMax: 0,
     chatroomId: '',
     chatBlockedId: [],
     chatBlockedUid: [],
     savedFormData: '',
     roomLastSyncSender: 0,
+    wsConnector: null,
+    syncInstance: null,
+    heartbeatInstance: null,
+    heartbeat: 0,
 
     // [검색]
     searchedPlayrooms: [],
@@ -82,6 +88,15 @@ const playroom = {
     SET_ROOM_PLAYER_STATE: (state, value) => state.roomPlayerState = value ? value : state.roomPlayerState,
     SET_ROOM_CHATROOM_ID: ( state, value ) => state.chatroomId = value ? value : state.chatroomId,
     SET_ROOM_LAST_SYNC_SENDER: ( state, value ) => state.roomLastSyncSender = value ? value : state.roomLastSyncSender,
+    SET_ROOM_USER_COUNT_MAX: ( state, value ) => state.roomUserCountMax = value ? value : state.roomUserCountMax,
+    SET_ROOM_GUESTS: ( state, value ) => state.roomGuests = value ? value : state.roomGuests,
+    SET_SYNC_INSTANCE: ( state, value ) => state.syncInstance = value ? value : state.state.syncInstance,
+    SET_HEARTBEAT_INSTANCE: ( state, value ) => state.heartbeatInstance = value ? value : state.heartbeatInstance,
+    CLR_HEARTBEAT_INSTANCE: ( state ) => state.heartbeatInstance = null,
+    SET_HEARTBEAT: ( state ) => state.heartbeat += 1,
+    CLR_HEARTBEAT: ( state ) => state.heartbeat = 0,
+    SET_WS_CONNECTOR: ( state, value ) => state.wsConnector = value ? value : state.wsConnector,
+    CLR_WS_CONNECTOR: ( state ) => state.wsConnector = null,
     BLOCK_CHAT_BY_ID: ( state, id ) => {
       state.roomChats.map((v) => { if (v.id == id) v.blockedMessage = true; })
       state.chatBlockedId.push(id)
@@ -166,10 +181,14 @@ const playroom = {
       commit('SET_ROOM_TAGS', data.tags);
       commit('SET_ROOM_PLAYLISTS', data.playlists);
       commit('SET_ROOM_VIDEOS', data.videos);
-      // commit('SET_ROOM_CURRENT_VIDEO_PLAYTIME', data.currentVideoPlaytime)
       commit('SET_ROOM_CURRENT_PLAYLIST_ID', Object.keys(data.playlists)[0])
-      commit('SET_ROOM_CHATROOM_ID', `playroom-${data.id}`);//'731f3b99-8257-4eae-86b2-ed38ea36ccff');//data.chatroomId);
+      commit('SET_ROOM_CHATROOM_ID', `playroom-${data.id}`);
+      commit('SET_ROOM_USER_COUNT_MAX', data.userCountMax)
+      commit('SET_ROOM_GUESTS', data.guests)
     }),
+    setRoomAuthor: ({commit}, author) => {
+      commit('SET_ROOM_AUTHOR', author)
+    },
     followUser: ({commit}, id) => {
       console.log('유저 팔로우 처리')
       commit('DESELECT_CHAT_ITEM')
@@ -256,8 +275,70 @@ const playroom = {
           console.log(err)
         })
     },
+    togglePlayroomRepeat: function ( {state, commit} ) {
+      commit('SET_ROOM_REPEAT', !state.roomRepeat);
+    },
+    loadRoomInfo: async function ( {dispatch}, roomId ) {
+      const roomInfo = await axiosConnector.get(`/playroom/${roomId}`);
+      dispatch('setRoomInfo', roomInfo);
+    },
+    loadLikeState: async function ( {rootState, state, commit} ) {
+      if (!rootState.isLogin) return;
+
+      const { status, data } = await axiosConnector.get(`/playroom/${state.roomId}/like`)
+      if (status != 200) return;
+
+      commit('SET_ROOM_LIKED', Boolean(data))
+    },
+    togglePlayroomLike: async function ( {state, dispatch} ) {
+      if (state.roomLiked) await axiosConnector.delete(`/playroom/${state.roomId}/like`);
+      else await axiosConnector.post(`/playroom/${state.roomId}/like`);
+
+      dispatch('loadLikeState');
+    },
+    updatePlayroom: async function ( {state, dispatch} ) {
+      const formData = {
+        title: state.roomTitle,
+        content: state.roomContent,
+        tags: [...state.roomTags.split(',')],
+        isPublic: state.roomPublic,
+        inviteIds: state.roomInviteIds,
+        playlists: Object.keys(state.roomPlaylists).reduce((playlists, playlistId) => {
+          playlists[playlistId] = state.roomPlaylists[playlistId].map(vid => state.roomVideos.find(roomVideo => roomVideo.id == vid).videoId);
+          return playlists;
+        }, {}),
+        userCountMax: state.roomUserCountMax
+      }
+
+      dispatch('saveFormData', formData)
+    },
+    deletePlayroom: async function ( {state, commit} ) {
+      return await axiosConnector.delete(`/playroom/${state.roomId}`);
+    },
+    startHeartbeat: function ( {state, commit}, heartbeat_method ) {
+      if (state.heartbeatInstance) return;
+      commit('SET_HEARTBEAT_INSTANCE', heartbeat_method);
+    },
+    stopHeartbeat: function ( {state, commit} ) {
+      if (!state.heartbeatInstance) return;
+      clearInterval(state.heartbeatInstance);
+      commit('CLR_HEARTBEAT_INSTANCE');
+    },
+    setHeartbeat: function ( {commit} ) {
+      commit('SET_HEARTBEAT');
+    },
+    resetHeartbeat: function ( {commit} ) {
+      commit('CLR_HEARTBEAT');
+    },
+    setWsConnector: function ( {commit}, wsConnector ) {
+      commit('SET_WS_CONNECTOR', wsConnector);
+    },
+    resetWsConnector: function ( {commit} ) {
+      commit('CLR_WS_CONNECTOR');
+    }
   },
   getters: {
+    isAuthor: ( {roomAuthorId}, {}, {userId} ) => userId && roomAuthorId && userId == roomAuthorId,
     roomPublicLabel: ( {roomPublic} ) => roomPublic ? '공개' : '비공개',
     roomReducedContent: ( {roomContent} ) => roomContent.split(/\r?\n/).slice(0, 2).join('\n'),
     roomCurrentPlaylistVideos: ( {roomPlaylists, roomVideos, roomCurrentPlaylistId} ) => {
