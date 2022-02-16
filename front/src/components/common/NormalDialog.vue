@@ -1,13 +1,14 @@
 <template>
   <v-dialog
     v-model="show"
-    class="tupli-dialog-normal"
     :width="width ? parseInt(width) : undefined"
     :max-width="maxWidth ? parseInt(maxWidth) : undefined"
     :scrollable="scrollable"
     :persistent="persistent"
   >
-    <v-card>
+    <v-card
+      class="tupli-dialog-normal"
+    >
       <v-card-title
         class="tupli-dialog-normal-title"
       >
