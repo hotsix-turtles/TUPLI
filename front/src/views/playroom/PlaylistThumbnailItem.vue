@@ -7,17 +7,17 @@
       size="80"
       :class="{ selected: selected, not_selected: !selected }"
     >
-      <playlist-cd-medium :thumbnail="src" :playlist-id="parseInt(id)" readonly />
+      <playlist-cd-small :thumbnail="src" :playlist-id="parseInt(id)" readonly />
     </v-avatar>
   </v-card>
 </template>
 
 <script>
 import { mapMutations } from 'vuex'
-import PlaylistCdMedium from '../../components/playlist/PlaylistCdMedium.vue'
+import PlaylistCdSmall from '../../components/playlist/PlaylistCdSmall.vue'
 export default {
   name: 'PlaylistThumbnailItem',
-  components: { PlaylistCdMedium },
+  components: { PlaylistCdSmall },
   props: {
     id: {type: String, default: ''},
     src: {type: String, default: ''},
