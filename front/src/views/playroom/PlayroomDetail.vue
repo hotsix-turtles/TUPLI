@@ -948,9 +948,10 @@ export default {
     loadNextVideo() {
       if (this.roomNextVideo)
       {
-        this.SET_ROOM_CURRENT_PLAYLIST_ID(this.roomNextVideo.playlistId)
-        this.SET_ROOM_CURRENT_VIDEO_ID(this.roomNextVideo.videoId)
-        this.SET_ROOM_CURRENT_VIDEO_PLAYTIME(0)
+        this.SET_ROOM_CURRENT_PLAYLIST_ID(this.roomNextVideo.playlistId);
+        this.SET_ROOM_CURRENT_VIDEO_ID(this.roomNextVideo.videoId);
+        this.SET_ROOM_CURRENT_VIDEO_PLAYTIME(0);
+        this.updateVideoId();
       } else if (this.roomRepeat) {
         this.loadFirstVideo();
       }
@@ -971,15 +972,10 @@ export default {
     },
     playThisVideo() {
       if (this.roomCurrentVideoId != this.selectedVideoItem[0])
-      {
         this.SET_ROOM_CURRENT_VIDEO_ID(this.selectedVideoItem[0])
-        this.SET_ROOM_CURRENT_VIDEO_PLAYTIME(0)
-        this.updateVideoId();
-      }
-      else
-      {
-        this.SET_ROOM_CURRENT_VIDEO_PLAYTIME(0)
-      }
+
+      this.SET_ROOM_CURRENT_VIDEO_PLAYTIME(0)
+      this.updateVideoId();
 
       this.selectedVideoItem = []
       console.log('playThisVideo')
