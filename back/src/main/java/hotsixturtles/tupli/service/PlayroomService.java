@@ -93,6 +93,7 @@ public class PlayroomService {
         playroom.setEndTime(playroomDto.getEndTime());
         playroom.setStartTime(playroomDto.getStartTime());
         playroom.setUserCountMax(playroomDto.getUserCountMax());
+        playroom.setInviteIds(playroomDto.getInviteIds());
 
         // 플레이리스트 비디오 분리하고 저장 + ID만 저장
         ConcurrentHashMap<Long, List<Long>> playlists = new ConcurrentHashMap<>();
