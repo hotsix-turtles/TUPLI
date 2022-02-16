@@ -219,8 +219,20 @@
         <v-card
           height="d-flex flex-column"
         >
-          <v-card-title>
-            <v-toolbar-title>채팅</v-toolbar-title>
+          <v-card-title
+            class="chat-title py-2"
+          >
+            <span
+              class="font-weight-bold text-md-body-2"
+            >
+              실시간 채팅
+            </span>
+            <div
+              class="ml-2 text-caption"
+            >
+              <v-icon dense>mdi-account</v-icon>
+              {{ roomGuests.length }}
+            </div>
             <v-btn
               icon
               class="ml-auto"
@@ -258,10 +270,10 @@
                 label="메시지를 입력하세요"
                 solo
                 dense
+                rounded
                 :disabled="!canChat"
                 :error="errorOnSend"
                 @keydown.enter="sendChat"
-                @click:append-outer="sendMessage"
               >
                 <template v-slot:append>
                   <v-menu
@@ -274,6 +286,7 @@
                   >
                     <template v-slot:activator="{ on, attrs }">
                       <v-icon
+                        class="mr-0"
                         v-if="showEmoji"
                         v-bind="attrs"
                         v-on="on"
@@ -305,12 +318,16 @@
                     size="24"
                     indeterminate
                   />
-                  <v-icon
+                  <v-btn text small>
+                    <v-img width="30" height="30" :src="require('@/assets/tupli_send_chat.png')" @click="sendChat"></v-img>
+                  </v-btn>
+
+                  <!-- <v-icon
                     v-else
                     @click="sendChat"
                   >
                     mdi-send
-                  </v-icon>
+                  </v-icon> -->
                   <!-- </v-fade-transition> -->
                 </template>
               </v-text-field>
@@ -1244,5 +1261,10 @@ iframe {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
+}
+
+.chat-title {
+  background-color:#d8d8ee;
+  font-weight: bold;
 }
 </style>
