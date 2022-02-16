@@ -62,7 +62,7 @@
       v-if="playlistComments.length == 0"
       class="text-center text--secondary mt-5"
     >
-      덧글이 없습니다.
+      댓글이 없습니다.
     </div>
 
     <!-- 댓글 입력창 -->

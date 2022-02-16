@@ -2,7 +2,8 @@
   <div>
     <v-text-field
       v-model="inputVal"
-      class="comment-input"
+      class="comment-input pt-5 pl-2"
+      style="width: 94vw !important;"
       label="댓글 입력"
       solo
       dense
@@ -56,7 +57,7 @@
         </v-icon>
       </template>
     </v-text-field>
-    <div />
+    <div class="" />
     <login-dialog
       :show="showLoginDialog"
       @on-click="showLoginDialog = false"

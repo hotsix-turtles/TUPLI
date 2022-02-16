@@ -1,10 +1,10 @@
 <template>
   <div>
     <!-- 뒤로가기와 제목 -->
-    <back :page-name="'댓글'" />
+    <back :page-name="'댓글'" /><br><br>
     <!-- 댓글 노출 -->
     <div
-      v-for="(boardComment, index) in boardComments"
+      v-for="(boardComment, index) in boardComments.reverse()"
       :key="index"
       class="ml-2"
     >
@@ -59,7 +59,7 @@
       v-if="boardComments.length == 0"
       class="text-center text--secondary"
     >
-      덧글이 없습니다.
+      댓글이 없습니다.
     </div>
 
     <!-- 댓글 입력창 -->
