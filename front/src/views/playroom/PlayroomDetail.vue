@@ -22,9 +22,8 @@
 
       <!-- 유튜브 동영상 플레이어 하단 네비게이션 -->
       <v-bottom-navigation
-        style="{top: -2;}"
         grow
-        class="elevation-2"
+        class="elevation-0"
       >
         <!-- 플레이룸 좋아요 -->
         <v-btn
@@ -51,22 +50,24 @@
           @click="isChatting = true"
         >
           <span>채팅</span>
-          <v-icon>mdi-message</v-icon>
+          <v-icon>mdi-comment-text-outline</v-icon>
         </v-btn>
 
         <!-- 플레이룸 공유 -->
-        <v-btn class="playroomShare">
+        <v-btn
+          class="playroomShare"
+          @click="kakaoShare"
+        >
           <span>공유</span>
-          <v-icon>mdi-share</v-icon>
+          <v-icon>mdi-share-outline</v-icon>
         </v-btn>
-
         <!-- 플레이룸 반복 -->
         <v-btn
           v-if="isAuthor"
           @click="onClickModal"
         >
           <span>설정</span>
-          <v-icon>mdi-wrench</v-icon>
+          <v-icon>mdi-wrench-outline</v-icon>
         </v-btn>
 
         <!-- 플레이룸 나가기 -->
@@ -79,6 +80,7 @@
           <v-icon>mdi-exit-to-app</v-icon>
         </v-btn>
       </v-bottom-navigation>
+      <hr>
       <!-- 유튜브 동영상 플레이어 하단 네비게이션(플레이룸 SNS 활동 네비게이션) 끝 -->
     </v-sheet>
     <!-- 유튜브 동영상 플레이어 끝 -->
@@ -94,6 +96,48 @@
         @on-select="onSelectModal"
       />
 
+      <!-- 플레이룸 작성자 Wrapper -->
+      <v-sheet class="playroomAuthorWrapper">
+        <!-- 플레이룸 작성자 프로필 사진 -->
+        <div class="authorProfilePic">
+          <img
+            :src="ImgUrl(roomAuthorProfilePic)"
+            alt=""
+            class="rounded-circle"
+            style="width: 100%; height: auto;"
+            @click="gotoAuthorProfile"
+          >
+        </div>
+
+        <div class="d-flex flex-column justify-center ml-1">
+          <!-- 플레이룸 작성자 이름 -->
+          <span class="authorName mt-0 mb-0">{{ roomAuthorName }}</span>
+
+          <!-- 플레이룸 팔로워 수 -->
+          <span class="authorFollower mt-0 mb-0">{{ roomAuthorFollowerCount }}</span>
+        </div>
+
+        <v-btn
+          v-if="isFollow && !isAuthor"
+          class="my-auto ml-auto"
+          color="accent"
+          text
+          @click="unfollowAuthor"
+        >
+          언팔로우
+        </v-btn>
+        <v-btn
+          v-else-if="!isAuthor"
+          class="my-auto ml-auto"
+          color="accent"
+          text
+          @click="followAuthor"
+        >
+          팔로우
+        </v-btn>
+      </v-sheet>
+      <hr>
+
       <!-- 플레이룸 정보 Wrapper 시작 -->
       <div class="playroomInfo">
         <!-- 플레이룸 타이틀 Wrapper -->
@@ -108,33 +152,15 @@
           </p>
         </div>
 
-        <!-- 플레이룸 작성자 Wrapper -->
-        <div class="playroomAuthorWrapper">
-          <!-- 플레이룸 작성자 프로필 사진 -->
-          <div class="authorProfilePic">
-            <img
-              :src="ImgUrl(roomAuthorProfilePic)"
-              alt=""
-              class="rounded-circle"
-              style="width: 100%; height: auto;"
-              @click="gotoAuthorProfile"
-            >
-          </div>
-
-          <!-- 플레이룸 작성자 이름 -->
-          <span class="authorName">{{ roomAuthorName }}</span>
-
-          <!-- 플레이룸 팔로워 수 -->
-          <div class="authorFollowerWrapper">
-            <span class="authorFollower">{{ roomAuthorFollowerCount }}</span>
-          </div>
-        </div>
-
         <!-- 플레이룸 운영 시간(?) Wrapper -->
         <div class="playroomPlaytimeWrapper">
-          <p class="playtime">
+          <v-icon color="accent" dense>
+            mdi-clock
+          </v-icon>
+          {{roomPlaytime}}
+          <!-- <p class="playtime">
             {{ roomPlaytime }}
-          </p>
+          </p> -->
         </div>
 
         <!-- 플레이룸 설명 Wrapper -->
@@ -173,8 +199,7 @@
       <div class="playlistWrapper mx-3 my-2">
         <p>현재 재생중인 <b>플레이리스트</b></p>
         <!-- 플레이리스트 목록 -->
-        <v-card
-          outlined
+        <v-sheet
           style="display:flex; flex-wrap: nowrap; overflow-x: auto"
           class="playlistThumbnailWrapper px-1 py-1"
         >
@@ -186,7 +211,7 @@
             :selected="playlistId == roomCurrentPlaylistId"
             @click="isAuthor && SET_ROOM_CURRENT_PLAYLIST_ID(playlistId)"
           />
-        </v-card>
+        </v-sheet>
       </div>
       <!-- 플레이룸 플레이리스트 목록 끝 -->
 
@@ -456,6 +481,7 @@ export default {
         mute: 1,
         playsinline: 1
       },
+      isFollow: false,
       isSelectedAll: false,
       lastPlaytime: 0,
       showEmoji: false,
@@ -693,6 +719,7 @@ export default {
       if (!this.checkPermission()) return;
       await this.loadLikeState();
       await this.loadFollowerCount();
+      await this.loadFollowState();
       await this.loadFirstVideo();
       await this.loadRoomPlaytime();
       await this.initWsConnector();
@@ -1102,6 +1129,52 @@ export default {
       }
       this.isSelectedAll = !this.isSelectedAll
     },
+    kakaoShare() {
+      Kakao.Link.sendDefault({
+        objectType: "feed",
+        content: {
+          title: this.roomTitle,
+          description: this.roomContent,
+          imageUrl:
+            this.roomVideos.find(roomVideo => roomVideo.id == this.roomPlaylists[this.roomCurrentPlaylistId][0]).thumbnail,
+          link: {
+            mobileWebUrl: `https://tupli.kr/playroom/${this.roomId}`,
+          },
+        },
+        social: {
+          likeCount: this.roomLikesCnt,
+          subscriberCount: this.roomGuests.length,
+        },
+        buttons: [
+          {
+            title: '플레이룸 이동',
+            link: {
+              mobileWebUrl: `https://tupli.kr/playroom/${this.roomId}`
+            }
+          },
+          {
+            title: '다른 영상 찾기',
+            link: {
+              mobileWebUrl: 'https://tupli.kr/category'
+            }
+          }
+        ]
+      })
+    },
+    async loadFollowState() {
+      await this.loadFollowerCount();
+      const {data, status} = await axiosConnector.get(`/account/follow/${this.roomAuthorId}`)
+      this.isFollow = (status == 200);
+      return this.isFollow;
+    },
+    async followAuthor() {
+      await axiosConnector.post(`/account/follow/${this.roomAuthorId}`)
+      return await this.loadFollowState();
+    },
+    async unfollowAuthor() {
+      await axiosConnector.delete(`/account/follow/${this.roomAuthorId}`)
+      return await this.loadFollowState();
+    },
     ...mapMutations('playroom', [
       'RESET_VUEX_DATA',
       'SET_ROOM_AUTHOR',
@@ -1209,7 +1282,6 @@ iframe {
   width: 100%;
   height: 100%;
   padding: 5px;
-  line-height: 45px;
 }
 
 .authorProfilePic {
@@ -1221,7 +1293,7 @@ iframe {
 }
 
 .authorName {
-  font-size: 16px;
+  font-size: 14px;
   font-weight: bold;
   margin-right: 3px;
 }
@@ -1233,7 +1305,7 @@ iframe {
 
 .authorFollower {
   color: #bbb;
-  font-size: 12px;
+  font-size: 11px;
 }
 
 .playroomPlaytimeWrapper {
@@ -1261,7 +1333,7 @@ iframe {
 .playroomReducedContent:after {
   content: '더 보기';
   margin-left: 10px;
-  color: #bbb;
+  color: #d8d8ee;
   font-size: 14px;
 }
 
