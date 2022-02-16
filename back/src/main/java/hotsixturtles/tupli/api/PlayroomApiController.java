@@ -14,6 +14,7 @@ import hotsixturtles.tupli.entity.youtube.YoutubeVideo;
 import hotsixturtles.tupli.service.*;
 import hotsixturtles.tupli.service.list.CategoryListWord;
 import hotsixturtles.tupli.service.token.JwtTokenProvider;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.Data;
@@ -38,6 +39,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
+@Api(tags = "플레이룸 관련 API")
 public class PlayroomApiController {
 
     private final PlayroomService playroomService;
@@ -63,6 +65,7 @@ public class PlayroomApiController {
      * @return
      */
     @GetMapping("/playroom/my")
+    @ApiOperation(value = "자신이 작성한 플레이룸 목록을 리턴받습니다.", notes = "")
     public ResponseEntity getMyPlayroom(@RequestHeader(value = "Authorization") String token,
                                       @PageableDefault(size = 50, sort ="id",  direction = Sort.Direction.DESC) Pageable pageable){
         // 유저 정보
@@ -94,6 +97,7 @@ public class PlayroomApiController {
      * 반환 코드 : 200, 404
      */
     @GetMapping("/playroom/list")
+    @ApiOperation(value = "현재 생성된 모든 플레이룸 목록을 리턴받습니다.", notes = "")
     public ResponseEntity<?> getPlayroomList(HttpServletRequest request){
 
         List<Playroom> playroomList = playroomService.getPlayroomList();
@@ -138,6 +142,7 @@ public class PlayroomApiController {
      * 반환 코드: 200, 404
      */
     @GetMapping("/playroom/{playroomId}")
+    @ApiOperation(value = "playroomId에 해당하는 플레이룸 정보를 리턴합니다.", notes = "")
     public ResponseEntity<?> getPlayroom(@PathVariable("playroomId") Long playroomId,
                                          HttpServletRequest request){
 
@@ -169,6 +174,7 @@ public class PlayroomApiController {
      * @return
      */
     @PostMapping("/playroom/in/{playroomId}")
+    @ApiOperation(value = "플레이룸에 사용자가 입장했을 시 실행합니다.", notes = "")
     public ResponseEntity<?> addGuest(@PathVariable("playroomId") Long playroomId,
                                       @RequestHeader(value = "Authorization") String token){
         if (!jwtTokenProvider.validateToken(token)) {
@@ -194,6 +200,7 @@ public class PlayroomApiController {
      * 반환 코드: 200, 404
      */
     @GetMapping("/playroom2/{playroomId}")
+    @ApiOperation(value = "playroomId에 해당하는 플레이룸 정보를 리턴합니다.", notes = "")
     public ResponseEntity<?> getPlayroom2(@PathVariable("playroomId") Long playroomId,
                                          HttpServletRequest request){
 
@@ -226,6 +233,7 @@ public class PlayroomApiController {
      * 반환 코드 : 201, 403, 404
      */
     @PostMapping("/playroom")
+    @ApiOperation(value = "플레이룸을 생성합니다.", notes = "")
     public ResponseEntity<?> addPlayroom(@RequestHeader(value = "Authorization") String token,
                                          @RequestBody RequestPlayroomDto playroomDto){
         if (!jwtTokenProvider.validateToken(token)) {
@@ -263,6 +271,7 @@ public class PlayroomApiController {
      * 반환 코드 : 200, 404
      */
     @PutMapping("/playroom/{playroomId}/user")
+    @ApiOperation(value = "플레이룸의 방장을 변경합니다.", notes = "")
     public ResponseEntity changePlayroomUser(@RequestHeader(value = "Authorization") String token,
                                              @PathVariable("playroomId") Long playroomId) {
 
@@ -287,6 +296,7 @@ public class PlayroomApiController {
      * 반환 코드 : 200, 401, 403, 404
      */
     @PutMapping("/playroom/{playroomId}")
+    @ApiOperation(value = "플레이룸의 정보를 수정합니다.", notes = "")
     public ResponseEntity<?> updatePlayroom(@RequestHeader(value = "Authorization") String token,
                                             @PathVariable("playroomId") Long playroomId,
                                             @RequestBody RequestPlayroomDto playroomDto){
@@ -316,6 +326,7 @@ public class PlayroomApiController {
      * 반환코드 : 200, 401, 403, 404
      */
     @DeleteMapping("/playroom/{playroomId}")
+    @ApiOperation(value = "플레이룸을 제거합니다.", notes = "")
     public ResponseEntity<?> deletePlayroom(@RequestHeader(value = "Authorization") String token,
                                             @PathVariable("playroomId") Long playroomId){
 
@@ -343,6 +354,7 @@ public class PlayroomApiController {
      * 반환코드 : 200, 403, 404
      */
     @GetMapping("/playroom/likes")
+    @ApiOperation(value = "사용자가 좋아요한 플레이룸의 목록을 리턴합니다.", notes = "")
     public ResponseEntity<?> getPlayroomLiked(@RequestHeader(value = "Authorization") String token)
     {
         if (!jwtTokenProvider.validateToken(token)) {
@@ -378,8 +390,7 @@ public class PlayroomApiController {
      * 반환코드 : 200, 403, 404
      */
     @GetMapping("/playroom/{playroomId}/like")
-    @ApiOperation(value = "플레이룸 좋아요 확인", notes = "유저 정보가 일치하지 않으면 404, '유효하지 않은 토큰입니다' 반환," +
-            "정상 등록 시 200, null 반환")
+    @ApiOperation(value = "해당 playroomId를 가진 플레이룸을 좋아요 하였는지 여부를 리턴합니다.", notes = "")
     public ResponseEntity<?> getBoardLike(@ApiParam(value = "auth token")
                                           @RequestHeader(value = "Authorization") String token,
                                           @ApiParam(value = "플레이룸 id") @PathVariable("playroomId") Long playroomId) {
@@ -402,8 +413,7 @@ public class PlayroomApiController {
      * 반환 코드 : 200, 403, 404
      */
     @PostMapping("/playroom/{playroomId}/like")
-    @ApiOperation(value = "플레이룸에 좋아요 등록", notes = "유저 정보가 일치하지 않으면 404, '유효하지 않은 토큰입니다' 반환," +
-            "정상 등록 시 200, null 반환")
+    @ApiOperation(value = "플레이룸에 좋아요를 합니다.", notes = "")
     public ResponseEntity<?> addBoardLike(@ApiParam(value = "auth token")
                                           @RequestHeader(value = "Authorization") String token,
                                           @ApiParam(value = "플레이룸 id") @PathVariable("playroomId") Long playroomId) {
@@ -424,8 +434,7 @@ public class PlayroomApiController {
      * @return
      */
     @DeleteMapping("/playroom/{playroomId}/like")
-    @ApiOperation(value = "플레이룸 좋아요 해제", notes = "유저 정보가 일치하지 않으면 404, '유효하지 않은 토큰입니다' 반환," +
-            "정상 등록 시 200, null 반환")
+    @ApiOperation(value = "플레이룸에 좋아요를 해제합니다.", notes = "")
     public ResponseEntity<?> deleteBoardLike(@ApiParam(value = "auth token")
                                              @RequestHeader(value = "Authorization") String token,
                                              @ApiParam(value = "플레이룸 id") @PathVariable("playroomId") Long playroomId) {
@@ -449,6 +458,7 @@ public class PlayroomApiController {
      * @return
      */
     @GetMapping("/playroom/category/{categoryKeyword}")
+    @ApiOperation(value = "카테고리 키워드를 통해 플레이룸을 검색합니다.", notes = "")
     public ResponseEntity categoryPlayroom(@PathVariable("categoryKeyword") String categoryKeyword,
                                            @PageableDefault(size = 50, sort ="id",  direction = Sort.Direction.DESC) Pageable pageable,
                                            HttpServletRequest request) {
@@ -489,6 +499,7 @@ public class PlayroomApiController {
      * @return
      */
     @PutMapping("/playroom/out/{playroomId}")
+    @ApiOperation(value = "플레이룸에서 퇴장할 때 실행합니다.", notes = "")
     public ResponseEntity playroomOut(@PathVariable("playroomId") Long playroomId,
                                       @RequestBody RoomOutDto watchTime,
                                       HttpServletRequest request) {
