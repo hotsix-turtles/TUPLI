@@ -272,6 +272,11 @@ const routes = [
     component: PlayroomFormFriend
   },
   {
+    path: '/playroom/update/:id',
+    name: 'PlayroomUpdateForm',
+    component: PlayroomForm
+  },
+  {
     path: '/playroom/:id',
     name: 'PlayroomDetail',
     component: PlayroomDetail
@@ -340,6 +345,11 @@ const routes = [
   {
     path: "/404",
     name: "NotFound",
+    component: NotFound,
+  },
+  {
+    path: "/500",
+    name: "Error",
     component: NotFound,
   },
   {

@@ -1,7 +1,10 @@
 /* eslint-disable vue/require-default-prop */
 <template>
   <div>
-    <v-icon @click="goBack">
+    <v-icon
+      color="black"
+      @click="goBack"
+    >
       mdi-arrow-left
     </v-icon>
   </div>

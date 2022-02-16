@@ -73,11 +73,11 @@
           <!-- 플레이룸 좋아요 -->
           <v-btn
             class="playroomLike"
-            @click="playroomLike"
+            @click="togglePlayroomLike"
           >
             <span>좋아요</span>
-            <v-icon :color="roomLiked ? 'blue' : undefined">
-              mdi-thumb-up
+            <v-icon :color="roomLiked ? 'red' : undefined">
+              mdi-heart
             </v-icon>
           </v-btn>
 
@@ -98,25 +98,32 @@
 
           <!-- 플레이룸 반복 -->
           <v-btn
-            v-if="roomAuthorId == userId"
-            class="playroomReport"
-            @click="playroomRepeat"
+            v-if="isAuthor"
+            @click="onClickModal"
           >
-            <span>반복</span>
-            <v-icon :color="roomRepeat ? 'blue' : undefined">mdi-repeat</v-icon>
+            <span>설정</span>
+            <v-icon>mdi-wrench</v-icon>
           </v-btn>
 
-          <!-- 플레이룸 신고 -->
+          <!-- 플레이룸 나가기 -->
           <v-btn
             v-else
             class="playroomReport"
+            @click="exitPrompt = true"
           >
-            <span>신고</span>
-            <v-icon>mdi-alert</v-icon>
+            <span>나가기</span>
+            <v-icon>mdi-exit-to-app</v-icon>
           </v-btn>
         </v-bottom-navigation>
       </div>
       <!-- 유튜브 동영상 플레이어 하단 네비게이션(플레이룸 SNS 활동 네비게이션) 끝 -->
+
+      <modal
+        :items="selectList"
+        :modal-name="'플레이룸 설정'"
+        :modal-type="'modal'"
+        @on-select="onSelectModal"
+      />
 
       <!-- 플레이룸 정보 Wrapper 시작 -->
       <div class="playroomInfo">
@@ -218,6 +225,7 @@
         <!-- 현재 플레이리스트 비디오 목록 상단 메뉴 -->
         <div class="playlistVideoNav d-flex justify-space-between align-center mx-3">
           <v-btn
+            v-if="!isAuthor"
             small
             elevation="0"
             color="white"
@@ -240,7 +248,7 @@
         </div>
 
         <!-- 현재 플레이리스트 비디오 목록 -->
-        <div
+        <v-container
           v-if="roomPlaylists"
           class="playlistVideoItems d-flex flex-column overflow-y-auto"
         >
@@ -252,7 +260,7 @@
             :visible="video.included"
             @click="onPlaylistVideoSelected"
           />
-        </div>
+        </v-container>
       </div>
 
       <!-- 플레이룸 채팅창 -->
@@ -280,19 +288,20 @@
             ref="chat_messages"
             class="my-1"
           >
-            <ChatItem
-              v-for="chat in roomChats"
-              :id="chat.id"
-              :key="chat.id"
-              :author="chat.author"
-              :content="chat.content"
-              :timestamp="chat.timestamp"
-              :blocked-user="chat.blockedUser"
-              :blocked-message="chat.blockedMessage"
-              @kick-user="sendKick"
-            />
+            <v-container fluid>
+              <ChatItem
+                v-for="chat in roomChats"
+                :id="chat.id"
+                :key="chat.id"
+                :author="chat.author"
+                :content="chat.content"
+                :timestamp="chat.timestamp"
+                :blocked-user="chat.blockedUser"
+                :blocked-message="chat.blockedMessage"
+                @kick-user="sendKick"
+              />
+            </v-container>
           </v-card-text>
-          <v-spacer />
           <v-card-actions
             class="mx-1 mb-0 align-item-bottom"
           >
@@ -336,12 +345,11 @@
                         mdi-emoticon-outline
                       </v-icon>
                     </template>
-                    <v-card>
-                      <v-list>
-                        <v-list-item>
-                          이모지
-                        </v-list-item>
-                      </v-list>
+                    <v-card
+                      width="250"
+                      height="250"
+                    >
+                      <emoji @click="clickEmoji"/>
                     </v-card>
                   </v-menu>
                 </template>
@@ -369,32 +377,11 @@
       <!--
         방장 전환시 팝업
       -->
-      <v-dialog
-        v-model="isAuthorChangedInfo"
-        persistent
-        width="300"
-      >
-        <v-card
-          color="#5B5C9D"
-          dark
-          height="100%"
-          class="py-1"
-        >
-          <v-card-text>
-            방장 전환 중...
-            <v-progress-linear
-              indeterminate
-              color="white"
-              class="mb-0"
-            />
-          </v-card-text>
-        </v-card>
-      </v-dialog>
+      <loading-dialog
+        title="방장 전환중..."
+        :show="isAuthorChangedInfo"
+      />
 
-      <!--
-        미운영중 접속시 팝업
-        하영님 팝업으로 교체 예정
-      -->
       <normal-dialog
         title="오류"
         content-html="이미 접속한 플레이룸입니다."
@@ -436,6 +423,16 @@
         @button-click="errorPromptHandler"
       />
       <normal-dialog
+        title="오류"
+        content-html="중복 접속으로 인하여 연결이 끊어졌습니다."
+        max-width="290"
+        :show="isKickedDupError"
+        :buttons="[{name: '확인'}]"
+        button-spacing
+        persistent
+        @button-click="errorPromptHandler"
+      />
+      <normal-dialog
         content-html="플레이룸을 종료할까요?"
         max-width="290"
         :show="exitPrompt"
@@ -456,13 +453,15 @@ import PlaylistThumbnailItem from './PlaylistThumbnailItem.vue'
 import PlaylistVideoItem from './PlaylistVideoItem.vue'
 import ChatItem from './ChatItem.vue'
 import axiosConnector from '../../utils/axios-connector';
-// import wsConnector from '../../utils/ws-connector';
 import NavButton from '../../components/common/NavButton.vue'
-import Stomp from "webstomp-client"
-import SockJS from "sockjs-client"
 import Tags from '../../components/common/Tags.vue';
 import NormalDialog from '../../components/common/NormalDialog.vue';
-import { getImage } from '../../utils/utils'
+import { getImage, playtimeConverter } from '../../utils/utils'
+import Modal from '../../components/common/Modal.vue';
+import Stomp from 'webstomp-client';
+import SockJS from 'sockjs-client';
+import LoadingDialog from '../../components/common/LoadingDialog.vue';
+import Emoji from '../../components/common/Emoji.vue';
 
 Vue.use(VueYoutube)
 
@@ -475,30 +474,33 @@ export default {
     NavButton,
     Tags,
     NormalDialog,
+    Modal,
+    LoadingDialog,
+    Emoji
   },
   data() {
     return {
       showReducedContent: false,
       videoId: '',
       playerVars: {
-        mute: 1
+        mute: 1,
+        playsinline: 1
       },
       selectedVideoItem: [],
       isChatting: false,
       lastPlaytime: 0,
-      wsConnector: null,
       showEmoji: false,
       sending: false,
       message: '',
       canChat: true,
       errorOnSend: false,
       playlistThumbnails: [],
-      heartbeat: 0,
       isOperationTimeError: false,
       isNotInvitedError: false,
       isAuthorChangedInfo: false,
       isDuplicatedError: false,
       isKickedError: false,
+      isKickedDupError: false,
       exitPrompt: false,
       exitTo: null,
       roomPlaytime: null,
@@ -507,20 +509,37 @@ export default {
   },
   metaInfo () {
     return {
-      //title: this.roomTitle,
       titleTemplate: `${this.roomTitle} | Tupli`,
       htmlAttrs: {
         lang: 'ko-KR'
       },
       meta: [
         { charset: 'utf-8' },
-        //{ name: 'description', content: ''},
         { name: 'viewport', content: 'width=device-width, initial-scale=1' }
       ]
     }
   },
   computed: {
-    ...mapState(['userId']),
+    selectList() {
+      return this.roomRepeat ? {
+        '수정하기': 'update',
+        '삭제하기': 'delete',
+        '플레이리스트 반복 해제': 'repeat',
+      } : {
+        '수정하기': 'update',
+        '삭제하기': 'delete',
+        '플레이리스트 반복 설정': 'repeat',
+      }
+    },
+    roomContentReduced() {
+      return this.roomContent == this.roomReducedContent
+    },
+    isDialogOpened() {
+      return this.isDuplicatedError || this.isOperationTimeError || this.isNotInvitedError || this.isAuthorChangedInfo
+    },
+    ...mapState([
+      'userId'
+    ]),
     ...mapState('playroom', [
       'roomId',
       'roomTitle',
@@ -544,10 +563,17 @@ export default {
       'roomCurrentVideoId',
       'roomCurrentVideoPlaytime',
       'roomChats',
+      'roomGuests',
       'roomSendingMessage',
       'chatroomId',
       'chatBlockedId',
       'chatBlockedUid',
+      'roomLastSyncSender',
+      'wsConnector',
+      'heartbeat'
+    ]),
+    ...mapState('common', [
+      'showModal'
     ]),
     ...mapGetters('playroom', [
       'roomPublicLabel',
@@ -555,28 +581,18 @@ export default {
       'roomCurrentPlaylistVideos',
       'roomFirstVideo',
       'roomPrevVideo',
-      'roomNextVideo'
-    ]),
-    roomContentReduced() {
-      return this.roomContent == this.roomReducedContent
-    }
+      'roomNextVideo',
+      'isAuthor'
+    ])
   },
   async created() {
-    const isValid = await this.validateToken();
-    if (!isValid)
-    {
-      // 토큰 만료시 현재 vuex 정보를 초기화하고 로그인 페이지로 이동
-      localStorage.clear();
-      this.certification = true;
-      this.$router.push('/login')
-    }
+    //await this.checkToken();
+    await this.RESET_VUEX_DATA();
   },
   mounted() {
     this.$nextTick(async () => {
-      await this.RESET_VUEX_DATA();
-
       this.player = this.$refs.youtube.player;
-      await this.getRoomInfo();
+      await this.initPlayroom();
     });
 
     this.$watch('roomCurrentPlaylistVideos', (newVal, oldVal) =>
@@ -588,19 +604,6 @@ export default {
         return prevPlaylistIds;
       }, []);
     });
-    // this.$watch('roomCurrentPlaylistId', (newVal, oldVal) => {
-    //   //this.updateVideoId()
-    // });
-    // this.$watch('roomCurrentVideoId', (newVal, oldVal) => {
-    //   this.updateVideoId()
-    // });
-    // this.$watch('roomCurrentVideoPlaytime', async (newVal, oldVal) => {
-    //   if (newVal - oldVal < 2 && Math.abs(newVal - await this.player.getCurrentTime()) < 1) return;
-    //   if (this.userId == this.roomAuthorId) return;
-    //   if (document.hidden) return;
-    //   console.log('roomCurrentVideoPlaytime watch')
-    //   this.seekTo()
-    // });
 
     this.$watch('isChatting', (newVal, oldVal) => {
       if (newVal)
@@ -611,24 +614,7 @@ export default {
           messages.scrollTo({ top: messages.scrollHeight, behavior: 'smooth' });
         });
       }
-      // TODO: 채팅방에서 모바일 뒤로가기버튼 누르면 채팅방만 꺼지게 하고 싶었지만... 실-패
-      // if (newVal && !oldVal) {
-      //   document.addEventListener("backbutton", this.closeChatting, false);
-      //   window.addEventListener("popstate", this.closeChatting, false);
-      // }
-      // if (!newVal && oldVal) {
-      //   document.removeEventListener("backbutton", this.closeChatting);
-      //   window.removeEventListener("popstate", this.closeChatting);
-      // }
     })
-
-    this.$watch('roomStartTime', (newVal, oldVal) => {
-      this.loadRoomPlaytime();
-    });
-
-    this.$watch('roomEndTime', (newVal, oldVal) => {
-      this.loadRoomPlaytime();
-    });
 
     this.$watch('roomChats', (newVal, oldVal) => {
       this.$nextTick(() => {
@@ -637,33 +623,84 @@ export default {
         messages.scrollTo({ top: messages.scrollHeight, behavior: 'smooth' });
       });
     });
+
+    this.$watch('roomStartTime', (newVal, oldVal) => {
+      this.loadRoomPlaytime();
+    });
+
+    this.$watch('roomEndTime', (newVal, oldVal) => {
+      this.loadRoomPlaytime();
+    });
   },
-  beforeDestroy() {
-    if (this.wsConnector) this.releaseChatroom();
-  },
+  // async beforeDestroy() {
+  //   console.log('beforeDestroy')
+  //   await this.destroyWsConnector();
+  // },
   async beforeRouteLeave(to, from, next) {
+    if (to.name == 'Error')
+    {
+      this.stopHeartbeat();
+      await this.destroyWsConnector();
+      next();
+      return;
+    }
+
     if (this.isChatting)
     {
-      this.isChatting = false;
+      this.closeChatbox();
       next(false);
       return;
     }
 
-    console.log(to)
-
-    if (this.certification)
+    if (!this.certification)
     {
-      await this.releaseChatroom();
-      next();
-      return;
-    } else {
       this.exitTo = to.path;
       this.exitPrompt = true;
       next(false);
       return;
     }
+
+    this.stopHeartbeat();
+    await this.destroyWsConnector();
+    next();
   },
   methods: {
+    async checkToken() {
+      const isValid = await this.validateToken();
+      if (!isValid) {
+        this.clearLocalStorage();
+        this.goToLoginPage();
+      }
+    },
+    clearLocalStorage() {
+      localStorage.clear();
+    },
+    goToLoginPage() {
+      this.certification = true;
+      this.$router.push({ name: 'Login' })
+    },
+    async requestUpdatePlayroom() {
+      await this.updatePlayroom();
+      this.certification = true;
+      this.$router.push({ name: 'PlayroomUpdateForm', params: { id: this.roomId } })
+    },
+    async requestDeletePlayroom() {
+      await this.loadRoomInfo(this.roomId);
+      this.roomGuests.map(async (roomGuest) => await this.sendKick(roomGuest));
+      await this.deletePlayroom();
+      await this.RESET_VUEX_DATA();
+      this.certification = true;
+      this.$router.push({ name: 'Home' })
+    },
+    async onSelectModal(item) {
+      if (item === 'update') {
+        await this.requestUpdatePlayroom();
+      } else if (item === 'delete') {
+        await this.requestDeletePlayroom();
+      } else if (item === 'repeat') {
+        this.togglePlayroomRepeat();
+      }
+    },
     errorPromptHandler() {
       this.certification = true;
       this.$router.go(-1)
@@ -677,92 +714,118 @@ export default {
       }
       this.exitPrompt = false;
     },
-    loadRoomPlaytime() {
-      const roomStartTime = this.roomStartTime
-      const roomEndTime = this.roomEndTime
-      const timezoneOffset = new Date().getTimezoneOffset() * 60 * 1000;
-
-      const roomStartDate = new Date(roomStartTime - timezoneOffset);
-      const roomEndDate = new Date(roomEndTime - timezoneOffset);
-
-      if (roomStartDate.getDate() == roomEndDate.getDate())
-        this.roomPlaytime = `${roomStartDate.toISOString().substr(11, 5)} - ${roomEndDate.toISOString().substr(11, 5)}`
-      else if (roomStartDate.getMonth() == roomEndDate.getMonth())
-        this.roomPlaytime = `${roomStartDate.getDate()}일 ${roomStartDate.toISOString().substr(11, 5)} - ${roomEndDate.getDate()}일 ${roomEndDate.toISOString().substr(11, 5)}`
-      else if (roomStartDate.getFullYear() == roomEndDate.getFullYear())
-        this.roomPlaytime = `${roomStartDate.getMonth()}월 ${roomStartDate.getDate()}일 ${roomStartDate.toISOString().substr(11, 5)} - ${roomEndDate.getMonth()}월 ${roomEndDate.getDate()}일 ${roomEndDate.toISOString().substr(11, 5)}`
-
-      this.roomPlaytime = this.roomPlaytime ? this.roomPlaytime : null;
-    },
-    closeChatting() {
+    closeChatbox() {
       this.isChatting = false;
     },
-    async getRoomInfo() {
-      // const token = localStorage.getItem('jwt')
-
-      const roomInfo = await axiosConnector.get(`/playroom/${this.$route.params.id}`);
-      await this.$store.dispatch('playroom/setRoomInfo', roomInfo);
-
-      const userFollowerInfo = await axiosConnector.get(`/profile/followers/${this.roomAuthorId}/count`);
-      this.SET_ROOM_AUTHOR({ follower: parseInt(userFollowerInfo.data) })
-
-      if (roomInfo.data.guests.filter(guestId => guestId == this.userId).length > 1)
-      {
-        this.isDuplicatedError = true
-        return;
-      }
-
-      await this.checkPermission();
-      await this.loadFirstVideo();
+    async initPlayroom() {
+      await this.loadRoomInfo(this.$route.params.id);
+      if (!this.checkPermission()) return;
       await this.loadLikeState();
+      await this.loadFollowerCount();
+      await this.loadFirstVideo();
       await this.loadRoomPlaytime();
-      await this.initChatRoom();
-      clearInterval(this.sendSync);
-      clearInterval(this.checkHeartbeat)
-      setInterval(this.sendSync, 1000);
-      setInterval(this.checkHeartbeat, 1000);
+      await this.initWsConnector();
+      if (!this.checkDuplicatedAccess()) return;
     },
-    async getRoomInfo2() {
-      // const token = localStorage.getItem('jwt')
-
-      const roomInfo = await axiosConnector.get(`/playroom2/${this.$route.params.id}`);
-      await this.$store.dispatch('playroom/setRoomInfo', roomInfo);
-
-      const userFollowerInfo = await axiosConnector.get(`/profile/followers/${this.roomAuthorId}/count`);
-      this.SET_ROOM_AUTHOR({ follower: parseInt(userFollowerInfo.data) })
-    },
-    checkPermission() {
-      // 방 운영시간 외이면
-      if (this.roomStartTime >= Date.now() || this.roomEndTime <= Date.now())
-        this.showErrorOperationTime();
-
-      // 비공개방이고 미초대 유저면
-      if (!this.roomPublic && !this.roomInviteIds.find(inviteId => inviteId == this.userId)) {
-        this.showErrorNotInvited();
+    async checkDuplicatedAccess() {
+      try {
+        // 동일 방 중복 접속 체크
+        if (this.roomGuests && this.roomGuests.filter(guestId => guestId == this.userId).length)
+          throw 'duplcated-access';
+      } catch (err) {
+        console.log(err)
+        switch (err) {
+        case 'duplcated-access':
+          await this.sendKickDup();
+          this.showErrorDuplicatedAccess();
+          this.stopHeartbeat();
+          await this.destroyWsConnector();
+          return false;
+        }
       }
+      return true;
+    },
+    async checkPermission() {
+      try {
+        // 방장이 아니고 방 운영시간 외이면
+        if (!this.isAuthor && (this.roomStartTime >= Date.now() || this.roomEndTime <= Date.now()))
+          throw 'not-operation-time';
+
+        // 비공개방이고 미초대 유저면
+        if (!this.roomPublic && !this.roomInviteIds.find(inviteId => inviteId == this.userId))
+          throw 'not-invited';
+      } catch (err) {
+        console.log(err)
+        switch (err) {
+        case 'not-operation-time':
+          this.showErrorOperationTime();
+          this.stopHeartbeat();
+          await this.destroyWsConnector();
+          return false;
+        case 'not-invited':
+          this.showErrorNotInvited();
+          this.stopHeartbeat();
+          await this.destroyWsConnector();
+          return false;
+        default:
+          break;
+        }
+      }
+      return true;
+    },
+    showErrorDuplicatedAccess() {
+      if (this.isDialogOpened) return;
+      this.isDuplicatedError = true;
+    },
+    hideErrorDuplicatedAccess() {
+      this.isDuplicatedError = false;
     },
     showErrorOperationTime() {
-      if (this.isOperationTimeError) return;
+      if (this.isDialogOpened) return;
       this.isOperationTimeError = true;
-      // setTimeout(() => {
-      //   this.isOperationTimeError = false;
-      //   this.$router.go(-1);
-      // }, 3000)
+    },
+    hideErrorOperationTime() {
+      this.isOperationTimeError = false;
     },
     showErrorNotInvited() {
-      if (this.isNotInvitedError) return;
+      if (this.isDialogOpened) return;
       this.isNotInvitedError = true;
-      // setTimeout(() => {
-      //   this.isNotInvitedError = false;
-      //   this.$router.go(-1);
-      // }, 3000)
+    },
+    hideErrorNotInvited() {
+      this.isNotInvitedError = false;
+    },
+    async checkConnection() {
+      if (this.$router.currentRoute.name != 'PlayroomDetail') return;
+      if (this.wsConnector && this.wsConnector.subscriptions) return;
+      await this.initWsConnector();
+    },
+    async checkHeartbeat() {
+      this.checkPermission();
+
+      if (this.heartbeat > 30)
+      {
+        if (this.userId)
+          if ((parseInt(this.userId) + Date.now()) % 10 == (parseInt(this.roomId) + parseInt(this.roomAuthorId)) % 10)
+          {
+            this.showInfoAuthorChanged()
+            this.requestRoomAuthor()
+          }
+      }
+
+      if (this.isAuthor) this.sendSync();
+      else this.setHeartbeat();
     },
     showInfoAuthorChanged() {
-      if (this.isAuthorChangedInfo) return;
+      if (this.isDialogOpened) return;
       this.isAuthorChangedInfo = true;
-      setTimeout(() => {
-        this.isAuthorChangedInfo = false;
-      }, 3000)
+      setTimeout(this.hideInfoAuthorChanged, 3000)
+    },
+    hideInfoAuthorChanged() {
+      this.isAuthorChangedInfo = false;
+    },
+    async loadFollowerCount() {
+      const userFollowerInfo = await axiosConnector.get(`/profile/followers/${this.roomAuthorId}/count`);
+      this.setRoomAuthor({ follower: parseInt(userFollowerInfo.data) })
     },
     loadFirstVideo() {
       if (this.roomFirstVideo)
@@ -773,36 +836,40 @@ export default {
         this.updateVideoId();
       }
     },
-    initChatRoom() {
-      const token = localStorage.getItem('jwt')
+    loadRoomPlaytime() {
+      this.roomPlaytime = playtimeConverter(this.roomStartTime, this.roomEndTime);
+    },
+    async initWsConnector() {
+      const token = localStorage.getItem('jwt');
       const baseURL = "https://tupli.kr/api/v1" + "/ws-stomp"
       const sock = new SockJS(baseURL);
-      this.wsConnector = Stomp.over(sock);
+
+      this.setWsConnector(Stomp.over(sock));
+      if (!this.wsConnector) return;
+
       this.wsConnector.connect(
-        token ? { Authorization: this.token } : { },
-        async () => {
-          await this.wsConnector.subscribe(`/sub/chat/room/${this.chatroomId}`, this.onReceiveMessage, token ? { Authorization: token } : undefined)
-          this.SET_USER_START_TIME(new Date())
+        token ? { Authorization: token } : { },
+        () => {
+          this.wsConnector.subscribe(`/sub/chat/room/${this.chatroomId}`, this.onReceiveMessage, token ? { Authorization: token } : undefined);
+          this.startHeartbeat(setInterval(this.checkHeartbeat, 1000));
         },
         () => alert("서버 연결에 실패 하였습니다. 다시 접속해 주십시요.")
       )
+      await axiosConnector.post(`/playroom/in/${this.roomId}`)
+      this.SET_USER_START_TIME(new Date());
     },
-    // syncSeek() {
-    //   const playTime = parseFloat(this.roomCurrentVideoPlaytime)
-    //   console.log(playTime)
-    //   this.player.seekTo(playTime);
-    // },
-    onPlaylistVideoSelected({ id, selected }) {
-      if (selected)
-      {
-        const idx = this.selectedVideoItem.findIndex(el => el == id)
-        this.selectedVideoItem.splice(idx, 1)
-      }
-      else
-      {
-        this.selectedVideoItem.push(id)
-      }
-      if (this.roomAuthorId == this.userId) this.playThisVideo()
+    async destroyWsConnector() {
+      // 이 방에 있었던 시간 (밀리초 단위)
+      this.SET_USER_END_TIME(new Date());
+
+      var time = Math.floor((new Date(this.roomUserEndTime).getTime() - new Date(this.roomUserStartTime).getTime()) / 1000 / 1000)
+      console.log(time, '초 경과')
+
+      // 새로운 뱃지 취득시 이거 응답으로 받습니다...
+      if (this.roomId > -1) await axiosConnector.put(`/playroom/out/${this.roomId}`, { watchTime: time })
+
+      if (this.wsConnector) await this.wsConnector.disconnect()
+      this.resetWsConnector();
     },
     onVideoReady() {
     },
@@ -818,17 +885,35 @@ export default {
     onVideoCued() {
       this.playVideo()
     },
+    onPlaylistVideoSelected({ id, selected }) {
+      if (selected)
+      {
+        const idx = this.selectedVideoItem.findIndex(el => el == id)
+        this.selectedVideoItem.splice(idx, 1)
+      }
+      else
+      {
+        this.selectedVideoItem.push(id)
+      }
+      if (this.isAuthor) this.playThisVideo()
+    },
     async onReceiveMessage(payload) {
       const id = payload.headers['message-id']
       const body = JSON.parse(payload.body);
 
       if (body.type == 'KICK')
       {
-        this.isKickedError = true
+        const { userId } = JSON.parse(body.message)
+        if (this.userId == userId) this.isKickedError = true
+      }
+      else if (body.type == 'KICK_DUP')
+      {
+        const { userId } = JSON.parse(body.message)
+        if (this.userId == userId) this.isKickedDupError = true
       }
       else if (body.type == 'SYNC')
       {
-        this.heartbeat = 0;
+        this.resetHeartbeat();
 
         const currentPlaylistId = this.roomCurrentPlaylistId
         const currentVideoId = this.roomCurrentVideoId
@@ -841,19 +926,22 @@ export default {
         const syncVideoId = syncData.videoId
         const syncVideoTime = syncData.videoPlaytime
         const syncPlayerState = syncData.playerState
-        const syncSender = syncData.sender
+        const syncSender = body.userSeq
 
-        if (!currentSyncSender) {
-          this.SET_ROOM_LAST_SYNC_SENDER(syncSender)
+        if (!currentSyncSender)
+        {
+          // console.log('currentSyncSender', currentSyncSender, 'syncSender', syncSender, syncData)
+          await this.SET_ROOM_LAST_SYNC_SENDER(syncSender)
         }
         else if (currentSyncSender != syncSender)
         {
+          // console.log('currentSyncSender', currentSyncSender, 'syncSender', syncSender)
           this.showInfoAuthorChanged()
-          await this.getRoomInfo()
           await this.SET_ROOM_LAST_SYNC_SENDER(syncSender)
+          await this.loadRoomInfo(this.$route.params.id);
         }
 
-        if (this.userId == this.roomAuthorId) return;
+        if (this.isAuthor) return;
 
         if (currentPlaylistId != syncPlaylistId) this.SET_ROOM_CURRENT_PLAYLIST_ID(syncPlaylistId)
         if (currentVideoId != syncVideoId) this.SET_ROOM_CURRENT_VIDEO_ID(syncVideoId)
@@ -870,17 +958,11 @@ export default {
           // if (currentVideoId != syncVideoId) this.SET_ROOM_CURRENT_VIDEO_ID(syncVideoId)
 
           if (syncVideoId == this.roomCurrentVideoId) this.SET_ROOM_CURRENT_VIDEO_PLAYTIME(syncVideoTime);
-
-          if (document.hidden) return;
           this.seekTo()
         }
       }
-      else// if (body.type == 'TALK')
+      else
       {
-        // const profile = await axiosConnector.post('/echo', {
-        //   nickname: '시스템',
-        //   profilePictureUrl: 'https://picsum.photos/80/80'
-        // })
         const author = { id: body.userSeq, name: body.sender ? body.sender : "익명의 유저", thumbnail: body.img };
         const content = body.message;
         const timestamp = new Date().getTime();
@@ -900,9 +982,10 @@ export default {
     loadNextVideo() {
       if (this.roomNextVideo)
       {
-        this.SET_ROOM_CURRENT_PLAYLIST_ID(this.roomNextVideo.playlistId)
-        this.SET_ROOM_CURRENT_VIDEO_ID(this.roomNextVideo.videoId)
-        this.SET_ROOM_CURRENT_VIDEO_PLAYTIME(0)
+        this.SET_ROOM_CURRENT_PLAYLIST_ID(this.roomNextVideo.playlistId);
+        this.SET_ROOM_CURRENT_VIDEO_ID(this.roomNextVideo.videoId);
+        this.SET_ROOM_CURRENT_VIDEO_PLAYTIME(0);
+        this.updateVideoId();
       } else if (this.roomRepeat) {
         this.loadFirstVideo();
       }
@@ -923,65 +1006,20 @@ export default {
     },
     playThisVideo() {
       if (this.roomCurrentVideoId != this.selectedVideoItem[0])
-      {
         this.SET_ROOM_CURRENT_VIDEO_ID(this.selectedVideoItem[0])
-        this.SET_ROOM_CURRENT_VIDEO_PLAYTIME(0)
-        this.updateVideoId();
-      }
-      else
-      {
-        this.SET_ROOM_CURRENT_VIDEO_PLAYTIME(0)
-      }
+
+      this.SET_ROOM_CURRENT_VIDEO_PLAYTIME(0)
+      this.updateVideoId();
 
       this.selectedVideoItem = []
       console.log('playThisVideo')
       this.seekTo()
     },
-    async loadLikeState() {
-      if (!this.$store.state.isLogin) return;
-
-      const { status, data } = await axiosConnector.get(`/playroom/${this.roomId}/like`)
-      if (status != 200) return;
-      this.SET_ROOM_LIKED(Boolean(data))
-    },
-    async playroomLike() {
-      if (this.roomLiked)
-      {
-        // 좋아요 되어있으면 좋아요 해제
-        this.SET_ROOM_LIKED(false)
-        await axiosConnector.delete(`/playroom/${this.roomId}/like`);
-      }
-      else
-      {
-        // 좋아요 안되어있으면 좋아요 설정
-        this.SET_ROOM_LIKED(true)
-        await axiosConnector.post(`/playroom/${this.roomId}/like`);
-      }
-
-      await this.loadLikeState();
-    },
-    async playroomRepeat() {
-      if (this.roomRepeat)
-      {
-        // 반복 설정 되어있으면 반복 해제
-        this.SET_ROOM_REPEAT(false)
-      }
-      else
-      {
-        // 반복 설정 안되어있으면 반복 설정
-        this.SET_ROOM_REPEAT(true)
-      }
-    },
     async sendMessage(payload) {
       if (!this.chatroomId) return;
       if (!payload || !payload.type || !payload.message || !payload.token) return;
 
-      if (!this.wsConnector)
-        if (this.$router.currentRoute.name == 'PlayroomDetail') await this.initChatRoom();
-        else return;
-
-      if (!this.wsConnector.subscriptions) return;
-
+      if (!this.wsConnector) return;
       return await this.wsConnector.send(
         "/pub/chat/message",
         JSON.stringify({ type: payload.type, roomId: this.chatroomId, message: payload.message }),
@@ -999,7 +1037,20 @@ export default {
       if (!token) return;
       if (this.userId != this.roomAuthorId) return;
 
-      this.sendMessage({ type: 'KICK', message: JSON.stringify(kickData), token })
+      await this.sendMessage({ type: 'KICK', message: JSON.stringify(kickData), token })
+    },
+    async sendKickDup() {
+      const token = localStorage.getItem('jwt')
+
+      const kickData = {
+        timestamp: new Date().getTime(),
+        userId: this.userId
+      };
+
+      if (!token) return;
+      if (this.userId != this.roomAuthorId) return;
+
+      await this.sendMessage({ type: 'KICK_DUP', message: JSON.stringify(kickData), token })
     },
     async sendSync() {
       const token = localStorage.getItem('jwt')
@@ -1015,18 +1066,17 @@ export default {
       };
 
       if (!token) return;
-
-      if (this.roomLastSyncSender != this.userId) await this.getRoomInfo2();
+      if (this.roomLastSyncSender != this.userId) await this.loadRoomInfo(this.$route.params.id);
       if (this.userId != this.roomAuthorId) return;
 
-      this.sendMessage({ type: 'SYNC', message: JSON.stringify(syncData), token })
+      await this.sendMessage({ type: 'SYNC', message: JSON.stringify(syncData), token })
     },
-    sendChat() {
+    async sendChat() {
       const token = localStorage.getItem('jwt')
 
       this.disableChatbox()
       this.pendingToSendMessage()
-      this.sendMessage({ type: 'TALK', message: this.message, token })
+      await this.sendMessage({ type: 'TALK', message: this.message, token })
         .then(() => {
           this.clearMessage()
         })
@@ -1061,47 +1111,10 @@ export default {
     clearSendError() {
       this.errorOnSend = false;
     },
-    async checkHeartbeat() {
-      this.checkPermission();
-      if (!this.wsConnector || (this.wsConnector && !this.wsConnector.subscriptions)) await this.initChatRoom();
-
-      if (this.heartbeat > 30)
-      {
-        // 방 접속자 정보가 있다면 (ID리스트)
-        // Date.now().getTime() % this.roomUsers.length
-        // const userOffset = this.roomUsers.findIndex(roomUser => roomUser == this.userInfo.userSeq)
-
-        // 그런거 없으니까 일단은.. 무작정 도전!
-        if (this.userId)
-          if ((parseInt(this.userId) + Date.now()) % 10 == (parseInt(this.roomId) + parseInt(this.roomAuthorId)) % 10)
-          {
-            this.showInfoAuthorChanged()
-            this.requestRoomAuthor()
-          }
-
-      }
-
-      if (this.userId && this.userId == this.roomAuthorId) return;
-      this.heartbeat += 1;
-    },
     async requestRoomAuthor() {
       await axiosConnector.put(`/playroom/${this.roomId}/user`);
-      await this.getRoomInfo2();
-      this.heartbeat = 0;
-    },
-    async releaseChatroom() {
-      // 이 방에 있었던 시간 (밀리초 단위)
-      this.SET_USER_END_TIME(new Date())
-
-
-      var time = Math.floor((new Date(this.roomUserEndTime).getTime() - new Date(this.roomUserStartTime).getTime()) / 1000 / 1000)
-      console.log(time, '초 경과')
-
-      // 새로운 뱃지 취득시 이거 응답으로 받습니다...
-      await axiosConnector.put(`/playroom/out/${this.roomId}`, { watchTime:time })
-
-      if (this.wsConnector) await this.wsConnector.disconnect()
-      this.wsConnector = null
+      await this.loadRoomInfo(this.$route.params.id);
+      this.resetHeartbeat();
     },
     ImgUrl: function(img) {
       return getImage(img)
@@ -1110,10 +1123,46 @@ export default {
       this.certification = true;
       this.$router.push(`/profile/${this.roomAuthorId}`);
     },
-    ...mapMutations('playroom', ['RESET_VUEX_DATA', 'SET_ROOM_AUTHOR', 'SET_ROOM_LIKED', 'SET_ROOM_REPEAT', 'SEEK_VIDEO',
-      'SET_ROOM_CURRENT_PLAYLIST_ID', 'SET_ROOM_CURRENT_VIDEO_ID', 'SET_ROOM_CURRENT_VIDEO_PLAYTIME',
-      'SET_ROOM_LAST_SYNC_SENDER', 'SET_USER_START_TIME', 'SET_USER_END_TIME']),
-    ...mapActions('account', ['validateToken']),
+    clickEmoji: function({ idx, emoticon }) {
+      this.message += `#${idx}`;
+      this.$nextTick(() => this.$refs.chat_input.focus())
+    },
+    ...mapMutations('playroom', [
+      'RESET_VUEX_DATA',
+      'SET_ROOM_AUTHOR',
+      'SET_ROOM_LIKED',
+      'SET_ROOM_REPEAT',
+      'SEEK_VIDEO',
+      'SET_ROOM_CURRENT_PLAYLIST_ID',
+      'SET_ROOM_CURRENT_VIDEO_ID',
+      'SET_ROOM_CURRENT_VIDEO_PLAYTIME',
+      'SET_ROOM_LAST_SYNC_SENDER',
+      'SET_USER_START_TIME',
+      'SET_USER_END_TIME'
+    ]),
+    ...mapActions('playroom', [
+      'setRoomInfo',
+      'setRoomAuthor',
+      'loadRoomInfo',
+      'loadLikeState',
+      'togglePlayroomLike',
+      'togglePlayroomRepeat',
+      'updatePlayroom',
+      'deletePlayroom',
+      'saveFormData',
+      'startHeartbeat',
+      'stopHeartbeat',
+      'setHeartbeat',
+      'resetHeartbeat',
+      'setWsConnector',
+      'resetWsConnector'
+    ]),
+    ...mapActions('account', [
+      'validateToken'
+    ]),
+    ...mapActions('common', [
+      'onClickModal',
+    ]),
   },
 }
 </script>

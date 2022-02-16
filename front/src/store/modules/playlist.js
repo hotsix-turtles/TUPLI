@@ -100,7 +100,7 @@ const playlist = {
     ADD_PLAYLISTS: function (state) {
       state.addedPlaylists = []
       state.selectedPlaylists.map(selectedPlaylist => {
-        if (selectedPlaylist.videos)
+        if (selectedPlaylist && selectedPlaylist.videos)
           selectedPlaylist.videos
             .filter(video => !state.addedPlaylistVideoIds.find(addedPlaylistVideoId => addedPlaylistVideoId == video.videoId))
             .map(video => state.addedPlaylistVideoIds.push(video.videoId))
