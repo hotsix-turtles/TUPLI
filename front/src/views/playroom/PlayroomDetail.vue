@@ -801,6 +801,8 @@ export default {
       this.roomPlaytime = playtimeConverter(this.roomStartTime, this.roomEndTime);
     },
     async initWsConnector() {
+      if (!this.$route.params.id) return;
+
       const token = localStorage.getItem('jwt');
       const baseURL = "https://tupli.kr/api/v1" + "/ws-stomp"
       const sock = new SockJS(baseURL);
