@@ -262,8 +262,7 @@
               v-model="autoTime"
               label="자동"
               class="mt-0"
-            >
-            </v-checkbox>
+            />
           </v-col>
         </v-row>
 
@@ -291,8 +290,8 @@
                   prepend-icon="mdi-calendar"
                   :rules="startDateRules"
                   v-bind="attrs"
-                  v-on="on"
                   :disabled="autoTime"
+                  v-on="on"
                 />
               </template>
               <v-date-picker
@@ -321,8 +320,8 @@
                   :rules="startTimeRules"
                   readonly
                   v-bind="attrs"
-                  v-on="on"
                   :disabled="autoTime"
+                  v-on="on"
                 />
               </template>
               <v-time-picker
@@ -359,8 +358,8 @@
                   prepend-icon="mdi-calendar"
                   :rules="endDateRules"
                   v-bind="attrs"
-                  v-on="on"
                   :disabled="autoTime"
+                  v-on="on"
                 />
               </template>
               <v-date-picker
@@ -389,8 +388,8 @@
                   :rules="endTimeRules"
                   readonly
                   v-bind="attrs"
-                  v-on="on"
                   :disabled="autoTime"
+                  v-on="on"
                 />
               </template>
               <v-time-picker
@@ -436,13 +435,13 @@
               참여할 최대 유저 수를 설정합니다.
             </p>
             <v-combobox
+              v-model="formData.userCountMax"
               class="ml-5"
               style="width: 50px;"
               dense
               solo
-              v-model="formData.userCountMax"
               :items="userCountMaxItems"
-            ></v-combobox>
+            />
           </v-col>
         </v-row>
       </v-container>
@@ -587,17 +586,18 @@ export default {
       }
     },
   },
-  async created() {
-    const isValid = await this.validateToken();
-    if (!isValid)
-    {
-      // 토큰 만료시 현재 vuex 정보를 초기화하고 로그인 페이지로 이동
-      localStorage.clear();
-      this.$router.push('/login')
-    }
+  created() {
+    // const isValid = await this.validateToken();
+    // if (!isValid)
+    // {
+    //   // 토큰 만료시 현재 vuex 정보를 초기화하고 로그인 페이지로 이동
+    //   localStorage.clear();
+    //   this.$router.push('/login')
+    // }
 
     if (this.$route.name == 'PlayroomForm') this.formType = 'create'
     if (this.$route.name == 'PlayroomUpdateForm') this.formType = 'update'
+    if (this.$route.name == 'PlayroomByPlaylist') this.formType = 'create'
 
     if (this.savedFormData) {
       this.formData = this.savedFormData
@@ -633,7 +633,7 @@ export default {
       return await axiosConnector.get(`/playlist/${playlistId}`)
     },
     updateTags: function (tags) {
-      this.formData.tags = tags
+      Vue.set(this.formData, 'tags', tags)
     },
     onVideoItemClicked ( { id, selected }) {
       return this.formData.playlists.map((playlist) => playlist.videos.map((v) => v.included = (v.id == id ? !selected : v.included)))

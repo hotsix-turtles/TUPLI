@@ -82,7 +82,7 @@
                 <span class="semi-bold">
                   PLAY TIME
                 </span>
-                {{ playroom.startTime }} ~ {{ playroom.endTime }}
+                {{ playroom.playTime }}
               </span>
             </div>
             <tags

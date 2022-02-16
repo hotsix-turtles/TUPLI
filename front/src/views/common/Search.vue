@@ -29,13 +29,6 @@
         >
       </div>
     </div>
-    <!-- 로그아웃 -->
-    <div
-      class="d-flex justify-space-between setting-bar align-center"
-      @click="logoutUser"
-    >
-      <p>로그아웃</p>
-    </div>
   </div>
 </template>
 
@@ -84,17 +77,6 @@ export default {
     ...mapActions('video', [
       'resetVideoSearchState',
     ]),
-    // 로그아웃
-    logoutUser: function() {
-      this.$store.dispatch('logout')
-      this.$router.push({ name: 'Home' })
-      swal.fire ({
-        icon: 'info',
-        title: '로그아웃',
-        text: '로그아웃되었습니다.',
-        // width: '200px'
-      })
-    },
 
   }
 }
