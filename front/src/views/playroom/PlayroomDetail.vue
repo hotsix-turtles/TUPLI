@@ -496,7 +496,7 @@ export default {
       playlistThumbnails: [],
       isOperationTimeError: false,
       isNotInvitedError: false,
-      isAuthorChangedInfo: true,
+      isAuthorChangedInfo: false,
       isDuplicatedError: false,
       isKickedError: false,
       isKickedDupError: false,
