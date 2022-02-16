@@ -1,5 +1,6 @@
 import axios from 'axios';
 import SERVER from '@/api/server'
+import router from '../router';
 
 const baseURL = SERVER.URL  // 드래곤볼 검토
 // const baseURL = "https://tupli.kr"
@@ -24,6 +25,17 @@ axiosConnector.interceptors.request.use(
   },
   (error) => {
 
+    return Promise.reject(error);
+  }
+);
+
+axiosConnector.interceptors.response.use(
+  (response) => {
+    return response;
+  },
+  (error) => {
+    const { data, status } = error.response;
+    if (status == 500) router.push({ name: 'Error' })
     return Promise.reject(error);
   }
 );
