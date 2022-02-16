@@ -89,8 +89,12 @@ public class AuthApiController {
         List<Long> badges = badgeService.getUserBadgeSeq(userbadges);
         // jwt 토큰 발급
         List<Badge> badgeResult = new ArrayList<>();
-        badgeResult.addAll(badgeService.checkLoginNum(userSeq, badges));
-        badgeResult.addAll(badgeService.checkDaily(userSeq, badges));
+        List<Badge> loginBadges = badgeService.checkLoginNum(userSeq, badges);
+        List<Badge> daliyBadges = badgeService.checkDaily(userSeq, badges);
+        if(loginBadges != null)
+        badgeResult.addAll(loginBadges);
+        if(daliyBadges != null)
+        badgeResult.addAll(daliyBadges);
 
         if(badgeResult == null || badgeResult.size() == 0) return ResponseEntity.ok(null);
         List<SimpleBadgeDto> badgeDtoResult = badgeResult.stream().map(b -> new SimpleBadgeDto(b)).collect(Collectors.toList());
