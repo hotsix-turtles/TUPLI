@@ -75,7 +75,7 @@
 <script>
 import { mapActions, mapState } from 'vuex'
 import Back from '../../components/common/Back.vue'
-import CommentInput from '../../components/board/CommentInput.vue'
+import CommentInput from '../../components/common/CommentInput.vue'
 import { getImage } from '../../utils/utils'
 
 

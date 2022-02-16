@@ -33,6 +33,7 @@
   position: fixed !important;
   bottom: 0 !important;
   width: 100% !important;
+  height: 65px;
 }
 
 .fixed-top {
@@ -68,7 +69,8 @@
 .border-line {
   height: 6px;
   background-color: #F1F1F4;
-  margin-top: 16px;
+  margin-top: 12px;
+  width: 100%;
 }
 
 
@@ -320,7 +322,18 @@
   }
 }
 
-// 프로필 사진 Medium7
+// 프로필 사진 Medium-main.ver
+.profile-img-main {
+  border-radius: 100%;
+  border: solid 1px;
+  border-color: $color-main;
+  width: 50px;
+  height: 50px;
+  align-items: center;
+  margin: 10px;
+}
+
+// 프로필 사진 Small
 .profile-img-small {
   border-radius: 100%;
   border: solid 1px;
@@ -340,7 +353,7 @@
 .tag {
   color: #3a3939;
   background-color: #d8d8ee;
-  border-radius: 15%;
+  border-radius: 5px;
   font-size: 12px;
   padding: 3px 3px 3px 3px;
 }
@@ -350,11 +363,82 @@
   color: black;
   background-color: $color-sub2;
   border-radius: 5px;
-  margin: 2px;
+  margin-right: 3px;
+  margin-bottom: 2px;
+  margin-top: 3px;
   padding: 2px 5px 1px 5px;
+  font-weight: 300;
   font-size: 12px;
 }
 
+
+// 메인 소제목
+.main-top-text {
+  font-size: 14px;
+  font-weight: 600;
+  font-stretch: normal;
+  font-style: normal;
+  line-height: normal;
+  letter-spacing: normal;
+  text-align: left;
+  margin-top: 8px;
+  padding-left: 1px;
+}
+
+// 메인 제목 크기
+.main-title {
+  font-size: 14px;
+  font-weight: 600;
+  font-stretch: normal;
+  font-style: normal;
+  line-height: normal;
+  letter-spacing: normal;
+  text-align: left;
+  margin-top: 8px;
+  padding-left: 1px;
+  padding-right: 6px;
+}
+
+// 메인 내용 크기
+.main-content {
+  font-size: 14px;
+  font-weight: normal;
+  font-stretch: normal;
+  font-style: normal;
+  line-height: normal;
+  letter-spacing: normal;
+  text-align: left;
+}
+
+// 메인 유저 네임 크기
+.main-username {
+  font-size: 13px;
+  font-weight: normal;
+  font-stretch: normal;
+  font-style: normal;
+  line-height: normal;
+  letter-spacing: normal;
+  text-align: left;
+  padding-top: 2px;
+  padding-left: 1px;
+}
+
+// 메인 추천
+.main-special {
+  font-size: 11px;
+  font-weight: normal;
+  font-stretch: normal;
+  font-style: normal;
+  line-height: normal;
+  letter-spacing: normal;
+  text-align: left;
+}
+
+// 메인 아이콘 텍스트
+.main-icon-text {
+  font-size: 10px;
+  margin-top: 6px;
+}
 
 // 무조건 가운데 정렬
 .center {

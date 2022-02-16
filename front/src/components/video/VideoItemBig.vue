@@ -5,8 +5,8 @@
       <img
         :src="video.thumbnail"
         alt="썸네일"
-        width="390px"
-        height="215px"
+        width="100%"
+        height="225px"
         style="object-fit: cover;"
         @click="watchingVideo(video)"
       >
@@ -59,22 +59,34 @@
         </div>
       </div>
     </div>
+    <login-dialog
+      :show="showLoginDialog"
+      @on-click="showLoginDialog = false"
+    />
   </div>
 </template>
 
 <script>
-import { mapActions } from 'vuex'
+import { mapActions, mapState } from 'vuex'
+import LoginDialog from '../../components/common/LoginDialog.vue';
 
 export default {
   name: 'VideoItemBig',
+  components: {
+    LoginDialog,
+  },
   props: {
     video: { type: Object, default() { {} } },
   },
   data() {
     return {
+      showLoginDialog: false,
     }
   },
   computed: {
+    ...mapState({
+      isLogin: state => state.isLogin,
+    }),
   },
   methods: {
     ...mapActions('video', [
@@ -83,14 +95,22 @@ export default {
       'unlikeVideo',
     ]),
     onClickLike: function () {
-      this.video.isLiked = true
-      this.video.likesCnt++
-      this.likeVideo(this.video)
+      if (this.isLogin) {
+        this.video.isLiked = true
+        this.video.likesCnt++
+        this.likeVideo(this.video)
+      } else {
+        this.showLoginDialog = true
+      }
     },
     onClickUnlike: function () {
-      this.video.isLiked = false
-      this.video.likesCnt--
-      this.unlikeVideo(this.video.id)
+      if (this.isLogin) {
+        this.video.isLiked = false
+        this.video.likesCnt--
+        this.unlikeVideo(this.video.id)
+      } else {
+        this.showLoginDialog = true
+      }
     },
   }
 }

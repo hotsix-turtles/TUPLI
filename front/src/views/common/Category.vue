@@ -1,5 +1,8 @@
 <template>
   <div class="">
+    <div class="font-1 bold color-main mt-4 mx-4">
+      취향 탐색
+    </div>
     <!-- 탭 -->
     <v-tabs
       v-model="tab"
@@ -87,10 +90,6 @@ export default {
       ],
       categoryTypes: ['일상', '노하우/스타일', '동물', '엔터테인먼트', '게임', '영화/드라마', '음악', '교육/시사', '스포츠', '기타', '여행'],
       tastes: ['영화/드라마', '일상', '노하우/스타일', '동물', '엔터테인먼트'],
-      // category: '',
-      // playlistCategory: '',
-      // playroomCategory: '',
-      // videoCategory: '',
       rerenderKeyInfinite: 999,
       rerenderKeyList: 0,
     }
@@ -106,25 +105,29 @@ export default {
       videoCategory: state => state.videoCategory,
       categoryVideos: state => state.categoryVideos,
       categoryNextPageToken: state => state.categoryNextPageToken,
-      // rerenderKey: state => state.rerenderKey,
+    }),
+    ...mapState({
+      isLogin: state => state.isLogin,
     }),
   },
   created: function () {
     // 유저 취향 기반으로 탭 셋팅
-    axiosConnector.get(`/account/userInfo`,
-    ).then((res) => {
-      this.tastes = res.data.taste.slice()
-      let i = 0
-      while (this.tastes.length < 5) {
-        if (!this.tastes.includes(this.categoryTypes[i])) {
-          this.tastes.push(this.categoryTypes[i])
+    if (this.isLogin) {
+      axiosConnector.get(`/account/userInfo`,
+      ).then((res) => {
+        this.tastes = res.data.taste.slice()
+        let i = 0
+        while (this.tastes.length < 5) {
+          if (!this.tastes.includes(this.categoryTypes[i])) {
+            this.tastes.push(this.categoryTypes[i])
+          }
+          i++
         }
-        i++
-      }
-    })
-      .catch((err) => {
-        console.log(err)
       })
+        .catch((err) => {
+          console.log(err)
+        })
+    }
     this.resetVideoCategoryState()
     console.log('this.tastes', this.tastes)
     // console.log('categoryVideos[videoCategory]', this.categoryVideos[this.videoCategory].length)

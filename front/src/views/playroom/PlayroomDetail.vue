@@ -349,7 +349,7 @@
                       width="250"
                       height="250"
                     >
-                      <emoji @click="clickEmoji"/>
+                      <emoji @click="clickEmoji" />
                     </v-card>
                   </v-menu>
                 </template>

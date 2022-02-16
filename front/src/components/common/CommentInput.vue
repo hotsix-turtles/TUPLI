@@ -6,9 +6,11 @@
       label="댓글 입력"
       solo
       dense
-      :disabled="!isLogin"
+      append-icon="mdi-emoticon-outline"
+      append-outer-icon="mdi-send"
       @keydown.enter="sendComment"
       @click:append-outer="sendComment"
+      @click:append="checkIsLogin"
     >
       <template v-slot:append>
         <v-menu
@@ -55,20 +57,29 @@
       </template>
     </v-text-field>
     <div />
+    <login-dialog
+      :show="showLoginDialog"
+      @on-click="showLoginDialog = false"
+    />
   </div>
 </template>
 
 <script>
 import { mapActions, mapState } from 'vuex'
+import LoginDialog from '@/components/common/LoginDialog.vue'
 
 export default {
   name: 'CommentInput',
+  components: {
+    LoginDialog,
+  },
   props: {
   },
   data: function () {
     return {
       showEmoji: false,
       inputVal: '',
+      showLoginDialog: false,
     }
   },
   computed: {
@@ -78,14 +89,17 @@ export default {
   },
   methods: {
     sendComment: function (event) {
-      if(this.inputVal == '') {
-        console.log("CommentInput.vue : 덧글 내용 입력을 해주세요")
-        return
-      }
-      else {
-        // console.log("CommentInput.vue 로 왔씁니까?")
+      if (this.isLogin) {
         this.$emit('send-comment', this.inputVal)
         this.inputVal = ''
+      } else {
+        console.log("showLoginDialog")
+        this.showLoginDialog = true
+      }
+    },
+    checkIsLogin: function () {
+      if (!this.isLogin) {
+        this.showLoginDialog = true
       }
     }
   }

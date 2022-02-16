@@ -1,9 +1,10 @@
 <template>
   <div>
-    <back :page-name="pageName" />
+    <back :page-name="pageName" /><br>
     <search-bar
       :label="'새로운 영상을 검색해주세요'"
       :router-page="'VideoSearch'"
+      class="pt-4"
     />
 
     <!-- 탭 -->
