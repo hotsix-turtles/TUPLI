@@ -100,6 +100,7 @@ public class HomeInfoService {
             for(String nowPlCate : nowPlaylist.getPlaylistCate().split(",")){
                 if(userTaste.contains(nowPlCate)){
                     SimpleHomePlaylistDto nowDto = new SimpleHomePlaylistDto(nowPlaylist, user);
+                    nowDto.setIsRecommend(false);
                     if(!homeInfos.contains(nowDto)) {
                         nowDto.setIsRecommend(true);
                         homeInfos.add(nowDto);
@@ -123,6 +124,7 @@ public class HomeInfoService {
             for(String nowPlayroomCate : nowPlayroom.getPlayroomCate().split(",")){
                 if(userTaste.contains(nowPlayroomCate)){
                     SimpleHomePlayroomDto nowDto = new SimpleHomePlayroomDto(nowPlayroom, user);
+                    nowDto.setIsRecommend(false);
                     if(!homeInfos.contains(nowDto)) {
                         nowDto.setIsRecommend(true);
                         homeInfos.add(nowDto);
