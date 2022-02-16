@@ -519,11 +519,13 @@ public class UserApiController {
             List<Long> badges = badgeService.getUserBadgeSeq(userbadges);
             List<Badge> badgeResult = new ArrayList<>();
 
-            badgeResult.addAll(badgeService.checkFollowees(userSeq, badges));
+            badgeResult = badgeService.checkFollowees(userSeq, badges);
 
-            if(badgeResult.size() == 0) badgeResult = null;
+            if(badgeResult == null || badgeResult.size() == 0) {
+                return ResponseEntity.status(HttpStatus.CREATED).body(null);
+            }
             List<SimpleBadgeDto> badgeDtoResult = badgeResult.stream().map(b -> new SimpleBadgeDto(b)).collect(Collectors.toList());
-            return ResponseEntity.status(HttpStatus.OK).body(badgeDtoResult);
+            return ResponseEntity.status(HttpStatus.CREATED).body(badgeDtoResult);
         }
         // 이미 팔로우 되어있음
         return ResponseEntity.status(HttpStatus.OK).body(null);
