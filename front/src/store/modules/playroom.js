@@ -301,8 +301,8 @@ const playroom = {
 
       commit('SET_ROOM_LIKED', Boolean(data))
     },
-    togglePlayroomLike: async function ( {state, dispatch} ) {
-      if (!this.isLogin) return;
+    togglePlayroomLike: async function ( {rootState, state, dispatch} ) {
+      if (!rootState.isLogin) return;
 
       if (state.roomLiked) await axiosConnector.delete(`/playroom/${state.roomId}/like`);
       else await axiosConnector.post(`/playroom/${state.roomId}/like`);
