@@ -33,6 +33,7 @@
   position: fixed !important;
   bottom: 0 !important;
   width: 100% !important;
+  height: 65px;
 }
 
 .fixed-top {
@@ -332,7 +333,7 @@
 .tag {
   color: #3a3939;
   background-color: #d8d8ee;
-  border-radius: 15%;
+  border-radius: 5px;
   font-size: 12px;
   padding: 3px 3px 3px 3px;
 }

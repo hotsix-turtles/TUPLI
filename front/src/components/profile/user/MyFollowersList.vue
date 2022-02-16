@@ -28,7 +28,7 @@ export default {
     ...mapState(['authToken', 'userId', 'following', 'followers'])
   },
   created: function() {
-    console.log('팔로우 리스트 받아오기')
+    console.log('팔로워 리스트 받아오기')
     this.getFollowerList()
   },
   methods: {
@@ -41,9 +41,9 @@ export default {
     getFollowerList: function() {
       axiosConnector.get(`userinfo/${this.userId}`)
         .then((res) => {
-          console.log('내 팔로우 리스트 가져오기11', res.data.to_user)
-          this.followerlist = res.data.to_user
-          console.log('내 팔로우 리스트 가져오기2', this.followerlist)
+          console.log('내 팔로워 리스트 가져오기11', res.data.from_user)
+          this.followerlist = res.data.from_user
+          console.log('내 팔로워 리스트 가져오기2', this.followerlist)
           // this.followinglist = res.data.from_user
           // console.log('내 팔로우 리스트 가져오기3', this.followinglist)
         })

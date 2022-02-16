@@ -44,7 +44,7 @@ np/* eslint-disable vue/require-default-prop */
     <!-- 네브바 -->
     <div class="d-flex-column fixed-bottom-navbar">
       <div
-        class="d-flex justify-space-around fixed-bottom-navbar navbar-background py-2"
+        class="d-flex justify-space-around align-center fixed-bottom-navbar navbar-background pt-2 pb-3"
       >
         <!-- 홈 버튼 -->
         <div
@@ -181,15 +181,15 @@ export default {
   .makeBtns {
     z-index: 2;
     position: fixed;
-    bottom: 6vh;
+    bottom: 9vh;
     width: 100% !important;
   }
 
   .makeBtn {
     z-index: 5;
-    font-size: 3.2rem !important;
+    font-size: 3.6rem !important;
     position: fixed;
-    bottom: 0.8vh;
+    bottom: 1.5vh;
     left: 50%;
     transform: translate(-50%, 0%);
   }
