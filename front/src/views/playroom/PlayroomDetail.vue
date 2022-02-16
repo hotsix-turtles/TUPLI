@@ -27,6 +27,7 @@
       >
         <!-- 플레이룸 좋아요 -->
         <v-btn
+          v-if="isLogin"
           class="playroomLike"
           @click="togglePlayroomLike"
         >
@@ -40,6 +41,18 @@
           <v-icon
             v-else
           >
+            mdi-heart-outline
+          </v-icon>
+        </v-btn>
+
+        <!-- 비로그인 플레이룸 좋아요 -->
+        <v-btn
+          v-else
+          class="playroomLike"
+          @click="isLoginNeededInfo = true"
+        >
+          <span v-text="roomCurrentLike"></span>
+          <v-icon>
             mdi-heart-outline
           </v-icon>
         </v-btn>
@@ -118,7 +131,7 @@
         </div>
 
         <v-btn
-          v-if="isFollow && !isAuthor"
+          v-if="isFollow && !isAuthor && isLogin"
           class="my-auto ml-auto"
           color="accent"
           text
@@ -127,7 +140,7 @@
           언팔로우
         </v-btn>
         <v-btn
-          v-else-if="!isAuthor"
+          v-else-if="!isAuthor && isLogin"
           class="my-auto ml-auto"
           color="accent"
           text
@@ -300,11 +313,11 @@
               <v-text-field
                 ref="chat_input"
                 v-model="message"
-                label="메시지를 입력하세요"
+                :label="isLogin ? '메시지를 입력하세요' : '로그인 후 이용 가능합니다'"
                 solo
                 dense
                 rounded
-                :disabled="!canChat"
+                :disabled="!canChat || !isLogin"
                 :error="errorOnSend"
                 @keydown.enter="sendChat"
               >
@@ -369,6 +382,8 @@
         </v-card>
       </v-dialog>
     </v-sheet>
+
+    <login-dialog :show="isLoginNeededInfo"/>
 
     <!--
       방장 전환시 팝업
@@ -457,6 +472,7 @@ import LoadingDialog from '../../components/common/LoadingDialog.vue';
 import Emoji from '../../components/common/Emoji.vue';
 import VideoListItemSmall from '../../components/video/VideoListItemSmall.vue';
 import DetailButtonBottom from '../../components/playlist/DetailButtonBottom.vue';
+import LoginDialog from '../../components/common/LoginDialog.vue';
 
 Vue.use(VueYoutube)
 
@@ -471,7 +487,8 @@ export default {
     LoadingDialog,
     Emoji,
     VideoListItemSmall,
-    DetailButtonBottom
+    DetailButtonBottom,
+    LoginDialog
   },
   data() {
     return {
@@ -494,6 +511,7 @@ export default {
       isOperationTimeError: false,
       isNotInvitedError: false,
       isAuthorChangedInfo: false,
+      isLoginNeededInfo: false,
       isDuplicatedError: false,
       isKickedError: false,
       isKickedDupError: false,
@@ -537,7 +555,8 @@ export default {
       return this.isDuplicatedError || this.isOperationTimeError || this.isNotInvitedError || this.isAuthorChangedInfo
     },
     ...mapState([
-      'userId'
+      'userId',
+      'isLogin'
     ]),
     ...mapState('playroom', [
       'roomId',
@@ -717,9 +736,9 @@ export default {
     async initPlayroom() {
       await this.loadRoomInfo(this.$route.params.id);
       if (!this.checkPermission()) return;
-      await this.loadLikeState();
+      if (this.isLogin) await this.loadLikeState();
       await this.loadFollowerCount();
-      await this.loadFollowState();
+      if (this.isLogin) await this.loadFollowState();
       await this.loadFirstVideo();
       await this.loadRoomPlaytime();
       await this.initWsConnector();
@@ -857,19 +876,25 @@ export default {
         },
         () => alert("서버 연결에 실패 하였습니다. 다시 접속해 주십시요.")
       )
-      await axiosConnector.post(`/playroom/in/${this.roomId}`)
-      this.SET_USER_START_TIME(new Date());
+
+      if (this.isLogin) {
+        await axiosConnector.post(`/playroom/in/${this.roomId}`)
+        this.SET_USER_START_TIME(new Date());
+      }
     },
     async destroyWsConnector() {
       if (this.roomId == -1) return;
-      // 이 방에 있었던 시간 (밀리초 단위)
-      this.SET_USER_END_TIME(new Date());
 
-      var time = Math.floor((new Date(this.roomUserEndTime).getTime() - new Date(this.roomUserStartTime).getTime()) / 1000 / 1000)
-      console.log(time, '초 경과')
+      if (this.isLogin) {
+        // 이 방에 있었던 시간 (밀리초 단위)
+        this.SET_USER_END_TIME(new Date());
 
-      // 새로운 뱃지 취득시 이거 응답으로 받습니다...
-      await axiosConnector.put(`/playroom/out/${this.roomId}`, { watchTime: time })
+        var time = Math.floor((new Date(this.roomUserEndTime).getTime() - new Date(this.roomUserStartTime).getTime()) / 1000 / 1000)
+        console.log(time, '초 경과')
+
+        // 새로운 뱃지 취득시 이거 응답으로 받습니다...
+        await axiosConnector.put(`/playroom/out/${this.roomId}`, { watchTime: time })
+      }
 
       if (this.wsConnector) await this.wsConnector.disconnect()
       this.resetWsConnector();
