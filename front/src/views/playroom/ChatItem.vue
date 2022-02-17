@@ -1,5 +1,7 @@
 <template>
-  <v-row>
+  <v-row
+    class="black--text"
+  >
     <v-col
       height="60px"
       cols="12"
@@ -10,6 +12,7 @@
     >
       <v-avatar
         circle
+        size="40"
         @click.stop="SELECT_CHAT_AVATAR(id)"
       >
         <v-img
@@ -31,23 +34,28 @@
           </template>
         </v-img>
       </v-avatar>
-      <p class="font-3 ml-1 font-weight-bold">
-        {{ author.name }}
-      </p>
-      <p
-        v-if="!blocked"
-        class="font-3 ml-1"
-        v-html="renderContent"
-      />
-      <p
-        v-else
-        class="font-3 ml-1 blocked"
-      >
-        [차단됨]
-      </p>
-      <p class="font-3 ml-auto mr-1">
-        {{ timeLabel }}
-      </p>
+      <div class="d-flex ml-3 flex-column">
+        <div class="d-flex flex-row">
+          <p class="font-weight-bold">
+            {{ author.name }}
+          </p>
+          <p class="ml-2 text-caption">
+            {{ timeLabel }}
+          </p>
+        </div>
+
+        <p
+          v-if="!blocked"
+          class="font-caption mr-1"
+          v-html="renderContent"
+        />
+        <p
+          v-else
+          class="ml-1 mr-1 blocked"
+        >
+          [차단됨]
+        </p>
+      </div>
     </v-col>
     <v-dialog
       v-model="selected"
