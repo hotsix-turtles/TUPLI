@@ -22,18 +22,20 @@
         v-if="authToken"
         class="d-flex mx-5 mt-4 mb-3"
       >
-        <p
-          class="font-weight-bold color-main"
-          style="margin-right: 1px;"
-          bold
-        >
-          {{ nickname }}
-        </p>
-        <p class="">
-          님이 좋아하는&nbsp;
-        </p>
-        <p class="color-main">
-          오늘의 추천 컨텐츠
+        <p>
+          <span
+            class="font-weight-bold color-main"
+            style="margin-right: 0px;"
+            bold
+          >
+            {{ nickname }}
+          </span>
+          <span class="">
+            님이 좋아하는&nbsp;
+          </span>
+          <span class="color-main">
+            오늘의 추천 컨텐츠
+          </span>
         </p>
       </div>
       <div
