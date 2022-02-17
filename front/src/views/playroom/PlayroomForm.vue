@@ -217,16 +217,14 @@
             class="pt-0"
           >
             <v-card
-              v-if="!addedFriends.length"
               class="d-flex flex-column justify-center align-center"
               min-height="300"
             >
-              <p>초대한 친구가 없습니다</p>
+              <p v-if="!addedFriends.length">초대한 친구가 없습니다</p>
+              <account-list-item-small
+                :accounts="addedFriends"
+              />
             </v-card>
-            <account-list-item-small
-              :accounts="addedFriends"
-              :readonly="true"
-            />
           </v-col>
         </v-row>
 
