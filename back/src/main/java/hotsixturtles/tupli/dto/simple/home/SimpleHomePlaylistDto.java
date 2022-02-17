@@ -35,6 +35,7 @@ public class SimpleHomePlaylistDto {
     private Integer likesCnt;
     private List<SimpleUserDto> playlistLikes;
     private SimpleYoutubeVideoDto videos;
+    private Integer commentCnt;
 
 
     public SimpleHomePlaylistDto(Playlist playlist) {
@@ -62,6 +63,8 @@ public class SimpleHomePlaylistDto {
         }
         else this.videos = new SimpleYoutubeVideoDto(playlist.getYoutubeVideos().get(0));
 
+        this.commentCnt = playlist.getPlaylistComments() == null ? 0 : playlist.getPlaylistComments().size();
+
     }
     public SimpleHomePlaylistDto(Playlist playlist, User user) {
         this.id = playlist.getId();
@@ -87,6 +90,8 @@ public class SimpleHomePlaylistDto {
             this.videos = null;
         }
         else this.videos = new SimpleYoutubeVideoDto(playlist.getYoutubeVideos().get(0));
+
+        this.commentCnt = playlist.getPlaylistComments() == null ? 0 : playlist.getPlaylistComments().size();
 
         if(playlist.getPlaylistLikes() == null){
             this.userLikesYN = "N";
