@@ -1,3 +1,9 @@
+.back-menu-text {
+  font-size: 18px;
+  font-weight: 800;
+  padding-left: 4px;;
+}
+
 .dark-background {
   position: fixed;
   z-index: 2;
@@ -805,7 +811,7 @@
 
 // 활동 플룸 공간
 .main-playroom-content {
-  width: 98%;
+  width: 95%;
   border-radius: 8px;
   border: solid 1px;
   border-color: $color-sub2;
@@ -871,6 +877,23 @@
   margin-top: 8px;
   margin-bottom: 8px;
   padding: 6px 10px;
+
+  span {
+  font-size: 14px;
+  font-weight: 500;
+  font-stretch: normal;
+  font-style: normal;
+  line-height: normal;
+  letter-spacing: normal;
+  text-align: left;
+  }
+}
+
+// 활동 내역 제목
+.history-board-content-new {
+  width: 90%;
+  margin-bottom: 5px;
+  padding-left: 8px;
 
   span {
   font-size: 14px;

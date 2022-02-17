@@ -229,7 +229,10 @@
         <div
           class="d-flex flex-column history-board-playlist align-center"
         >
-          <div class="mx-3">
+          <div
+            class="mx-3 history-board-content-new"
+            style=""
+          >
             <span>{{ activity.content }}</span>
           </div>
 
@@ -437,7 +440,7 @@ export default {
     // 태그
     getTag: function() {
       if (this.activity.type === 'board') {
-        if (this.activity.contents.tags) {
+        if (this.activity.contents) {
           this.allBoardTags = this.activity.contents.tags.split(',')
         }
         else {

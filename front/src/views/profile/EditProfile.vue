@@ -33,7 +33,7 @@
       </v-row>
       <v-container>
         <div class="d-flex flex-column align-center">
-          <div class="profile-img-medium">
+          <div class="profile-img-large">
             <img
               :src="ImgUrl(profileImage)"
               alt=""
@@ -41,10 +41,11 @@
             >
           </div>
           <!-- 사진 업로드용 임시 -->
-          <div class="update-modal mb-3">
+          <div class="d-flex flex-column align-center update-modal mb-3">
             <label for="profile-photo" />
             <input
               type="file"
+              accept="image/*"
               @change="getNewImage"
             >
           </div>
@@ -59,6 +60,7 @@
                 v-model="credentials.newNickname"
                 class="pt-0"
                 hint="새로운 닉네임을 입력해주세요."
+                :rules="[nicknameRules.input, nicknameRules.max]"
               />
               <!-- label="김춘식" -->
             </div>
@@ -92,6 +94,11 @@ export default {
   name: 'EditProfile',
   data: function() {
     return {
+      nicknameRules: {
+        input: v => !!v || '닉네임을 입력해주세요.',
+        max: v => v.length <= 7 || '7글자 내의 닉네임을 입력해주세요.',
+      },
+
       credentials: {
         newNickname: '',
         newIntroduction:'',
