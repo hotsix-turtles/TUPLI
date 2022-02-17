@@ -100,10 +100,12 @@ export default {
     ]),
     selectVideo: function() {
       if (this.isVideoList) return;
-      if (this.isSelected !== -1) {
-        this.removeSelectedVideo(this.video.videoId)
-      } else {
+      if (this.isSelected === -1) {
+        console.log('selectVideo add')
         this.addSelectedVideo(this.video)
+      } else {
+        console.log('selectVideo remove')
+        this.removeSelectedVideo(this.video.videoId)
       }
     },
     changeVideo: function (video) {

@@ -1,5 +1,7 @@
 <template>
-  <div />
+  <div>
+    <p />
+  </div>
 </template>
 
 <script>
@@ -7,6 +9,9 @@
 export default {
   name: 'TasteItem',
   props: {
+    name: {type : String, default() { '' } },
+    value: {type : String, default() { '' } }
+
   },
   created: function() {
     // console.log('아이테메엠1', this.taste)

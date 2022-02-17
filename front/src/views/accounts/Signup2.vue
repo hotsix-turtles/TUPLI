@@ -70,6 +70,7 @@
               :rules="[nicknameRules.input, nicknameRules.max]"
               type=""
               label="닉네임"
+              @keydown.enter="onInputKeyword"
             />
           </v-form>
 
@@ -138,11 +139,20 @@ export default {
     ...mapActions([
       'signup',
     ]),
+    // 로그인
+    requestSignup: function () {
+      this.signup(this.credentials)
+      this.valid = true
+    },
 
     // 회원가입 유효성 검사
     signupCheck: function () {
       this.signup(this.credentials)
     },
+
+    onInputKeyword: function() {
+      this.requestSignup()
+    }
 
   },
 

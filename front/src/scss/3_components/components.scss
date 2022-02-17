@@ -517,7 +517,7 @@
 
 // 메인 내용 크기
 .main-content {
-  width: 300px;
+  width: 280px;
   font-size: 14px;
   font-weight: normal;
   font-stretch: normal;
@@ -638,15 +638,16 @@
   border-color: $color-sub2;
   margin-top: 8px;
   margin-bottom: 8px;
-  padding-bottom: 10px;
+  padding-bottom: 14px;
 
   div {
     width: 100%;
 
     img {
-      width: 100%;
+      width: 90%;
       height: auto;
-
+      margin-left: 5%;
+      margin-bottom: 6px;
     }
   }
 }

@@ -33,7 +33,7 @@
     <!-- 플레이리스트 생성 폼 -->
     <v-form
       v-model="valid"
-      class="mt-5"
+      class="mt-5 mx-1"
     >
       <v-container>
         <v-row>

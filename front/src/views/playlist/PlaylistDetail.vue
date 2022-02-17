@@ -53,12 +53,6 @@
             mdi-dots-vertical
           </v-icon>
         </div>
-        <modal
-          :items="selectList"
-          :modal-name="'플레이리스트 변경'"
-          :modal-type="'modal'"
-          @on-select="onSelect"
-        />
       </div>
     </div><br><br>
     <div class="container mt-2">
@@ -163,6 +157,13 @@
 
     <!-- 플레이룸생성/내 플레이리스트에 넣기/저장하기 -->
     <detail-button-bottom />
+    <!-- 수정하기/삭제하기 -->
+    <modal
+      :items="selectList"
+      modal-name="플레이리스트 변경"
+      modal-type="modal"
+      @on-select="onSelect"
+    />
     <!-- 플레이룸 생성 -->
     <normal-dialog
       title="플레이룸 생성하기"
@@ -172,6 +173,25 @@
       :buttons="[{ name: '확인', color: '#5B5C9D' }, { name: '취소', color: 'gray' }]"
       :show="createPlayroom"
       @button-click="onClickCreatePlayroomDialog"
+    />
+    <!-- 삭제 여부 확인 다이얼로그 -->
+    <normal-dialog
+      title="플레이리스트 삭제하기"
+      content-html="정말 이 플레이리스트를 삭제하시겠습니까?"
+      max-width="290"
+      persistent
+      :buttons="[{ name: '확인', color: '#5B5C9D' }, { name: '취소', color: 'gray' }]"
+      :show="deletePlaylist"
+      @button-click="onClickDeletePlaylistDialog"
+    />
+    <timeout-dialog-k
+      :content="'해당 플레이리스트가 삭제되었습니다.'"
+      :show="showTimeoutDialog"
+      hide-progress
+      :persistent="false"
+      timeout="1700"
+      @timeout="onTimeout"
+      @click="onTimeout"
     />
     <login-dialog
       :show="showLoginDialog"
@@ -191,6 +211,7 @@ import Tags from '../../components/common/Tags.vue'
 import Modal from '../../components/common/Modal.vue'
 import NormalDialog from '../../components/common/NormalDialog.vue';
 import LoginDialog from '../../components/common/LoginDialog.vue';
+import TimeoutDialogK from '@/components/common/TimeoutDialogK.vue'
 
 import VideoListItemSmall from '../../components/video/VideoListItemSmall.vue'
 import PlaylistThumbnailItem from '../../components/playlist/PlaylistThumbnailItem.vue'
@@ -207,6 +228,7 @@ export default {
     Modal,
     NormalDialog,
     LoginDialog,
+    TimeoutDialogK,
   },
   data: function() {
     return {
@@ -216,6 +238,8 @@ export default {
         '삭제하기': 'delete',
       },
       createPlayroom: false,
+      deletePlaylist: false,
+      showTimeoutDialog: false,
       showLoginDialog: false,
     }
   },
@@ -275,14 +299,7 @@ export default {
         this.saveAddedVideos(this.playlistDetail.videos)
         this.$router.push({ name: 'PlaylistUpdateForm', params: { playlistId: this.playlistDetail.id } })
       } else if (item === 'delete') {
-        console.log('onSelect 삭제', item)
-        axiosConnector.delete(`/playlist/${this.playlistDetail.id}`
-        ).then((res) => {
-          console.log('삭제되었습니다', res)
-          this.$router.push({ name: 'Home' })
-        }).catch((err) => {
-          console.log(err)
-        })
+        this.deletePlaylist = true
       }
     },
     showCreatePlayroomDialog: function () {
@@ -314,22 +331,42 @@ export default {
         this.createPlayroom = false
       }
     },
+    onClickDeletePlaylistDialog: function (idx) {
+      if (idx === 0) { // 확인
+        console.log('onClickDeletePlaylistDialog 삭제')
+        this.deletePlaylist = false
+        axiosConnector.delete(`/playlist/${this.playlistDetail.id}`
+        ).then((res) => {
+          console.log('삭제되었습니다', res)
+          this.showTimeoutDialog = true
+          this.$router.push({ name: 'Home' })
+        }).catch((err) => {
+          console.log(err)
+        })
+      } else {
+        this.deletePlaylist = false
+      }
+    },
+    onTimeout () {
+      this.showTimeoutDialog = false
+      this.$router.push({ name: 'Home' })
+    },
     ImgUrl: function(img) {
       return getImage(img)
     },
     onClickLike: function () {
       console.log(this.isLogin)
       if (this.isLogin) {
-        this.playlist.isLiked = true
-        this.likePlaylist(playlistDetail.id)
+        this.playlistDetail.isLiked = true
+        this.likePlaylist(this.playlistDetail.id)
       } else {
         this.showLoginDialog = true
       }
     },
     onClickUnlike: function () {
       if (this.isLogin) {
-        this.playlist.isLiked = false
-        this.unlikePlaylist(playlistDetail.id)
+        this.playlistDetail.isLiked = false
+        this.unlikePlaylist(this.playlistDetail.id)
       } else {
         this.showLoginDialog = true
       }

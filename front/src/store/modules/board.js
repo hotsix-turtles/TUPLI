@@ -67,7 +67,7 @@ const board = {
       console.log(state.myPlayrooms)
     },
     GET_LIKED_PLAYROOMS: function (state, playrooms) {
-      let today = new Date()
+      let today = new Date() / 1000
       playrooms.forEach((playroom) => {
         if (playroom.startTime <= today && playroom.endTime >= today) {
           playroom.onPlay = true
@@ -82,7 +82,7 @@ const board = {
     GET_BOARD_DETAIL: function (state, boardDetail) {
       boardDetail.created = timeConverter(boardDetail.created)
       if (boardDetail.playroom !== null) {
-        const today = new Date()
+        const today = new Date() / 1000
         if (boardDetail.playroom.startTime <= today && boardDetail.playroom.endTime >= today) {
           boardDetail.playroom.onPlay = true
         } else {

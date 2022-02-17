@@ -91,12 +91,14 @@ export default {
   },
   methods: {
     sendComment: function (event) {
-      if (this.isLogin) {
-        this.$emit('send-comment', this.inputVal)
-        this.inputVal = ''
-      } else {
-        console.log("showLoginDialog")
-        this.showLoginDialog = true
+      if (this.inputVal) {
+        if (this.isLogin) {
+          this.$emit('send-comment', this.inputVal)
+          this.inputVal = ''
+        } else {
+          console.log("showLoginDialog")
+          this.showLoginDialog = true
+        }
       }
     },
     checkIsLogin: function () {
@@ -116,14 +118,14 @@ export default {
 <style scoped>
   .comment-input {
     width: 94vw !important;
-    z-index: 20 !important;
+    z-index: 1 !important;
     position: fixed !important;
     bottom: 50px !important;
   }
 
   .background {
     background-color: white;
-    z-index: 19 !important;
+    z-index: 1 !important;
     position: fixed !important;
     bottom: 0 !important;
     height: "20vh" !important;

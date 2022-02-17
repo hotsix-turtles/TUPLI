@@ -7,7 +7,7 @@
     <v-bottom-navigation
       absolute
       background-color="#5B5C9D"
-      height="75px"
+      height="66px"
       class="fixed-bottom"
       :input-value="addedFriends.length > 0 || selectedFriends.length > 0"
     >
@@ -35,12 +35,19 @@
       id="scroll-threshold-example"
       class="overflow-y-auto"
     >
-      <back :page-name="pageName" />
-      <!-- <search-bar
-        :label="'초대할 친구를 검색해주세요'"
-        :is-detail="true"
-        @input-change="onEnterSearch"
-      /> -->
+      <!-- 뒤로가기/완료 or 수정 -->
+      <div class="d-flex justify-space-between fixed-top light-background">
+        <div class="d-flex mx-3 my-3">
+          <div>
+            <v-icon @click="saveAndGoBack">
+              mdi-arrow-left
+            </v-icon>
+          </div>
+          <div class="font-2 semi-bold center">
+            {{ pageName }}
+          </div>
+        </div>
+      </div>
 
       <!-- 탭 -->
       <v-tabs
@@ -81,7 +88,7 @@
 
 <script>
 import { mapActions, mapState } from 'vuex'
-import Back from '../../components/common/Back.vue'
+//import Back from '../../components/common/Back.vue'
 // import SearchBar from '../../components/common/SearchBar.vue'
 
 import NavButton from '../../components/common/NavButton.vue'
@@ -90,7 +97,7 @@ import AccountListItemSmall from '../../components/account/AccountListItemSmall.
 
 export default {
   name: 'PlayroomFormFriend',
-  components: { NavButton, Back, AccountListItemSmall },
+  components: { NavButton,  AccountListItemSmall },
   data() {
     return {
       pageName: "친구 추가하기",
@@ -117,6 +124,9 @@ export default {
     });
   },
   methods: {
+    saveAndGoBack() {
+      this.requestAddFriends()
+    },
     async getUserFriendInfo() {
       var followerFriends;
       var cofollowerFriends;

@@ -1,13 +1,13 @@
 <template>
   <v-card
-    class="playroom mx-auto overflow-hidden mb-10"
+    class="playroom mx-auto overflow-hidden"
     height="100%"
   >
     <!-- 하단 네비게이션 (플레이리스트 조작) -->
     <v-bottom-navigation
       absolute
       background-color="#5B5C9D"
-      height="75px"
+      height="66px"
       class="fixed-bottom"
       :input-value="addedPlaylists.length > 0 || selectedPlaylists.length > 0"
     >
@@ -35,10 +35,19 @@
       id="scroll-threshold-example"
       class="overflow-y-auto"
     >
-      <back :page-name="pageName" />
-      <!-- <search-bar
-        :label="'새로운 플레이리스트를 검색해주세요'"
-      /> -->
+      <!-- 뒤로가기/완료 or 수정 -->
+      <div class="d-flex justify-space-between fixed-top light-background">
+        <div class="d-flex mx-3 my-3">
+          <div>
+            <v-icon @click="saveAndGoBack">
+              mdi-arrow-left
+            </v-icon>
+          </div>
+          <div class="font-2 semi-bold center">
+            {{ pageName }}
+          </div>
+        </div>
+      </div>
 
       <!-- 탭 -->
       <v-tabs
@@ -74,15 +83,13 @@
 
 <script>
 import { mapActions, mapState } from 'vuex'
-import Back from '../../components/common/Back.vue'
-// import SearchBar from '../../components/common/SearchBar.vue'
 import PlaylistListItemSmall from '../../components/playlist/PlaylistListItemSmall.vue'
 import NavButton from '../../components/common/NavButton.vue'
 import axiosConnector from '../../utils/axios-connector';
 
 export default {
   name: 'PlayroomFormPlaylist',
-  components: { NavButton, PlaylistListItemSmall, Back },
+  components: { NavButton, PlaylistListItemSmall },
   data() {
     return {
       pageName: "플레이리스트 추가하기",
@@ -107,6 +114,9 @@ export default {
     });
   },
   methods: {
+    saveAndGoBack() {
+      this.requestAddPlaylists()
+    },
     async getUserPlaylistInfo() {
       const token = localStorage.getItem('jwt')
 
