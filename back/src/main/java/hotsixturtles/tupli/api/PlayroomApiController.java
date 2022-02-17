@@ -540,4 +540,15 @@ public class PlayroomApiController {
         private Long watchTime;
     }
 
+    @GetMapping("/playroom/{playroomId}/usercount")
+    @ApiOperation(value = "플레이룸 유저 수를 가져옵니다.", notes = "")
+    public ResponseEntity categoryPlayroom(@PathVariable("playroomId") Long playroomId) {
+
+        Playroom playroom = playroomService.getPlayroom(playroomId);
+        if(playroom == null || playroom.getGuests() == null) return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+
+        return ResponseEntity.status(HttpStatus.OK).body(playroom.getGuests().size());
+
+    }
+
 }
