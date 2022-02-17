@@ -48,7 +48,7 @@
         </div>
       </div>
     </div>
-    <timeout-dialog
+    <timeout-dialog-k
       :content="timeoutMsg"
       :show="showTimeoutDialog"
       hide-progress
@@ -62,12 +62,12 @@
 
 <script>
 import { mapActions, mapState } from 'vuex'
-import TimeoutDialog from '../common/TimeoutDialog.vue'
+import TimeoutDialogK from '../common/TimeoutDialogK.vue'
 
 export default {
   name: 'AddButtonBottom',
   components: {
-    TimeoutDialog
+    TimeoutDialogK
   },
   props: {
   },

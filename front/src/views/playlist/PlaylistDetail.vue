@@ -184,7 +184,7 @@
       :show="deletePlaylist"
       @button-click="onClickDeletePlaylistDialog"
     />
-    <timeout-dialog
+    <timeout-dialog-k
       :content="'해당 플레이리스트가 삭제되었습니다.'"
       :show="showTimeoutDialog"
       hide-progress
@@ -211,7 +211,7 @@ import Tags from '../../components/common/Tags.vue'
 import Modal from '../../components/common/Modal.vue'
 import NormalDialog from '../../components/common/NormalDialog.vue';
 import LoginDialog from '../../components/common/LoginDialog.vue';
-import TimeoutDialog from '@/components/common/TimeoutDialog.vue'
+import TimeoutDialogK from '@/components/common/TimeoutDialogK.vue'
 
 import VideoListItemSmall from '../../components/video/VideoListItemSmall.vue'
 import PlaylistThumbnailItem from '../../components/playlist/PlaylistThumbnailItem.vue'
@@ -228,7 +228,7 @@ export default {
     Modal,
     NormalDialog,
     LoginDialog,
-    TimeoutDialog,
+    TimeoutDialogK,
   },
   data: function() {
     return {

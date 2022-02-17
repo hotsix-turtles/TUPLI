@@ -139,7 +139,7 @@
       :show="deleteBoard"
       @button-click="onClickDeleteBoardDialog"
     />
-    <timeout-dialog
+    <timeout-dialog-k
       :content="'해당 게시글이 삭제되었습니다.'"
       :show="showTimeoutDialog"
       hide-progress
@@ -168,7 +168,7 @@ import VideoListItemSmall from '../../components/video/VideoListItemSmall.vue';
 
 import NormalDialog from '../../components/common/NormalDialog.vue';
 import LoginDialog from '../../components/common/LoginDialog.vue';
-import TimeoutDialog from '../../components/common/TimeoutDialog.vue'
+import TimeoutDialogK from '../../components/common/TimeoutDialogK.vue'
 import DetailButtonBottom from '../../components/playlist/DetailButtonBottom.vue'
 
 export default {
@@ -182,7 +182,7 @@ export default {
     VideoListItemSmall,
     NormalDialog,
     LoginDialog,
-    TimeoutDialog,
+    TimeoutDialogK,
   },
   data: function() {
     return {
