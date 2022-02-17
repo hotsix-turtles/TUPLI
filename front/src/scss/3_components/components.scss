@@ -607,9 +607,20 @@
 
 // 메인 내용 크기
 .main-content {
-  width: 280px;
   font-size: 14px;
   font-weight: normal;
+  font-stretch: normal;
+  font-style: normal;
+  line-height: normal;
+  letter-spacing: normal;
+  text-align: left;
+  padding-right: 30px;
+}
+
+// 메인 내용 크기
+.main-content-board {
+  font-size: 14px;
+  font-weight: 500;
   font-stretch: normal;
   font-style: normal;
   line-height: normal;
@@ -749,8 +760,52 @@
 }
 
 // 활동 플룸 공간
+.history-playroom-content-main {
+  width: 100%;
+  border-radius: 8px;
+  border: solid 1px;
+  border-color: $color-sub2;
+  margin-top: 8px;
+  margin-bottom: 8px;
+  padding-bottom: 14px;
+
+  div {
+    width: 100%;
+
+    img {
+      width: 90%;
+      height: auto;
+      margin-left: 5%;
+      margin-bottom: 6px;
+    }
+  }
+}
+
+// 활동 플룸 공간
 .history-playroom-content {
   width: 90%;
+  border-radius: 8px;
+  border: solid 1px;
+  border-color: $color-sub2;
+  margin-top: 8px;
+  margin-bottom: 8px;
+  padding-bottom: 14px;
+
+  div {
+    width: 100%;
+
+    img {
+      width: 90%;
+      height: auto;
+      margin-left: 5%;
+      margin-bottom: 6px;
+    }
+  }
+}
+
+// 활동 플룸 공간
+.main-playroom-content {
+  width: 98%;
   border-radius: 8px;
   border: solid 1px;
   border-color: $color-sub2;
@@ -781,6 +836,19 @@
   padding-bottom: 10px;
 
 }
+
+// 활동 플리 공간
+.main-playlist-content {
+  width: 94%;
+  border-radius: 8px;
+  border: solid 1px;
+  border-color: $color-sub2;
+  margin-top: 8px;
+  margin-bottom: 8px;
+  padding-bottom: 10px;
+
+}
+
 
 // 활동 내역 제목
 .history-board-content {
