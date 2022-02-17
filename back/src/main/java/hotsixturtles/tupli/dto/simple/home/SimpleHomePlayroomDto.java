@@ -28,6 +28,7 @@ public class SimpleHomePlayroomDto {
 
     private SimpleYoutubeVideoDto videos;
     private OffsetDateTime startTime;
+    private OffsetDateTime endTime;
 
     // 유저 정보
 
@@ -54,6 +55,7 @@ public class SimpleHomePlayroomDto {
         this.userProfileImg = playroom.getUser().getProfileImage();
         this.userFollowersCnt = playroom.getUser().getTo_user() == null ? 0 : playroom.getUser().getTo_user().size();
         this.startTime = playroom.getStartTime();
+        this.endTime = playroom.getEndTime();
         if(playroom.getVideos() == null || playroom.getVideos().size() == 0) this.videos = null;
         else this.videos = new SimpleYoutubeVideoDto(playroom.getVideos().get(0));
     }
@@ -71,6 +73,7 @@ public class SimpleHomePlayroomDto {
             this.userProfileImg = playroom.getUser().getProfileImage();
             this.userFollowersCnt = playroom.getUser().getTo_user() == null ? 0 : playroom.getUser().getTo_user().size();
             this.startTime = playroom.getStartTime();
+            this.endTime = playroom.getEndTime();
 
             if(playroom.getVideos() == null || playroom.getVideos().size() == 0) this.videos = null;
             else this.videos = new SimpleYoutubeVideoDto(playroom.getVideos().get(0));
