@@ -9,50 +9,12 @@
       :key="index"
       class="ml-2 mr-3"
     >
-      <v-container>
-        <v-row>
-          <v-col :cols="2">
-            <!-- 프로필사진 노출 -->
-            <img
-              style="border-radius: 100px;"
-              :src="ImgUrl(playlistComment.user.profileImage)"
-              width="40px"
-              height="40px"
-            >
-          </v-col>
-          <v-col :cols="10">
-            <v-row
-              style="table-layout:fixed"
-            >
-              <div class="mt-2">
-                <!-- 유저닉네임 노출 -->
-                <span class="semi-bold">
-                  {{ playlistComment.user.nickname }}
-                </span>
-                <!-- 덧글내용 노출 -->
-                <span v-html="renderContent(playlistComment.content)" />
-              </div>
-            </v-row>
-            <v-row>
-              <!-- 날짜 표시 -->
-              <div class="">
-                <span style="color:gray;font-size:14px">
-                  {{ playlistComment.created }}
-                </span>
-                <!-- 댓글삭제 버튼 -->
-                <span
-                  v-if="userId == playlistComment.user.userSeq"
-                  style="color:gray;font-size:13px"
-                  class="ml-1"
-                  @click.stop="deleteComment(playlistComment.id)"
-                >
-                  삭제
-                </span>
-              </div>
-            </v-row>
-          </v-col>
-        </v-row>
-      </v-container>
+      <comment-item
+        :id="playlistId"
+        :comment-type="'playlist'"
+        :comment="playlistComment"
+        @delete-comment="deleteComment"
+      />
     </div>
 
     <!-- 덧글이 한개도 없을때 나오는 출력창 -->
@@ -77,6 +39,7 @@ import { mapActions, mapState } from 'vuex'
 import Back from '../../components/common/Back.vue'
 import CommentInput from '../../components/common/CommentInput.vue'
 import { getImage, renderEmoticon } from '../../utils/utils'
+import CommentItem from '../../components/common/CommentItem.vue'
 
 
 export default {
@@ -84,11 +47,11 @@ export default {
   components: {
     Back,
     CommentInput,
+    CommentItem,
   },
   data: function() {
     return {
       playlistId: 0,
-
     }
   },
   computed: {
@@ -107,6 +70,9 @@ export default {
   mounted: function () {
     this.updateScroll()
   },
+  // updated: function () {
+  //   this.updateScroll()
+  // },
   methods: {
     ...mapActions('playlist', [
       'getPlaylistComments',
@@ -122,10 +88,11 @@ export default {
       this.createPlaylistComment({ playlistId, data })
       this.updateScroll()
     },
-    deleteComment: function () {
+    deleteComment: function (commentId) {
       const playlistId = this.playlistId
-      console.log("playlistComment.vue : playlistId", playlistId)
+      console.log("playlistComment.vue deleteComment : playlistId", playlistId)
       this.deletePlaylistComment({commentId, playlistId})
+      this.getPlaylistComments(this.playlistId)
     },
     ImgUrl: function(img) {
       return getImage(img)
