@@ -255,7 +255,7 @@ export default {
           })
         })
         .catch (() => {
-          dialogDeleteUser = false
+          this.dialogDeleteUser = false
           swal.fire ({
             icon: 'error',
             title: '탈퇴 실패',

@@ -119,7 +119,7 @@ export default {
 
       passwordRules: {
         input: v => !!v || '비밀번호를 입력해주세요.',
-        min: v => v.length >= 4 && v.length <= 16 || '4자 이상 16자 이하 비밀번호를 입력해주세요.',
+        min: v => v.length >= 8 && v.length <= 16 || '8자 이상 16자 이하 비밀번호를 입력해주세요.',
       },
 
       passwordCheckRules: {
