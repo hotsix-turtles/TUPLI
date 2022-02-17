@@ -4,7 +4,6 @@
       v-for="playroomlist in playroomlists"
       :key="playroomlist.id"
       :playroomlist="playroomlist"
-      :thumbnail="playroomlist.videos[0].thumbnail"
     />
   </v-app>
 </template>
