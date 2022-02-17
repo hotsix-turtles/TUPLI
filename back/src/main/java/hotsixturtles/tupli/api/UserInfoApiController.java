@@ -81,7 +81,7 @@ public class UserInfoApiController {
             Long myUserSeq = jwtTokenProvider.getUserSeq(token);
             User user = userRepository.findByUserSeq(userSeq);
 
-            List<Object> activities = homeInfoService.getActivites(userSeq, pageable);
+            List<Object> activities = homeInfoService.getUserActivites(userSeq, myUserSeq, pageable);
             List<Playroom> playrooms = playroomService.getWatchingPlayroom(userSeq);
             UserProfileDto result = new UserProfileDto(user, userInfo, playrooms, activities);
             if(myUserSeq == user.getUserSeq()) result.setMeCheck(true);

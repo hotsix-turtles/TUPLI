@@ -4,6 +4,9 @@ import hotsixturtles.tupli.dto.simple.home.SimpleHomeBoardDto;
 import hotsixturtles.tupli.dto.simple.home.SimpleHomePlaylistDto;
 import hotsixturtles.tupli.dto.simple.home.SimpleHomePlayroomDto;
 import hotsixturtles.tupli.entity.*;
+import hotsixturtles.tupli.entity.likes.BoardLikes;
+import hotsixturtles.tupli.entity.likes.PlaylistLikes;
+import hotsixturtles.tupli.entity.likes.PlayroomLikes;
 import hotsixturtles.tupli.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -158,6 +161,66 @@ public class HomeInfoService {
             }
             else{
                 infoResult.add(new SimpleHomeBoardDto(boardRepository.findById(nowHomeInfo.getInfoId()).orElse(null)));
+            }
+        }
+
+        return infoResult;
+
+    }
+    @Transactional
+    public List<Object> getUserActivites(Long userSeq,Long myUserSeq, Pageable pageable){
+        Page<HomeInfo> homeInfoPage = homeInfoRepository.findByUserSeq(userSeq, pageable);
+
+        List<HomeInfo> result = homeInfoPage.getContent();
+
+        List<Object> infoResult = new ArrayList<>();
+        for(HomeInfo nowHomeInfo : result){
+            String type = nowHomeInfo.getType();
+            if(type.equals("playlist")){
+                Playlist nowPlaylist = playlistRepository.findById(nowHomeInfo.getInfoId()).orElse(null);
+                if(nowPlaylist == null) continue;
+                SimpleHomePlaylistDto simplePlaylist = new SimpleHomePlaylistDto(nowPlaylist);
+                simplePlaylist.setUserLikesYN("N");
+                if(nowPlaylist.getPlaylistLikes() != null) {
+                    for (PlaylistLikes nowPlaylistLikes : nowPlaylist.getPlaylistLikes()) {
+                        if (nowPlaylistLikes.getUser().getUserSeq() == myUserSeq) {
+                            simplePlaylist.setUserLikesYN("Y");
+                            break;
+                        }
+                    }
+                }
+                infoResult.add(simplePlaylist);
+            }
+            else if(type.equals("playroom")){
+                    Playroom nowPlayroom = playroomRepository.findById(nowHomeInfo.getInfoId()).orElse(null);
+                    if(nowPlayroom == null) continue;
+                    SimpleHomePlayroomDto simplePlayroom = new SimpleHomePlayroomDto(nowPlayroom);
+                    simplePlayroom.setUserLikesYN("N");
+                    if(nowPlayroom.getPlayroomLikes() != null) {
+                        for (PlayroomLikes nowPlayroomLikes : nowPlayroom.getPlayroomLikes()) {
+                            if (nowPlayroomLikes.getUser().getUserSeq() == myUserSeq) {
+                                simplePlayroom.setUserLikesYN("Y");
+                                break;
+                            }
+                        }
+                    }
+
+                infoResult.add(simplePlayroom);
+            }
+            else{
+                Board nowBoard = boardRepository.findById(nowHomeInfo.getInfoId()).orElse(null);
+                if(nowBoard == null) continue;
+                SimpleHomeBoardDto simpleBoard = new SimpleHomeBoardDto(nowBoard);
+                simpleBoard.setUserLikesYN("N");
+                if(nowBoard.getBoardLikes() != null){
+                    for (BoardLikes nowBoardLikes : nowBoard.getBoardLikes()) {
+                        if (nowBoardLikes.getUser().getUserSeq() == myUserSeq) {
+                            simpleBoard.setUserLikesYN("Y");
+                            break;
+                        }
+                    }
+                }
+                infoResult.add(simpleBoard);
             }
         }
 
