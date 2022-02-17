@@ -115,7 +115,7 @@
         <!-- 플레이룸 작성자 프로필 사진 -->
         <div class="authorProfilePic">
           <img
-            :src="ImgUrl(roomAuthorProfilePic)"
+            :src="roomAuthorProfilePicRendered"
             alt=""
             class="rounded-circle"
             style="width: 100%; height: auto;"
@@ -554,6 +554,9 @@ export default {
     }
   },
   computed: {
+    roomAuthorProfilePicRendered() {
+      return getImage(this.roomAuthorProfilePic);
+    },
     selectList() {
       return this.roomRepeat ? {
         '수정하기': 'update',
