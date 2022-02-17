@@ -883,7 +883,7 @@ export default {
       const baseURL = "https://tupli.kr/api/v1" + "/ws-stomp"
       const sock = new SockJS(baseURL);
 
-      this.setWsConnector(Stomp.over(sock));
+      this.setWsConnector(Stomp.over(sock, { debug: false }));
       if (!this.wsConnector) return;
 
       this.wsConnector.connect(
