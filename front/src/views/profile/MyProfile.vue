@@ -73,6 +73,7 @@
     <!-- 유저 활동, 취향 탭 -->
     <div class="d-flex justify-space-around mt-1">
       <v-tabs
+        v-model="tab"
         centered
         grow
         color="#5B5C9D"
@@ -94,6 +95,7 @@
 
     <!--무한스크롤 -->
     <infinite-loading
+      v-if="tab === 0"
       spinner="waveDots"
       @infinite="getAccounts"
     >
@@ -116,6 +118,7 @@ export default {
   components: { MyProfilePlaylist, MyProfileTaste, InfiniteLoading, },
   data: function() {
     return {
+      tab: null,
       followerlist: [],
       followinglist: [],
       activities: [],
@@ -164,11 +167,11 @@ export default {
         params
       })
         .then((res) => {
-          if (this.page === 1) {
+          if (this.page === 0) {
             this.page++
             console.log('본인 프로필', res.data)
             this.profile = res.data
-            this.activities = res.data.activities
+            this.activities.push(...res.data.activities)
             $state.loaded()
           // console.log('액티비티22', this.activities)
           } else if (res.data.activities.length) {

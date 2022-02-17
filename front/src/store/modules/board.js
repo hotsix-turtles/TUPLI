@@ -99,7 +99,7 @@ const board = {
         boardComments.forEach((boardComment) => {
           boardComment.created = timeConverter(boardComment.created)
         })
-        state.boardComments = boardComments
+        state.boardComments = boardComments.reverse()
       }
       else {
         state.boardComments = []

@@ -159,11 +159,11 @@ export default {
         params
       })
         .then((res) => {
-          if (this.page === 1) {
+          if (this.page === 0) {
             this.page++
             console.log('성공적 프로필', res.data)
             this.profile = res.data
-            this.activities = res.data.activities
+            this.activities.push(...res.data.activities)
             this.tastes = res.data.userInfo.tasteInfo
             this.nickname = res.data.nickname
             this.follower_cnt = res.data.from_user.length
