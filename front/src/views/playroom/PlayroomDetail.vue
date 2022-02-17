@@ -1164,6 +1164,7 @@ export default {
             this.roomVideos.find(roomVideo => roomVideo.id == this.roomPlaylists[this.roomCurrentPlaylistId][0]).thumbnail,
           link: {
             mobileWebUrl: `https://tupli.kr/playroom/${this.roomId}`,
+            webUrl: `https://tupli.kr/playroom/${this.roomId}`
           },
         },
         social: {
@@ -1174,13 +1175,15 @@ export default {
           {
             title: '플레이룸 이동',
             link: {
-              mobileWebUrl: `https://tupli.kr/playroom/${this.roomId}`
+              mobileWebUrl: `https://tupli.kr/playroom/${this.roomId}`,
+              webUrl: `https://tupli.kr/playroom/${this.roomId}`
             }
           },
           {
             title: '다른 영상 찾기',
             link: {
-              mobileWebUrl: 'https://tupli.kr/category'
+              mobileWebUrl: 'https://tupli.kr/category',
+              webUrl: 'https://tupli.kr/category'
             }
           }
         ]
