@@ -3,20 +3,27 @@
     <v-card
       class="d-flex align-center my-2"
       :color="color"
-      @click.stop="clickFriend"
       outlined
+      @click.stop="clickFriend"
     >
       <div>
         <img
           class="profile"
-          src="https://pbs.twimg.com/media/E4fuVa0WUAAlO1D.jpg"
+          :src="ImgUrl(account.profileImage)"
+          @click="redirectProfile"
         >
       </div>
       <div class="ml-3 d-flex-column justify-center">
-        <div class="font-2 semi-bold">
+        <div
+          class="font-2 semi-bold"
+          @click="redirectProfile"
+        >
           {{ account.nickname }}
         </div>
-        <div class="color-dark-gray">
+        <div
+          class="color-dark-gray"
+          @click="redirectProfile"
+        >
           {{ account.email }}
         </div>
         <div class="color-dark-gray">
@@ -24,12 +31,17 @@
         </div>
       </div>
     </v-card>
-    <hr v-if="underline" class="hr">
+    <hr
+      v-if="underline"
+      class="hr"
+    >
   </div>
 </template>
 
 <script>
 import { mapActions, mapState } from 'vuex'
+import { getImage } from '../../utils/utils'
+
 export default {
   name: 'AccountListItemSmall',
   props: {
@@ -55,6 +67,10 @@ export default {
     console.log(this.playlist)
   },
   methods: {
+    redirectProfile() {
+      if (!this.readonly) return;
+      this.$router.push({ name: 'Profile', params: { userId : this.account.userSeq }})
+    },
     clickFriend() {
       if (this.readonly) return;
       if (this.selected) {
@@ -64,6 +80,9 @@ export default {
         this.selectFriend(this.account)
         this.selected = true;
       }
+    },
+    ImgUrl: function(img) {
+      return getImage(img)
     },
     ...mapActions('friend', [
       'selectFriend',

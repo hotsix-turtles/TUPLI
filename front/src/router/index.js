@@ -9,6 +9,7 @@ import Login from '../views/accounts/Login.vue'
 import Signup from '../views/accounts/Signup1.vue'
 import Signup2 from '../views/accounts/Signup2.vue'
 import Signup3 from '../views/accounts/Signup3.vue'
+import FindPassword from '../views/accounts/FindPassword.vue'
 //profile
 import EditProfile from '../views/profile/EditProfile.vue'
 import MyFollow from '../views/profile/MyFollow.vue'
@@ -86,6 +87,13 @@ const routes = [
     path: '/oauth/redirect',
     name: 'AuthHandler',
     component: AuthHandler
+  },
+
+  // 비밀번호 찾기
+  {
+    path: '/findpassword',
+    name: 'FindPassword',
+    component: FindPassword,
   },
 
   // 플레이리스트

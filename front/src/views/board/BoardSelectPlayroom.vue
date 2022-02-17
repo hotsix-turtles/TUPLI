@@ -1,9 +1,10 @@
 <template>
   <div>
-    <back :page-name="'플레이룸 선택하기'" />
+    <back :page-name="'플레이룸 선택하기'" /><br>
     <search-bar
       :label="'검색어를 입력해주세요'"
       :router-page="'PlayroomSearch'"
+      class="pt-3"
     />
 
     <!-- 탭 -->

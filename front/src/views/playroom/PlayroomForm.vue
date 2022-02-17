@@ -4,7 +4,7 @@
     <div class="d-flex justify-space-between fixed-top light-background">
       <div class="d-flex mx-3 my-3">
         <div>
-          <v-icon @click="$router.go(-1)">
+          <v-icon @click="resetFormAndGo">
             mdi-arrow-left
           </v-icon>
         </div>
@@ -17,8 +17,7 @@
         :class="{ 'color-main': addedPlaylists.length > 0 }"
         @click="submit"
         v-text="formType == 'create' ? '완료' : '수정'"
-      >
-      </div>
+      />
     </div><br><br>
 
     <!-- 플레이룸 생성 폼 -->
@@ -218,16 +217,14 @@
             class="pt-0"
           >
             <v-card
-              v-if="!addedFriends.length"
               class="d-flex flex-column justify-center align-center"
               min-height="300"
             >
-              <p>초대한 친구가 없습니다</p>
+              <p v-if="!addedFriends.length">초대한 친구가 없습니다</p>
+              <account-list-item-small
+                :accounts="addedFriends"
+              />
             </v-card>
-            <account-list-item-small
-              :accounts="addedFriends"
-              :readonly="true"
-            />
           </v-col>
         </v-row>
 
@@ -455,7 +452,10 @@
         </v-row>
       </v-container>
     </v-form>
-    <loading-dialog :title="formType == 'create' ? '플레이룸 생성중...' : '플레이룸 변경중...'" :show="isSending" />
+    <loading-dialog
+      :title="formType == 'create' ? '플레이룸 생성중...' : '플레이룸 변경중...'"
+      :show="isSending"
+    />
   </div>
 </template>
 
@@ -614,7 +614,6 @@ export default {
       this.formData = this.savedFormData
       this.RESET_FORM_DATA()
 
-      if (this.formType == 'create') return;
       if (!Object.keys(this.formData.playlists).length) return;
 
       const promiseArray = [
@@ -635,11 +634,17 @@ export default {
               this.formData.playlists[playlistId].map(videoId => this.selectPlaylistVideo(videoId));
             }
           );
+          this.formData.playlists = []
         }
       );
     }
   },
   methods: {
+    resetFormAndGo() {
+      this.RESET_FORM_DATA();
+      this.RESET_ADDED_PLAYLISTS();
+      this.$router.go(-1);
+    },
     async getPlaylistInfo(playlistId) {
       return await axiosConnector.get(`/playlist/${playlistId}`)
     },
@@ -767,6 +772,7 @@ export default {
       return axiosConnector.put(`/playroom/${this.$route.params.id}`, formData)
     },
     ...mapMutations('playroom', ['RESET_FORM_DATA']),
+    ...mapMutations('playlist', ['RESET_ADDED_PLAYLISTS']),
     ...mapActions('playroom', ['saveFormData']),
     ...mapActions('playlist', ['selectPlaylist2', 'addPlaylists', 'selectPlaylistVideo', 'selectAllPlaylistVideo', 'deselectAllPlaylistVideo', 'resetAddedPlaylists']),
     ...mapActions('account', ['validateToken']),

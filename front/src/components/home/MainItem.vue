@@ -391,9 +391,10 @@ export default {
     // 타 유저 프로필로 가기
     setProfile: function() {
       // 만약 클릭한 사람이 나라면
-      console.log('니니니니니', this.content)
+      console.log('나야 나', this.content)
       axiosConnector.get(`userinfo/${this.content.userId}`)
         .then((res) => {
+          console.log('비로그인', res.data.meCheck)
           if (res.data.meCheck === false) {  // 내가 아니라면, 프로필로 !
             console.log( '타인 프로필')
             this.$router.push({ name: 'Profile', params: { userId : this.content.userId }})

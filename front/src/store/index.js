@@ -198,6 +198,7 @@ export default new Vuex.Store({
         .catch((err) => {
           console.log('signup fail')
           console.log(err.response.data)
+          console.log('알림 띄우기')
         })
     },
     // 사용자 정보 얻기

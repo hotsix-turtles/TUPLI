@@ -65,6 +65,7 @@
           <v-list-item-subtitle
             style="white-space: pre-line"
             class="txt-1"
+            @click="$router.push({ name: 'Profile', params: { userId : playlist.userId }})"
           >
             {{ playlist.nickName }}
           </v-list-item-subtitle>

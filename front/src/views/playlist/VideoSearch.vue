@@ -47,6 +47,7 @@
         @infinite="searchVideosByScroll"
       >
         <div slot="no-results" />
+        <div slot="no-more" />
       </infinite-loading><br><br>
     </div>
   </div>

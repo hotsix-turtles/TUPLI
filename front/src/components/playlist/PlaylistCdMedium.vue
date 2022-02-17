@@ -2,12 +2,12 @@
   <div class="text-center">
     <span
       class="playlist-cd-medium"
+      @click="readonly ? undefined : $router.push({ name: 'PlaylistDetail', params: { playlistId: playlistId } })"
     >
       <img
         :src="thumbnail"
-        @click="readonly ? undefined : $router.push({ name: 'PlaylistDetail', params: { playlistId: playlistId } })"
       >
-      <div @click="readonly ? undefined : $router.push({ name: 'PlaylistDetail', params: { playlistId: playlistId } })" />
+      <div />
     </span>
   </div>
 </template>

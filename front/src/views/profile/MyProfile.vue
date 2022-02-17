@@ -92,25 +92,38 @@
         </v-tab-item>
       </v-tabs>
     </div>
+
+    <!--무한스크롤 -->
+    <infinite-loading
+      spinner="waveDots"
+      @infinite="getAccounts"
+    >
+      <div slot="no-results" />
+      <div slot="no-more" />
+    </infinite-loading><br><br>
   </v-app>
 </template>
 
 <script>
 import MyProfilePlaylist from '../../components/profile/timeline/MyProfilePlaylist.vue'
 import MyProfileTaste from '../../components/profile/timeline/MyProfileTaste.vue'
+import InfiniteLoading from "vue-infinite-loading"
 
 import axiosConnector from '@/utils/axios-connector.js'
 import { getImage } from '../../utils/utils'
 import { mapState } from 'vuex'
 
 export default {
-  components: { MyProfilePlaylist, MyProfileTaste, },
+  components: { MyProfilePlaylist, MyProfileTaste, InfiniteLoading, },
   data: function() {
     return {
       followerlist: [],
       followinglist: [],
       activities: [],
       badges: '',
+
+      // 무한스크롤용
+      page: 1,
     }
   },
   computed: {
@@ -139,18 +152,35 @@ export default {
     },
 
     // [조회]
-    getAccounts: function () {
+    getAccounts: function ($state) {
       console.log('getAccounts params 본인')
-      axiosConnector.get(`userinfo/${this.userId}`)
+      const params = {
+        paged: true,
+        page: this.page,
+        size: 5,
+      }
+      axiosConnector.get(`userinfo/${this.userId}`, {
+        params
+      })
         .then((res) => {
-          console.log('본인 프로필', res.data)
-          this.profile = res.data
-          this.activities = res.data.activities
+          if (this.page === 1) {
+            this.page++
+            console.log('본인 프로필', res.data)
+            this.profile = res.data
+            this.activities = res.data.activities
+            $state.loaded()
           // console.log('액티비티22', this.activities)
-
+          } else if (res.data.activities.length) {
+            this.page++
+            this.activities.push(...res.data.activities)
+            $state.loaded()
+          } else {
+            $state.complete()
+          }
         })
         .catch((err) => {
           console.log('에러', err)
+          $state.complete()
         })
     },
     getBadge: function() {
