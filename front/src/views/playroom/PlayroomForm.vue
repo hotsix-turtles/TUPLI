@@ -4,7 +4,7 @@
     <div class="d-flex justify-space-between fixed-top light-background">
       <div class="d-flex mx-3 my-3">
         <div>
-          <v-icon @click="$router.go(-1)">
+          <v-icon @click="resetFormAndGo">
             mdi-arrow-left
           </v-icon>
         </div>
@@ -616,7 +616,6 @@ export default {
       this.formData = this.savedFormData
       this.RESET_FORM_DATA()
 
-      if (this.formType == 'create') return;
       if (!Object.keys(this.formData.playlists).length) return;
 
       const promiseArray = [
@@ -637,11 +636,17 @@ export default {
               this.formData.playlists[playlistId].map(videoId => this.selectPlaylistVideo(videoId));
             }
           );
+          this.formData.playlists = []
         }
       );
     }
   },
   methods: {
+    resetFormAndGo() {
+      this.RESET_FORM_DATA();
+      this.RESET_ADDED_PLAYLISTS();
+      this.$router.go(-1);
+    },
     async getPlaylistInfo(playlistId) {
       return await axiosConnector.get(`/playlist/${playlistId}`)
     },
@@ -769,6 +774,7 @@ export default {
       return axiosConnector.put(`/playroom/${this.$route.params.id}`, formData)
     },
     ...mapMutations('playroom', ['RESET_FORM_DATA']),
+    ...mapMutations('playlist', ['RESET_ADDED_PLAYLISTS']),
     ...mapActions('playroom', ['saveFormData']),
     ...mapActions('playlist', ['selectPlaylist2', 'addPlaylists', 'selectPlaylistVideo', 'selectAllPlaylistVideo', 'deselectAllPlaylistVideo', 'resetAddedPlaylists']),
     ...mapActions('account', ['validateToken']),
