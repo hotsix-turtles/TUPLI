@@ -10,18 +10,18 @@
       class="tupli-dialog-normal"
     >
       <v-card-title
-        class="tupli-dialog-normal-title"
+        class="tupli-dialog-normal-title text-weight-bold"
       >
         {{ title }}
       </v-card-title>
       <v-card-text
         v-if="contentHtml"
-        class="tupli-dialog-normal-content"
+        class="tupli-dialog-normal-content black--text"
         v-html="contentHtml"
       />
       <v-card-text
         v-else-if="content"
-        class="tupli-dialog-normal-content"
+        class="tupli-dialog-normal-content black--text"
       >
         {{ content }}
       </v-card-text>
@@ -34,7 +34,7 @@
           :key="idx"
           text
           :class="button.class"
-          :color="button.color"
+          :color="button.color ? button.color : 'accent'"
           @click="onButtonClick(idx)"
         >
           {{ button.name }}
@@ -77,5 +77,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-
+.tupli-dialog-normal-title {
+  color: $color-main;
+}
 </style>
