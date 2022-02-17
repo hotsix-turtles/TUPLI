@@ -1,16 +1,25 @@
 <template>
   <div>
-    <!-- 뒤로가기/완료 -->
-    <div class="d-flex justify-space-between">
-      <back :page-name="pageName" />
-      <v-btn
-        class="clickable"
-        text
+    <!-- 뒤로가기/완료 or 수정 -->
+    <div class="d-flex justify-space-between fixed-top light-background">
+      <div class="d-flex mx-3 my-3">
+        <div>
+          <v-icon @click="$router.go(-1)">
+            mdi-arrow-left
+          </v-icon>
+        </div>
+        <div class="font-2 semi-bold center">
+          {{ pageName }}
+        </div>
+      </div>
+      <div
+        class="clickable font-2 semi-bold mt-3 mr-3 color-dark-gray"
+        :class="{ 'color-main': addedPlaylists.length > 0 }"
         @click="submit"
+        v-text="formType == 'create' ? '완료' : '수정'"
       >
-        완료
-      </v-btn>
-    </div>
+      </div>
+    </div><br><br>
 
     <!-- 플레이룸 생성 폼 -->
     <v-form v-model="isValid">
@@ -60,23 +69,81 @@
           </v-col>
         </v-row>
 
-        <!-- 공개 여부 -->
-        <v-row
-          v-if="formType=='create'"
-        >
+        <!-- 플레이리스트 구성 하기 레이블 -->
+        <v-row>
           <v-col
             cols="12"
-            md="4"
+            md="12"
             class="d-flex flex-row justify-space-between"
           >
-            <p class="font-3">
-              공개 여부
+            <div>
+              <p class="font-3">
+                플레이리스트 구성
+              </p>
+              <p class="font-4 ml-1 mr-auto">
+                원하는 플레이리스트를 검색하고 추가하여<br> 나만의 플레이리스트를 구성할 수 있습니다.
+              </p>
+            </div>
+
+            <!-- 플레이리스트 추가 버튼 -->
+            <div
+              class="py-0 mr-0"
+            >
+              <v-btn
+                small
+                @click="saveAndGoPlaylist"
+              >
+                <v-icon color="black">
+                  mdi-plus
+                </v-icon>
+                <span style="color: black;">플레이리스트 추가</span>
+              </v-btn>
+            </div>
+          </v-col>
+        </v-row>
+
+        <!-- 플레이리스트 리스트 조작 버튼 -->
+        <v-row>
+          <v-col
+            cols="12"
+            md="12"
+            class="d-flex flex-row justify-space-between pb-0"
+          >
+            <v-btn
+              small
+              elevation="0"
+              color="white"
+              @click="selectAllVideo"
+            >
+              <v-icon class="mdi-18px">
+                mdi-check
+              </v-icon>
+              <span class="ml-1">전체 선택</span>
+            </v-btn>
+            <p class="font-4">
+              {{ numberOfAddedPlaylists }}개 플레이리스트 / {{ numberOfAddedPlaylistSelectedVideos }}개 영상 선택
             </p>
-            <p class="font-4 ml-1 mr-auto">
-              {{ isPublicMsg }}
-            </p>
-            <v-switch
-              v-model="formData.isPublic"
+          </v-col>
+        </v-row>
+
+        <!-- 플레이리스트 리스트 -->
+        <v-row>
+          <v-col
+            cols="12"
+            md="12"
+            class="pt-0"
+          >
+            <v-card
+              v-if="!addedPlaylists.length"
+              class="d-flex flex-column justify-center align-center"
+              min-height="300"
+            >
+              <p>플레이리스트가 비어있습니다</p>
+            </v-card>
+            <playlist-list-item-small
+              :playlists="addedPlaylists"
+              :playlist-readonly="true"
+              :video-readonly="false"
             />
           </v-col>
         </v-row>
@@ -160,85 +227,6 @@
             <account-list-item-small
               :accounts="addedFriends"
               :readonly="true"
-            />
-          </v-col>
-        </v-row>
-
-        <!-- 플레이리스트 구성 하기 레이블 -->
-        <v-row>
-          <v-col
-            cols="12"
-            md="12"
-            class="d-flex flex-row justify-space-between"
-          >
-            <div>
-              <p class="font-3">
-                플레이리스트 구성
-              </p>
-              <p class="font-4 ml-1 mr-auto">
-                원하는 플레이리스트를 검색하고 추가하여<br> 나만의 플레이리스트를 구성할 수 있습니다.
-              </p>
-            </div>
-
-            <!-- 플레이리스트 추가 버튼 -->
-            <div
-              class="py-0 mr-0"
-            >
-              <v-btn
-                small
-                @click="saveAndGoPlaylist"
-              >
-                <v-icon color="black">
-                  mdi-plus
-                </v-icon>
-                <span style="color: black;">플레이리스트 추가</span>
-              </v-btn>
-            </div>
-          </v-col>
-        </v-row>
-
-        <!-- 플레이리스트 리스트 조작 버튼 -->
-        <v-row>
-          <v-col
-            cols="12"
-            md="12"
-            class="d-flex flex-row justify-space-between pb-0"
-          >
-            <v-btn
-              small
-              elevation="0"
-              color="white"
-              @click="selectAllVideo"
-            >
-              <v-icon class="mdi-18px">
-                mdi-check
-              </v-icon>
-              <span class="ml-1">전체 선택</span>
-            </v-btn>
-            <p class="font-4">
-              {{ numberOfAddedPlaylists }}개 플레이리스트 / {{ numberOfAddedPlaylistSelectedVideos }}개 영상 선택
-            </p>
-          </v-col>
-        </v-row>
-
-        <!-- 플레이리스트 리스트 -->
-        <v-row>
-          <v-col
-            cols="12"
-            md="12"
-            class="pt-0"
-          >
-            <v-card
-              v-if="!addedPlaylists.length"
-              class="d-flex flex-column justify-center align-center"
-              min-height="300"
-            >
-              <p>플레이리스트가 비어있습니다</p>
-            </v-card>
-            <playlist-list-item-small
-              :playlists="addedPlaylists"
-              :playlist-readonly="true"
-              :video-readonly="false"
             />
           </v-col>
         </v-row>
@@ -402,6 +390,27 @@
           </v-col>
         </v-row>
 
+        <!-- 공개 여부 -->
+        <v-row
+          v-if="formType=='create'"
+        >
+          <v-col
+            cols="12"
+            md="4"
+            class="d-flex flex-row justify-space-between"
+          >
+            <p class="font-3">
+              공개 여부
+            </p>
+            <p class="font-4 ml-1 mr-auto">
+              {{ isPublicMsg }}
+            </p>
+            <v-switch
+              v-model="formData.isPublic"
+            />
+          </v-col>
+        </v-row>
+
         <!-- 플레이리스트 셔플 여부 -->
         <v-row>
           <v-col
@@ -446,25 +455,26 @@
         </v-row>
       </v-container>
     </v-form>
+    <loading-dialog :title="formType == 'create' ? '플레이룸 생성중...' : '플레이룸 변경중...'" :show="isSending" />
   </div>
 </template>
 
 <script>
 import { mapGetters, mapState } from 'vuex'
-import Back from '../../components/common/Back.vue'
 import PlaylistListItemSmall from '../../components/playlist/PlaylistListItemSmall.vue'
 import TagInput from '../../components/common/TagInput.vue'
 import { mapMutations, mapActions } from 'vuex'
 import axiosConnector from '../../utils/axios-connector';
 import AccountListItemSmall from '../../components/account/AccountListItemSmall.vue'
+import LoadingDialog from '../../components/common/LoadingDialog.vue'
 
 export default {
   name: 'PlayroomForm',
   components: {
-    Back,
     TagInput,
     PlaylistListItemSmall,
-    AccountListItemSmall
+    AccountListItemSmall,
+    LoadingDialog
   },
   data: function() {
     return {
@@ -490,6 +500,7 @@ export default {
       ],
       isValid: false,
       isShuffle: false,
+      isSending: false,
       // Create할 때 넘길 데이터
       formType: '',
       formData: {
@@ -633,13 +644,14 @@ export default {
       return await axiosConnector.get(`/playlist/${playlistId}`)
     },
     updateTags: function (tags) {
-      Vue.set(this.formData, 'tags', tags)
+      this.formData.tags = tags
     },
     onVideoItemClicked ( { id, selected }) {
       return this.formData.playlists.map((playlist) => playlist.videos.map((v) => v.included = (v.id == id ? !selected : v.included)))
     },
     submit() {
-      // TODO: 원래 axiosConnector에서 알아서 갱신하고 보내야하지만...
+      this.isSending = true;
+
       const token = localStorage.getItem('jwt')
       let totalDuration = 0
 
@@ -688,26 +700,18 @@ export default {
         this.formData.endTime = `${this.endDate}T${this.endTime}:00.000+09:00`
       }
 
-      if (((this.endDateTime.getTime() - this.startDateTime.getTime()) / 1000) < totalDuration) console.log('이상한데?')
-
-      //inviteIds
       this.formData.inviteIds = this.addedFriends.map(addedFriend => addedFriend.userSeq)
-
-      console.log('보내기 전', this.formData)
 
       if (this.$route.params && this.$route.params.id)
       {
         this.updatePlayroom({ formData: this.formData, token })
           .then((res) => {
-            console.log(res)
-
             this.clearForm()
             this.RESET_FORM_DATA()
 
             this.$router.push('/playroom/' + res.data.id)
           })
           .catch((err) => {
-            console.log(err)
             return null
           })
       }

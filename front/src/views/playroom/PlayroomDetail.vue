@@ -22,18 +22,38 @@
 
       <!-- 유튜브 동영상 플레이어 하단 네비게이션 -->
       <v-bottom-navigation
-        style="{top: -2;}"
         grow
-        class="elevation-2"
+        class="elevation-0"
       >
         <!-- 플레이룸 좋아요 -->
         <v-btn
+          v-if="isLogin"
           class="playroomLike"
           @click="togglePlayroomLike"
         >
-          <span>좋아요</span>
-          <v-icon :color="roomLiked ? 'red' : undefined">
+          <span v-text="roomCurrentLike"></span>
+          <v-icon
+            v-if="roomLiked"
+            color="accent"
+          >
             mdi-heart
+          </v-icon>
+          <v-icon
+            v-else
+          >
+            mdi-heart-outline
+          </v-icon>
+        </v-btn>
+
+        <!-- 비로그인 플레이룸 좋아요 -->
+        <v-btn
+          v-else
+          class="playroomLike"
+          @click="isLoginNeededInfo = true"
+        >
+          <span v-text="roomCurrentLike"></span>
+          <v-icon>
+            mdi-heart-outline
           </v-icon>
         </v-btn>
 
@@ -43,22 +63,24 @@
           @click="isChatting = true"
         >
           <span>채팅</span>
-          <v-icon>mdi-message</v-icon>
+          <v-icon>mdi-comment-text-outline</v-icon>
         </v-btn>
 
         <!-- 플레이룸 공유 -->
-        <v-btn class="playroomShare">
+        <v-btn
+          class="playroomShare"
+          @click="kakaoShare"
+        >
           <span>공유</span>
-          <v-icon>mdi-share</v-icon>
+          <v-icon>mdi-share-outline</v-icon>
         </v-btn>
-
         <!-- 플레이룸 반복 -->
         <v-btn
           v-if="isAuthor"
           @click="onClickModal"
         >
           <span>설정</span>
-          <v-icon>mdi-wrench</v-icon>
+          <v-icon>mdi-wrench-outline</v-icon>
         </v-btn>
 
         <!-- 플레이룸 나가기 -->
@@ -71,6 +93,7 @@
           <v-icon>mdi-exit-to-app</v-icon>
         </v-btn>
       </v-bottom-navigation>
+      <hr>
       <!-- 유튜브 동영상 플레이어 하단 네비게이션(플레이룸 SNS 활동 네비게이션) 끝 -->
     </v-sheet>
     <!-- 유튜브 동영상 플레이어 끝 -->
@@ -86,6 +109,48 @@
         @on-select="onSelectModal"
       />
 
+      <!-- 플레이룸 작성자 Wrapper -->
+      <v-sheet class="playroomAuthorWrapper">
+        <!-- 플레이룸 작성자 프로필 사진 -->
+        <div class="authorProfilePic">
+          <img
+            :src="ImgUrl(roomAuthorProfilePic)"
+            alt=""
+            class="rounded-circle"
+            style="width: 100%; height: auto;"
+            @click="gotoAuthorProfile"
+          >
+        </div>
+
+        <div class="d-flex flex-column justify-center ml-1">
+          <!-- 플레이룸 작성자 이름 -->
+          <span class="authorName mt-0 mb-0">{{ roomAuthorName }}</span>
+
+          <!-- 플레이룸 팔로워 수 -->
+          <span class="authorFollower mt-0 mb-0">{{ roomAuthorFollowerCount }}</span>
+        </div>
+
+        <v-btn
+          v-if="isFollow && !isAuthor && isLogin"
+          class="my-auto ml-auto"
+          color="accent"
+          text
+          @click="unfollowAuthor"
+        >
+          언팔로우
+        </v-btn>
+        <v-btn
+          v-else-if="!isAuthor && isLogin"
+          class="my-auto ml-auto"
+          color="accent"
+          text
+          @click="followAuthor"
+        >
+          팔로우
+        </v-btn>
+      </v-sheet>
+      <hr>
+
       <!-- 플레이룸 정보 Wrapper 시작 -->
       <div class="playroomInfo">
         <!-- 플레이룸 타이틀 Wrapper -->
@@ -100,33 +165,15 @@
           </p>
         </div>
 
-        <!-- 플레이룸 작성자 Wrapper -->
-        <div class="playroomAuthorWrapper">
-          <!-- 플레이룸 작성자 프로필 사진 -->
-          <div class="authorProfilePic">
-            <img
-              :src="ImgUrl(roomAuthorProfilePic)"
-              alt=""
-              class="rounded-circle"
-              style="width: 100%; height: auto;"
-              @click="gotoAuthorProfile"
-            >
-          </div>
-
-          <!-- 플레이룸 작성자 이름 -->
-          <span class="authorName">{{ roomAuthorName }}</span>
-
-          <!-- 플레이룸 팔로워 수 -->
-          <div class="authorFollowerWrapper">
-            <span class="authorFollower">{{ roomAuthorFollowerCount }}</span>
-          </div>
-        </div>
-
         <!-- 플레이룸 운영 시간(?) Wrapper -->
         <div class="playroomPlaytimeWrapper">
-          <p class="playtime">
+          <v-icon color="accent" dense>
+            mdi-clock
+          </v-icon>
+          {{roomPlaytime}}
+          <!-- <p class="playtime">
             {{ roomPlaytime }}
-          </p>
+          </p> -->
         </div>
 
         <!-- 플레이룸 설명 Wrapper -->
@@ -165,8 +212,7 @@
       <div class="playlistWrapper mx-3 my-2">
         <p>현재 재생중인 <b>플레이리스트</b></p>
         <!-- 플레이리스트 목록 -->
-        <v-card
-          outlined
+        <v-sheet
           style="display:flex; flex-wrap: nowrap; overflow-x: auto"
           class="playlistThumbnailWrapper px-1 py-1"
         >
@@ -178,7 +224,7 @@
             :selected="playlistId == roomCurrentPlaylistId"
             @click="isAuthor && SET_ROOM_CURRENT_PLAYLIST_ID(playlistId)"
           />
-        </v-card>
+        </v-sheet>
       </div>
       <!-- 플레이룸 플레이리스트 목록 끝 -->
 
@@ -219,8 +265,20 @@
         <v-card
           height="d-flex flex-column"
         >
-          <v-card-title>
-            <v-toolbar-title>채팅</v-toolbar-title>
+          <v-card-title
+            class="chat-title py-2"
+          >
+            <span
+              class="font-weight-bold text-md-body-2"
+            >
+              실시간 채팅
+            </span>
+            <div
+              class="ml-2 text-caption"
+            >
+              <v-icon dense>mdi-account</v-icon>
+              {{ roomGuests.length }}
+            </div>
             <v-btn
               icon
               class="ml-auto"
@@ -255,13 +313,13 @@
               <v-text-field
                 ref="chat_input"
                 v-model="message"
-                label="메시지를 입력하세요"
+                :label="isLogin ? '메시지를 입력하세요' : '로그인 후 이용 가능합니다'"
                 solo
                 dense
-                :disabled="!canChat"
+                rounded
+                :disabled="!canChat || !isLogin"
                 :error="errorOnSend"
                 @keydown.enter="sendChat"
-                @click:append-outer="sendMessage"
               >
                 <template v-slot:append>
                   <v-menu
@@ -274,6 +332,7 @@
                   >
                     <template v-slot:activator="{ on, attrs }">
                       <v-icon
+                        class="mr-0"
                         v-if="showEmoji"
                         v-bind="attrs"
                         v-on="on"
@@ -305,12 +364,16 @@
                     size="24"
                     indeterminate
                   />
-                  <v-icon
+                  <v-btn text small>
+                    <v-img width="30" height="30" :src="require('@/assets/tupli_send_chat.png')" @click="sendChat"></v-img>
+                  </v-btn>
+
+                  <!-- <v-icon
                     v-else
                     @click="sendChat"
                   >
                     mdi-send
-                  </v-icon>
+                  </v-icon> -->
                   <!-- </v-fade-transition> -->
                 </template>
               </v-text-field>
@@ -319,6 +382,8 @@
         </v-card>
       </v-dialog>
     </v-sheet>
+
+    <login-dialog :show="isLoginNeededInfo"/>
 
     <!--
       방장 전환시 팝업
@@ -407,6 +472,7 @@ import LoadingDialog from '../../components/common/LoadingDialog.vue';
 import Emoji from '../../components/common/Emoji.vue';
 import VideoListItemSmall from '../../components/video/VideoListItemSmall.vue';
 import DetailButtonBottom from '../../components/playlist/DetailButtonBottom.vue';
+import LoginDialog from '../../components/common/LoginDialog.vue';
 
 Vue.use(VueYoutube)
 
@@ -421,7 +487,8 @@ export default {
     LoadingDialog,
     Emoji,
     VideoListItemSmall,
-    DetailButtonBottom
+    DetailButtonBottom,
+    LoginDialog
   },
   data() {
     return {
@@ -431,6 +498,7 @@ export default {
         mute: 1,
         playsinline: 1
       },
+      isFollow: false,
       isSelectedAll: false,
       lastPlaytime: 0,
       showEmoji: false,
@@ -443,6 +511,7 @@ export default {
       isOperationTimeError: false,
       isNotInvitedError: false,
       isAuthorChangedInfo: false,
+      isLoginNeededInfo: false,
       isDuplicatedError: false,
       isKickedError: false,
       isKickedDupError: false,
@@ -476,6 +545,9 @@ export default {
         '플레이리스트 반복 설정': 'repeat',
       }
     },
+    roomCurrentLike() {
+      return this.roomLikesCnt + (this.roomLiked ? 1 : 0);
+    },
     roomContentReduced() {
       return this.roomContent == this.roomReducedContent
     },
@@ -483,13 +555,15 @@ export default {
       return this.isDuplicatedError || this.isOperationTimeError || this.isNotInvitedError || this.isAuthorChangedInfo
     },
     ...mapState([
-      'userId'
+      'userId',
+      'isLogin'
     ]),
     ...mapState('playroom', [
       'roomId',
       'roomTitle',
       'roomPublic',
       'roomLiked',
+      'roomLikesCnt',
       'roomRepeat',
       'roomAuthorId',
       'roomAuthorProfilePic',
@@ -542,6 +616,7 @@ export default {
 
     this.$watch('roomCurrentPlaylistVideos', (newVal, oldVal) =>
     {
+      if (!this.roomPlaylists || Object.keys(this.roomPlaylists).length) return;
       this.playlistThumbnails = Object.keys(this.roomPlaylists).reduce((prevPlaylistIds, curPlaylistId) => {
         if (this.roomPlaylists[curPlaylistId])
           prevPlaylistIds.push(this.roomVideos.find(roomVideo => roomVideo.id == this.roomPlaylists[curPlaylistId][0]).thumbnail);
@@ -662,8 +737,9 @@ export default {
     async initPlayroom() {
       await this.loadRoomInfo(this.$route.params.id);
       if (!this.checkPermission()) return;
-      await this.loadLikeState();
+      if (this.isLogin) await this.loadLikeState();
       await this.loadFollowerCount();
+      if (this.isLogin) await this.loadFollowState();
       await this.loadFirstVideo();
       await this.loadRoomPlaytime();
       await this.initWsConnector();
@@ -784,6 +860,8 @@ export default {
       this.roomPlaytime = playtimeConverter(this.roomStartTime, this.roomEndTime);
     },
     async initWsConnector() {
+      if (!this.$route.params.id) return;
+
       const token = localStorage.getItem('jwt');
       const baseURL = "https://tupli.kr/api/v1" + "/ws-stomp"
       const sock = new SockJS(baseURL);
@@ -799,19 +877,25 @@ export default {
         },
         () => alert("서버 연결에 실패 하였습니다. 다시 접속해 주십시요.")
       )
-      await axiosConnector.post(`/playroom/in/${this.roomId}`)
-      this.SET_USER_START_TIME(new Date());
+
+      if (this.isLogin) {
+        await axiosConnector.post(`/playroom/in/${this.roomId}`)
+        this.SET_USER_START_TIME(new Date());
+      }
     },
     async destroyWsConnector() {
       if (this.roomId == -1) return;
-      // 이 방에 있었던 시간 (밀리초 단위)
-      this.SET_USER_END_TIME(new Date());
 
-      var time = Math.floor((new Date(this.roomUserEndTime).getTime() - new Date(this.roomUserStartTime).getTime()) / 1000 / 1000)
-      console.log(time, '초 경과')
+      if (this.isLogin) {
+        // 이 방에 있었던 시간 (밀리초 단위)
+        this.SET_USER_END_TIME(new Date());
 
-      // 새로운 뱃지 취득시 이거 응답으로 받습니다...
-      await axiosConnector.put(`/playroom/out/${this.roomId}`, { watchTime: time })
+        var time = Math.floor((new Date(this.roomUserEndTime).getTime() - new Date(this.roomUserStartTime).getTime()) / 1000 / 1000)
+        console.log(time, '초 경과')
+
+        // 새로운 뱃지 취득시 이거 응답으로 받습니다...
+        if (this.wsConnector && this.wsConnector.connected) await axiosConnector.put(`/playroom/out/${this.roomId}`, { watchTime: time })
+      }
 
       if (this.wsConnector) await this.wsConnector.disconnect()
       this.resetWsConnector();
@@ -930,9 +1014,10 @@ export default {
     },
     updateVideoId() {
       //console.log('updateVideoId', this.roomCurrentPlaylistVideos, this.roomCurrentPlaylistId, this.roomCurrentVideoId)
-      if (!this.roomCurrentPlaylistVideos) return;
+      if (!this.roomPlaylists || !Object.keys(this.roomPlaylists).length) return;
+      if (!this.roomCurrentPlaylistVideos || !Object.keys(this.roomCurrentPlaylistVideos).length) return;
       if (!this.roomCurrentVideoId) return;
-      if (!this.roomCurrentPlaylistVideos.find(roomCurrentPlaylistVideo => roomCurrentPlaylistVideo.id == this.roomCurrentVideoId)) return;
+      if (!this.roomCurrentPlaylistVideos.find(roomCurrentPlaylistVideo => roomCurrentPlaylistVideo ? roomCurrentPlaylistVideo.id == this.roomCurrentVideoId : false)) return;
       this.videoId = this.roomCurrentPlaylistVideos.find(roomCurrentPlaylistVideo => roomCurrentPlaylistVideo.id == this.roomCurrentVideoId).videoId;
     },
     playVideo() {
@@ -1071,6 +1156,55 @@ export default {
       }
       this.isSelectedAll = !this.isSelectedAll
     },
+    kakaoShare() {
+      Kakao.Link.sendDefault({
+        objectType: "feed",
+        content: {
+          title: this.roomTitle,
+          description: this.roomContent,
+          imageUrl:
+            this.roomVideos.find(roomVideo => roomVideo.id == this.roomPlaylists[this.roomCurrentPlaylistId][0]).thumbnail,
+          link: {
+            mobileWebUrl: `https://tupli.kr/playroom/${this.roomId}`,
+            webUrl: `https://tupli.kr/playroom/${this.roomId}`
+          },
+        },
+        social: {
+          likeCount: this.roomLikesCnt,
+          subscriberCount: this.roomGuests.length,
+        },
+        buttons: [
+          {
+            title: '플레이룸 이동',
+            link: {
+              mobileWebUrl: `https://tupli.kr/playroom/${this.roomId}`,
+              webUrl: `https://tupli.kr/playroom/${this.roomId}`
+            }
+          },
+          {
+            title: '다른 영상 찾기',
+            link: {
+              mobileWebUrl: 'https://tupli.kr/category',
+              webUrl: 'https://tupli.kr/category'
+            }
+          }
+        ]
+      })
+    },
+    async loadFollowState() {
+      await this.loadFollowerCount();
+      const {data, status} = await axiosConnector.get(`/account/follow/${this.roomAuthorId}`)
+      this.isFollow = (status == 200);
+      return this.isFollow;
+    },
+    async followAuthor() {
+      await axiosConnector.post(`/account/follow/${this.roomAuthorId}`)
+      return await this.loadFollowState();
+    },
+    async unfollowAuthor() {
+      await axiosConnector.delete(`/account/follow/${this.roomAuthorId}`)
+      return await this.loadFollowState();
+    },
     ...mapMutations('playroom', [
       'RESET_VUEX_DATA',
       'SET_ROOM_AUTHOR',
@@ -1178,7 +1312,6 @@ iframe {
   width: 100%;
   height: 100%;
   padding: 5px;
-  line-height: 45px;
 }
 
 .authorProfilePic {
@@ -1190,7 +1323,7 @@ iframe {
 }
 
 .authorName {
-  font-size: 16px;
+  font-size: 14px;
   font-weight: bold;
   margin-right: 3px;
 }
@@ -1202,7 +1335,7 @@ iframe {
 
 .authorFollower {
   color: #bbb;
-  font-size: 12px;
+  font-size: 11px;
 }
 
 .playroomPlaytimeWrapper {
@@ -1230,7 +1363,7 @@ iframe {
 .playroomReducedContent:after {
   content: '더 보기';
   margin-left: 10px;
-  color: #bbb;
+  color: #d8d8ee;
   font-size: 14px;
 }
 
@@ -1244,5 +1377,10 @@ iframe {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
+}
+
+.chat-title {
+  background-color:#d8d8ee;
+  font-weight: bold;
 }
 </style>

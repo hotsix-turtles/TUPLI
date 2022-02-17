@@ -236,25 +236,6 @@ export default new Vuex.Store({
           console.log(err.response.data)
         })
     },
-    // 실시간 알람 가져오기 (로그인 등 이후에 호출할 것!)
-    getRealtimeAlarm({state, commit}) {
-      firebase
-        .database()
-        .ref('tupli/realtime')  // 기초 버전 : 전부 다 받는 버전
-        .limitToLast(20)
-        .on('value', (snap) => {
-          let res = snap.val()
-          const tmp = {}
-          tmp.from = res.from
-          tmp.fromId = res.fromId
-          tmp.img = res.image
-          tmp.to = res.to
-          tmp.toId = res.toId
-          tmp.type = res.type
-          tmp.isRead = false
-          commit('SET_REALTIME_ALARM', tmp);
-        });
-    },
   },
   modules: {
     playroom: playroom,
