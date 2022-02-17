@@ -25,7 +25,12 @@ export default {
     realtime: {
       immediate: true,
       handler(val) {
-        console.log('실시간 알림', val)
+        console.log('handler 알림', val)
+        console.log('handler 알림 - toId :', toId)
+        console.log('handler 알림 - userId :', userId)
+        console.log('handler 알림 - val.isRead :', val.isRead)
+        console.log('handler 알림 - this.realtimeBoolean :', this.realtimeBoolean)
+        console.log('handler 알림 - realtimeNoti :', realtimeNoti)
         // this.newAlarms = val;
         if ((val.toId == this.userId) && (val.isRead == false) && (this.realtimeBoolean == false) ) {this.realtimeNoti(val)}
       }

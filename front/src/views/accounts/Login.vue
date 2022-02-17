@@ -1,6 +1,9 @@
 <template>
-  <div>
-    <div class="d-flex justify-center align-center background-login px-5">
+  <div class="background-login">
+    <div
+      class="d-flex justify-center align-center px-5"
+      style="height:915px;"
+    >
       <div>
         <img
           src="@/assets/tupli_logo_dark.png"
@@ -80,7 +83,7 @@
 
         <!-- 그 외 -->
         <div>
-          <div class="row justify-center mb-4 mt-1">
+          <div class="row justify-center mt-1">
             <p
               class="mx-1"
               @click="$router.push({ name: 'Signup2' })"
@@ -90,7 +93,10 @@
             <p class="mx-1">
               |
             </p>
-            <p class="mx-1">
+            <p
+              class="mx-1"
+              @click="findPassword"
+            >
               비밀번호 찾기
             </p>
           </div>
@@ -162,7 +168,11 @@ export default {
       // const REDIRECT_URI = `${location.protocol}//${location.hostname}${FRONTEND_PORT}/oauth/redirect`
       // console.log(`${BACKEND_URL}/oauth2/authorization/${socialType}?redirect_uri=${REDIRECT_URI}`)
       return `https://tupli.kr/api/v1/oauth2/authorization/${socialType}?redirect_uri=https://tupli.kr/oauth/redirect`
-    }
+    },
+
+    findPassword: function() {
+      this.$router.push({ name: 'FindPassword' })
+    },
 
   },
 
@@ -181,7 +191,6 @@ export default {
 <style scoped>
   .background-login {
     background-color: #F1F1F4;
-    height: 915px;
   }
 
   .btn-login {
