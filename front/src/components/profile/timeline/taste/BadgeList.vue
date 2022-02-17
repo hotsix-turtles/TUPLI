@@ -1,6 +1,6 @@
 <template>
   <div
-    class="d-flex flex-wrap"
+    class="d-flex flex-wrap justify-center"
   >
     <badge-item
       v-for="badge in badges"
