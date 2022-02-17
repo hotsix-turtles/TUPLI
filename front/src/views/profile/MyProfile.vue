@@ -130,7 +130,6 @@ export default {
     ...mapState(['authToken', 'userId', 'nickname', 'image', 'introduction', 'following', 'followers'])
   },
   created: function() {
-    this.getAccounts()
     this.getFollowerList()
     this.getBadge()
   },
@@ -153,7 +152,6 @@ export default {
 
     // [조회]
     getAccounts: function ($state) {
-      console.log('getAccounts params 본인')
       const params = {
         paged: true,
         page: this.page,
@@ -165,11 +163,9 @@ export default {
         .then((res) => {
           if (this.page === 1) {
             this.page++
-            console.log('본인 프로필', res.data)
             this.profile = res.data
-            this.activities = res.data.activities
+            this.activities.push(...res.data.activities)
             $state.loaded()
-          // console.log('액티비티22', this.activities)
           } else if (res.data.activities.length) {
             this.page++
             this.activities.push(...res.data.activities)

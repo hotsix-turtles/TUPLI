@@ -145,7 +145,7 @@ const playroom = {
     },
     // [검색]
     SEARCH_PLAYROOMS: function (state, playrooms) {
-      let today = new Date()
+      let today = new Date() / 1000
       playrooms.forEach((playroom) => {
         if (playroom.startTime <= today && playroom.endTime >= today) {
           playroom.onPlay = true
@@ -161,7 +161,8 @@ const playroom = {
     },
     // [둘러보기]
     GET_CATEGORY_PLAYROOMS: function (state, playrooms) {
-      let today = new Date()
+      let today = new Date() / 1000
+
       playrooms.forEach((playroom) => {
         if (playroom.startTime <= today && playroom.endTime >= today) {
           playroom.onPlay = true
