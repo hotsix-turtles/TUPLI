@@ -95,6 +95,7 @@ public class PlayroomService {
         playroom.setUserCountMax(playroomDto.getUserCountMax());
         playroom.setInviteIds(playroomDto.getInviteIds());
 
+        Set<String> categorys = new HashSet<>();
         // 플레이리스트 비디오 분리하고 저장 + ID만 저장
         ConcurrentHashMap<Long, List<Long>> playlists = new ConcurrentHashMap<>();
         ConcurrentHashMap<Integer, Integer> playroomInfo = new ConcurrentHashMap<Integer, Integer>();
@@ -107,7 +108,7 @@ public class PlayroomService {
 
             String image = null;
 
-            // 비디오 저장(플레이리스트 삭제 대비 및 편한 추가 삭제를 위해 DB 별도 저장) 최적화 반드시 필요!!!!! $$$
+            // 비디오 저장(플레이리스트 삭제 대비 및 편한 추가 삭제를 위해 DB 별도 저장)
             for (String videoUrl : entry.getValue()) {
                 YoutubeVideo video = new YoutubeVideo();
                 YoutubeVideo existVideo = youtubeVideoRepository.findFirstByVideoId(videoUrl);
@@ -125,11 +126,13 @@ public class PlayroomService {
 
                 // 플레이룸 구성 비디오 정보로 메타 정보 구축
                 Integer categoryId = existVideo.getCategoryId();
+
                 Integer count = playroomInfo.getOrDefault(categoryId, 0);
                 playroomInfo.put(categoryId, count+1);
 
                 // 카테고리에 따른 분류
                 String category = CategoryList.CATEGORY_LIST.getOrDefault(categoryId, "기타");
+                categorys.add(category);
 
                 // 취향 반영
                 Integer tasteScore = tasteInfo.getOrDefault(category, 0);
@@ -140,39 +143,6 @@ public class PlayroomService {
         }
         playroom.setPlayroomInfo(playroomInfo);
         playroom.setPlaylists(playlists);
-
-        List<SimpleYoutubeVideoDto> youtubeVideoDtoList = youtubeVideoList
-                .stream().map(x -> new SimpleYoutubeVideoDto(x)).collect(Collectors.toList());
-        playroomDto.setVideos(youtubeVideoDtoList);
-
-        // 카테고리 정보
-        Map<Integer, String> categoryList = new HashMap<>();
-        List<Category> categories =  categoryRepository.findAll();
-        for(Category category : categories){
-            categoryList.put(category.getCategoryId().intValue(), category.getSort());
-        }
-
-        Set<String> categorys = new HashSet<>();
-
-        // Video 정보
-        ConcurrentHashMap<Integer, Integer> playroominfo = new ConcurrentHashMap<Integer, Integer>();
-        String image = null;
-        for (SimpleYoutubeVideoDto videoDto : playroomDto.getVideos()) {
-            // 첫 영상 이미지만 저장 (미리보기용)
-            if (image == null) {
-                image = videoDto.getThumbnail();
-                playroom.setImage(image);
-            }
-
-            // Playroominfo에 따라 갈림
-            Integer categoryId = videoDto.getCategoryId();
-            Integer count = playroominfo.getOrDefault(categoryId, 0);
-            playroominfo.put(categoryId, count+1);
-
-            // 카테고리에 따른 분류
-            String category = categoryList.getOrDefault(categoryId, "기타");
-            categorys.add(category);
-        }
 
         // 검색을 위한 Stringify
         String categorysString = "";
