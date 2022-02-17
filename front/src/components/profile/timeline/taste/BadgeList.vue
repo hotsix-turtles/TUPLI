@@ -1,8 +1,11 @@
 <template>
   <div
-    class="d-flex-contents justify-center"
+    class="d-flex justify-center"
   >
-    <div class="d-flex flex-wrap justify-start">
+    <div
+      class="d-flex flex-wrap justify-center"
+      style="width: 96%; margin-left: 2%; margin-right: 2%;"
+    >
       <badge-item
         v-for="badge in badges"
         :key="badge.id"
@@ -24,7 +27,7 @@ export default {
     badges: {type : Array, default() { [] } },
   },
   created: function() {
-    // console.log('뱃지333', this.badges)
+    console.log('뱃지333', this.badges)
   },
 }
 </script>

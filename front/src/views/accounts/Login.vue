@@ -1,110 +1,114 @@
 <template>
-  <div class="background-login">
+  <body>
     <div
-      class="d-flex justify-center align-center px-5"
-      style="height:915px;"
+      class="background-login"
     >
-      <div>
-        <img
-          src="@/assets/tupli_logo_dark.png"
-          width="40%"
-          alt="tupli logo"
-        >
-        <h4>
-          너와 나의 유튜브 취향을 꽃피우다
-        </h4>
-        <h2 class="mt-5">
-          튜플리에서
-        </h2>
-        <h2 class="mb-5">
-          우리 같이 유튜브 볼래?
-        </h2>
-
-        <!-- 로그인 form -->
-        <div class="mt-4 pt-4">
-          <v-form ref="form">
-            <v-text-field
-              v-model="credentials.email"
-              :rules="emailRules"
-              label="이메일을 입력해주세요"
-              required
-            />
-
-            <v-text-field
-              v-model="credentials.password"
-              class=""
-              type="password"
-              :rules="[passwordRules.min]"
-              label="비밀번호를 입력해주세요"
-              required
-              @keydown.enter="onInputKeyword"
-            />
-          </v-form>
-
-          <v-btn
-            class="white--text my-5"
-            color="#5B5C9D"
-            block
-            elevation="0"
-            rounded
-            width="50px"
-            @click="requestLogin"
-          >
-            로그인
-          </v-btn>
-        </div>
-
-        <!-- 소셜 로그인 -->
-        <v-container>
-          <div class="align-center my-4">
-            <v-row class="justify-center">
-              <v-col col>
-                <v-row class="justify-center mb-2">
-                  <p>----------</p>
-                  <p>또는</p>
-                  <p>----------</p>
-                </v-row>
-                <v-row class="justify-center">
-                  <v-btn
-                    fab
-                    elevation="0"
-                    class="mx-3"
-                    :href="socialLoginUrl('google')"
-                    :loading="loading"
-                    :disabled="loading"
-                    @click="loader = 'loading'"
-                  >
-                    구글
-                  </v-btn>
-                </v-row>
-              </v-col>
-            </v-row>
-          </div>
-        </v-container>
-
-        <!-- 그 외 -->
+      <div
+        class="d-flex justify-center align-center px-5"
+        style="height:822px;"
+      >
         <div>
-          <div class="row justify-center mt-1">
-            <p
-              class="mx-1"
-              @click="$router.push({ name: 'Signup2' })"
+          <img
+            src="@/assets/tupli_logo_dark.png"
+            width="40%"
+            alt="tupli logo"
+          >
+          <h4>
+            너와 나의 유튜브 취향을 꽃피우다
+          </h4>
+          <h2 class="mt-5">
+            튜플리에서
+          </h2>
+          <h2 class="mb-5">
+            우리 같이 유튜브 볼래?
+          </h2>
+
+          <!-- 로그인 form -->
+          <div class="mt-4 pt-4">
+            <v-form ref="form">
+              <v-text-field
+                v-model="credentials.email"
+                :rules="emailRules"
+                label="이메일을 입력해주세요"
+                required
+              />
+
+              <v-text-field
+                v-model="credentials.password"
+                class=""
+                type="password"
+                :rules="[passwordRules.min]"
+                label="비밀번호를 입력해주세요"
+                required
+                @keydown.enter="onInputKeyword"
+              />
+            </v-form>
+
+            <v-btn
+              class="white--text my-5"
+              color="#5B5C9D"
+              block
+              elevation="0"
+              rounded
+              width="50px"
+              @click="requestLogin"
             >
-              회원가입
-            </p>
-            <p class="mx-1">
-              |
-            </p>
-            <p
-              class="mx-1"
-              @click="findPassword"
-            >
-              비밀번호 찾기
-            </p>
+              로그인
+            </v-btn>
+          </div>
+
+          <!-- 소셜 로그인 -->
+          <v-container>
+            <div class="align-center my-4">
+              <v-row class="justify-center">
+                <v-col col>
+                  <v-row class="justify-center mb-2">
+                    <p>----------</p>
+                    <p>또는</p>
+                    <p>----------</p>
+                  </v-row>
+                  <v-row class="justify-center">
+                    <v-btn
+                      fab
+                      elevation="0"
+                      class="mx-3"
+                      :href="socialLoginUrl('google')"
+                      :loading="loading"
+                      :disabled="loading"
+                      @click="loader = 'loading'"
+                    >
+                      구글
+                    </v-btn>
+                  </v-row>
+                </v-col>
+              </v-row>
+            </div>
+          </v-container>
+
+          <!-- 그 외 -->
+          <div>
+            <div class="row justify-center mt-1">
+              <p
+                class="mx-1"
+                @click="$router.push({ name: 'Signup2' })"
+              >
+                회원가입
+              </p>
+              <p class="mx-1">
+                |
+              </p>
+              <p
+                class="mx-1"
+                @click="findPassword"
+              >
+                비밀번호 찾기
+              </p>
+            </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
+  </body>
 </template>
 
 <script>
@@ -195,6 +199,11 @@ export default {
 
 <style scoped>
   .background-login {
+    background-color: #F1F1F4;
+    width: auto;
+  }
+
+  .backgrounds-login {
     background-color: #F1F1F4;
   }
 

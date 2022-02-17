@@ -45,7 +45,7 @@ export default {
       if (this.badge.badgeSeq < 32) {
         this.badgeCheck = true
         this.img = this.badge.badgeSeq
-        console.log('뱃지이미지이ㅣ이ㅣ', this.img, typeof(this.img))
+        // console.log('뱃지이미지이ㅣ이ㅣ', this.img, typeof(this.img))
       }
       else {
         this.badgeCheck = false

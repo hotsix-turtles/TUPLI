@@ -8,6 +8,7 @@
       <!-- 유튜브 동영상 플레이어 -->
       <youtube
         ref="youtube"
+        class="youtube-player"
         :video-id="videoId"
         :player-vars="playerVars"
         width="100%"
@@ -137,7 +138,7 @@
           text
           @click="unfollowAuthor"
         >
-          언팔로우
+          팔로잉 중
         </v-btn>
         <v-btn
           v-else-if="!isAuthor && isLogin"
@@ -280,25 +281,25 @@
         scrollable
       >
         <v-card
-          height="d-flex flex-column"
+          class="d-flex flex-column chat-card"
         >
           <v-card-title
             class="chat-title py-2"
           >
             <span
-              class="font-weight-bold text-title-2"
+              class="font-weight-bold text-title-2 chat-title-text"
             >
               실시간 채팅
             </span>
             <div
-              class="ml-2 text-body-2"
+              class="ml-2 text-body-2 chat-title-text"
             >
               <v-icon color="accent" dense>mdi-account</v-icon>
               {{ roomGuests.length }}
             </div>
             <v-btn
               icon
-              class="ml-auto"
+              class="ml-auto chat-title-close-btn"
               @click="isChatting = false"
             >
               <v-icon>mdi-close</v-icon>
@@ -306,7 +307,7 @@
           </v-card-title>
           <v-card-text
             ref="chat_messages"
-            class="my-1"
+            class="my-1 chat-messages"
           >
             <v-container fluid>
               <ChatItem
@@ -326,7 +327,9 @@
             class="mx-1 mb-0 align-item-bottom"
           >
             <!-- 채팅 입력창 -->
-            <v-row>
+            <v-row
+              class="chat-input"
+            >
               <v-text-field
                 ref="chat_input"
                 v-model="message"
@@ -464,7 +467,7 @@
       content-html="플레이룸을 종료할까요?"
       max-width="290"
       :show="exitPrompt"
-      :buttons="[{name: '나가기'}, {name: '취소'},]"
+      :buttons="[{name: '취소', color: 'gray'},{name: '나가기'}]"
       button-spacing
       persistent
       @button-click="exitPromptHandler"
@@ -740,7 +743,7 @@ export default {
       this.$router.go(-1)
     },
     exitPromptHandler(idx) {
-      if (idx == 0)
+      if (idx == 1)
       {
         this.certification = true;
         if (this.exitTo) this.$router.push(this.exitTo);
@@ -883,7 +886,7 @@ export default {
       const baseURL = "https://tupli.kr/api/v1" + "/ws-stomp"
       const sock = new SockJS(baseURL);
 
-      this.setWsConnector(Stomp.over(sock));
+      this.setWsConnector(Stomp.over(sock, { debug: false }));
       if (!this.wsConnector) return;
 
       this.wsConnector.connect(
@@ -1399,5 +1402,92 @@ iframe {
 .chat-title {
   color: $color-main;
   font-weight: bold;
+}
+
+@media (orientation: portrait) {
+
+}
+
+@media (orientation: landscape) {
+  body {
+    overflow: hidden;
+  }
+
+  body * { touch-action: none; }
+
+  .youtube-player {
+    height: 100vh;
+    z-index: 2 !important;
+    position: fixed;
+  }
+
+  .fixed-bottom-navbar {
+    display: none;
+  }
+
+  .chat-dialog {
+    display: fixed;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    z-index: 3 !important;
+    width: 50% !important;
+    height: 100%;
+    margin: 0;
+    background-color: rgba(255,255,255,0);
+    box-shadow: none;
+  }
+
+  .chat-card {
+    background-color: rgba(255,255,255,0) !important;
+  }
+
+  .align-item-bottom {
+    display: none;
+  }
+
+  .chat-input {
+    display: none;
+  }
+
+  .chat-messages {
+    padding-left: 3px !important;
+  }
+
+  .chat-profile-img {
+    display: none !important;
+  }
+
+  .chat-author-name {
+    color: rgba(255,255,255,0.5);
+  }
+
+  .chat-time-label {
+    color: rgba(255,255,255,0.5);
+  }
+
+  .chat-content {
+    color: rgba(255,255,255,0.5);
+  }
+
+  .chat-content-blocked {
+    color: rgba(255,255,255,0.5);
+  }
+
+  .chat-title-text {
+    display: none;
+  }
+
+  .chat-title-close-btn {
+    display: none;
+  }
+}
+</style>
+
+<style lang="scss" scoped>
+@media (orientation: landscape) {
+  .fixed-bottom-navbar {
+    display: none;
+  }
 }
 </style>

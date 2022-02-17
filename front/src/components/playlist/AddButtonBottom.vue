@@ -53,6 +53,7 @@
       :show="showTimeoutDialog"
       hide-progress
       :persistent="false"
+      timeout="2400"
       @timeout="onTimeout"
     />
   </v-bottom-navigation>

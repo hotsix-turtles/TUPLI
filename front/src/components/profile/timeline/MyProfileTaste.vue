@@ -1,28 +1,32 @@
 <template>
   <div>
     <div>
-      <span
-        style="font-size:16px;"
-        class="mx-5 mt-3"
-      >
-        <span style="font-weight: 600;">{{ nickname }}</span>님의 <span style="color:#5C5B9D; font-weight: 800;">취향 분석</span>
-      </span>
-
-      <taste-list
-        :tastes="tastes"
-      />
-
-      <div class="mb-3">
+      <div>
         <span
           style="font-size:16px;"
-          class="mx-5 mt-5"
+          class="mx-5 mt-3"
         >
-          <span style="font-weight: 600;">{{ nickname }}</span>님의 <span style="color:#5C5B9D; font-weight: 800;">튜플리 뱃지</span>
+          <span style="font-weight: 600;">{{ nickname }}</span>님의 <span style="color:#5C5B9D; font-weight: 800;">취향 분석</span>
         </span>
+
+        <taste-list
+          :tastes="tastes"
+        />
       </div>
-      <badge-list
-        :badges="badges"
-      />
+
+      <div>
+        <div class="mb-3">
+          <span
+            style="font-size:16px;"
+            class="mx-5 mt-5"
+          >
+            <span style="font-weight: 600;">{{ nickname }}</span>님의 <span style="color:#5C5B9D; font-weight: 800;">튜플리 뱃지</span>
+          </span>
+        </div>
+        <badge-list
+          :badges="badges"
+        />
+      </div>
     </div>
   </div>
 </template>
