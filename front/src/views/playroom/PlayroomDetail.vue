@@ -616,6 +616,7 @@ export default {
 
     this.$watch('roomCurrentPlaylistVideos', (newVal, oldVal) =>
     {
+      if (!this.roomPlaylists || Object.keys(this.roomPlaylists).length) return;
       this.playlistThumbnails = Object.keys(this.roomPlaylists).reduce((prevPlaylistIds, curPlaylistId) => {
         if (this.roomPlaylists[curPlaylistId])
           prevPlaylistIds.push(this.roomVideos.find(roomVideo => roomVideo.id == this.roomPlaylists[curPlaylistId][0]).thumbnail);
@@ -893,7 +894,7 @@ export default {
         console.log(time, '초 경과')
 
         // 새로운 뱃지 취득시 이거 응답으로 받습니다...
-        await axiosConnector.put(`/playroom/out/${this.roomId}`, { watchTime: time })
+        if (this.wsConnector && this.wsConnector.connected) await axiosConnector.put(`/playroom/out/${this.roomId}`, { watchTime: time })
       }
 
       if (this.wsConnector) await this.wsConnector.disconnect()
@@ -1013,9 +1014,10 @@ export default {
     },
     updateVideoId() {
       //console.log('updateVideoId', this.roomCurrentPlaylistVideos, this.roomCurrentPlaylistId, this.roomCurrentVideoId)
-      if (!this.roomCurrentPlaylistVideos) return;
+      if (!this.roomPlaylists || !Object.keys(this.roomPlaylists).length) return;
+      if (!this.roomCurrentPlaylistVideos || !Object.keys(this.roomCurrentPlaylistVideos).length) return;
       if (!this.roomCurrentVideoId) return;
-      if (!this.roomCurrentPlaylistVideos.find(roomCurrentPlaylistVideo => roomCurrentPlaylistVideo.id == this.roomCurrentVideoId)) return;
+      if (!this.roomCurrentPlaylistVideos.find(roomCurrentPlaylistVideo => roomCurrentPlaylistVideo ? roomCurrentPlaylistVideo.id == this.roomCurrentVideoId : false)) return;
       this.videoId = this.roomCurrentPlaylistVideos.find(roomCurrentPlaylistVideo => roomCurrentPlaylistVideo.id == this.roomCurrentVideoId).videoId;
     },
     playVideo() {
@@ -1164,6 +1166,7 @@ export default {
             this.roomVideos.find(roomVideo => roomVideo.id == this.roomPlaylists[this.roomCurrentPlaylistId][0]).thumbnail,
           link: {
             mobileWebUrl: `https://tupli.kr/playroom/${this.roomId}`,
+            webUrl: `https://tupli.kr/playroom/${this.roomId}`
           },
         },
         social: {
@@ -1174,13 +1177,15 @@ export default {
           {
             title: '플레이룸 이동',
             link: {
-              mobileWebUrl: `https://tupli.kr/playroom/${this.roomId}`
+              mobileWebUrl: `https://tupli.kr/playroom/${this.roomId}`,
+              webUrl: `https://tupli.kr/playroom/${this.roomId}`
             }
           },
           {
             title: '다른 영상 찾기',
             link: {
-              mobileWebUrl: 'https://tupli.kr/category'
+              mobileWebUrl: 'https://tupli.kr/category',
+              webUrl: 'https://tupli.kr/category'
             }
           }
         ]

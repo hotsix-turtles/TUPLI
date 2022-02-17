@@ -1,8 +1,7 @@
 <template>
-  <v-app>
-    <div class="background-login px-5">
-      <!-- <h1>회원가입 페이지</h1> -->
-      <v-container>
+  <div class="background-login">
+    <div class="px-5">
+      <div>
         <v-container class="mb-5">
           <v-row
             class="align-center mt-5"
@@ -23,11 +22,17 @@
           </v-row>
         </v-container>
 
-        <!-- 상태바 -->
-        <v-img
-          src="../../assets/signup_bar2.png"
-          alt="logo"
-        />
+
+        <div
+          class="d-flex justify-center"
+        >
+          <!-- 상태바 -->
+          <img
+            src="../../assets/signup_bar2.png"
+            alt="logo"
+            width="90%"
+          >
+        </div>
 
 
         <!-- 회원가입 form -->
@@ -36,21 +41,24 @@
             <h3>이메일</h3>
             <v-text-field
               v-model="credentials.email"
-              class="pt-0"
+              required
+              :rules="emailRules"
               label="이메일을 입력해주세요"
             />
 
             <h3>비밀번호</h3>
             <v-text-field
               v-model="credentials.password"
-              class="pt-0"
+              required
+              :rules="[passwordRules.input, passwordRules.min]"
               type="password"
               label="비밀번호"
             />
 
             <v-text-field
               v-model="credentials.passwordCheck"
-              class="pt-0"
+              required
+              :rules="[passwordCheckRules.input, passwordCheckRules.check]"
               type="password"
               label="비밀번호 확인"
             />
@@ -58,24 +66,18 @@
             <h3>닉네임</h3>
             <v-text-field
               v-model="credentials.nickname"
-              class="pt-0"
+              required
+              :rules="[nicknameRules.input, nicknameRules.max]"
               type=""
               label="닉네임"
             />
-
-            <!-- <h3>이름</h3>
-            <v-text-field
-              v-model="credentials.username"
-              class="pt-0"
-              type=""
-              label="이름"
-            /> -->
           </v-form>
 
           <v-btn
             class="white--text my-5"
             color="#5B5C9D"
             block
+            required
             elevation="0"
             rounded
             @click="signupCheck"
@@ -83,9 +85,9 @@
             회원가입
           </v-btn>
         </div>
-      </v-container>
+      </div>
     </div>
-  </v-app>
+  </div>
 </template>
 
 <script>
@@ -97,12 +99,12 @@ export default {
   // 이메일 비밀번호 규칙 설정
   data: function() {
     return {
-    // 회원 정보
+      // 회원 정보
       credentials: {
-        email: null,
-        password: null,
-        passwordCheck: null,
-        nickname: null,
+        email: '',
+        password: '',
+        passwordCheck: '',
+        nickname: '',
         image: '@/assets/tupli_logo2_dark.png',
         // username: null,
       },
@@ -116,16 +118,18 @@ export default {
       ],
 
       passwordRules: {
-        min: v => v.length >= 8 || '올바른 비밀번호를 입력해주세요.',
+        input: v => !!v || '비밀번호를 입력해주세요.',
+        min: v => v.length >= 8 && v.length <= 12 || '8자 이상 12자 이하 비밀번호를 입력해주세요.',
       },
 
       passwordCheckRules: {
-        check: v => v === password || '일치하지 않는 비밀번호입니다.',
+        input: v => !!v || '비밀번호를 입력해주세요.',
+        check: v => v === this.credentials.password || '일치하지 않는 비밀번호입니다.',
       },
 
       nicknameRules: {
-        max: v => v.length <= 6 || '6글자 내의 닉네임을 입력해주세요.',
-        min: v => v.length > 0 || '닉네임을 입력해주세요.'
+        input: v => !!v || '닉네임을 입력해주세요.',
+        max: v => v.length <= 7 || '7글자 내의 닉네임을 입력해주세요.',
       }
     };
   },
@@ -134,6 +138,7 @@ export default {
     ...mapActions([
       'signup',
     ]),
+
     // 회원가입 유효성 검사
     signupCheck: function () {
       this.signup(this.credentials)

@@ -27,7 +27,7 @@
             class=""
             @click="changeVideo(video)"
           >
-          <span class="duration">{{ video.duration }}</span>
+          <span class="duration">{{ video ? video.duration : undefined }}</span>
         </div>
         <div
           v-if="!isVideoList"
@@ -37,12 +37,12 @@
             class="h6"
           >
             <div class="font-3 semi-bold line-height-s txt-3">
-              {{ video.title }}
+              {{ video ? video.title : undefined }}
             </div>
           </div>
           <div class="font-4 color-dark-gray">
-            <div>{{ video.channelTitle }}</div>
-            <div>{{ video.date.slice(0, 10) }}</div>
+            <div>{{ video ? video.channelTitle : undefined }}</div>
+            <div>{{ video ? video.date.slice(0, 10) : undefined }}</div>
           </div>
         </div>
         <div
@@ -54,12 +54,12 @@
             class="h6"
           >
             <div class="font-3 semi-bold line-height-s txt-3">
-              {{ video.title }}
+              {{ video ? video.title : undefined }}
             </div>
           </div>
           <div class="font-4 color-dark-gray">
-            <div>{{ video.channelTitle }}</div>
-            <div>{{ video.date.slice(0, 10) }}</div>
+            <div>{{ video ? video.channelTitle : undefined }}</div>
+            <div>{{ video ? video.date.slice(0, 10) : undefined }}</div>
           </div>
         </div>
       </div>
