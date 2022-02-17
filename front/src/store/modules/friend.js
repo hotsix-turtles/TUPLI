@@ -15,23 +15,23 @@ const friend = {
       state.addedFriends = []
       state.selectedFriends.map(selectedFriend => state.addedFriends.push(selectedFriend))
       state.selectedFriends = []
-      console.log('state.addedFriends', state.addedFriends)
+      //console.log('state.addedFriends', state.addedFriends)
     },
     REVOKE_FRIENDS: function (state) {
       state.selectedFriends = []
       state.addedFriends.map(addedFriend => state.selectedFriends.push(addedFriend))
       state.addedFriends = []
 
-      console.log('state.revokeFriends', state.selectedFriends)
+      //console.log('state.revokeFriends', state.selectedFriends)
     },
     SELECT_FRIEND: function (state, toAddFriend) {
       state.selectedFriends.push(toAddFriend)
-      console.log('select_friend', state.selectedFriends)
+      //console.log('select_friend', state.selectedFriends)
     },
     DESELECT_FRIEND: function (state, toRemoveFriend) {
       const idx = state.selectedFriends.findIndex(selectedFriend => selectedFriend.id == toRemoveFriend.id)
       state.selectedFriends.splice(idx, 1)
-      console.log('deselect_friend', state.selectedFriends)
+      //console.log('deselect_friend', state.selectedFriends)
     },
     RESET_ADDED_FRIENDS: function (state) {
       state.selectedFriends = []

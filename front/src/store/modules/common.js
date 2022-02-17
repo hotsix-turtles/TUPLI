@@ -30,12 +30,12 @@ const common = {
     },
     // 모달 클릭
     onClickModal: function ({ commit }) {
-      console.log('onClickModal')
+      //console.log('onClickModal')
       commit('ON_CLICK_MODAL')
     },
     // 요소 선택
     onSelectItem: function ({ commit, dispatch }, item) {
-      console.log('onSelectItem', item)
+      //console.log('onSelectItem', item)
       commit('ON_SELECT_ITEM', item)
       dispatch('onClickModal')  // created할때 얘가 실행돼서 showModal이 true인거
     },
