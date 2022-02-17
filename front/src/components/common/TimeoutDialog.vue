@@ -79,11 +79,24 @@ export default {
       return Math.ceil(this.value / parseInt(this.timeout) * 100);
     }
   },
+  watch: {
+    show: function () {
+      if (this.show = true) {
+        setTimeout(() => {
+          console.log('setTimeout')
+          this.show = false
+          this.$emit('timeout')
+        }, this.timeout)
+      }
+    }
+  },
   created() {
     this.$emit('created', this);
 
-    if (this.timeout)
-      this.progressEvent = setInterval(this.updateProgress, 33); // 60FPS
+    console.log('Timeout created')
+
+    // if (this.timeout)
+    //   this.progressEvent = setInterval(this.updateProgress, 33); // 60FPS
   },
   mounted() {
     this.$emit('mounted', this);

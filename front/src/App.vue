@@ -1,5 +1,5 @@
 <template>
-  <v-app>
+  <v-app id="tupli">
     <v-main>
       <router-view
         :key="$route.path"
@@ -31,5 +31,11 @@ export default {
 * {
   font-family: 'SUIT';
 }
-
+#tupli {
+    width: 100vw;
+    height: 100vh;
+    max-width: 412px;
+    max-height: 915px;
+    margin: 0 auto;
+}
 </style>

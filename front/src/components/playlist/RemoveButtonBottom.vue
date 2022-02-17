@@ -20,10 +20,9 @@
       <div
         class="d-flex-column justify-center mx-5 font-3 clickable"
       >
-        <div>
+        <div @click="onClickRemove">
           <v-icon
             color="white"
-            @click="onClickRemove"
           >
             mdi-trash-can-outline
           </v-icon>
@@ -54,6 +53,7 @@
       :show="showTimeoutDialog"
       hide-progress
       :persistent="false"
+      timeout="2400"
       @timeout="onTimeout"
     />
   </v-bottom-navigation>
