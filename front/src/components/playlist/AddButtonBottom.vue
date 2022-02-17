@@ -11,7 +11,7 @@
     <v-badge
       :content="selectedVideos.length"
       color="#F6F7FF"
-      offset-x="60"
+      offset-x="30"
       offset-y="10"
       overlap
       class="videoCounter shadow-s"
@@ -20,10 +20,9 @@
       <div
         class="d-flex-column justify-center mx-5 font-3 clickable"
       >
-        <div>
+        <div @click="onClickAdd">
           <v-icon
             color="white"
-            @click="addVideos"
           >
             mdi-plus-box
           </v-icon>
@@ -41,7 +40,7 @@
             color="white"
             @click="watchingVideos(selectedVideos)"
           >
-            mdi-play-circle
+            mdi-play
           </v-icon>
         </div>
         <div style="color: white;">
@@ -49,28 +48,52 @@
         </div>
       </div>
     </div>
+    <timeout-dialog
+      :content="timeoutMsg"
+      :show="showTimeoutDialog"
+      hide-progress
+      :persistent="false"
+      @timeout="onTimeout"
+    />
   </v-bottom-navigation>
 </template>
 
 <script>
 import { mapActions, mapState } from 'vuex'
+import TimeoutDialog from '../common/TimeoutDialog.vue'
 
 export default {
   name: 'AddButtonBottom',
   components: {
+    TimeoutDialog
   },
   props: {
+  },
+  data: function () {
+    return {
+      showTimeoutDialog: false,
+    }
   },
   computed: {
     ...mapState('video', {
       selectedVideos: state => state.selectedVideos,
-    })
+    }),
+    timeoutMsg: function () {
+      return '총 ' + String(this.selectedVideos.length) + '개의 영상이 추가되었습니다.\n 중복된 영상은 제거됩니다.'
+    }
   },
   methods: {
     ...mapActions('video', [
       'addVideos',
       'watchingVideos',
-    ])
+    ]),
+    onClickAdd () {
+      this.showTimeoutDialog = true
+    },
+    onTimeout () {
+      this.showTimeoutDialog = false
+      this.addVideos()
+    }
   }
 }
 </script>

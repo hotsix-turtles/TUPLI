@@ -156,28 +156,23 @@
         <!-- 플레이룸 타이틀 Wrapper -->
         <div class="playroomTitleWrapper">
           <!-- 플레이룸 공개 여부 뱃지 -->
-          <p :class="{ playroomPublicBadge: roomPublic, playroomPrivateBadge: !roomPublic }">
+          <!-- <p :class="{ playroomPublicBadge: roomPublic, playroomPrivateBadge: !roomPublic }">
             {{ roomPublicLabel }}
-          </p>
+          </p> -->
+          <v-icon
+            v-if="!roomPublic"
+            color="accent"
+          >
+            mdi-lock
+          </v-icon>
           <!-- 플레이룸 타이틀 -->
-          <p class="playroomTitle">
+          <p class="font-weight-bold text-title">
             {{ roomTitle }}
           </p>
         </div>
 
-        <!-- 플레이룸 운영 시간(?) Wrapper -->
-        <div class="playroomPlaytimeWrapper">
-          <v-icon color="accent" dense>
-            mdi-clock
-          </v-icon>
-          {{roomPlaytime}}
-          <!-- <p class="playtime">
-            {{ roomPlaytime }}
-          </p> -->
-        </div>
-
         <!-- 플레이룸 설명 Wrapper -->
-        <div class="playroomContentWrapper">
+        <div class="font-weight-medium text-body-2 mt-2">
           <!-- 플레이룸 요약 설명 -->
           <p
             v-if="!showReducedContent && roomReducedContent != roomContent"
@@ -190,14 +185,36 @@
           <!-- 플레이룸 상세 설명 (더보기) -->
           <p
             v-else
-            class="playroomContent"
+            class="playroomContent text-title-1"
           >
             {{ roomContent }}
           </p>
         </div>
 
+        <!-- 플레이룸 운영 시간(?) Wrapper -->
+        <div class="mt-2 text-caption">
+          <v-icon color="accent" dense>
+            mdi-clock
+          </v-icon>
+          {{roomPlaytime}}
+          <!-- <p class="playtime">
+            {{ roomPlaytime }}
+          </p> -->
+        </div>
+
+        <!-- 플레이룸 운영 시간(?) Wrapper -->
+        <div class="mt-2 text-caption">
+          <v-icon color="accent" dense>
+            mdi-account
+          </v-icon>
+          {{roomGuests.length}}명  시청 중
+          <!-- <p class="playtime">
+            {{ roomPlaytime }}
+          </p> -->
+        </div>
+
         <!-- 플레이룸 태그 Wrapper -->
-        <div class="playroomTagWrapper">
+        <div class="playroomTagWrapper mt-3">
           <!-- <tags
             v-for="roomTag in roomTags"
             :key="roomTag"
@@ -269,14 +286,14 @@
             class="chat-title py-2"
           >
             <span
-              class="font-weight-bold text-md-body-2"
+              class="font-weight-bold text-title-2"
             >
               실시간 채팅
             </span>
             <div
-              class="ml-2 text-caption"
+              class="ml-2 text-body-2"
             >
-              <v-icon dense>mdi-account</v-icon>
+              <v-icon color="accent" dense>mdi-account</v-icon>
               {{ roomGuests.length }}
             </div>
             <v-btn
@@ -616,7 +633,7 @@ export default {
 
     this.$watch('roomCurrentPlaylistVideos', (newVal, oldVal) =>
     {
-      if (!this.roomPlaylists || Object.keys(this.roomPlaylists).length) return;
+      if (!this.roomPlaylists || !Object.keys(this.roomPlaylists).length) return;
       this.playlistThumbnails = Object.keys(this.roomPlaylists).reduce((prevPlaylistIds, curPlaylistId) => {
         if (this.roomPlaylists[curPlaylistId])
           prevPlaylistIds.push(this.roomVideos.find(roomVideo => roomVideo.id == this.roomPlaylists[curPlaylistId][0]).thumbnail);
@@ -1380,7 +1397,7 @@ iframe {
 }
 
 .chat-title {
-  background-color:#d8d8ee;
+  color: $color-main;
   font-weight: bold;
 }
 </style>

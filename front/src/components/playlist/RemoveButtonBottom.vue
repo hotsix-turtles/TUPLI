@@ -11,7 +11,7 @@
     <v-badge
       :content="selectedVideos.length"
       color="#F6F7FF"
-      offset-x="120"
+      offset-x="30"
       offset-y="10"
       overlap
       class="videoCounter"
@@ -23,7 +23,7 @@
         <div>
           <v-icon
             color="white"
-            @click="removeVideos"
+            @click="onClickRemove"
           >
             mdi-trash-can-outline
           </v-icon>
@@ -41,7 +41,7 @@
             color="white"
             @click="watchingVideos(selectedVideos)"
           >
-            mdi-play-circle
+            mdi-play
           </v-icon>
         </div>
         <div style="color: white;">
@@ -49,28 +49,53 @@
         </div>
       </div>
     </div>
+    <timeout-dialog
+      :content="timeoutMsg"
+      :show="showTimeoutDialog"
+      hide-progress
+      :persistent="false"
+      @timeout="onTimeout"
+    />
   </v-bottom-navigation>
 </template>
 
 <script>
 import { mapActions, mapState } from 'vuex'
+import TimeoutDialog from '../common/TimeoutDialog.vue'
 
 export default {
   name: 'RemoveButtonBottom',
   components: {
+    TimeoutDialog
   },
   props: {
+  },
+  data: function () {
+    return {
+      showTimeoutDialog: false,
+    }
   },
   computed: {
     ...mapState('video', {
       selectedVideos: state => state.selectedVideos,
-    })
+    }),
+    timeoutMsg: function () {
+      return '총 ' + String(this.selectedVideos.length) + '개의 영상이 삭제되었습니다.'
+    }
   },
   methods: {
     ...mapActions('video', [
       'removeVideos',
       'watchingVideos',
-    ])
+    ]),
+    onClickRemove () {
+      console.log('onClickRemove')
+      this.showTimeoutDialog = true
+    },
+    onTimeout () {
+      this.showTimeoutDialog = false
+      this.removeVideos()
+    }
   }
 }
 </script>

@@ -29,14 +29,8 @@
                 <span class="semi-bold">
                   {{ playlistComment.user.nickname }}
                 </span>
-                <!-- <span
-                  class=""
-                  v-html="renderContent(playlistComment.content)"
-                > -->
-                <span>
-                  <!-- 덧글내용 노출 -->
-                  {{ playlistComment.content }}
-                </span>
+                <!-- 덧글내용 노출 -->
+                <span v-html="renderContent(playlistComment.content)" />
               </div>
             </v-row>
             <v-row>
@@ -110,12 +104,9 @@ export default {
     this.playlistId = this.$route.params.playlistId
     this.getPlaylistComments(this.playlistId)
   },
-  // mounted: function () {
-  //   this.updateScroll()
-  // },
-  // updated: function () {
-  //   this.updateScroll()
-  // },
+  mounted: function () {
+    this.updateScroll()
+  },
   methods: {
     ...mapActions('playlist', [
       'getPlaylistComments',
@@ -129,6 +120,7 @@ export default {
         emoticon: null,
       }
       this.createPlaylistComment({ playlistId, data })
+      this.updateScroll()
     },
     deleteComment: function () {
       const playlistId = this.playlistId
@@ -139,6 +131,7 @@ export default {
       return getImage(img)
     },
     updateScroll: function () {
+      console.log('updateScroll')
       var element = document.getElementById('comment');
       element.scrollTop = element.scrollHeight - element.clientHeight;
     },
