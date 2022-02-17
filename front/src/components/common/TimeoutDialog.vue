@@ -98,7 +98,7 @@ export default {
   },
   methods: {
     updateProgress() {
-      this.value += 50;
+      this.value += 33;
 
       if (this.progress >= 100)
       {
