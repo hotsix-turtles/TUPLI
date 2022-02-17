@@ -22,7 +22,8 @@
       </div>
       <div
         v-else
-        class="clickable"
+        class="clickable font-2 semi-bold mt-3 mr-3 color-dark-gray"
+        :class="{ 'color-main': valid && boardValid }"
         @click="onClickCompletion"
       >
         수정
@@ -32,7 +33,7 @@
     <!-- 게시글 생성 폼-->
     <v-form
       v-model="valid"
-      class="mt-5"
+      class="mt-5 mx-1"
     >
       <v-container>
         <v-row>
@@ -210,12 +211,9 @@ export default {
   created: function() {
     if (this.isSaved) {
       this.formData = this.savedFormData
-      console.log("내가 가져온 플레이리스트는", this.chosenPlaylist)
     } else {
-      console.log("boardForm첨왔어요")
       this.resetFormData()
     }
-    console.log('this.$route.params.boardId',this.$route.params.boardId)
     if (typeof this.$route.params.boardId === 'undefined') {
       this.formType = 'create'
     } else {

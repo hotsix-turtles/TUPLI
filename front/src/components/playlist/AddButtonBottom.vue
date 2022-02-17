@@ -53,8 +53,9 @@
       :show="showTimeoutDialog"
       hide-progress
       :persistent="false"
-      timeout="2400"
+      timeout="1700"
       @timeout="onTimeout"
+      @click="onTimeout"
     />
   </v-bottom-navigation>
 </template>
@@ -92,8 +93,8 @@ export default {
       this.showTimeoutDialog = true
     },
     onTimeout () {
-      this.showTimeoutDialog = false
       this.addVideos()
+      this.showTimeoutDialog = false
     }
   }
 }

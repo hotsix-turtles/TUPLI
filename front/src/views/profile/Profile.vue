@@ -134,7 +134,7 @@ export default {
       nickname: '',
 
       // 무한스크롤용
-      page: 1,
+      page: 0,
     }
   },
   computed: {

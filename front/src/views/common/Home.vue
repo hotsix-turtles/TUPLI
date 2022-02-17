@@ -88,7 +88,7 @@ export default {
 
   data: function () {
     return {
-      page: 1,
+      page: 0,
       mainContents: [],
     }
   },
