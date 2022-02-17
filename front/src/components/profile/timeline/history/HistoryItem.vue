@@ -227,9 +227,9 @@
           </div>
         </div>
         <div
-          class="d-flex flex-column history-board-content"
+          class="d-flex flex-column history-board-playlist align-center"
         >
-          <div>
+          <div class="mx-3">
             <span>{{ activity.content }}</span>
           </div>
 
@@ -303,8 +303,17 @@
               <div class="d-flex justify-center history-playlist-content">
                 <!-- 플레이리스트 -->
                 <div
-                  class="mt-3"
+                  class="mt-4"
                 >
+                  <div class="d-flex align-center ml-6">
+                    <div class="profile-img-small-history">
+                      <img
+                        :src="ImgUrl(activity.contents.userProfileImg)"
+                        alt=""
+                      >
+                    </div>
+                    <span class="history-nickname ml-3">{{ activity.contents.nickName }}</span>
+                  </div>
                   <!-- playlist 썸네일 -->
                   <span
                     class="playlist-cd-case-small"

@@ -35,7 +35,7 @@
         <div class="d-flex flex-column align-center">
           <div class="profile-img-medium">
             <img
-              :src="ImgUrl(image)"
+              :src="ImgUrl(profileImage)"
               alt=""
               fab
             >
@@ -96,14 +96,16 @@ export default {
         newNickname: '',
         newIntroduction:'',
         newImage: ''
-      }
+      },
+      profileImage: '',
     }
   },
   computed: {
-    ...mapState(['nickname', 'introduction', 'image', 'authToken'])
+    ...mapState(['nickname', 'userId', 'introduction', 'image', 'authToken'])
   },
   created() {
     this.init()
+    this.getOldImage()
   },
   methods: {
     init: function() {
@@ -136,6 +138,17 @@ export default {
     },
     getNewImage: function(event) {
       this.credentials.newImage = event.target.files[0]
+    },
+    getOldImage: function() {
+      axiosConnector.get(`/account/userInfo`)
+        .then((res) => {
+          // console.log('프로필', res.data)
+          this.profileImage = res.data.profileImage
+        })
+        .catch((err) => {
+          console.log('에러 - 프로필 변경', err)
+
+        })
     },
     // 이미지 조합
     ImgUrl: function(img) {

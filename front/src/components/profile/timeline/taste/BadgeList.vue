@@ -3,7 +3,7 @@
     class="d-flex justify-center"
   >
     <div
-      class="d-flex flex-wrap justify-center"
+      class="d-flex flex-wrap justify-start"
       style="width: 96%; margin-left: 2%; margin-right: 2%;"
     >
       <badge-item

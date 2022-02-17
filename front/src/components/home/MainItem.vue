@@ -319,7 +319,7 @@
               </span>
             </p>
             <div
-              class="main-content"
+              class="main-content mt-1"
               style="width:96%;"
               @click="goBoard"
             >
