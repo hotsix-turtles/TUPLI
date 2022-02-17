@@ -156,13 +156,19 @@ public class HomeInfoService {
         for(HomeInfo nowHomeInfo : result){
             String type = nowHomeInfo.getType();
             if(type.equals("playlist")){
-                infoResult.add(new SimpleHomePlaylistDto(playlistRepository.findById(nowHomeInfo.getInfoId()).orElse(null)));
+                Playlist nowPlaylist = playlistRepository.findById(nowHomeInfo.getInfoId()).orElse(null);
+                if(nowPlaylist == null) continue;
+                infoResult.add(new SimpleHomePlaylistDto(nowPlaylist));
             }
             else if(type.equals("playroom")){
-                infoResult.add(new SimpleHomePlayroomDto(playroomRepository.findById(nowHomeInfo.getInfoId()).orElse(null)));
+                Playroom nowPlayroom = playroomRepository.findById(nowHomeInfo.getInfoId()).orElse(null);
+                if(nowPlayroom == null) continue;
+                infoResult.add(new SimpleHomePlayroomDto(nowPlayroom));
             }
             else{
-                infoResult.add(new SimpleHomeBoardDto(boardRepository.findById(nowHomeInfo.getInfoId()).orElse(null)));
+                Board nowBoard = boardRepository.findById(nowHomeInfo.getInfoId()).orElse(null);
+                if(nowBoard == null) continue;
+                infoResult.add(new SimpleHomeBoardDto(nowBoard));
             }
         }
 
@@ -185,7 +191,7 @@ public class HomeInfoService {
                 simplePlaylist.setUserLikesYN("N");
                 if(nowPlaylist.getPlaylistLikes() != null) {
                     for (PlaylistLikes nowPlaylistLikes : nowPlaylist.getPlaylistLikes()) {
-                        if (nowPlaylistLikes.getUser().getUserSeq() == myUserSeq) {
+                        if (Objects.equals(nowPlaylistLikes.getUser().getUserSeq() ,myUserSeq)) {
                             simplePlaylist.setUserLikesYN("Y");
                             break;
                         }
@@ -196,11 +202,12 @@ public class HomeInfoService {
             else if(type.equals("playroom")){
                     Playroom nowPlayroom = playroomRepository.findById(nowHomeInfo.getInfoId()).orElse(null);
                     if(nowPlayroom == null) continue;
+                    if(!Objects.equals(nowPlayroom.getUser().getUserSeq(), myUserSeq)) continue;
                     SimpleHomePlayroomDto simplePlayroom = new SimpleHomePlayroomDto(nowPlayroom);
                     simplePlayroom.setUserLikesYN("N");
                     if(nowPlayroom.getPlayroomLikes() != null) {
                         for (PlayroomLikes nowPlayroomLikes : nowPlayroom.getPlayroomLikes()) {
-                            if (nowPlayroomLikes.getUser().getUserSeq() == myUserSeq) {
+                            if (Objects.equals(nowPlayroomLikes.getUser().getUserSeq(), myUserSeq)) {
                                 simplePlayroom.setUserLikesYN("Y");
                                 break;
                             }
@@ -216,7 +223,7 @@ public class HomeInfoService {
                 simpleBoard.setUserLikesYN("N");
                 if(nowBoard.getBoardLikes() != null){
                     for (BoardLikes nowBoardLikes : nowBoard.getBoardLikes()) {
-                        if (nowBoardLikes.getUser().getUserSeq() == myUserSeq) {
+                        if (Objects.equals(nowBoardLikes.getUser().getUserSeq(), myUserSeq)) {
                             simpleBoard.setUserLikesYN("Y");
                             break;
                         }
