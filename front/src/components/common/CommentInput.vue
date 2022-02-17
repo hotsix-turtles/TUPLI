@@ -20,7 +20,7 @@
           left
           offset-x
           offset-y
-          style="height: 100px;"
+          style="height: 130px;"
         >
           <template v-slot:activator="{ on, attrs }">
             <v-icon
@@ -87,7 +87,7 @@ export default {
   computed: {
     ...mapState({
       isLogin: state => state.isLogin,
-    })
+    }),
   },
   methods: {
     sendComment: function (event) {
@@ -105,7 +105,7 @@ export default {
       }
     },
     clickEmoji: function({ idx, emoticon }) {
-      console.log(idx, emoticon)
+      // console.log(idx, emoticon)
       this.inputVal += `#${idx}`;
       this.$nextTick(() => this.$refs.comment_input.focus())
     },

@@ -17,7 +17,10 @@
       <div class="d-flex justify-space-between">
         <div class="d-flex-column">
           <!-- 닉네임 -->
-          <div class="font-3 color-dark-gray">
+          <div
+            class="font-3 color-dark-gray"
+            @click="$router.push({ name: 'Profile', params: { userId : playlist.userId }})"
+          >
             {{ playlist.nickName }}
           </div>
           <!-- 태그 -->

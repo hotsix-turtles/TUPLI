@@ -58,6 +58,7 @@
           @infinite="getCategoryVideosByScroll"
         >
           <div slot="no-results" />
+          <div slot="no-more" />
         </infinite-loading><br><br>
       </v-tab-item>
     </v-tabs>

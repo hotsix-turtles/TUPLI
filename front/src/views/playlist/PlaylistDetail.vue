@@ -86,31 +86,33 @@
       </div>
       <!-- CD -->
       <!-- playlist 썸네일 -->
-      <span
-        class="playlist-cd-case"
-      >
-        <div id="case" />
-        <img
-          :src="playlistDetail.videos[0].thumbnail"
-          alt="썸네일"
+      <div class="d-flex justify-center">
+        <span
+          class="playlist-cd-case"
         >
-        <div />
-      </span>
+          <div id="case" />
+          <img
+            :src="playlistDetail.videos[0].thumbnail"
+            alt="썸네일"
+          >
+          <div />
+        </span>
+      </div>
       <div class="container">
         <!-- 소개글 -->
-        <div class="mx-4">
+        <div class="mx-1">
           {{ playlistDetail.content }}
         </div>
         <!-- 태그 -->
         <tags
           v-if="playlistDetail.tags"
-          class="mx-4"
+          class="mx-1"
           :tags="playlistDetail.tags"
         /><br>
         <!-- 유사 플레이리스트 추천 -->
         <div
           v-if="playlistDetail.recommendPlaylists !== null && playlistDetail.recommendPlaylists !== []"
-          class="mx-3"
+          class=""
         >
           <div class="font-2 semi-bold color-main mt-2 mb-2">
             유사 플레이리스트 추천
@@ -129,12 +131,12 @@
           </v-card>
         </div><br>
         <!-- 전체 선택 / 영상 리스트 -->
-        <div class="mx-3">
+        <div class="">
           <div class="font-2 semi-bold color-main mt-2 mb-1">
             재생 영상 목록
           </div>
           <div
-            class=""
+            class="my-3"
             @click="onClickSelectAll"
           >
             <v-icon>mdi-check</v-icon>

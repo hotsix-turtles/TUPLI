@@ -16,14 +16,14 @@
           <img
             v-if="!isVideoList"
             :src="video.thumbnail"
-            style="width: 35vw; height: 100%; object-fit: cover;"
+            style="width: 35vw; height: 100px; object-fit: cover;"
             class=""
             @click="watchingVideo(video)"
           >
           <img
             v-else
             :src="video.thumbnail"
-            style="width: 35vw; height: 100%; object-fit: cover;"
+            style="width: 35vw; height: 100px; object-fit: cover;"
             class=""
             @click="changeVideo(video)"
           >

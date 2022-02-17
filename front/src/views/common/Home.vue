@@ -35,13 +35,24 @@
     </div>
 
     <div>
-      <main-list />
+      <main-list :main-contents="mainContents" />
     </div>
+
+    <!--무한스크롤 -->
+    <infinite-loading
+      spinner="waveDots"
+      @infinite="getMainContents"
+    >
+      <div slot="no-results" />
+      <div slot="no-more" />
+    </infinite-loading><br><br>
   </v-app>
 </template>
 
 <script>
 import MainList from '@/components/home/MainList'
+import InfiniteLoading from "vue-infinite-loading"
+import axiosConnector from '../../utils/axios-connector';
 
 import { mapState } from 'vuex'
 
@@ -50,6 +61,17 @@ export default {
 
   components: {
     MainList,
+    InfiniteLoading,
+  },
+
+  data: function () {
+    return {
+      page: 1,
+      mainContents: [],
+    }
+  },
+
+  created: function () {
   },
 
   computed: {
@@ -57,9 +79,33 @@ export default {
   },
 
   methods: {
-
+    getMainContents($state) {
+      console.log('getMainContents')
+      const params = {
+        paged: true,
+        page: this.page,
+        size: 5,
+      }
+      axiosConnector.get(`home/all/`, {
+        params
+      })
+        .then((res) => {
+          if (res.data.length) {
+            console.log('getMainContents then', res)
+            this.page++
+            this.mainContents.push(...res.data)
+            $state.loaded()
+            console.log('this.mainContents', this.mainContents)
+          } else {
+            $state.complete()
+          }
+        })
+        .catch((err) => {
+          console.log(err)
+          $state.complete()
+        })
+    }
   }
-
 }
 </script>
 
