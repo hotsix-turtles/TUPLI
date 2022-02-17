@@ -105,12 +105,17 @@ const playlist = {
     ADD_PLAYLISTS: function (state) {
       state.addedPlaylists = []
       state.selectedPlaylists.map(selectedPlaylist => {
+        if (state.addedPlaylists.find(addedPlaylist => addedPlaylist.id == selectedPlaylist.id)) return;
+
         if (selectedPlaylist && selectedPlaylist.videos)
           selectedPlaylist.videos
             .filter(video => !state.addedPlaylistVideoIds.find(addedPlaylistVideoId => addedPlaylistVideoId == video.videoId))
             .map(video => state.addedPlaylistVideoIds.push(video.videoId))
       });
-      state.selectedPlaylists.map(selectedPlaylist => state.addedPlaylists.push(selectedPlaylist))
+      state.selectedPlaylists.map(selectedPlaylist => {
+        if (state.addedPlaylists.find(addedPlaylist => addedPlaylist.id == selectedPlaylist.id)) return;
+        state.addedPlaylists.push(selectedPlaylist)
+      })
       state.selectedPlaylists = []
       console.log('state.addedPlaylists', state.addedPlaylists)
     },
