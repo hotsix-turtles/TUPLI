@@ -26,7 +26,7 @@
           <div class="notice-content">
             <p
               class="mb-0"
-              @click="setProfile"
+              @click="goProfile"
             >
               {{ notice.from }}
               님이&nbsp;
