@@ -45,7 +45,7 @@
                   {{ activity.title }}
                 </span>
 
-                <div class="d-flex">
+                <div class="d-flex flex-wrap">
                   <p
                     v-for="tag in allTags"
                     :key="tag.id"
@@ -149,7 +149,7 @@
                     {{ activity.title }}
                   </span>
 
-                  <div class="d-flex">
+                  <div class="d-flex flex-wrap">
                     <p
                       v-for="tag in allTags"
                       :key="tag.id"

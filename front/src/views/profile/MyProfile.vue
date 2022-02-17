@@ -171,11 +171,11 @@ export default {
         params
       })
         .then((res) => {
+          this.profile = res.data
+          this.image = res.data.profileImage
           if (this.page === 1) {
             this.page++
             console.log('본인 프로필', res.data)
-            this.profile = res.data
-            this.image = res.data.profileImage
             // this.tastes = res.data.taste.userInfo.tasteInfo
             // this.activities.push(...res.data.activities)
             this.activities = res.data.activities

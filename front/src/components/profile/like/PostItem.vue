@@ -1,10 +1,10 @@
 <template>
   <div>
     <div
-      class="d-flex mt-5"
+      class="d-flex mt-5 justify-center"
     >
       <!-- board 정보 -->
-      <div class="d-flex">
+      <div class="d-flex align-start">
         <div class="d-flex">
           <img
             style="border-radius: 100px; margin: 10px;"
@@ -15,15 +15,15 @@
             @click="setProfile"
           >
         </div>
-        <div class="d-flex flex-column justify-center align-start">
+        <div class="d-flex flex-column justify-center align-start mx-2">
           <p
-            class="mb-0"
+            class="like-content"
             @click="goBoard"
           >
             {{ boardlist.content }}
           </p>
           <p
-            class="mb-0"
+            class="main-username"
             @click="setProfile"
           >
             {{ boardlist.user.nickname }}
@@ -37,7 +37,7 @@
       >
         <template v-slot:activator="{ on, attrs }">
           <v-icon
-            class="pb-10"
+            class="pb-5"
             v-bind="attrs"
             @click.stop="dialog = true"
             v-on="on"
