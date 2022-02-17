@@ -1,12 +1,14 @@
 <template>
   <div
-    class="d-flex flex-wrap justify-center"
+    class="d-flex-contents justify-center"
   >
-    <badge-item
-      v-for="badge in badges"
-      :key="badge.id"
-      :badge="badge"
-    />
+    <div class="d-flex flex-wrap justify-start">
+      <badge-item
+        v-for="badge in badges"
+        :key="badge.id"
+        :badge="badge"
+      />
+    </div>
   </div>
 </template>
 

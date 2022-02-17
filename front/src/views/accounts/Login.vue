@@ -37,6 +37,7 @@
               :rules="[passwordRules.min]"
               label="비밀번호를 입력해주세요"
               required
+              @keydown.enter="onInputKeyword"
             />
           </v-form>
 
@@ -48,7 +49,6 @@
             rounded
             width="50px"
             @click="requestLogin"
-            @keydown.enter="onInputKeyword"
           >
             로그인
           </v-btn>
@@ -136,7 +136,7 @@ export default {
 
     password: '',
     passwordRules: {
-      min: v => v.length >= 8 || '올바른 비밀번호를 입력해주세요.',
+      min: v => v.length >= 4 || '올바른 비밀번호를 입력해주세요.',
     }
   }),
 

@@ -210,6 +210,7 @@
 import axios from 'axios'
 import SERVER from '@/api/server'
 import { mapState } from 'vuex'
+import axiosConnector from '@/utils/axios-connector.js'
 import swal from 'sweetalert2'
 
 export default {
@@ -238,11 +239,12 @@ export default {
 
     // 회원 탈퇴
     deleteUser: function() {
-      axios({
-        method: 'DELETE',
-        url: SERVER.URL + '/account/withdraw',
-        headers: {Authorization: this.authToken}
-      })
+      axiosConnector.delete('/account/withdraw')
+      // axios({
+      //   method: 'DELETE',
+      //   url: SERVER.URL + '/account/withdraw',
+      //   headers: {Authorization: this.authToken}
+      // })
         .then(() => {
           this.$store.commit('DELETE_TOKEN')
           this.$router.push({ name: 'Home' })
@@ -255,7 +257,7 @@ export default {
           })
         })
         .catch (() => {
-          dialogDeleteUser = false
+          this.dialogDeleteUser = false
           swal.fire ({
             icon: 'error',
             title: '탈퇴 실패',

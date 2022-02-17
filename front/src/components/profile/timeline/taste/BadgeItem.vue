@@ -1,7 +1,8 @@
 <template>
-  <v-card
+  <div
     v-if="badgeCheck"
-    style="width:20%; margin-left: 8px; margin-right: 8px; margin-top: 4px; margin-bottom: 4px;"
+    style="width:20%; margin-left: 4px; margin-right: 4px; margin-bottom: 4px;"
+    class="d-flex flex-column"
   >
     <img
       :src="ImgUrl(img)"
@@ -10,11 +11,11 @@
       style="background-size: 50%;"
     >
     <div class="d-flex justify-center">
-      <p style="font-size: 10px; padding-bottom: 10px; color:gray;">
+      <p style="font-size: 10px; padding-bottom: 5px; color:gray;">
         {{ date }}
       </p>
     </div>
-  </v-card>
+  </div>
 </template>
 
 <script>

@@ -1,10 +1,12 @@
 <template>
   <div>
     <div>
-      <h2>{{ nickname }}님의 취향 분석</h2>
+      <h2>{{ nickname }}의 취향 분석</h2>
       <taste-list
         :tastes="tastes"
       />
+
+      <h2>{{ nickname }}의 튜플리 뱃지</h2>
       <badge-list
         :badges="badges"
       />
