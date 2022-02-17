@@ -73,9 +73,6 @@ public class HomeInfoService {
                if(nowBoard == null) continue;
                if(userSeq == -1L) infoResult.add(new SimpleHomeBoardDto(nowBoard));
                else {
-                   System.out.println("크허허허   " + nowBoard.getUser().getUserSeq());
-                   System.out.println("크허허허2   " + userSeq);
-
                    if(Objects.equals(nowBoard.getUser().getUserSeq(), userSeq)) continue;
 
                    SimpleHomeBoardDto simpleBoard = new SimpleHomeBoardDto(nowBoard, user);
