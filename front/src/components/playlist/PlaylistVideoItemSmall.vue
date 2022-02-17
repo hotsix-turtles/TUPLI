@@ -34,9 +34,6 @@
           </div>
         </div>
       </div>
-      <div class="">
-        <v-icon>mdi-dots-vertical</v-icon>
-      </div>
     </div>
   </v-card>
 </template>

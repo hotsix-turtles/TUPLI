@@ -115,7 +115,7 @@
         <!-- 플레이룸 작성자 프로필 사진 -->
         <div class="authorProfilePic">
           <img
-            :src="ImgUrl(roomAuthorProfilePic)"
+            :src="roomAuthorProfilePicRendered"
             alt=""
             class="rounded-circle"
             style="width: 100%; height: auto;"
@@ -208,7 +208,7 @@
           <v-icon color="accent" dense>
             mdi-account
           </v-icon>
-          {{roomGuests.length}}명  시청 중
+          {{roomUserCount}}명  시청 중
           <!-- <p class="playtime">
             {{ roomPlaytime }}
           </p> -->
@@ -295,7 +295,7 @@
               class="ml-2 text-body-2 chat-title-text"
             >
               <v-icon color="accent" dense>mdi-account</v-icon>
-              {{ roomGuests.length }}
+              {{ roomUserCount }}
             </div>
             <v-btn
               icon
@@ -554,6 +554,9 @@ export default {
     }
   },
   computed: {
+    roomAuthorProfilePicRendered() {
+      return getImage(this.roomAuthorProfilePic);
+    },
     selectList() {
       return this.roomRepeat ? {
         '수정하기': 'update',
@@ -603,6 +606,8 @@ export default {
       'roomCurrentVideoPlaytime',
       'roomChats',
       'roomGuests',
+      'roomUserCount',
+      'roomUserCountMax',
       'roomSendingMessage',
       'chatroomId',
       'chatBlockedId',
@@ -911,7 +916,7 @@ export default {
         this.SET_USER_END_TIME(new Date());
 
         var time = Math.floor((new Date(this.roomUserEndTime).getTime() - new Date(this.roomUserStartTime).getTime()) / 1000 / 1000)
-        console.log(time, '초 경과')
+        //console.log(time, '초 경과')
 
         // 새로운 뱃지 취득시 이거 응답으로 받습니다...
         if (this.wsConnector && this.wsConnector.connected) await axiosConnector.put(`/playroom/out/${this.roomId}`, { watchTime: time })
@@ -943,7 +948,11 @@ export default {
       const id = payload.headers['message-id']
       const body = JSON.parse(payload.body);
 
-      if (body.type == 'KICK')
+      if (body.type == 'ENTER')
+      {
+        await this.loadRoomUserCount();
+      }
+      else if (body.type == 'KICK')
       {
         const { userId } = JSON.parse(body.message)
         if (this.userId == userId) this.isKickedError = true
@@ -1044,7 +1053,7 @@ export default {
       this.player.playVideo()
     },
     seekTo() {
-      console.log('seekTo', this.roomCurrentVideoPlaytime)
+      //console.log('seekTo', this.roomCurrentVideoPlaytime)
       this.player.seekTo(this.roomCurrentVideoPlaytime)
       //setTimeout(this.player.playVideo, 1000)
     },
@@ -1053,7 +1062,7 @@ export default {
       this.updateVideoId();
 
       this.selectedVideoItem = []
-      console.log('playThisVideo')
+      //console.log('playThisVideo')
       this.seekTo()
     },
     async sendMessage(payload) {
@@ -1242,6 +1251,7 @@ export default {
       'setRoomInfo',
       'setRoomAuthor',
       'loadRoomInfo',
+      'loadRoomUserCount',
       'loadLikeState',
       'togglePlayroomLike',
       'togglePlayroomRepeat',
@@ -1404,11 +1414,7 @@ iframe {
   font-weight: bold;
 }
 
-@media (orientation: portrait) {
-
-}
-
-@media (orientation: landscape) {
+@media screen and (min-device-aspect-ratio: 1/1) and (orientation: landscape) {
   body { overflow: hidden; }
 
   body * { touch-action: none; }
@@ -1483,7 +1489,7 @@ iframe {
 </style>
 
 <style lang="scss" scoped>
-@media (orientation: landscape) {
+@media screen and (min-device-aspect-ratio: 1/1) and (orientation: landscape) {
   .fixed-bottom-navbar {
     display: none;
   }

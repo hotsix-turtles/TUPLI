@@ -7,7 +7,7 @@
     :persistent="persistent"
   >
     <v-card
-      class="tupli-dialog-normal"
+      class="tupli-dialog-timeout"
     >
       <v-progress-linear
         v-if="timeout && !hideProgress && (topProgress || (!topProgress && !bottomProgress))"
@@ -16,18 +16,18 @@
         color="accent"
       />
       <v-card-title
-        class="tupli-dialog-normal-title"
+        class="tupli-dialog-timeout-title"
       >
         {{ title }}
       </v-card-title>
       <v-card-text
         v-if="contentHtml"
-        class="tupli-dialog-normal-content"
+        class="tupli-dialog-timeout-content"
         v-html="contentHtml"
       />
       <v-card-text
         v-else-if="content"
-        class="tupli-dialog-normal-content"
+        class="tupli-dialog-timeout-content"
       >
         {{ content }}
       </v-card-text>
@@ -162,5 +162,11 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.tupli-dialog-timeout-title {
+  color: $color-main;
+}
 
+.tupli-dialog-timeout-content {
+  color: black !important;
+}
 </style>

@@ -90,7 +90,7 @@
             <div class="row justify-center mt-1">
               <p
                 class="mx-1"
-                @click="$router.push({ name: 'Signup2' })"
+                @click="$router.push({ name: 'Signup' })"
               >
                 회원가입
               </p>
@@ -108,14 +108,24 @@
         </div>
       </div>
     </div>
+    <timeout-dialog
+      v-model="isAccountNotFoundError"
+      title="오류"
+      content-html="존재하지 않는 계정이거나 <br>비밀번호가 틀렸습니다"
+      timeout="2000"
+      hide-progress
+      @timeout="isAccountNotFoundError = false"
+    />
   </body>
 </template>
 
 <script>
 import { mapActions } from 'vuex'
+import TimeoutDialog from '../../components/common/TimeoutDialog.vue'
 
 export default {
   name: 'Login',
+  components: { TimeoutDialog },
 
   // 이메일 비밀번호 규칙 설정
   data: () => ({
@@ -124,6 +134,8 @@ export default {
       email: '',
       password: '',
     },
+
+    isAccountNotFoundError: false,
 
     // 로딩 아이콘
     loader: null,
@@ -158,9 +170,15 @@ export default {
 
   methods: {
     // 로그인
-    requestLogin: function () {
-      this.login(this.credentials)
-      this.valid = true
+    requestLogin: async function () {
+      const { data, status } = await this.login(this.credentials)
+
+      if (status == 200) {
+        this.valid = true
+        this.$router.push({ name: 'Home' })
+      } else if (status == 404) {
+        this.isAccountNotFoundError = true;
+      }
     },
     ...mapActions([
       'login',

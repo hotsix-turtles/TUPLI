@@ -36,7 +36,7 @@ const playlist = {
     RESET_FORM_DATA: function (state) {
       state.savedFormData = ''
       state.isSaved = false
-      console.log('RESET_FORM_DATA', state.savedFormData)
+      //console.log('RESET_FORM_DATA', state.savedFormData)
     },
     SAVE_FORM_DATA: function (state, formData) {
       state.savedFormData = formData
@@ -45,17 +45,17 @@ const playlist = {
 
     // [플레이리스트 디테일]
     GET_PLAYLIST_DETAIL: function (state, playlistDetail) {
-      console.log('GET_PLAYLIST_DETAIL', playlistDetail)
+      //console.log('GET_PLAYLIST_DETAIL', playlistDetail)
       playlistDetail.tags = playlistDetail.tags.split(',')
       playlistDetail.createdAt = timeConverter(playlistDetail.createdAt)
       state.playlistDetail = playlistDetail
       state.recommendedPlaylists = playlistDetail.recommendedPlaylists
 
-      console.log(state.playlistDetail)
+      //console.log(state.playlistDetail)
     },
     // 플레이리스트 좋아요 여부 조회
     IS_LIKED: function (state, isLiked) {
-      console.log('is_LIKED', isLiked)
+      //console.log('is_LIKED', isLiked)
       if (isLiked === "ok") {
         state.isLiked = true
       } else {
@@ -105,14 +105,19 @@ const playlist = {
     ADD_PLAYLISTS: function (state) {
       state.addedPlaylists = []
       state.selectedPlaylists.map(selectedPlaylist => {
+        if (state.addedPlaylists.find(addedPlaylist => addedPlaylist.id == selectedPlaylist.id)) return;
+
         if (selectedPlaylist && selectedPlaylist.videos)
           selectedPlaylist.videos
             .filter(video => !state.addedPlaylistVideoIds.find(addedPlaylistVideoId => addedPlaylistVideoId == video.videoId))
             .map(video => state.addedPlaylistVideoIds.push(video.videoId))
       });
-      state.selectedPlaylists.map(selectedPlaylist => state.addedPlaylists.push(selectedPlaylist))
+      state.selectedPlaylists.map(selectedPlaylist => {
+        if (state.addedPlaylists.find(addedPlaylist => addedPlaylist.id == selectedPlaylist.id)) return;
+        state.addedPlaylists.push(selectedPlaylist)
+      })
       state.selectedPlaylists = []
-      console.log('state.addedPlaylists', state.addedPlaylists)
+      //console.log('state.addedPlaylists', state.addedPlaylists)
     },
     REVOKE_PLAYLISTS: function (state) {
       state.selectedPlaylists = []
@@ -120,16 +125,16 @@ const playlist = {
       state.addedPlaylists = []
       state.addedPlaylistVideoIds = []
 
-      console.log('state.revokePlaylists', state.selectedPlaylists)
+      //console.log('state.revokePlaylists', state.selectedPlaylists)
     },
     SELECT_PLAYLIST: function (state, toAddPlaylist) {
       state.selectedPlaylists.push(toAddPlaylist)
-      console.log('select_playlist', state.selectedPlaylists)
+      //console.log('select_playlist', state.selectedPlaylists)
     },
     DESELECT_PLAYLIST: function (state, toRemovePlaylist) {
       const idx = state.selectedPlaylists.findIndex(selectedPlaylist => selectedPlaylist.id == toRemovePlaylist.id)
       state.selectedPlaylists.splice(idx, 1)
-      console.log('deselect_playlist', state.selectedPlaylists)
+      //console.log('deselect_playlist', state.selectedPlaylists)
     },
     WATCHING_PLAYLIST: function (state, watchingPlaylist) {
       state.watchingPlaylist = watchingPlaylist
@@ -140,7 +145,7 @@ const playlist = {
       if (idx != -1) return;
       state.addedPlaylistVideoIds.push(videoId)
 
-      console.log('select_playlist_video', videoId)
+      //console.log('select_playlist_video', videoId)
     },
     SELECT_ALL_PLAYLIST_VIDEO: function (state) {
       state.addedPlaylists.map(addedPlaylist => {
@@ -152,13 +157,13 @@ const playlist = {
           });
       });
 
-      console.log('select_all_playlist_video')
+      //console.log('select_all_playlist_video')
     },
     DESELECT_PLAYLIST_VIDEO: function (state, videoId) {
       const idx = state.addedPlaylistVideoIds.findIndex(addedPlaylistVideoId => addedPlaylistVideoId == videoId)
       state.addedPlaylistVideoIds.splice(idx, 1)
 
-      console.log('deselect_playlist_video', videoId)
+      //console.log('deselect_playlist_video', videoId)
     },
     DESELECT_ALL_PLAYLIST_VIDEO: function (state) {
       state.addedPlaylists.map(addedPlaylist => {
@@ -169,7 +174,7 @@ const playlist = {
           });
       });
 
-      console.log('deselect_all_playlist_video')
+      //console.log('deselect_all_playlist_video')
     },
     RESET_ADDED_PLAYLISTS: function (state) {
       state.selectedPlaylists = []
@@ -196,8 +201,8 @@ const playlist = {
       axiosConnector.post('/playlist',
         formData
       ).then((res) => {
-        console.log('---------------[플레이리스트 생성]', formData)
-        console.log(res)
+        //console.log('---------------[플레이리스트 생성]', formData)
+        //console.log(res)
         router.push({ name: 'PlaylistDetail', params: { playlistId: res.data.id } })
         commit('RESET_FORM_DATA')
       })
@@ -208,11 +213,11 @@ const playlist = {
 
     // [플레이리스트 수정]
     updatePlaylist: function ({ commit }, { formData, id } ) {
-      console.log('updatePlaylist', formData)
+      //console.log('updatePlaylist', formData)
       axiosConnector.put(`/playlist/${id}`,
         formData
       ).then((res) => {
-        console.log(res)
+        //console.log(res)
         router.push({ name: 'PlaylistDetail', params: { playlistId: id } })
         commit('RESET_FORM_DATA')
       })
@@ -222,7 +227,7 @@ const playlist = {
     },
     // 내 플레이리스트에 담기
     addVideoInPlaylist: function ({ commit }, { formData, id } ) {
-      console.log('addVideoInPlaylist', formData)
+      //console.log('addVideoInPlaylist', formData)
       axiosConnector.put(`/playlist/${id}`,
         formData
       ).then((res) => {
@@ -236,20 +241,20 @@ const playlist = {
 
     // [플레이리스트 디테일]
     getPlaylistDetail: function ({ commit, dispatch }, playlistId) {
-      console.log('getPlaylistDetail 실행됨')
+      //console.log('getPlaylistDetail 실행됨')
       axiosConnector.get(`/playlist/${playlistId}`,
       )
         .then((res) => {
-          console.log('getPlaylistDetail', res)
+          //console.log('getPlaylistDetail', res)
           commit('GET_PLAYLIST_DETAIL', res.data)
-          console.log('playlistId', playlistId)
+          //console.log('playlistId', playlistId)
         })
         .catch((err) => {
           console.log(err)
         })
     },
     saveFormData: function ({ commit }, formData) {
-      console.log('saveFormData', formData)
+      //console.log('saveFormData', formData)
       commit('SAVE_FORM_DATA', formData)
     },
     // 플레이리스트 좋아요
@@ -257,7 +262,7 @@ const playlist = {
       axiosConnector.post(`/playlist/${playlistId}/like`,
       )
         .then((res) => {
-          console.log('playlist.js 189 likePlaylist', res)
+          //console.log('playlist.js 189 likePlaylist', res)
           commit('LIKE_PLAYLIST')
         })
         .catch((err) => {
@@ -269,7 +274,7 @@ const playlist = {
       axiosConnector.delete(`/playlist/${playlistId}/like`,
       )
         .then((res) => {
-          console.log('playlist.js 189 unlikePlaylist', res)
+          //console.log('playlist.js 189 unlikePlaylist', res)
           commit('UNLIKE_PLAYLIST')
         })
         .catch((err) => {
@@ -282,7 +287,7 @@ const playlist = {
       axiosConnector.get(`/playlist/${playlistId}/comment`)
         .then((res) => {
           commit('GET_PLAYLIST_COMMENTS', res.data)
-          console.log("playlist.js : res.data", res.data)
+          //console.log("playlist.js : res.data", res.data)
         })
         .catch((err) => {
           console.log(err)
@@ -294,10 +299,10 @@ const playlist = {
         data
       )
         .then((res) => {
-          console.log('createPlaylistComment', res)
+          //console.log('createPlaylistComment', res)
           // commit('CREATE_PLAYLIST_COMMENT', res.data)
           // 생성 성공. 아무 행동 안함.
-          console.log("덧글 작성 완료.")
+          //console.log("덧글 작성 완료.")
           axiosConnector.get(`/playlist/${playlistId}/comment`)
             .then((res) => {
               commit('GET_PLAYLIST_COMMENTS', res.data)
@@ -315,7 +320,7 @@ const playlist = {
       axiosConnector.delete(`/playlist/${ commentId }/comment`)
         .then((res) => {
           // 삭제 성공. 아무 행동 안함.
-          console.log(commentId + "번 덧글 삭제 완료.")
+          //console.log(commentId + "번 덧글 삭제 완료.")
           axiosConnector.get(`/playlist/${playlistId}/comment`)
             .then((res) => {
               commit('GET_PLAYLIST_COMMENTS', res.data)
@@ -331,12 +336,12 @@ const playlist = {
 
     // [검색]
     searchPlaylists: function ({ commit }, params) {
-      console.log('searchPlaylists params', params)
+      //console.log('searchPlaylists params', params)
       axiosConnector.get(`/playlist/search`, {
         params
       })
         .then((res) => {
-          console.log(res)
+          //console.log(res)
           commit('SEARCH_PLAYLISTS', res.data)
         }).catch((err) => {
           console.log(err)
@@ -351,7 +356,7 @@ const playlist = {
 
       axiosConnector.get(`/playlist/category/${categoryName}`,
       ).then((res) => {
-        console.log(`/playlist/category/${categoryName}`, categoryName)
+        //console.log(`/playlist/category/${categoryName}`, categoryName)
         commit('GET_CATEGORY_PLAYLISTS', res.data)
       })
         .catch((err) => {

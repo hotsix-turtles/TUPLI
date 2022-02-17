@@ -111,25 +111,36 @@ export default new Vuex.Store({
   },
   actions: {
     // 로그인
-    login: function ({ commit, dispatch }, credentials) {
-      axios({
-        method: 'POST',
-        url: SERVER.URL + '/account/login',
-        data: {
-          email: credentials.email,
-          password: credentials.password,
-        }
-      })
-        .then((res) => {
-          console.log('로그인', res)
-          commit('TOKEN', res.data.token)
-          dispatch('getUserInfo', res.data.token)
-          dispatch('getSetting', res.data.token)
-          router.push({ name: 'Home' })
-        })
-        .catch((err) => {
-          console.log(err.response.data)
-        })
+    login: async function ({ commit, dispatch }, credentials) {
+      let response;
+      try {
+        response = await axiosConnector.post('/account/login', credentials);
+        commit('TOKEN', response.data.token)
+        dispatch('getUserInfo', response.data.token)
+        dispatch('getSetting', response.data.token)
+      } catch (err) {
+        response = err.response
+      }
+      return response
+
+      // axios({
+      //   method: 'POST',
+      //   url: SERVER.URL + '/account/login',
+      //   data: {
+      //     email: credentials.email,
+      //     password: credentials.password,
+      //   }
+      // })
+      //   .then((res) => {
+      //     console.log('로그인', res)
+      //     commit('TOKEN', res.data.token)
+      //     dispatch('getUserInfo', res.data.token)
+      //     dispatch('getSetting', res.data.token)
+      //     router.push({ name: 'Home' })
+      //   })
+      //   .catch((err) => {
+      //     console.log(err.response)
+      //   })
     },
     // 로그인 (회원가입, 자동로그인 등을 위한 라우터 이동 없는 버전)
     loginHere: function ({ commit, dispatch }, credentials) {
@@ -188,19 +199,30 @@ export default new Vuex.Store({
       // commit('LOGIN')
     },
     // 회원가입
-    signup: function (context, credentials) {
-      axiosConnector.post('/account/signup', { email: credentials.email, password: credentials.password, nickname: credentials.nickname })
-        .then((res) => {
-          // 회원가입시 자동 로그인까지 하고 signup 3으로 보내기 (강민구)
-          this.dispatch('loginHere', credentials)
-          router.push( { name: 'Signup3' })
-        })
-        .catch((err) => {
-          console.log('signup fail')
-          console.log(err.response.data)
-          console.log('알림 띄우기')
-        })
+    signup: async function ({ commit, dispatch }, credentials) {
+      let response;
+      try {
+        response = await axiosConnector.post('/account/signup', { email: credentials.email, password: credentials.password, nickname: credentials.nickname });
+        dispatch('loginHere', credentials)
+      } catch (err) {
+        response = err.response
+      }
+
+      return response
     },
+    // signup: function (context, credentials) {
+    //   axiosConnector.post('/account/signup', { email: credentials.email, password: credentials.password, nickname: credentials.nickname })
+    //     .then((res) => {
+    //       // 회원가입시 자동 로그인까지 하고 signup 3으로 보내기 (강민구)
+    //       this.dispatch('loginHere', credentials)
+    //       router.push( { name: 'Signup3' })
+    //     })
+    //     .catch((err) => {
+    //       console.log('signup fail')
+    //       console.log(err.response.data)
+    //       console.log('알림 띄우기')
+    //     })
+    // },
     // 사용자 정보 얻기
     // getUserInfo({commit}, token) {
     //   axios({

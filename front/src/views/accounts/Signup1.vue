@@ -83,14 +83,24 @@
         </div>
       </v-container>
     </div>
+    <timeout-dialog
+      v-model="isTermNotAcceptedError"
+      title="오류"
+      content-html="필수 약관에 모두 동의해주세요"
+      timeout="2000"
+      hide-progress
+      @timeout="isTermNotAcceptedError = false"
+    />
   </v-app>
 </template>
 
 <script>
 import axios from 'axios'
 import Signup2Vue from './Signup2.vue'
+import TimeoutDialog from '../../components/common/TimeoutDialog.vue'
 
 export default {
+  components: { TimeoutDialog },
   name: 'Signup',
 
   // 이메일 비밀번호 규칙 설정
@@ -100,6 +110,8 @@ export default {
       email: null,
       password: null,
     },
+
+    isTermNotAcceptedError: false,
 
     checkbox1: false,
     checkbox2: false,
@@ -155,7 +167,7 @@ export default {
         this.$router.push({ name: 'Signup2' })
       }
       else {
-        console.log('약관에 동의해주세요')
+        this.isTermNotAcceptedError = true
       }
 
     },
