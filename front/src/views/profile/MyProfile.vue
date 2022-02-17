@@ -43,6 +43,9 @@
             <p>{{ followerlist.length }}</p>
           </div>
           <div
+            style="width: 1px; height: 6px;"
+          />
+          <div
             class="d-flex mx-3"
             @click="$router.push({ name: 'MyFollow' })"
           >
@@ -68,9 +71,9 @@
     </v-container>
 
     <!-- 유저 활동, 취향 탭 -->
-    <div class="d-flex justify-space-around mt-5">
+    <div class="d-flex justify-space-around mt-1">
       <v-tabs
-        v-model="activeTab"
+        fixed
         centered
         grow
         color="#5B5C9D"

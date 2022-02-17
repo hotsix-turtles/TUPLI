@@ -7,7 +7,7 @@
     <v-bottom-navigation
       absolute
       background-color="#5B5C9D"
-      height="65px"
+      height="75px"
       class="fixed-bottom"
       :input-value="addedPlaylists.length > 0 || selectedPlaylists.length > 0"
     >
@@ -36,15 +36,16 @@
       class="overflow-y-auto"
     >
       <back :page-name="pageName" />
-      <search-bar
+      <!-- <search-bar
         :label="'새로운 플레이리스트를 검색해주세요'"
-      />
+      /> -->
 
       <!-- 탭 -->
       <v-tabs
         v-model="tab"
         background-color="transparent"
         grow
+        class="mt-14"
       >
         <v-tab
           v-for="item in items"
@@ -74,14 +75,14 @@
 <script>
 import { mapActions, mapState } from 'vuex'
 import Back from '../../components/common/Back.vue'
-import SearchBar from '../../components/common/SearchBar.vue'
+// import SearchBar from '../../components/common/SearchBar.vue'
 import PlaylistListItemSmall from '../../components/playlist/PlaylistListItemSmall.vue'
 import NavButton from '../../components/common/NavButton.vue'
 import axiosConnector from '../../utils/axios-connector';
 
 export default {
   name: 'PlayroomFormPlaylist',
-  components: { SearchBar, NavButton, PlaylistListItemSmall, Back },
+  components: { NavButton, PlaylistListItemSmall, Back },
   data() {
     return {
       pageName: "플레이리스트 추가하기",

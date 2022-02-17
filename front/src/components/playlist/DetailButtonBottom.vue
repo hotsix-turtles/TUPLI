@@ -5,7 +5,7 @@
       v-if="selectedVideos.length"
       absolute
       background-color="#5B5C9D"
-      height="60px"
+      height="75px"
       :input-value="selectedVideos.length > 0"
       class="fixed-bottom animate__animated animate__slideInUp"
     >

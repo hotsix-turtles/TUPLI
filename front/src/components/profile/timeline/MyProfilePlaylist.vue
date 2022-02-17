@@ -2,6 +2,7 @@
   <div>
     <history-list
       :activities="activities"
+      class="mb-8"
     />
   </div>
 </template>
