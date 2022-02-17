@@ -75,7 +75,6 @@ public class UserInfoApiController {
             List<Object> activities = homeInfoService.getActivites(userSeq, pageable);
             List<Playroom> playrooms = playroomService.getWatchingPlayroom(userSeq);
             UserProfileDto result = new UserProfileDto(user, userInfo, playrooms, activities);
-            result.setMeCheck(true);
             return ResponseEntity.ok().body(result);
         }
         else{
