@@ -629,6 +629,15 @@
   padding-left: 8px;
 }
 
+// 두 줄 말 줄임
+.twolines {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
 // 무조건 가운데 정렬
 .center {
   position: absolute;

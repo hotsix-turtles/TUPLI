@@ -69,23 +69,81 @@
           </v-col>
         </v-row>
 
-        <!-- 공개 여부 -->
-        <v-row
-          v-if="formType=='create'"
-        >
+        <!-- 플레이리스트 구성 하기 레이블 -->
+        <v-row>
           <v-col
             cols="12"
-            md="4"
+            md="12"
             class="d-flex flex-row justify-space-between"
           >
-            <p class="font-3">
-              공개 여부
+            <div>
+              <p class="font-3">
+                플레이리스트 구성
+              </p>
+              <p class="font-4 ml-1 mr-auto">
+                원하는 플레이리스트를 검색하고 추가하여<br> 나만의 플레이리스트를 구성할 수 있습니다.
+              </p>
+            </div>
+
+            <!-- 플레이리스트 추가 버튼 -->
+            <div
+              class="py-0 mr-0"
+            >
+              <v-btn
+                small
+                @click="saveAndGoPlaylist"
+              >
+                <v-icon color="black">
+                  mdi-plus
+                </v-icon>
+                <span style="color: black;">플레이리스트 추가</span>
+              </v-btn>
+            </div>
+          </v-col>
+        </v-row>
+
+        <!-- 플레이리스트 리스트 조작 버튼 -->
+        <v-row>
+          <v-col
+            cols="12"
+            md="12"
+            class="d-flex flex-row justify-space-between pb-0"
+          >
+            <v-btn
+              small
+              elevation="0"
+              color="white"
+              @click="selectAllVideo"
+            >
+              <v-icon class="mdi-18px">
+                mdi-check
+              </v-icon>
+              <span class="ml-1">전체 선택</span>
+            </v-btn>
+            <p class="font-4">
+              {{ numberOfAddedPlaylists }}개 플레이리스트 / {{ numberOfAddedPlaylistSelectedVideos }}개 영상 선택
             </p>
-            <p class="font-4 ml-1 mr-auto">
-              {{ isPublicMsg }}
-            </p>
-            <v-switch
-              v-model="formData.isPublic"
+          </v-col>
+        </v-row>
+
+        <!-- 플레이리스트 리스트 -->
+        <v-row>
+          <v-col
+            cols="12"
+            md="12"
+            class="pt-0"
+          >
+            <v-card
+              v-if="!addedPlaylists.length"
+              class="d-flex flex-column justify-center align-center"
+              min-height="300"
+            >
+              <p>플레이리스트가 비어있습니다</p>
+            </v-card>
+            <playlist-list-item-small
+              :playlists="addedPlaylists"
+              :playlist-readonly="true"
+              :video-readonly="false"
             />
           </v-col>
         </v-row>
@@ -169,85 +227,6 @@
             <account-list-item-small
               :accounts="addedFriends"
               :readonly="true"
-            />
-          </v-col>
-        </v-row>
-
-        <!-- 플레이리스트 구성 하기 레이블 -->
-        <v-row>
-          <v-col
-            cols="12"
-            md="12"
-            class="d-flex flex-row justify-space-between"
-          >
-            <div>
-              <p class="font-3">
-                플레이리스트 구성
-              </p>
-              <p class="font-4 ml-1 mr-auto">
-                원하는 플레이리스트를 검색하고 추가하여<br> 나만의 플레이리스트를 구성할 수 있습니다.
-              </p>
-            </div>
-
-            <!-- 플레이리스트 추가 버튼 -->
-            <div
-              class="py-0 mr-0"
-            >
-              <v-btn
-                small
-                @click="saveAndGoPlaylist"
-              >
-                <v-icon color="black">
-                  mdi-plus
-                </v-icon>
-                <span style="color: black;">플레이리스트 추가</span>
-              </v-btn>
-            </div>
-          </v-col>
-        </v-row>
-
-        <!-- 플레이리스트 리스트 조작 버튼 -->
-        <v-row>
-          <v-col
-            cols="12"
-            md="12"
-            class="d-flex flex-row justify-space-between pb-0"
-          >
-            <v-btn
-              small
-              elevation="0"
-              color="white"
-              @click="selectAllVideo"
-            >
-              <v-icon class="mdi-18px">
-                mdi-check
-              </v-icon>
-              <span class="ml-1">전체 선택</span>
-            </v-btn>
-            <p class="font-4">
-              {{ numberOfAddedPlaylists }}개 플레이리스트 / {{ numberOfAddedPlaylistSelectedVideos }}개 영상 선택
-            </p>
-          </v-col>
-        </v-row>
-
-        <!-- 플레이리스트 리스트 -->
-        <v-row>
-          <v-col
-            cols="12"
-            md="12"
-            class="pt-0"
-          >
-            <v-card
-              v-if="!addedPlaylists.length"
-              class="d-flex flex-column justify-center align-center"
-              min-height="300"
-            >
-              <p>플레이리스트가 비어있습니다</p>
-            </v-card>
-            <playlist-list-item-small
-              :playlists="addedPlaylists"
-              :playlist-readonly="true"
-              :video-readonly="false"
             />
           </v-col>
         </v-row>
@@ -408,6 +387,27 @@
                 @click:minute="$refs.endTimeMenu.save(endTime)"
               />
             </v-menu>
+          </v-col>
+        </v-row>
+
+        <!-- 공개 여부 -->
+        <v-row
+          v-if="formType=='create'"
+        >
+          <v-col
+            cols="12"
+            md="4"
+            class="d-flex flex-row justify-space-between"
+          >
+            <p class="font-3">
+              공개 여부
+            </p>
+            <p class="font-4 ml-1 mr-auto">
+              {{ isPublicMsg }}
+            </p>
+            <v-switch
+              v-model="formData.isPublic"
+            />
           </v-col>
         </v-row>
 

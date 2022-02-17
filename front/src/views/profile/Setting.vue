@@ -29,7 +29,7 @@
         <p>관리자 페이지</p>
         <v-icon>mdi-chevron-right</v-icon>
       </div>
-      
+
       <hr>
 
       <!-- 좋아요한 게시물 -->
@@ -116,7 +116,7 @@
             </v-card-title>
 
             <v-card-text>
-              로그아웃 후 비회원 상태로 홈 화면으로 이동합니다.
+              로그아웃 후 게스트 모드로 홈 화면으로 이동합니다.
             </v-card-text>
 
             <v-card-actions>
@@ -200,7 +200,7 @@
         <p>구글 유저 비밀번호 설정(초회)</p>
         <v-icon>mdi-chevron-right</v-icon>
       </div>
-      
+
       <hr>
     </div>
   </v-app>
