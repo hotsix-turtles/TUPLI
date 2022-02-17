@@ -55,8 +55,8 @@
         </div>
         <modal
           :items="selectList"
-          :modal-name="'플레이리스트 변경'"
-          :modal-type="'modal'"
+          modal-name="플레이리스트 변경"
+          modal-type="modal"
           @on-select="onSelect"
         />
       </div>
@@ -320,16 +320,16 @@ export default {
     onClickLike: function () {
       console.log(this.isLogin)
       if (this.isLogin) {
-        this.playlist.isLiked = true
-        this.likePlaylist(playlistDetail.id)
+        this.playlistDetail.isLiked = true
+        this.likePlaylist(this.playlistDetail.id)
       } else {
         this.showLoginDialog = true
       }
     },
     onClickUnlike: function () {
       if (this.isLogin) {
-        this.playlist.isLiked = false
-        this.unlikePlaylist(playlistDetail.id)
+        this.playlistDetail.isLiked = false
+        this.unlikePlaylist(this.playlistDetail.id)
       } else {
         this.showLoginDialog = true
       }

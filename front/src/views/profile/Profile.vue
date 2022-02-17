@@ -143,9 +143,7 @@ export default {
   created: function() {
     console.log('타인 프로필 조회', this.$route.params.userId)
     console.log('타인 프로필 조회', this.profile)
-    // this.userId = this.$route.params.userId
     this.followState()
-    // this.getAccounts()
   },
   methods: {
     ...mapActions('account', ['follow', 'unfollow', 'getAccounts']),
@@ -168,7 +166,6 @@ export default {
             this.activities = res.data.activities
             this.tastes = res.data.userInfo.tasteInfo
             this.nickname = res.data.nickname
-            // this.followerList = res.data.from_user
             this.follower_cnt = res.data.from_user.length
             this.followingList = res.data.to_user
             console.log('취향', this.followerList)
