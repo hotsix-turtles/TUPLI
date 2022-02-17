@@ -1,33 +1,34 @@
 <template>
   <div>
-    <div class="d-flex justify-center mt-5 px-4">
+    <div class="d-flex justify-center align-center mt-2 mb-3">
       <img
         :src="thumbnail"
         alt="playroom img"
         style="width: 126px; height: 71px"
+        class="ml-3"
         @click="goPlayroom"
       >
       <div
         class="d-flex flex-column align-start mx-2"
-        style="width: 200px;"
+        style="width: 50%;"
       >
         <p
-          class="mb-0"
+          class="like-title-playlist pr-1"
           @click="goPlayroom"
         >
           {{ playroomlist.title }}
         </p>
         <p
-          class="mb-0"
+          class="main-username"
           @click="setProfile"
         >
           {{ playroomlist.user.nickname }}
         </p>
-        <div class="d-flex">
+        <div class="d-flex flex-wrap">
           <p
             v-for="tag in tags"
             :key="tag.id"
-            class="mb-0 main-tag"
+            class="main-tag"
           >
             {{ tag }}
           </p>
@@ -127,7 +128,6 @@ export default {
   props: {
     // eslint-disable-next-line vue/require-default-prop
     playroomlist: { type: Object },
-    thumbnail: { type: String, default: '' }
   },
   data: function() {
     return {
@@ -137,12 +137,16 @@ export default {
         writePost: null,
         like: true,
       },
+      thumbnail: '',
       // dialog: false,  // dialog 사용
 
     }
   },
   created: function() {
+    // console.log('thumbnaidldfasfadl', this.playroomlist)
     this.getTag()
+    this.thumbnail = this.playroomlist.videos[0].thumbnail
+    // console.log('thumbnaidladl', this.thumbnail)
   },
   methods: {
     ...mapActions( 'account',[

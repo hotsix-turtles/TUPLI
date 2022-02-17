@@ -87,7 +87,7 @@
               {{ content.nickName }}
             </p>
             <div
-              class="d-flex"
+              class="d-flex flex-wrap"
             >
               <p
                 v-for="tag in allTags
@@ -105,7 +105,7 @@
             <div
               v-if="content.userLikesYN === 'Y'"
               class="d-flex flex-column align-center mx-1"
-              @click="onClickPlayroomUnLike"
+              @click="onClickPlayroomUnlike"
             >
               <v-icon color="#5B5C9D">
                 mdi-cards-heart
@@ -213,7 +213,7 @@
             >
               {{ content.nickName }}
             </p>
-            <div class="d-flex">
+            <div class="d-flex flex-wrap">
               <p
                 v-for="tag in allTags"
                 :key="tag.id"
@@ -293,7 +293,7 @@
       >
         <div
           class="d-flex align-start"
-          width="100%"
+          width="95%"
         >
           <div class="d-flex">
             <img
@@ -375,7 +375,10 @@
 import axiosConnector from '@/utils/axios-connector.js'
 
 import { mapActions, mapState } from 'vuex'
-import { getImage } from '../../utils/utils'
+import { getImage } from '@/utils/utils'
+import { timeConverter } from '@/utils/utils';
+import { playtimeConverter } from '@/utils/utils';
+
 
 export default {
   name: 'MainItem',
@@ -388,6 +391,8 @@ export default {
       thumbnailImage: '',
       userProfileImg: '',
       allTags: [],
+      time: [],
+      time_playroom: [],
     }
   },
   computed: {
@@ -543,6 +548,25 @@ export default {
       this.content.userLikesYN = 'N'
       this.content.likesCnt--
       this.unlikeBoard(this.content.id)
+    },
+
+    // 작성 시간
+    createdAt: function() {
+      if (this.content.type === 'board'){
+        this.time = timeConverter(this.content.createdAt)
+      // console.log('시간 잘 나오나', this.time)
+      }
+      else if (this.content.type === 'playlist'){
+        this.time = timeConverter(this.content.createdAt)
+      // console.log('시간 잘 나오나', this.time)
+      }
+    },
+    // 플레이룸 작성 시간
+    createdAt_playroom: function() {
+      if (this.content.type === 'playroom'){
+        this.time_playroom = playtimeConverter(this.content.startTime, this.content.endTime)
+      // console.log('시간 잘 나오나', this.time)
+      }
     },
 
     // 로그인 페이지로 이동

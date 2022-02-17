@@ -34,8 +34,6 @@ export default {
 #tupli {
     width: 100vw;
     height: 100vh;
-    max-width: 412px;
-    max-height: 915px;
     margin: 0 auto;
 }
 </style>

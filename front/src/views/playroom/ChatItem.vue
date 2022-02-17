@@ -13,6 +13,7 @@
       <v-avatar
         circle
         size="40"
+        class="chat-profile-img"
         @click.stop="SELECT_CHAT_AVATAR(id)"
       >
         <v-img
@@ -36,22 +37,22 @@
       </v-avatar>
       <div class="d-flex ml-3 flex-column">
         <div class="d-flex flex-row">
-          <p class="font-weight-bold">
+          <p class="font-weight-bold chat-author-name">
             {{ author.name }}
           </p>
-          <p class="ml-2 text-caption">
+          <p class="ml-2 text-caption chat-time-label">
             {{ timeLabel }}
           </p>
         </div>
 
         <p
           v-if="!blocked"
-          class="font-caption mr-1"
+          class="font-caption mr-1 chat-content"
           v-html="renderContent"
         />
         <p
           v-else
-          class="ml-1 mr-1 blocked"
+          class="ml-1 mr-1 blocked chat-content-blocked"
         >
           [차단됨]
         </p>

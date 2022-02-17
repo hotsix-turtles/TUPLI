@@ -45,7 +45,7 @@
                   {{ activity.title }}
                 </span>
 
-                <div class="d-flex">
+                <div class="d-flex flex-wrap">
                   <p
                     v-for="tag in allTags"
                     :key="tag.id"
@@ -59,7 +59,28 @@
           </div>
         </div>
       </div>
-      <div class="d-flex justify-end mr-5">
+      <!-- 좋아요 -->
+      <div
+        v-if="activity.userLikesYN === 'N'"
+        class="d-flex justify-end mr-5"
+        @click="onClickPlayroomLike"
+      >
+        <v-icon
+          color="#5B5C9D"
+          size="18"
+        >
+          mdi-heart-outline
+        </v-icon>
+        <p class="history-icon-text">
+          {{ activity.likesCnt }}
+        </p>
+      </div>
+      <!-- 좋아요 취소 -->
+      <div
+        v-if="activity.userLikesYN === 'Y'"
+        class="d-flex justify-end mr-5"
+        @click="onClickPlayroomUnlike"
+      >
         <v-icon
           color="#5B5C9D"
           size="18"
@@ -128,7 +149,7 @@
                     {{ activity.title }}
                   </span>
 
-                  <div class="d-flex">
+                  <div class="d-flex flex-wrap">
                     <p
                       v-for="tag in allTags"
                       :key="tag.id"
@@ -144,7 +165,30 @@
         </div>
       </div>
       <!-- playlist 좋아요 -->
-      <div class="d-flex justify-end mr-5">
+      <!-- 좋아요 -->
+      <div
+        v-if="activity.userLikesYN === 'N'"
+        class="d-flex justify-end mr-5"
+        @click="onClickPlaylistLike"
+      >
+        <v-icon
+          color="#5B5C9D"
+          size="18"
+        >
+          mdi-heart-outline
+        </v-icon>
+        <p
+          class="history-icon-text"
+        >
+          {{ activity.likesCnt }}
+        </p>
+      </div>
+      <!-- 좋아요 취소 -->
+      <div
+        v-if="activity.userLikesYN === 'Y'"
+        class="d-flex justify-end mr-5"
+        @click="onClickPlaylistUnlike"
+      >
         <v-icon
           color="#5B5C9D"
           size="18"
@@ -190,7 +234,30 @@
           </div>
         </div>
       </div>
-      <div class="d-flex justify-end mr-5">
+      <!-- 좋아요 -->
+      <div
+        v-if="activity.userLikesYN === 'N'"
+        class="d-flex justify-end mr-5"
+        @click="onClickBoardLike"
+      >
+        <v-icon
+          color="#5B5C9D"
+          size="18"
+        >
+          mdi-heart-outline
+        </v-icon>
+        <p
+          class="history-icon-text"
+        >
+          {{ activity.likesCnt }}
+        </p>
+      </div>
+      <!-- 좋아요 취소 -->
+      <div
+        v-if="activity.userLikesYN === 'Y'"
+        class="d-flex justify-end mr-5"
+        @click="onClickBoardUnlike"
+      >
         <v-icon
           color="#5B5C9D"
           size="18"
