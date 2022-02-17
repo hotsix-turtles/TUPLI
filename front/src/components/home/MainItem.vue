@@ -87,7 +87,7 @@
               {{ content.nickName }}
             </p>
             <div
-              class="d-flex"
+              class="d-flex flex-wrap"
             >
               <p
                 v-for="tag in allTags
@@ -213,7 +213,7 @@
             >
               {{ content.nickName }}
             </p>
-            <div class="d-flex">
+            <div class="d-flex flex-wrap">
               <p
                 v-for="tag in allTags"
                 :key="tag.id"

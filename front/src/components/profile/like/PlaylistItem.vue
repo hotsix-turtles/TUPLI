@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="d-flex align-center">
-      <div class="playlist-cd-small mx-4 mb-2">
+      <div class="playlist-cd-small-like mx-4 mb-4">
         <img
           :src="thumbnail"
           alt="playlist image"
@@ -11,20 +11,26 @@
       </div>
       <div
         class="d-flex flex-column"
-        style="width: 200px;"
+        style="width: 60%;"
       >
-        <p class="mb-0">
+        <p class="like-title-playlist">
           {{ playlistlist.title }}
         </p>
         <p
-          class="mb-0"
+          class="main-username"
           @click="setProfile"
         >
           {{ playlistlist.nickName }}
         </p>
-        <p class="mb-0">
-          {{ playlistlist.tag }}
-        </p>
+        <div class="d-flex flex-wrap">
+          <p
+            v-for="tag in tags"
+            :key="tag.id"
+            class="main-tag"
+          >
+            {{ tag }}
+          </p>
+        </div>
       </div>
       <!-- menu 형태의 더보기 버튼 -->
       <v-menu
@@ -75,6 +81,8 @@ export default {
     // eslint-disable-next-line vue/require-default-prop
     playlistlist: { type: Object },
     thumbnail: { type: String, default: '' },
+    tags: { type: String, default: '' },
+
   },
   data: function() {
     return {
@@ -84,6 +92,12 @@ export default {
         like: true,
       },
     }
+  },
+  created: function() {
+    this.getTag()
+    console.log('태그123123', this.tags)
+
+    // this.getTag()
   },
   methods: {
     ...mapActions('account', [
@@ -95,9 +109,9 @@ export default {
       ]),
     // 태그
     getTag: function() {
-      // console.log('태그', this.playroomlist.tags)
-      this.tags = this.playroomlist.tags.split(',')
-      // console.log('태그2', this.tags)
+      console.log('태그', this.playlistlist)
+      this.tags = this.playlistlist.tags.split(',')
+      console.log('태그2', this.tags)
     },
     // 플레이리스트 상세로 가기
     goPlaylist: function() {
