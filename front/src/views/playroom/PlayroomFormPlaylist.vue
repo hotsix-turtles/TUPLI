@@ -1,13 +1,13 @@
 <template>
   <v-card
-    class="playroom mx-auto overflow-hidden mb-10"
+    class="playroom mx-auto overflow-hidden"
     height="100%"
   >
     <!-- 하단 네비게이션 (플레이리스트 조작) -->
     <v-bottom-navigation
       absolute
       background-color="#5B5C9D"
-      height="75px"
+      height="66px"
       class="fixed-bottom"
       :input-value="addedPlaylists.length > 0 || selectedPlaylists.length > 0"
     >

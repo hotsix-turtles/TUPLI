@@ -9,6 +9,10 @@ const mainContent = {
 
     // 좋아요
     isLikedMain: false,
+
+    // 플레이룸 재생 여부
+    mainPlayrooms: [],
+
   },
   mutations: {
     // 메인 컨텐츠 얻기
@@ -35,6 +39,21 @@ const mainContent = {
       state.isLikedMain = false
     },
 
+    // 재생 중 여부 파악
+    GET_MAIN_PLAYROOMS: function (state, playrooms) {
+      let today = new Date()
+      playrooms.forEach((playroom) => {
+        if (playroom.startTime <= today && playroom.endTime >= today) {
+          playroom.onPlay = true
+        } else {
+          playroom.onPlay = false
+        }
+        playroom.playTime = playtimeConverter(playroom.startTime, playroom.endTime)
+      })
+      state.mainPlayrooms = playrooms
+      console.log(state.myPlayrooms)
+    },
+
 
   },
   actions: {
@@ -58,6 +77,18 @@ const mainContent = {
         .catch((err) => {
           console.log(err)
         })
+    },
+
+    // 플레이타임 계산
+    getMainPlayrooms: function ({ commit }) {
+      axiosConnector.get(`/home/all/`
+      ).then((res) => {
+        if (res.data.type === 'playroom') {
+          commit('GET_MY_PLAYROOMS', res.data)
+        }
+      }).catch((err) => {
+        console.log(err)
+      })
     },
 
   },

@@ -130,7 +130,7 @@ export default {
 
 <style>
   .v-tap-width {
-    width: 130px !important;
+    width: 33% !important;
   }
 
 

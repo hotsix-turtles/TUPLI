@@ -464,7 +464,7 @@
       content-html="플레이룸을 종료할까요?"
       max-width="290"
       :show="exitPrompt"
-      :buttons="[{name: '나가기'}, {name: '취소'},]"
+      :buttons="[{name: '취소', color: 'gray'},{name: '나가기'}]"
       button-spacing
       persistent
       @button-click="exitPromptHandler"
@@ -740,7 +740,7 @@ export default {
       this.$router.go(-1)
     },
     exitPromptHandler(idx) {
-      if (idx == 0)
+      if (idx == 1)
       {
         this.certification = true;
         if (this.exitTo) this.$router.push(this.exitTo);
@@ -883,7 +883,7 @@ export default {
       const baseURL = "https://tupli.kr/api/v1" + "/ws-stomp"
       const sock = new SockJS(baseURL);
 
-      this.setWsConnector(Stomp.over(sock));
+      this.setWsConnector(Stomp.over(sock, { debug: false }));
       if (!this.wsConnector) return;
 
       this.wsConnector.connect(

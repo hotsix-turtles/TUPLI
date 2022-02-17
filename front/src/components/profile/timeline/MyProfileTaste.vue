@@ -1,7 +1,7 @@
 <template>
   <div>
     <div>
-      <h2>{{ nickname }}님의 취향 분석</h2>
+      <span style="font-size:14px;"><span class="bold">{{ nickname }}</span>님의 취향 분석</span>
 
       <taste-list
         :tastes="tastes"

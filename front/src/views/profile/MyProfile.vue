@@ -73,7 +73,6 @@
     <!-- 유저 활동, 취향 탭 -->
     <div class="d-flex justify-space-around mt-1">
       <v-tabs
-        fixed
         centered
         grow
         color="#5B5C9D"
