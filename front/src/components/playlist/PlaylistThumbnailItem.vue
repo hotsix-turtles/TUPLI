@@ -8,6 +8,18 @@
       :playlist-id="playlistId"
     />
   </v-avatar>
+  <!-- <v-card
+    class="mx-1 my-1 px-1 py-1"
+  >
+    <v-avatar
+      size="80"
+    >
+      <playlist-cd-small
+        :thumbnail="src"
+        :playlist-id="playlistId"
+      />
+    </v-avatar>
+  </v-card> -->
 </template>
 
 <script>

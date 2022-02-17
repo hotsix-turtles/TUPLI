@@ -11,7 +11,7 @@
     <v-badge
       :content="selectedVideos.length"
       color="#F6F7FF"
-      offset-x="60"
+      offset-x="30"
       offset-y="10"
       overlap
       class="videoCounter shadow-s"

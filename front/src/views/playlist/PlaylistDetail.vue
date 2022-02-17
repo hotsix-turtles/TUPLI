@@ -11,7 +11,7 @@
           </v-icon>
         </div>
         <!-- 좋아요 -->
-        <div class="mx-1">
+        <div class="mx-2">
           <div
             v-if="playlistDetail.isLiked"
             class="animate__animated animate__heartBeat"
@@ -31,16 +31,21 @@
           </div>
         </div>
         <!-- 댓글 -->
-        <div @click="$router.push({ name: 'PlaylistComment', params: { playlistId: playlistDetail.id }})">
+        <div
+          class="mr-2"
+          @click="$router.push({ name: 'PlaylistComment', params: { playlistId: playlistDetail.id }})"
+        >
           <v-icon color="black">
             mdi-comment-outline
           </v-icon>
         </div>
         <!-- 작성자일 경우, 수정하기 삭제하기 모달창 -->
-        <div v-if="userId === playlistDetail.userId">
+        <div
+          v-if="userId === playlistDetail.userId"
+          @click="onClickModal"
+        >
           <v-icon
             color="black"
-            @click="onClickModal"
           >
             mdi-dots-vertical
           </v-icon>
@@ -58,13 +63,18 @@
         <!-- 제목 공개여부 -->
         <div class="d-flex justify-center semi-bold">
           <div
+            v-if="!playlistDetail.isPublic"
+            class="mr-1"
+          >
+            <v-icon color="#5B5C9D">
+              mdi-lock
+            </v-icon>
+          </div>
+          <div
             class=""
             style="font-size: 20px;"
           >
             {{ playlistDetail.title }}
-          </div>
-          <div v-if="!playlistDetail.isPublic">
-            <v-icon>mdi-lock</v-icon>
           </div>
         </div>
         <!-- 작성자 정보 -->
@@ -118,7 +128,6 @@
             유사 플레이리스트 추천
           </div>
           <v-card
-            outlined
             style="display:flex; flex-wrap: nowrap; overflow-x: auto"
             class="playlistThumbnailWrapper"
           >
