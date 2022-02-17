@@ -3,6 +3,10 @@
 ![타이틀이미지](https://user-images.githubusercontent.com/55949647/154088644-8ae7ec32-04bb-4fc3-810a-c2111ec2afb8.png)
 
 
+## 튜플리 링크 : [https://tupli.kr](https://tupli.kr/api/v1/swagger-ui/index.html#/)
+
+<br>
+
 ## 💜 프로젝트 진행 기간
 2022.01.10(월) ~ 2022.02.18(금) (39일간 진행)  
 SSAFY 6기 2학기 공통프로젝트 - TUPLI
@@ -18,6 +22,8 @@ TUPLI는 그러한 니즈를 충족시켜주기 위해 탄생한 유튜브 콘�
 
 ## 💜 TUPLI - 개요
 *- 나의 유튜브 영상 취향을 공유하고 타인의 취향을 함께 즐기자 -*  
+
+소개 영상 보기 : [UCC 링크](https://youtu.be/WU3tIIOS0Ec)
 
 TUPLI는 You<span style="color:violet">TU</span>be <span style="color:violet">PL</span>ayl<span style="color:violet">I</span>st의 약자입니다.  
 TUPLI는 '플레이리스트'를 만들고 영상 리스트를 업로드하여 취향을 공유하거나, '플레이룸'을 개설하고 다른 영상을 동시에 실시간으로 시청할 수 있는 기능을 제공하는 웹서비스입니다.  
