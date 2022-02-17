@@ -97,6 +97,7 @@ public class HomeInfoService {
             if(nowPlaylist.getPlaylistCate() == null || nowPlaylist.getPlaylistCate().trim().length() == 0){
                 continue;
             }
+            if(nowPlaylist.getUser().getUserSeq() == userSeq) continue;
             for(String nowPlCate : nowPlaylist.getPlaylistCate().split(",")){
                 if(userTaste.contains(nowPlCate)){
                     SimpleHomePlaylistDto nowDto = new SimpleHomePlaylistDto(nowPlaylist, user);
@@ -121,6 +122,7 @@ public class HomeInfoService {
             if(nowPlayroom.getPlayroomCate() == null || nowPlayroom.getPlayroomCate().trim().length() == 0){
                 continue;
             }
+            if(nowPlayroom.getUser().getUserSeq() == userSeq) continue;
             for(String nowPlayroomCate : nowPlayroom.getPlayroomCate().split(",")){
                 if(userTaste.contains(nowPlayroomCate)){
                     SimpleHomePlayroomDto nowDto = new SimpleHomePlayroomDto(nowPlayroom, user);
