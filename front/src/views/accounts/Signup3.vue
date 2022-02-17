@@ -12,12 +12,14 @@
               class="no-background-hover"
             >
               <v-icon
-                color="#5B5C9D"
+                size="20"
+                color="black"
+                class="px-2"
               >
-                mdi-chevron-left
+                mdi-arrow-left
               </v-icon>
             </router-link>
-            <h4 class="">
+            <h4 class="back-menu-text">
               가입 완료
             </h4>
           </v-row>
@@ -28,19 +30,21 @@
           class="d-flex justify-center"
         >
           <img
-            src="../../assets/signup_bar3.png"
+            src="@/assets/signup_bar3.png"
             alt="logo"
             width="90%"
           >
         </div>
 
         <!-- 회원가입 form -->
-        <div class="d-flex flex-column mt-5">
+        <div class="d-flex flex-column align-center mt-5">
           <img
-            src=""
+            class="mt-6"
+            src="@/assets/tupli_party.png"
             alt=""
+            width="50%"
           >
-          <div class="d-flex">
+          <div class="d-flex mt-4">
             <p class="bold">
               {{ nickname }}
             </p>
@@ -51,11 +55,12 @@
           </p>
           <v-btn
             to="/"
-            class="white--text my-5"
+            class="white--text my-10"
             color="#5B5C9D"
             block
             elevation="0"
             rounded
+            large
           >
             홈으로 이동
           </v-btn>

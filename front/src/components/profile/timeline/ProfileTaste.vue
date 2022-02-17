@@ -1,15 +1,25 @@
 <template>
   <div>
     <div>
-      <h2>{{ nickname }}의 취향 분석</h2>
-      <taste-list
-        :tastes="tastes"
-      />
-
-      <h2>{{ nickname }}의 튜플리 뱃지</h2>
-      <badge-list
-        :badges="badges"
-      />
+      <div>
+        <span
+          style="font-size:16px;"
+          class="mx-5 mt-3"
+        >
+          <span style="font-weight: 600;">{{ nickname }}</span>님의 <span style="color:#5C5B9D; font-weight: 800;">취향 분석</span>
+        </span>
+        <div
+          v-if="tastes"
+          class="pt-2"
+        >
+          <taste-list
+            :tastes="tastes"
+          />
+        </div>
+        <div v-else>
+          <span>튜플리를 즐기다보면 취향 분석이 피어나요.</span>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -27,7 +37,7 @@ export default {
   },
   props: {
     tastes: {type : Object, default() { {} } },
-    badges: {type : Object, default() { {} } },
+    badges: {type : Array, default() { [] } },
     nickname: {type: String, default() { '' }},
     userId:  {type : Number, default() { 0 } },
   },

@@ -3,23 +3,25 @@
     <div class="px-5">
       <div>
         <v-container class="mb-5">
-          <v-row
-            class="align-center mt-5"
+          <div
+            class="align-center mt-5 d-flex"
           >
             <router-link
               to="/signup"
               class="no-background-hover"
             >
               <v-icon
-                color="#5B5C9D"
+                size="20"
+                color="black"
+                class="px-2"
               >
-                mdi-chevron-left
+                mdi-arrow-left
               </v-icon>
             </router-link>
-            <h4 class="">
+            <p class="back-menu-tex">
               회원정보
-            </h4>
-          </v-row>
+            </p>
+          </div>
         </v-container>
 
 
@@ -36,9 +38,13 @@
 
 
         <!-- 회원가입 form -->
-        <div class="mt-4 pt-4">
+        <div class="mt-4 pt-4 px-6">
           <v-form ref="form">
-            <h3>이메일</h3>
+            <h3
+              class="mt-2"
+            >
+              이메일
+            </h3>
             <v-text-field
               v-model="credentials.email"
               required
@@ -46,7 +52,9 @@
               label="이메일을 입력해주세요"
             />
 
-            <h3>비밀번호</h3>
+            <h3 class="mt-4">
+              비밀번호
+            </h3>
             <v-text-field
               v-model="credentials.password"
               required
@@ -63,7 +71,9 @@
               label="비밀번호 확인"
             />
 
-            <h3>닉네임</h3>
+            <h3 class="mt-5">
+              닉네임
+            </h3>
             <v-text-field
               v-model="credentials.nickname"
               required
@@ -74,13 +84,21 @@
             />
           </v-form>
 
+          <p
+            style="font-size: 11px; color: dark-gray;"
+            class="mt-3"
+          >
+            * 프로필 이미지와 자기소개 폼은 프로필 편집을 통해 변경할 수 있습니다.
+          </p>
+
           <v-btn
-            class="white--text my-5"
+            class="white--text my-6"
             color="#5B5C9D"
             block
             required
             elevation="0"
             rounded
+            large
             @click="signupCheck"
           >
             회원가입
@@ -88,14 +106,25 @@
         </div>
       </div>
     </div>
+    <timeout-dialog
+      v-model="isFormDataNotValidError"
+      title="오류"
+      :content="formDataNotValidReason"
+      max-width="320"
+      timeout="2000"
+      hide-progress
+      @timeout="isFormDataNotValidError = false"
+    />
   </div>
 </template>
 
 <script>
 import { mapActions } from 'vuex'
+import TimeoutDialog from '../../components/common/TimeoutDialog.vue';
 
 export default {
   name: 'Signup2',
+  components: { TimeoutDialog },
 
   // 이메일 비밀번호 규칙 설정
   data: function() {
@@ -109,6 +138,9 @@ export default {
         image: '@/assets/tupli_logo2_dark.png',
         // username: null,
       },
+
+      isFormDataNotValidError: false,
+      formDataNotValidReason: '',
 
       // 유효성 검사
       valid: true,
@@ -140,14 +172,21 @@ export default {
       'signup',
     ]),
     // 로그인
-    requestSignup: function () {
-      this.signup(this.credentials)
-      this.valid = true
+    requestSignup: async function () {
+      const { data, status } = await this.signup(this.credentials)
+
+      if (status == 201) {
+        this.valid = true
+        this.$router.push( { name: 'Signup3' })
+      } else if (status == 400) {
+        this.isFormDataNotValidError = true;
+        this.formDataNotValidReason = data.errorMessage;
+      }
     },
 
     // 회원가입 유효성 검사
     signupCheck: function () {
-      this.signup(this.credentials)
+      this.requestSignup()
     },
 
     onInputKeyword: function() {

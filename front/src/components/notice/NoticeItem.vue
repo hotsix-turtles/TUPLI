@@ -26,7 +26,7 @@
           <div class="notice-content">
             <p
               class="mb-0"
-              @click="setProfile"
+              @click="goProfile"
             >
               {{ notice.from }}
               님이&nbsp;
@@ -36,7 +36,7 @@
           <p
             class="mb-0"
           >
-            15분
+            {{ time }}
           </p>
         </div>
         <!-- 팔로우 버튼 -->
@@ -82,12 +82,15 @@
             <p
               class="mb-0"
             >
-              15분
+              {{ time }}
             </p>
           </div>
           <div>
             <v-btn
-              class="ml-4 notice-btn"
+              class="text-center mx-2 ml-4 dark--text"
+              color="#5C5B9D"
+              rounded
+              outlined
               @click="acceptInvite"
             >
               수락
@@ -113,7 +116,7 @@
           <p
             class="mb-0"
           >
-            15분
+            {{ time }}
           </p>
         </div>
       </div>
@@ -124,6 +127,7 @@
 <script>
 import { mapState } from 'vuex'
 import { getImage } from '../../utils/utils'
+import { timeConverter } from '@/utils/utils';
 import axiosConnector from '@/utils/axios-connector.js'
 
 export default {
@@ -138,6 +142,7 @@ export default {
       follow: false,
       meCheck: false,
       profileImg: '',
+      time: '',
     }
   },
   computed: {
@@ -219,6 +224,11 @@ export default {
         .catch((err) => {
           console.log('에러222', err)
         })
+    },
+
+    // 작성 시간
+    createdAt: function() {
+      this.time = timeConverter(this.notice.createdAt)
     },
 
     // 플레이룸 수락

@@ -61,11 +61,11 @@ const playroom = {
     },
     RESET_FORM_DATA: function (state) {
       state.savedFormData = ''
-      console.log('RESET_FORM_DATA', state.savedFormData)
+      //console.log('RESET_FORM_DATA', state.savedFormData)
     },
     SAVE_FORM_DATA: function (state, formData) {
       state.savedFormData = formData
-      console.log('SAVE_FORM_DATA', state.savedFormData)
+      //console.log('SAVE_FORM_DATA', state.savedFormData)
     },
     SET_ROOM_ID: ( state, value ) => state.roomId = value != undefined ? parseInt(value) : state.roomId,
     SET_ROOM_TITLE: ( state, value ) => state.roomTitle = value ? value : state.roomTitle,
@@ -174,7 +174,7 @@ const playroom = {
         playroom.playTime = playtimeConverter(playroom.startTime, playroom.endTime)
       })
       state.categoryPlayrooms = playrooms
-      console.log(state.categoryPlayrooms)
+      //console.log(state.categoryPlayrooms)
     },
   },
   actions: {
@@ -201,26 +201,26 @@ const playroom = {
       commit('SET_ROOM_AUTHOR', author)
     },
     followUser: ({commit}, id) => {
-      console.log('유저 팔로우 처리')
+      //console.log('유저 팔로우 처리')
       commit('DESELECT_CHAT_ITEM')
     },
     blockUser: ({commit}, id) => {
-      console.log('유저 차단 처리')
+      //console.log('유저 차단 처리')
       commit('BLOCK_CHAT_BY_UID', id)
       commit('DESELECT_CHAT_ITEM')
     },
     blockMessage: ({commit}, id) => {
-      console.log('메시지 차단 처리')
+      //console.log('메시지 차단 처리')
       commit('BLOCK_CHAT_BY_ID', id)
       commit('DESELECT_CHAT_ITEM')
     },
     unblockUser: ({commit}, id) => {
-      console.log('유저 차단 해제 처리')
+      //console.log('유저 차단 해제 처리')
       commit('UNBLOCK_CHAT_BY_UID', id)
       commit('DESELECT_CHAT_ITEM')
     },
     unblockMessage: ({commit}, id) => {
-      console.log('메시지 차단 해제 처리')
+      //console.log('메시지 차단 해제 처리')
       commit('UNBLOCK_CHAT_BY_ID', id)
       commit('DESELECT_CHAT_ITEM')
     },
@@ -229,27 +229,27 @@ const playroom = {
       // 1. 플레이룸 접속 URL 생성
       // 2. 카카오톡 공유 API URL 요청 혹은 생성
       // 3. API URL로 리다이렉트
-      console.log('플레이룸 카카오톡 공유 처리')
+      //console.log('플레이룸 카카오톡 공유 처리')
     },
     reportPlayroom: (state, id) => {
       // TODO:
       // 1. 플레이룸 신고 axios 처리 후 결과값(성공여부) 리턴
-      console.log('불량 플레이룸 신고 처리')
+      //console.log('불량 플레이룸 신고 처리')
     },
     saveFormData: function ({ commit }, formData) {
-      console.log('saveFormData', formData)
+      //console.log('saveFormData', formData)
       commit('SAVE_FORM_DATA', formData)
     },
     // [검색]
     searchPlayrooms: function ({ commit }, params) {
-      console.log('searchPlayrooms params', params)
+      //console.log('searchPlayrooms params', params)
       axiosConnector.get(`/playroom/search`, {
         params
       }).then((res) => {
-        console.log('searchPlayroom', res)
+        //console.log('searchPlayroom', res)
         commit('SEARCH_PLAYROOMS', res.data)
       }).catch((err) => {
-        console.log(err)
+        //console.log(err)
       })
     },
     resetSearchPlayrooms: function ({ commit }) {
@@ -257,11 +257,11 @@ const playroom = {
     },
     // [둘러보기]
     getCategoryPlayrooms: function ({ commit }, categoryName) {
-      console.log('playroom.js 245 getCategoryPlayrooms')
+      //console.log('playroom.js 245 getCategoryPlayrooms')
       axiosConnector.get(`/playroom/category/${categoryName}`,
       ).then((res) => {
-        console.log(res)
-        console.log(`/playroom/category/${categoryName}`, categoryName)
+        //console.log(res)
+        //console.log(`/playroom/category/${categoryName}`, categoryName)
         commit('GET_CATEGORY_PLAYROOMS', res.data)
       })
         .catch((err) => {
@@ -273,7 +273,7 @@ const playroom = {
     likePlayroom: function ({}, playroomId) {
       axiosConnector.post(`/playroom/${playroomId}/like`,
       ).then((res) => {
-        console.log('playroom.js 259 likePlayroom', res)
+        //console.log('playroom.js 259 likePlayroom', res)
       })
         .catch((err) => {
           console.log(err)
@@ -283,7 +283,7 @@ const playroom = {
     unlikePlayroom: function ({}, playroomId) {
       axiosConnector.delete(`/playroom/${playroomId}/like`,
       ).then((res) => {
-        console.log('playroom.js 259 unlikePlayroom', res)
+        //console.log('playroom.js 259 unlikePlayroom', res)
       })
         .catch((err) => {
           console.log(err)
@@ -364,7 +364,7 @@ const playroom = {
         playlists: data.playlists,
         userCountMax: 5,
       }
-      console.log(formData)
+      //console.log(formData)
       dispatch('saveFormData', formData)
       router.push({ name: 'PlayroomByPlaylist' })
     },

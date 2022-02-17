@@ -91,6 +91,7 @@
         </v-tab-item>
         <v-tab-item>
           <profile-taste
+            class="pt-4"
             :tastes="tastes"
             :nickname="nickname"
             :user-id="userId"

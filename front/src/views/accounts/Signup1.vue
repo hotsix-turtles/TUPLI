@@ -4,7 +4,6 @@
       <!-- <h1>회원가입 페이지</h1> -->
       <v-container class="d-flex flex-column">
         <v-icon
-          color="#5B5C9D"
           class="ml-0 mr-auto mt-5"
           @click="$router.push({ name: 'Login' })"
         >
@@ -12,7 +11,7 @@
         </v-icon>
 
         <img
-          class="mt-5"
+          class="mt-8"
           src="@/assets/tupli_logo2_dark.png"
           alt=""
           style="width: 30px; height:auto;"
@@ -24,6 +23,7 @@
 
         <!-- 상태바 -->
         <img
+          class="mt-1"
           src="../../assets/signup_bar1.png"
           alt="logo"
         >
@@ -71,10 +71,11 @@
           </h5>
 
           <v-btn
-            class="white--text my-5"
+            class="white--text my-12"
             color="#5B5C9D"
             block
             elevation="0"
+            large
             rounded
             @click="checkTerms"
           >
@@ -83,15 +84,25 @@
         </div>
       </v-container>
     </div>
+    <timeout-dialog
+      v-model="isTermNotAcceptedError"
+      title="오류"
+      content-html="필수 약관에 모두 동의해주세요"
+      timeout="2000"
+      hide-progress
+      @timeout="isTermNotAcceptedError = false"
+    />
   </v-app>
 </template>
 
 <script>
 import axios from 'axios'
 import Signup2Vue from './Signup2.vue'
+import TimeoutDialog from '../../components/common/TimeoutDialog.vue'
 
 export default {
   name: 'Signup',
+  components: { TimeoutDialog },
 
   // 이메일 비밀번호 규칙 설정
   data: () => ({
@@ -100,6 +111,8 @@ export default {
       email: null,
       password: null,
     },
+
+    isTermNotAcceptedError: false,
 
     checkbox1: false,
     checkbox2: false,
@@ -155,7 +168,7 @@ export default {
         this.$router.push({ name: 'Signup2' })
       }
       else {
-        console.log('약관에 동의해주세요')
+        this.isTermNotAcceptedError = true
       }
 
     },

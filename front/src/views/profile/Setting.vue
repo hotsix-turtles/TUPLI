@@ -5,11 +5,12 @@
         class="align-center mt-5"
       >
         <v-icon
-          color="#5B5C9D"
-          size="30"
+          size="20"
+          color="black"
+          class="px-2"
           @click="$router.push({ name: 'MyProfile' })"
         >
-          mdi-chevron-left
+          mdi-arrow-left
         </v-icon>
         <h3>
           설정
@@ -133,7 +134,7 @@
               <v-btn
                 color="purple darken-1"
                 text
-                @click="logoutUser"
+                @click="requestLogout"
               >
                 로그아웃
               </v-btn>
@@ -180,7 +181,7 @@
               <v-btn
                 color="purple darken-1"
                 text
-                @click="deleteUser"
+                @click="requestDeleteUser"
               >
                 회원탈퇴
               </v-btn>
@@ -203,6 +204,30 @@
 
       <hr>
     </div>
+    <timeout-dialog
+      v-model="isLogoutInfo"
+      title="로그아웃 되었습니다"
+      content="오늘도 튜플리와 함께 즐거우셨나요?"
+      timeout="2000"
+      hide-progress
+      @timeout="logoutUser"
+    />
+    <timeout-dialog
+      v-model="isDeleteUserInfo"
+      title="탈퇴 성공"
+      content="지금까지 튜플리와 함께해주셔서 감사합니다"
+      timeout="2000"
+      hide-progress
+      @timeout="deleteUser"
+    />
+    <timeout-dialog
+      v-model="isDeleteUserError"
+      title="탈퇴 실패"
+      content-html="서버가 혼잡합니다<br>잠시 뒤 다시 시도해주세요"
+      timeout="2000"
+      hide-progress
+      @timeout="deleteUser"
+    />
   </v-app>
 </template>
 
@@ -212,58 +237,49 @@ import SERVER from '@/api/server'
 import { mapState } from 'vuex'
 import axiosConnector from '@/utils/axios-connector.js'
 import swal from 'sweetalert2'
+import TimeoutDialog from '../../components/common/TimeoutDialog.vue'
 
 export default {
   name: 'Setting',
+  components: { TimeoutDialog },
   data: function() {
     return {
       dialogLogout: null,
       dialogDeleteUser: null,
+      isLogoutInfo: false,
+      isDeleteUserInfo: false,
+      isDeleteUserError: false
     }
   },
   computed: {
     ...mapState(['authToken', 'email', 'is_oauth'])
   },
   methods: {
+    requestLogout: function() {
+      this.$store.dispatch('logout')
+      this.dialogLogout = false
+      this.isLogoutInfo = true
+    },
+
     // 로그아웃
     logoutUser: function() {
-      this.$store.dispatch('logout')
       this.$router.push({ name: 'Home' })
-      swal.fire ({
-        icon: 'info',
-        title: '로그아웃',
-        text: '로그아웃되었습니다.',
-        // width: '200px'
-      })
+    },
+
+    requestDeleteUser: async function() {
+      let response;
+      try {
+        response = await axiosConnector.delete('/account/withdraw');
+        this.$store.commit('DELETE_TOKEN')
+      } catch (err) {
+        this.dialogDeleteUser = false
+        this.isDeleteUserError = true
+      }
     },
 
     // 회원 탈퇴
-    deleteUser: function() {
-      axiosConnector.delete('/account/withdraw')
-      // axios({
-      //   method: 'DELETE',
-      //   url: SERVER.URL + '/account/withdraw',
-      //   headers: {Authorization: this.authToken}
-      // })
-        .then(() => {
-          this.$store.commit('DELETE_TOKEN')
-          this.$router.push({ name: 'Home' })
-          // 여기까지 함께 해주셔서 감사합니다 같은 무언가
-          swal.fire ({
-            icon: 'info',
-            title: '탈퇴 성공',
-            text: '지금까지 튜플리와 함께해주셔서 감사합니다.',
-            // width: '200px'
-          })
-        })
-        .catch (() => {
-          this.dialogDeleteUser = false
-          swal.fire ({
-            icon: 'error',
-            title: '탈퇴 실패',
-            text: '서버가 혼잡합니다. 다시 시도해 주세요.'
-          })
-        })
+    deleteUser: async function() {
+      this.$router.push({ name: 'Home' })
     },
   },
 

@@ -8,10 +8,17 @@
         >
           <span style="font-weight: 600;">{{ nickname }}</span>님의 <span style="color:#5C5B9D; font-weight: 800;">취향 분석</span>
         </span>
-
-        <taste-list
-          :tastes="tastes"
-        />
+        <div
+          v-if="tastes"
+          class="pt-2"
+        >
+          <taste-list
+            :tastes="tastes"
+          />
+        </div>
+        <div v-else>
+          <span>튜플리를 즐기다보면 취향 분석이 피어나요.</span>
+        </div>
       </div>
 
       <div>
@@ -23,9 +30,17 @@
             <span style="font-weight: 600;">{{ nickname }}</span>님의 <span style="color:#5C5B9D; font-weight: 800;">튜플리 뱃지</span>
           </span>
         </div>
-        <badge-list
-          :badges="badges"
-        />
+        <div v-if="badges">
+          <badge-list
+            :badges="badges"
+          />
+        </div>
+        <div
+          v-else
+          class="pl-7"
+        >
+          <span>튜플리에 더 자주 방문해주세요. <br>기분 좋은 선물을 드릴게요.</span>
+        </div>
       </div>
     </div>
   </div>

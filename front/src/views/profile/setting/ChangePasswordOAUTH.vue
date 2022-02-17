@@ -5,11 +5,12 @@
         class="align-center mt-5"
       >
         <v-icon
-          color="#5B5C9D"
-          size="30"
-          @click="$router.push({ name: 'Setting'})"         
+          size="20"
+          color="black"
+          class="px-2"
+          @click="$router.push({ name: 'Setting'})"
         >
-          mdi-chevron-left
+          mdi-arrow-left
         </v-icon>
         <h3>
           비밀번호 설정(구글유저, 초회)
@@ -83,7 +84,7 @@ export default {
         })
       } else {
         axios({
-          method: 'PUT', 
+          method: 'PUT',
           url: SERVER.URL + '/account/password/oauth',
           headers: {Authorization: this.authToken},
           data: {
