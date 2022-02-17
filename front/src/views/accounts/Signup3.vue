@@ -36,6 +36,10 @@
 
         <!-- 회원가입 form -->
         <div class="d-flex flex-column mt-5">
+          <img
+            src=""
+            alt=""
+          >
           <div class="d-flex">
             <p class="bold">
               {{ nickname }}

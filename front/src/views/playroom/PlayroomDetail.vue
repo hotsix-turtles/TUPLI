@@ -616,7 +616,7 @@ export default {
 
     this.$watch('roomCurrentPlaylistVideos', (newVal, oldVal) =>
     {
-      if (!this.roomPlaylists || Object.keys(this.roomPlaylists).length) return;
+      if (!this.roomPlaylists || !Object.keys(this.roomPlaylists).length) return;
       this.playlistThumbnails = Object.keys(this.roomPlaylists).reduce((prevPlaylistIds, curPlaylistId) => {
         if (this.roomPlaylists[curPlaylistId])
           prevPlaylistIds.push(this.roomVideos.find(roomVideo => roomVideo.id == this.roomPlaylists[curPlaylistId][0]).thumbnail);
