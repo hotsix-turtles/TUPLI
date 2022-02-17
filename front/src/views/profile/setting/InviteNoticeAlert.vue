@@ -5,11 +5,12 @@
         class="align-center mt-5"
       >
         <v-icon
-          color="#5B5C9D"
-          size="30"
+          size="20"
+          color="black"
+          class="px-2"
           @click="$router.push({ name: 'Setting' })"
         >
-          mdi-chevron-left
+          mdi-arrow-left
         </v-icon>
         <h3>
           초대/알림 설정
@@ -121,7 +122,7 @@ export default {
   name: 'InviteNotice',
   data: function () {
     return {
-      newAlarmSetting: true,  // 알림 여부      
+      newAlarmSetting: true,  // 알림 여부
       newAlarmOnRealtime: true,  // 실시간 알림 받기
       newAlarmOnInvite: true, // 초대 받기
       newInviteDomain: 'everyone', //초대 가능한 사람

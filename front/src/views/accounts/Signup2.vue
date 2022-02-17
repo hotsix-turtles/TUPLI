@@ -11,12 +11,14 @@
               class="no-background-hover"
             >
               <v-icon
-                color="#5B5C9D"
+                size="20"
+                color="black"
+                class="px-2"
               >
-                mdi-chevron-left
+                mdi-arrow-left
               </v-icon>
             </router-link>
-            <p class="back-menu-text">
+            <p class="back-menu-tex">
               회원정보
             </p>
           </div>

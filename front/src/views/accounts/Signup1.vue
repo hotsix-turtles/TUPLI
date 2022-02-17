@@ -4,7 +4,6 @@
       <!-- <h1>회원가입 페이지</h1> -->
       <v-container class="d-flex flex-column">
         <v-icon
-          color="#5B5C9D"
           class="ml-0 mr-auto mt-5"
           @click="$router.push({ name: 'Login' })"
         >

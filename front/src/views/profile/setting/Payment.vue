@@ -5,11 +5,12 @@
         class="align-center mt-5"
       >
         <v-icon
-          color="#5B5C9D"
-          size="30"
+          size="20"
+          color="black"
+          class="px-2"
           @click="$router.push({ name: 'Setting' })"
         >
-          mdi-chevron-left
+          mdi-arrow-left
         </v-icon>
         <h3>
           결제 서비스
