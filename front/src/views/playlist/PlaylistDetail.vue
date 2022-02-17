@@ -4,12 +4,6 @@
     <div class="fixed-top d-flex justify-space-between light-background navbar-top mx-3 py-3">
       <back-only />
       <div class="d-flex me-5">
-        <!-- 플레이룸 생성 -->
-        <div @click="showCreatePlayroomDialog">
-          <v-icon color="black">
-            mdi-youtube
-          </v-icon>
-        </div>
         <!-- 좋아요 -->
         <div class="mx-2">
           <div
@@ -39,6 +33,15 @@
             mdi-comment-outline
           </v-icon>
         </div>
+        <!-- 플레이룸 생성 -->
+        <div
+          class="mr-1"
+          @click="showCreatePlayroomDialog"
+        >
+          <v-icon color="black">
+            mdi-youtube
+          </v-icon>
+        </div>
         <!-- 작성자일 경우, 수정하기 삭제하기 모달창 -->
         <div
           v-if="userId === playlistDetail.userId"
@@ -63,18 +66,18 @@
         <!-- 제목 공개여부 -->
         <div class="d-flex justify-center semi-bold">
           <div
-            v-if="!playlistDetail.isPublic"
-            class="mr-1"
-          >
-            <v-icon color="#5B5C9D">
-              mdi-lock
-            </v-icon>
-          </div>
-          <div
             class=""
             style="font-size: 20px;"
           >
             {{ playlistDetail.title }}
+          </div>
+          <div
+            v-if="!playlistDetail.isPublic"
+            class="mx-1"
+          >
+            <v-icon color="#5B5C9D">
+              mdi-lock
+            </v-icon>
           </div>
         </div>
         <!-- 작성자 정보 -->

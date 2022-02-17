@@ -11,10 +11,10 @@
     >
       <v-progress-linear
         v-if="timeout && !hideProgress"
-        class="mb-0"
         v-model="progress"
+        class="mb-0"
         color="accent"
-      ></v-progress-linear>
+      />
       <v-card-title
         class="tupli-dialog-normal-title"
       >
