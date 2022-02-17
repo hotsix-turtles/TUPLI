@@ -30,6 +30,7 @@ const defaultState = () => {
     roomSelectedChatItem: { id: '', type: null },
     roomChats: [],
     roomGuests: [],
+    roomUserCount: 0,
     roomUserCountMax: 0,
     chatroomId: '',
     chatBlockedId: [],
@@ -93,6 +94,7 @@ const playroom = {
     SET_ROOM_PLAYER_STATE: (state, value) => state.roomPlayerState = value ? value : state.roomPlayerState,
     SET_ROOM_CHATROOM_ID: ( state, value ) => state.chatroomId = value ? value : state.chatroomId,
     SET_ROOM_LAST_SYNC_SENDER: ( state, value ) => state.roomLastSyncSender = value ? value : state.roomLastSyncSender,
+    SET_ROOM_USER_COUNT: ( state, value ) => state.roomUserCount = value ? value : state.roomUserCount,
     SET_ROOM_USER_COUNT_MAX: ( state, value ) => state.roomUserCountMax = value ? value : state.roomUserCountMax,
     SET_ROOM_GUESTS: ( state, value ) => state.roomGuests = value ? value : state.roomGuests,
     SET_SYNC_INSTANCE: ( state, value ) => state.syncInstance = value ? value : state.state.syncInstance,
@@ -190,6 +192,7 @@ const playroom = {
       commit('SET_ROOM_VIDEOS', data.videos);
       commit('SET_ROOM_CURRENT_PLAYLIST_ID', Object.keys(data.playlists)[0])
       commit('SET_ROOM_CHATROOM_ID', `playroom-${data.id}`);
+      commit('SET_ROOM_USER_COUNT', data.guests.length)
       commit('SET_ROOM_USER_COUNT_MAX', data.userCountMax)
       commit('SET_ROOM_GUESTS', data.guests)
       commit('SET_ROOM_LIKES_CNT', data.likesCnt);
@@ -365,6 +368,10 @@ const playroom = {
       dispatch('saveFormData', formData)
       router.push({ name: 'PlayroomByPlaylist' })
     },
+    loadRoomUserCount: async function ( {state, commit} ) {
+      const { data } = await axiosConnector.get(`/playroom/${state.roomId}/usercount`)
+      commit('SET_ROOM_USER_COUNT', parseInt(data));
+    }
   },
   getters: {
     isAuthor: ( {roomAuthorId}, {}, {userId} ) => userId && roomAuthorId && userId == roomAuthorId,
