@@ -88,13 +88,24 @@
         </div>
       </div>
     </div>
+    <timeout-dialog
+      v-model="isFormDataNotValidError"
+      title="오류"
+      :content="formDataNotValidReason"
+      max-width="320"
+      timeout="2000"
+      hide-progress
+      @timeout="isFormDataNotValidError = false"
+    />
   </div>
 </template>
 
 <script>
 import { mapActions } from 'vuex'
+import TimeoutDialog from '../../components/common/TimeoutDialog.vue';
 
 export default {
+  components: { TimeoutDialog },
   name: 'Signup2',
 
   // 이메일 비밀번호 규칙 설정
@@ -109,6 +120,9 @@ export default {
         image: '@/assets/tupli_logo2_dark.png',
         // username: null,
       },
+
+      isFormDataNotValidError: false,
+      formDataNotValidReason: '',
 
       // 유효성 검사
       valid: true,
@@ -140,14 +154,21 @@ export default {
       'signup',
     ]),
     // 로그인
-    requestSignup: function () {
-      this.signup(this.credentials)
-      this.valid = true
+    requestSignup: async function () {
+      const { data, status } = await this.signup(this.credentials)
+
+      if (status == 201) {
+        this.valid = true
+        this.$router.push( { name: 'Signup3' })
+      } else if (status == 400) {
+        this.isFormDataNotValidError = true;
+        this.formDataNotValidReason = data.errorMessage;
+      }
     },
 
     // 회원가입 유효성 검사
     signupCheck: function () {
-      this.signup(this.credentials)
+      this.requestSignup()
     },
 
     onInputKeyword: function() {
