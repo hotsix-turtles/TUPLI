@@ -74,6 +74,7 @@ public class BoardService {
             if (boardDto.getType().equals("playroom")) {
                 Playroom playroom = playroomRepository.findById(boardDto.getTypeId()).orElse(null);
                 if (playroom != null) {
+                    board.setType("playroom");
                     board.setPlayroom(playroom);
                 }
             }
@@ -81,6 +82,7 @@ public class BoardService {
             if (boardDto.getType().equals("playlist")) {
                 Playlist playlist = playlistRepository.findById(boardDto.getTypeId()).orElse(null);
                 if (playlist != null) {
+                    board.setType("playlist");
                     board.setPlaylist(playlist);
                 }
             }
