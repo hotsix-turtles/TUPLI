@@ -9,11 +9,13 @@
   },
   "dependencies": {
     "axios": "^0.25.0",
+    "chart.js": "^3.7.1",
     "core-js": "^3.6.5",
     "firebase": "^9.6.6",
     "sockjs-client": "^1.5.2",
     "sweetalert2": "^11.3.10",
     "vue": "^2.6.11",
+    "vue-chartjs": "^3.5.1",
     "vue-infinite-loading": "^2.4.5",
     "vue-meta": "^2.4.0",
     "vue-router": "^3.2.0",
