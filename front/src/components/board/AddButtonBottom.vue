@@ -4,19 +4,22 @@
     v-if="chosen != 0"
     absolute
     background-color="#5B5C9D"
-    height="60px"
+    height="66px"
     class="fixed-bottom"
   >
     <div
       class="d-flex align-center"
       @click="runChoosePlaylist"
     >
-      <div>
+      <div class="mr-1">
         <v-icon color="white">
           mdi-plus-box
         </v-icon>
       </div>
-      <div style="color: white;">
+      <div
+        style="color: white;"
+        class="font-2"
+      >
         선택
       </div>
     </div>

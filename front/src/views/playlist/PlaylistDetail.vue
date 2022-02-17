@@ -219,8 +219,9 @@ export default {
     })
   },
   created: function() {
+    console.log('getPlaylistDetail created에서 실행됨')
     this.getPlaylistDetail(this.$route.params.playlistId)
-    console.log('취향 반영됐나', this.taste)
+    this.deselectAllDetailVideos()
   },
   methods: {
     ...mapActions('playlist', [

@@ -5,7 +5,7 @@
       v-if="selectedVideos.length"
       absolute
       background-color="#5B5C9D"
-      height="75px"
+      height="66px"
       :input-value="selectedVideos.length > 0"
       class="fixed-bottom animate__animated animate__slideInUp"
     >
@@ -26,7 +26,7 @@
             <v-icon
               color="white"
             >
-              mdi-play-circle
+              mdi-play
             </v-icon>
           </div>
           <div style="color: white;">

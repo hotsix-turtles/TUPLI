@@ -42,7 +42,7 @@ np/* eslint-disable vue/require-default-prop */
     <!-- 네브바 -->
     <div class="d-flex-column fixed-bottom-navbar">
       <div
-        class="d-flex justify-space-around align-center fixed-bottom-navbar navbar-background pt-2 pb-3"
+        class="d-flex justify-space-around align-center fixed-bottom-navbar navbar-background pb-2"
       >
         <!-- 홈 버튼 -->
         <div
@@ -206,7 +206,7 @@ export default {
     z-index: 5;
     font-size: 3.6rem !important;
     position: fixed;
-    bottom: 1.5vh;
+    bottom: 0.8vh;
     left: 50%;
     transform: translate(-50%, 0%);
   }

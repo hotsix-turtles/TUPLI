@@ -11,8 +11,8 @@
       class="mt-5"
       prepend-inner-icon="mdi-magnify"
       type="text"
-      @keypress.enter="onInputKeyword"
       @keydown.enter="onInputKeyword"
+      @keyup.tab="onInputKeyword"
       @click="goTo(routerPage)"
     />
     <!-- 모바일 이동 버튼용으로 처리 필요 -->

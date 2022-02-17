@@ -72,7 +72,9 @@
               class="color-dark-gray mt-1 txt-1"
               style="white-space: pre-line"
             >
-              {{ playroom.user.nickname }}
+              <span @click="$router.push({ name: 'Profile', params: { userId : playroom.user.userSeq }})">
+                {{ playroom.user.nickname }}
+              </span>
             </div>
             <div
               class="font-4 color-dark-gray mt-1 mb-2 txt-1"
