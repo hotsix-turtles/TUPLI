@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="background">
     <v-text-field
       ref="comment_input"
       v-model="inputVal"
@@ -8,6 +8,7 @@
       label="댓글을 입력하세요"
       solo
       dense
+      background-color="white"
       @keydown.enter="sendComment"
       @click:append-outer="sendComment"
       @click:append="checkIsLogin"
@@ -20,7 +21,6 @@
           left
           offset-x
           offset-y
-          style="height: 130px;"
         >
           <template v-slot:activator="{ on, attrs }">
             <v-icon
@@ -118,10 +118,10 @@ export default {
     width: 94vw !important;
     z-index: 20 !important;
     position: fixed !important;
-    bottom: 0 !important;
+    bottom: 50px !important;
   }
 
-  div {
+  .background {
     background-color: white;
     z-index: 19 !important;
     position: fixed !important;

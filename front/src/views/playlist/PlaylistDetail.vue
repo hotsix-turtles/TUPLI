@@ -4,14 +4,8 @@
     <div class="fixed-top d-flex justify-space-between light-background navbar-top mx-3 py-3">
       <back-only />
       <div class="d-flex me-5">
-        <!-- 플레이룸 생성 -->
-        <div @click="showCreatePlayroomDialog">
-          <v-icon color="black">
-            mdi-youtube
-          </v-icon>
-        </div>
         <!-- 좋아요 -->
-        <div class="mx-1">
+        <div class="mx-2">
           <div
             v-if="playlistDetail.isLiked"
             class="animate__animated animate__heartBeat"
@@ -31,16 +25,30 @@
           </div>
         </div>
         <!-- 댓글 -->
-        <div @click="$router.push({ name: 'PlaylistComment', params: { playlistId: playlistDetail.id }})">
+        <div
+          class="mr-2"
+          @click="$router.push({ name: 'PlaylistComment', params: { playlistId: playlistDetail.id }})"
+        >
           <v-icon color="black">
             mdi-comment-outline
           </v-icon>
         </div>
+        <!-- 플레이룸 생성 -->
+        <div
+          class="mr-1"
+          @click="showCreatePlayroomDialog"
+        >
+          <v-icon color="black">
+            mdi-youtube
+          </v-icon>
+        </div>
         <!-- 작성자일 경우, 수정하기 삭제하기 모달창 -->
-        <div v-if="userId === playlistDetail.userId">
+        <div
+          v-if="userId === playlistDetail.userId"
+          @click="onClickModal"
+        >
           <v-icon
             color="black"
-            @click="onClickModal"
           >
             mdi-dots-vertical
           </v-icon>
@@ -63,8 +71,13 @@
           >
             {{ playlistDetail.title }}
           </div>
-          <div v-if="!playlistDetail.isPublic">
-            <v-icon>mdi-lock</v-icon>
+          <div
+            v-if="!playlistDetail.isPublic"
+            class="mx-1"
+          >
+            <v-icon color="#5B5C9D">
+              mdi-lock
+            </v-icon>
           </div>
         </div>
         <!-- 작성자 정보 -->
@@ -118,7 +131,6 @@
             유사 플레이리스트 추천
           </div>
           <v-card
-            outlined
             style="display:flex; flex-wrap: nowrap; overflow-x: auto"
             class="playlistThumbnailWrapper"
           >
