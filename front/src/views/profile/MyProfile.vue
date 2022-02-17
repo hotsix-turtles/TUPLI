@@ -127,13 +127,14 @@ export default {
 
 
       // 무한스크롤용
-      page: 1,
+      page: 0,
     }
   },
   computed: {
     ...mapState(['authToken', 'userId', 'nickname', 'introduction', 'following', 'followers'])
   },
   created: function() {
+    // this.getAccounts()
     this.getFollowerList()
     this.getBadge()
     this.getTaste()
@@ -158,6 +159,9 @@ export default {
 
     // [조회]
     getAccounts: function ($state) {
+      // axiosConnector.get(`userinfo/${this.userId}`
+      // ).then((res) => {this.profile = res.data; this.activities = res.data.activities})
+      // console.log('getAccounts params 본인')
       const params = {
         paged: true,
         page: this.page,
@@ -169,11 +173,14 @@ export default {
         .then((res) => {
           if (this.page === 1) {
             this.page++
+            console.log('본인 프로필', res.data)
             this.profile = res.data
             this.image = res.data.profileImage
             // this.tastes = res.data.taste.userInfo.tasteInfo
-            this.activities.push(...res.data.activities)
+            // this.activities.push(...res.data.activities)
+            this.activities = res.data.activities
             $state.loaded()
+          // console.log('액티비티22', this.activities)
           } else if (res.data.activities.length) {
             this.page++
             this.activities.push(...res.data.activities)

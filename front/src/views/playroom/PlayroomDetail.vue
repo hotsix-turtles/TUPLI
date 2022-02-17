@@ -1409,9 +1409,7 @@ iframe {
 }
 
 @media (orientation: landscape) {
-  body {
-    overflow: hidden;
-  }
+  body { overflow: hidden; }
 
   body * { touch-action: none; }
 

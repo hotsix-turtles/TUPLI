@@ -48,25 +48,26 @@
         </div>
       </div>
     </div>
-    <timeout-dialog
+    <timeout-dialog-k
       :content="timeoutMsg"
       :show="showTimeoutDialog"
       hide-progress
       :persistent="false"
-      timeout="2400"
+      timeout="1700"
       @timeout="onTimeout"
+      @click="onTimeout"
     />
   </v-bottom-navigation>
 </template>
 
 <script>
 import { mapActions, mapState } from 'vuex'
-import TimeoutDialog from '../common/TimeoutDialog.vue'
+import TimeoutDialogK from '../common/TimeoutDialogK.vue'
 
 export default {
   name: 'RemoveButtonBottom',
   components: {
-    TimeoutDialog
+    TimeoutDialogK
   },
   props: {
   },
@@ -93,8 +94,8 @@ export default {
       this.showTimeoutDialog = true
     },
     onTimeout () {
-      this.showTimeoutDialog = false
       this.removeVideos()
+      this.showTimeoutDialog = false
     }
   }
 }

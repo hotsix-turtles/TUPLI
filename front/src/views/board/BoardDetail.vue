@@ -5,7 +5,7 @@
       <back-only />
       <div class="d-flex me-5">
         <!-- 좋아요 -->
-        <div class="mx-1">
+        <div class="mx-2">
           <div
             v-if="boardDetail.isLiked"
             class="animate__animated animate__heartBeat"
@@ -34,17 +34,12 @@
         <div v-if="userId === boardDetail.user.userSeq">
           <v-icon
             color="black"
+            class="mx-1"
             @click="onClickModal"
           >
             mdi-dots-vertical
           </v-icon>
         </div>
-        <modal
-          :items="selectList"
-          :modal-name="'플레이리스트 변경'"
-          :modal-type="'modal'"
-          @on-select="onSelect"
-        />
       </div>
     </div><br><br>
     <div class="container pt-0">
@@ -127,6 +122,36 @@
         <detail-button-bottom />
       </div>
     </div>
+    <!-- 수정하기/삭제하기 -->
+    <modal
+      :items="selectList"
+      :modal-name="'게시글 변경'"
+      :modal-type="'modal'"
+      @on-select="onSelect"
+    />
+    <!-- 삭제 여부 확인 다이얼로그 -->
+    <normal-dialog
+      title="게시글 삭제하기"
+      content-html="정말 이 게시글를 삭제하시겠습니까?"
+      max-width="290"
+      persistent
+      :buttons="[{ name: '확인', color: '#5B5C9D' }, { name: '취소', color: 'gray' }]"
+      :show="deleteBoard"
+      @button-click="onClickDeleteBoardDialog"
+    />
+    <timeout-dialog-k
+      :content="'해당 게시글이 삭제되었습니다.'"
+      :show="showTimeoutDialog"
+      hide-progress
+      :persistent="false"
+      timeout="1700"
+      @timeout="onTimeout"
+      @click="onTimeout"
+    />
+    <login-dialog
+      :show="showLoginDialog"
+      @on-click="showLoginDialog = false"
+    />
   </div>
 </template>
 
@@ -140,6 +165,10 @@ import PlaylistItemBig from '../../components/playlist/PlaylistItemBig.vue'
 import BackOnly from '../../components/common/BackOnly.vue'
 import Modal from '../../components/common/Modal.vue'
 import VideoListItemSmall from '../../components/video/VideoListItemSmall.vue';
+
+import NormalDialog from '../../components/common/NormalDialog.vue';
+import LoginDialog from '../../components/common/LoginDialog.vue';
+import TimeoutDialogK from '../../components/common/TimeoutDialogK.vue'
 import DetailButtonBottom from '../../components/playlist/DetailButtonBottom.vue'
 
 export default {
@@ -151,6 +180,9 @@ export default {
     PlaylistItemBig,
     DetailButtonBottom,
     VideoListItemSmall,
+    NormalDialog,
+    LoginDialog,
+    TimeoutDialogK,
   },
   data: function() {
     return {
@@ -159,6 +191,9 @@ export default {
         '수정하기': 'update',
         '삭제하기': 'delete',
       },
+      deleteBoard: false,
+      showTimeoutDialog: false,
+      showLoginDialog: false,
     }
   },
   computed: {
@@ -167,6 +202,7 @@ export default {
     }),
     ...mapState({
       userId: state => state.userId,
+      isLogin: state => state.isLogin,
     })
   },
   created: function() {
@@ -208,25 +244,24 @@ export default {
         this.saveFormData(formData)
         this.$router.push({ name: 'BoardUpdateForm', params: { boardId: this.boardDetail.id } })
       } else if (item === 'delete') {
-        console.log('onSelect 삭제', item)
-        axiosConnector.delete(`/board/${this.boardDetail.id}`
-        ).then((res) => {
-          console.log('게시글이 삭제되었습니다', res)
-          this.$router.push({ name: 'Home' })
-        }).catch((err) => {
-          console.log(err)
-        })
+        this.deleteBoard = true
       }
     },
     onClickLike: function () {
-      this.boardDetail.isLiked = true
-      // this.boardDetail.likesCnt++
-      this.likeBoard(this.boardDetail.id)
+      if (this.isLogin) {
+        this.boardDetail.isLiked = true
+        this.likeBoard(this.boardDetail.id)
+      } else {
+        this.showLoginDialog = true
+      }
     },
     onClickUnlike: function () {
-      this.boardDetail.isLiked = false
-      // this.boardDetail.likesCnt--
-      this.unlikeBoard(this.boardDetail.id)
+      if (this.isLogin) {
+        this.boardDetail.isLiked = false
+        this.unlikeBoard(this.boardDetail.id)
+      } else {
+        this.showLoginDialog = true
+      }
     },
     onClickSelectAll: function () {
       if (this.isSelectedAll) {
@@ -242,7 +277,25 @@ export default {
     },
     ImgUrl: function(img) {
       return getImage(img)
-    }
+    },
+    onClickDeleteBoardDialog: function (idx) {
+      if (idx === 0) { // 확인
+        this.deleteBoard = false
+        axiosConnector.delete(`/board/${this.boardDetail.id}`
+        ).then((res) => {
+          console.log('게시글이 삭제되었습니다', res)
+          this.showTimeoutDialog = true
+        }).catch((err) => {
+          console.log(err)
+        })
+      } else {
+        this.deleteBoard = false
+      }
+    },
+    onTimeout () {
+      this.showTimeoutDialog = false
+      this.$router.push({ name: 'Home' })
+    },
   },
 }
 </script>

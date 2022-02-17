@@ -13,15 +13,14 @@
         </div>
       </div>
       <div
-        class="clickable font-2 semi-bold mt-3 mr-3 color-dark-gray"
-        :class="{ 'color-main': addedPlaylists.length > 0 }"
+        class="clickable font-2 semi-bold mt-3 mr-3 color-dark-gray color-main"
         @click="submit"
         v-text="formType == 'create' ? '완료' : '수정'"
       />
     </div><br><br>
 
     <!-- 플레이룸 생성 폼 -->
-    <v-form v-model="isValid">
+    <v-form>
       <v-container>
         <!-- 제목 -->
         <v-row>
@@ -31,10 +30,10 @@
           >
             <v-text-field
               v-model="formData.title"
-              :rules="titleRules"
               :counter="30"
               color="accent"
               label="플레이룸 제목을 입력해주세요."
+              hint="3글자 이상 입력해주세요"
               required
             />
           </v-col>
@@ -112,6 +111,7 @@
               small
               elevation="0"
               color="white"
+              class="mb-3"
               @click="selectAllVideo"
             >
               <v-icon class="mdi-18px">
@@ -119,7 +119,7 @@
               </v-icon>
               <span class="ml-1">전체 선택</span>
             </v-btn>
-            <p class="font-4">
+            <p class="font-4 mt-1">
               {{ numberOfAddedPlaylists }}개 플레이리스트 / {{ numberOfAddedPlaylistSelectedVideos }}개 영상 선택
             </p>
           </v-col>
@@ -183,7 +183,7 @@
         </v-row>
 
         <!-- 친구 초대 리스트 조작 버튼 -->
-        <v-row
+        <!-- <v-row
           v-if="formType=='create'"
         >
           <v-col
@@ -195,17 +195,19 @@
               small
               elevation="0"
               color="white"
+              class="mb-3"
+              @click="selectAllFriend"
             >
               <v-icon class="mdi-18px">
                 mdi-check
               </v-icon>
               <span class="ml-1">전체 선택</span>
             </v-btn>
-            <p class="font-4">
+            <p class="font-4 mt-1">
               {{ numberOfAddedFriends }}명 유저 선택
             </p>
           </v-col>
-        </v-row>
+        </v-row> -->
 
         <!-- 친구 초대 리스트 -->
         <v-row
@@ -223,6 +225,7 @@
               <p v-if="!addedFriends.length">초대한 친구가 없습니다</p>
               <account-list-item-small
                 :accounts="addedFriends"
+                readonly
               />
             </v-card>
           </v-col>
@@ -456,6 +459,14 @@
       :title="formType == 'create' ? '플레이룸 생성중...' : '플레이룸 변경중...'"
       :show="isSending"
     />
+    <timeout-dialog
+      v-model="isFormInputError"
+      title="생성 실패"
+      content="입력 값이 올바르지 않습니다"
+      timeout="2000"
+      top-progress
+      @timeout="isFormInputError = false"
+    />
   </div>
 </template>
 
@@ -467,6 +478,7 @@ import { mapMutations, mapActions } from 'vuex'
 import axiosConnector from '../../utils/axios-connector';
 import AccountListItemSmall from '../../components/account/AccountListItemSmall.vue'
 import LoadingDialog from '../../components/common/LoadingDialog.vue'
+import TimeoutDialog from '../../components/common/TimeoutDialog.vue'
 
 export default {
   name: 'PlayroomForm',
@@ -474,7 +486,8 @@ export default {
     TagInput,
     PlaylistListItemSmall,
     AccountListItemSmall,
-    LoadingDialog
+    LoadingDialog,
+    TimeoutDialog
   },
   data: function() {
     return {
@@ -498,9 +511,11 @@ export default {
         v => !!v || '종료시간은 필수입니다.',
         v => this.startDateTime.getTime() < this.endDateTime.getTime() || '종료시간은 시간시간 이전일 수 없습니다',
       ],
-      isValid: false,
       isShuffle: false,
       isSending: false,
+
+      isFormInputError: false,
+
       // Create할 때 넘길 데이터
       formType: '',
       formData: {
@@ -546,7 +561,7 @@ export default {
       return this.isShuffle ? "플레이리스트를 랜덤으로 섞습니다." : "플레이리스트 순서대로 재생합니다."
     },
     ...mapState('playlist', ['addedPlaylists', 'addedPlaylistVideoIds']),
-    ...mapState('friend', ['addedFriends']),
+    ...mapState('friend', ['addedFriends', 'selectedFriends']),
     ...mapState('playroom', ['savedFormData']),
     ...mapGetters('playlist', ['numberOfAddedPlaylists', 'numberOfAddedPlaylistSelectedVideos', 'numberOfAddedPlaylistVideos']),
     ...mapGetters('friend', ['numberOfAddedFriends'])
@@ -640,6 +655,12 @@ export default {
     }
   },
   methods: {
+    isValid () {
+      return this.formData.title.length >= 3 &&
+        this.formData.tags.length > 0 &&
+        this.addedPlaylists.length > 0 &&
+        this.formData.userCountMax <= 20
+    },
     resetFormAndGo() {
       this.RESET_FORM_DATA();
       this.RESET_ADDED_PLAYLISTS();
@@ -655,6 +676,11 @@ export default {
       return this.formData.playlists.map((playlist) => playlist.videos.map((v) => v.included = (v.id == id ? !selected : v.included)))
     },
     submit() {
+      if (!this.isValid()) {
+        this.isFormInputError = true
+        return;
+      }
+
       this.isSending = true;
 
       const token = localStorage.getItem('jwt')
@@ -765,18 +791,43 @@ export default {
       else
         this.deselectAllPlaylistVideo()
     },
+    // selectAllFriend () {
+    //   if (!this.selectedFriends.length)
+    //     this.selectAllFriends()
+    //   else
+    //     this.deselectAllFriends()
+    // },
     createPlayroom: function ({formData}) {
       return axiosConnector.post('/playroom', formData)
     },
     updatePlayroom: function ({formData}) {
       return axiosConnector.put(`/playroom/${this.$route.params.id}`, formData)
     },
-    ...mapMutations('playroom', ['RESET_FORM_DATA']),
-    ...mapMutations('playlist', ['RESET_ADDED_PLAYLISTS']),
-    ...mapActions('playroom', ['saveFormData']),
-    ...mapActions('playlist', ['selectPlaylist2', 'addPlaylists', 'selectPlaylistVideo', 'selectAllPlaylistVideo', 'deselectAllPlaylistVideo', 'resetAddedPlaylists']),
-    ...mapActions('account', ['validateToken']),
-    ...mapActions('friend', ['resetAddedFriends'])
+    ...mapMutations('playroom', [
+      'RESET_FORM_DATA'
+    ]),
+    ...mapMutations('playlist', [
+      'RESET_ADDED_PLAYLISTS'
+    ]),
+    ...mapActions('playroom', [
+      'saveFormData'
+    ]),
+    ...mapActions('playlist', [
+      'selectPlaylist2',
+      'addPlaylists',
+      'selectPlaylistVideo',
+      'selectAllPlaylistVideo',
+      'deselectAllPlaylistVideo',
+      'resetAddedPlaylists'
+    ]),
+    ...mapActions('account', [
+      'validateToken'
+    ]),
+    ...mapActions('friend', [
+      'resetAddedFriends',
+      // 'selectAllFriends',
+      // 'deselectAllFriends'
+    ])
   },
 }
 </script>
