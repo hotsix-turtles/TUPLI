@@ -3,14 +3,14 @@
     <div class="d-flex align-center px-4 my-3">
       <!-- 프로필 사진 -->
       <div
-        class="d-flex justify-center align-center notice-img"
-        style="background-color: yellow; border-radius: 100%;"
-        @click="setProfile"
+        class="d-flex justify-center align-center"
+        @click="goProfile"
       >
         <img
-          src="@/assets/tupli_logo2_dark.png"
+          :src="ImgUrl(notice.image)"
           alt="profile img"
           width="30"
+          class="profile-img-history"
         >
       </div>
 
@@ -73,7 +73,7 @@
             <div class="d-flex flex-wrap notice-content">
               <p
                 class="mb-0"
-                @click="setProfile"
+                @click="goProfile"
               >
                 {{ notice.from }}님이&nbsp;{{ nickname }}님을 초대하였습니다.
                 플레이룸 제목이 들어갈 공간입니다
@@ -104,7 +104,7 @@
         <div class="d-flex mb-0">
           <p
             class="mb-0"
-            @click="setProfile"
+            @click="goProfile"
           >
             {{ notice.from }}님이&nbsp;{{ nickname }}님의 플레이리스트로 플레이룸을 생성하였습니다.
           </p>
@@ -123,6 +123,7 @@
 
 <script>
 import { mapState } from 'vuex'
+import { getImage } from '../../utils/utils'
 import axiosConnector from '@/utils/axios-connector.js'
 
 export default {
@@ -136,6 +137,7 @@ export default {
       noticeType: '',
       follow: false,
       meCheck: false,
+      profileImg: '',
     }
   },
   computed: {
@@ -149,11 +151,14 @@ export default {
     ImgUrl: function(img) {
       return getImage(img)
     },
+
     // 타 유저 프로필로 가기
-    setProfile: function() {
+    goProfile: function() {
       // 만약 클릭한 사람이 나라면
       axiosConnector.get(`userinfo/${this.notice.fromId}`)
         .then((res) => {
+          console.log('마아아아아앙고오오오오오',res.data)
+          this.profileImg = res.data.profileImg
           if (res.data.meCheck === false) {  // 내가 아니라면, 프로필로 !
             // console.log('타인 프로필', res.data.meCheck)
             this.$router.push({ name: 'Profile', params: { userId : this.notice.fromId }})
@@ -170,6 +175,7 @@ export default {
           console.log('에러', err)
         })
     },
+
     // 팔로우 여부
     checkFollow: function() {
     // 팔로워가 본인일 때
@@ -225,14 +231,9 @@ export default {
 
 <style scoped>
 p {
-  font-size: 10px;
+  font-size: 14px;
 }
 
-/* 알림 이미지 */
-.notice-img {
-  width: 44px ;
-  height: 44px;
-}
 
 /* 알림 내용 */
 .notice-content {

@@ -87,6 +87,7 @@
         <v-tab-item>
           <my-profile-taste
             :badges="badges"
+            :tastes="tastes"
           />
         </v-tab-item>
       </v-tabs>
@@ -109,7 +110,7 @@ import MyProfileTaste from '../../components/profile/timeline/MyProfileTaste.vue
 import InfiniteLoading from "vue-infinite-loading"
 
 import axiosConnector from '@/utils/axios-connector.js'
-import { getImage } from '../../utils/utils'
+import { getImage } from '@/utils/utils'
 import { mapState } from 'vuex'
 
 export default {
@@ -120,18 +121,24 @@ export default {
       followinglist: [],
       activities: [],
       badges: '',
+      tastes: [],
+      image: '',
+      profile: [],
+
 
       // 무한스크롤용
       page: 0,
     }
   },
   computed: {
-    ...mapState(['authToken', 'userId', 'nickname', 'image', 'introduction', 'following', 'followers'])
+    ...mapState(['authToken', 'userId', 'nickname', 'introduction', 'following', 'followers'])
   },
   created: function() {
     // this.getAccounts()
     this.getFollowerList()
     this.getBadge()
+    this.getTaste()
+    console.log('본인 프로필 확인', this.profile)
   },
   methods: {
     // 이미지 조합
@@ -168,6 +175,9 @@ export default {
             this.page++
             console.log('본인 프로필', res.data)
             this.profile = res.data
+            this.image = res.data.profileImage
+            // this.tastes = res.data.taste.userInfo.tasteInfo
+            // this.activities.push(...res.data.activities)
             this.activities = res.data.activities
             $state.loaded()
           // console.log('액티비티22', this.activities)
@@ -184,13 +194,37 @@ export default {
           $state.complete()
         })
     },
+
+    // getTaste: function() {
+    //   axiosConnector.get(`/account/userInfo`)
+    //     .then((res) => {
+    //       console.log('본인 프로필 취향취향취향', res.data)
+    //       console.log('본인 프로필 취향취향취향', res.data.taste.userInfo.tasteInfo)
+    //       this.tastes = res.data.taste.userInfo.tasteInfo
+    //     })
+    //     .catch((err) => {
+    //       console.log('에러', err)
+    //       $state.complete()
+    //     })
+    // },
+
+    getTaste: function() {
+      axiosConnector.get(`userinfo/${this.userId}`)
+        .then((res) => {
+          this.tastes = res.data.userInfo.tasteInfo
+        })
+        .catch((err) => {
+          console.log('에러 - 취향', err)
+        })
+    },
+
     getBadge: function() {
       console.log('뱃지')
       axiosConnector.get('/badge/list')
         .then((res) => {
-          console.log('뱃지 획득', res.data, typeof(res.data))
+          // console.log('뱃지 획득', res.data, typeof(res.data))
           this.badges = res.data
-          console.log('뱃지 획득2', this.badges, typeof(this.badges))
+          // console.log('뱃지 획득2', this.badges, typeof(this.badges))
 
         })
         .catch((err) => {

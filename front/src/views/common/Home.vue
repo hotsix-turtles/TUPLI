@@ -45,13 +45,13 @@
           style="margin-right: 1px;"
           bold
         >
-          게스트
+          튜플리
         </p>
         <p class="">
-          님이 좋아하는&nbsp;
+          가 추천하는&nbsp;
         </p>
         <p class="color-main">
-          오늘의 추천 컨텐츠
+          오늘의 컨텐츠
         </p>
       </div>
     </div>
