@@ -86,6 +86,7 @@
         </v-tab-item>
         <v-tab-item>
           <my-profile-taste
+            class="pt-4"
             :badges="badges"
             :tastes="tastes"
           />
