@@ -1,11 +1,11 @@
 <template>
-  <v-app>
+  <div>
     <main-item
       v-for="content in mainContents"
       :key="content.id"
       :content="content"
     />
-  </v-app>
+  </div>
 </template>
 
 <script>
@@ -29,6 +29,8 @@ export default {
   computed: {
   },
   created: function() {
+    console.log('메인 컨텐츠 얻기', this.mainContents)
+
   },
   methods: {
   }

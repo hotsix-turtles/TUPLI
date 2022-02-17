@@ -13,7 +13,8 @@ export default{
       kakaoPay: '/kakaoPay/'
     },
     // GCS
-    image : 'https://storage.cloud.google.com/tupli_profile',
+    image : 'https://storage.googleapis.com/tupli_profile',
+
   }
 
 }

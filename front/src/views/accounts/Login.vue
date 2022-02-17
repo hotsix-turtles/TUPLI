@@ -48,6 +48,7 @@
             rounded
             width="50px"
             @click="requestLogin"
+            @keydown.enter="onInputKeyword"
           >
             로그인
           </v-btn>
@@ -173,6 +174,10 @@ export default {
     findPassword: function() {
       this.$router.push({ name: 'FindPassword' })
     },
+
+    onInputKeyword: function() {
+      this.requestLogin()
+    }
 
   },
 
