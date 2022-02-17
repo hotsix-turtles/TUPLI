@@ -5,11 +5,12 @@
         class="align-center mt-5"
       >
         <v-icon
-          color="#5B5C9D"
-          size="30"
-          @click="$router.push({ name: 'Setting'})"         
+          size="20"
+          color="black"
+          class="px-2"
+          @click="$router.push({ name: 'Setting'})"
         >
-          mdi-chevron-left
+          mdi-arrow-left
         </v-icon>
         <h3>
           관리자 페이지
@@ -31,7 +32,7 @@
           dense
         />
       </div>
-    </div> 
+    </div>
     <v-btn
       class="d-flex justify-center p-5 mx-5"
       rounded
@@ -53,7 +54,7 @@
           dense
         />
       </div>
-    </div> 
+    </div>
     <v-btn
       class="d-flex justify-center p-5 mx-5"
       rounded
@@ -133,7 +134,7 @@ export default {
   methods: {
     adminDeleteUser: function() {
       axios({
-        method: 'DELETE', 
+        method: 'DELETE',
         url: SERVER.URL + '/admin/user/' + this.adminDeleteUserId,
         headers: {Authorization: this.authToken},
       })
@@ -156,7 +157,7 @@ export default {
     },
     adminDeleteBoard: function() {
       axios({
-        method: 'DELETE', 
+        method: 'DELETE',
         url: SERVER.URL + '/admin/board/' + this.adminDeleteBoardId,
         headers: {Authorization: this.authToken},
       })
@@ -179,7 +180,7 @@ export default {
     },
     adminDeletePlaylist: function() {
       axios({
-        method: 'DELETE', 
+        method: 'DELETE',
         url: SERVER.URL + '/admin/playlist/' + this.adminDeletePlaylistId,
         headers: {Authorization: this.authToken},
       })
@@ -202,7 +203,7 @@ export default {
     },
     adminDeletePlayroom: function() {
       axios({
-        method: 'DELETE', 
+        method: 'DELETE',
         url: SERVER.URL + '/admin/playroom/' + this.adminDeletePlayroomId,
         headers: {Authorization: this.authToken},
       })

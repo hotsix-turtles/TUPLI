@@ -5,11 +5,12 @@
         class="d-flex align-center mt-5"
       >
         <v-icon
-          color="#5B5C9D"
-          size="30"
+          size="20"
+          color="black"
+          class="px-2"
           @click="$router.go(-1)"
         >
-          mdi-chevron-left
+          mdi-arrow-left
         </v-icon>
         <h3 class="">
           {{ profile.nickname }}

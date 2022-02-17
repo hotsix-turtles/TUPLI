@@ -8,10 +8,12 @@
               class="align-center mt-5 d-flex"
             >
               <v-icon
-                color="#5B5C9D"
+                size="20"
+                color="black"
+                class="px-2"
                 @click="$router.push('/login')"
               >
-                mdi-chevron-left
+                mdi-arrow-left
               </v-icon>
               <p class="back-menu-text">
                 비밀번호 찾기

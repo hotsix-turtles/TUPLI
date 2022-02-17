@@ -6,11 +6,12 @@
       >
         <div class="d-flex">
           <v-icon
-            size="30"
-            color="#5B5C9D"
+            size="20"
+            color="black"
+            class="px-2"
             @click="$router.push({ name: 'MyProfile' })"
           >
-            mdi-chevron-left
+            mdi-arrow-left
           </v-icon>
           <h3>
             프로필 편집

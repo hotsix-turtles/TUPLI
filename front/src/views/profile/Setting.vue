@@ -5,11 +5,12 @@
         class="align-center mt-5"
       >
         <v-icon
-          color="#5B5C9D"
-          size="30"
+          size="20"
+          color="black"
+          class="px-2"
           @click="$router.push({ name: 'MyProfile' })"
         >
-          mdi-chevron-left
+          mdi-arrow-left
         </v-icon>
         <h3>
           설정
@@ -239,8 +240,8 @@ import swal from 'sweetalert2'
 import TimeoutDialog from '../../components/common/TimeoutDialog.vue'
 
 export default {
-  components: { TimeoutDialog },
   name: 'Setting',
+  components: { TimeoutDialog },
   data: function() {
     return {
       dialogLogout: null,
