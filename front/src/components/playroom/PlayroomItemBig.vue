@@ -35,7 +35,7 @@
         <div class="d-flex">
           <img
             style="border-radius: 100px;"
-            :src="ImgUrl(playroom.profileImage)"
+            :src="ImgUrl(playroom.profileImg)"
             alt="프로필 사진"
             width="50px"
             height="50px"
