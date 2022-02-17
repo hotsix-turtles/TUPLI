@@ -33,7 +33,7 @@
             style="width:67%"
           >
             <p
-              class="main-title"
+              class="main-title twolines"
               @click="goPlayroom"
             >
               {{ content.title }}
@@ -160,7 +160,7 @@
             style="width:67%"
           >
             <p
-              class="main-title"
+              class="main-title twolines"
               @click="goPlaylist"
             >
               {{ content.title }}

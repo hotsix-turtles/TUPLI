@@ -103,6 +103,10 @@ export default new Vuex.Store({
         state.image = state.image
       }
     },
+    // 프리미엄 회원 정보 갱신
+    SET_PREMIUM(state) {
+      state.is_vip= true
+    },
 
   },
   actions: {

@@ -1,5 +1,7 @@
 <template>
-  <div>
+  <div
+    class="d-flex flex-wrap"
+  >
     <badge-item
       v-for="badge in badges"
       :key="badge.id"

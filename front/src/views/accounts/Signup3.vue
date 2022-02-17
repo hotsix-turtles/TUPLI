@@ -24,19 +24,24 @@
         </v-container>
 
         <!-- 상태바 -->
-        <v-img
-          src="../../assets/signup_bar3.png"
-          alt="logo"
-        />
+        <div
+          class="d-flex justify-center"
+        >
+          <img
+            src="../../assets/signup_bar3.png"
+            alt="logo"
+            width="90%"
+          >
+        </div>
 
         <!-- 회원가입 form -->
-        <v-container class="mt-4 pt-4">
-          <v-row>
+        <div class="d-flex flex-column mt-5">
+          <div class="d-flex">
             <p class="bold">
-              거북이
+              {{ nickname }}
             </p>
             <p>님의</p>
-          </v-row>
+          </div>
           <p>
             튜플리 가입을 환영합니다!
           </p>
@@ -50,7 +55,7 @@
           >
             홈으로 이동
           </v-btn>
-        </v-container>
+        </div>
       </v-container>
     </div>
   </v-app>
@@ -58,17 +63,19 @@
 
 <script>
 import axios from 'axios'
+import { mapState } from 'vuex'
 
 export default {
   name: 'Signup3',
 
   // 이메일 비밀번호 규칙 설정
-  data: () => ({
+  data: function() {
+    return{
+    }
+  },
 
-  }),
-
-  watch: {
-
+  computed: {
+    ...mapState(['authToken', 'userId', 'nickname']),
   },
 
   methods: {
