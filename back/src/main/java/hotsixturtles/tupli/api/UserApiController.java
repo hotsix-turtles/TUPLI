@@ -118,12 +118,12 @@ public class UserApiController {
     static class CreateUserRequest {
 //        @Size(min=3, max=128, message = "{error.size.username}")
         private String username;
-        @Size(min=3, max=128, message = "{error.size.email}")
+//        @Size(min=3, max=128, message = "{error.size.email}")
         @Email(message = "{error.format.email}")
         @Email(message = "{email.notempty}")
         private String email;
         private String nickname;
-        @Size(min=3, max=128, message = "{error.size.password}")
+        @Size(min=4, max=12, message = "{error.size.password}")
 //        @Length(min=3, max=128, message = "비밀번호 길이 불일치")
         private String password;
         @Size(max = 64) String userId;
@@ -412,15 +412,26 @@ public class UserApiController {
 
     /**
      * 임시비밀번호 발송
-     * @param userSeq
+     * @param email
      * @return
      */
-    @PutMapping("/account/passwordFind/{userSeq}/nickname/{nickname}")
+    @PutMapping("/account/passwordFind/{email}/nickname/{nickname}")
     @ApiOperation(value = "비밀번호 변경 시, 임시 비밀번호를 메일로 전송", notes = "")
-    public ResponseEntity passwordFind(@PathVariable("userSeq") Long userSeq,
+    public ResponseEntity passwordFind(@PathVariable("email") String email,
                                        @PathVariable("nickname") String nickname) {
+
+        User user = userRepository.findByEmail(email);
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new ErrorResponse(messageSource.getMessage("error.none.user", null, LocaleContextHolder.getLocale())));
+        }
+        if (user.getNickname() != nickname) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new ErrorResponse(messageSource.getMessage("error.wrong.nickname", null, LocaleContextHolder.getLocale())));
+        }
+
         // 임시 비밀번호
-        mailSendService.sendTmpPassword(userSeq);
+        mailSendService.sendTmpPassword(user, email);
         return ResponseEntity.ok().body(null);
     }
 
