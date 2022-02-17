@@ -26,10 +26,8 @@
                 <span class="semi-bold">
                   {{ boardComment.user.nickname }}
                 </span>
-                <span>
-                  <!-- 덧글내용 노출 -->
-                  {{ boardComment.content }}
-                </span>
+                <!-- 덧글내용 노출 -->
+                <span v-html="renderContent(playlistComment.content)" />
               </div>
             </v-row>
             <v-row>
@@ -76,7 +74,7 @@
 import { mapActions, mapState } from 'vuex'
 import Back from '../../components/common/Back.vue'
 import CommentInput from '../../components/common/CommentInput.vue'
-import { getImage } from '../../utils/utils'
+import { getImage, renderEmoticon } from '../../utils/utils'
 
 
 export default {
@@ -132,7 +130,11 @@ export default {
     updateScroll: function () {
       var element = document.getElementById('comment');
       element.scrollTop = element.scrollHeight - element.clientHeight;
-    }
+    },
+    renderContent: function (content) {
+      console.log(content)
+      return renderEmoticon(content)
+    },
   },
 }
 </script>
