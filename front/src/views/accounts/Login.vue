@@ -1,12 +1,15 @@
 <template>
-  <v-app>
-    <div class="background-login px-5">
-      <v-container>
+  <div>
+    <div class="d-flex justify-center align-center background-login px-5">
+      <div>
         <img
-          src=""
-          alt=""
+          src="@/assets/tupli_logo_dark.png"
+          width="40%"
+          alt="tupli logo"
         >
-        <h1>youTUve PlayList</h1>
+        <h4>
+          너와 나의 유튜브 취향을 꽃피우다
+        </h4>
         <h2 class="mt-5">
           튜플리에서
         </h2>
@@ -19,7 +22,6 @@
           <v-form ref="form">
             <v-text-field
               v-model="credentials.email"
-              class="pt-0"
               :rules="emailRules"
               label="이메일을 입력해주세요"
               required
@@ -27,7 +29,7 @@
 
             <v-text-field
               v-model="credentials.password"
-              class="pt-0"
+              class=""
               type="password"
               :rules="[passwordRules.min]"
               label="비밀번호를 입력해주세요"
@@ -41,82 +43,61 @@
             block
             elevation="0"
             rounded
+            width="50px"
             @click="requestLogin"
           >
             로그인
           </v-btn>
         </div>
-      </v-container>
 
-      <!-- 소셜 로그인 -->
-      <v-container>
-        <div class="align-center my-4">
-          <v-row class="justify-center">
-            <v-col col>
-              <v-row class="justify-center mb-2">
-                <p>----------</p>
-                <p>또는</p>
-                <p>----------</p>
-              </v-row>
-              <v-row class="justify-center">
-                <v-btn
-                  fab
-                  elevation="0"
-                  class="mx-3"
-                  :href="socialLoginUrl('google')"
-                  :loading="loading"
-                  :disabled="loading"
-                  @click="loader = 'loading'"
-                >
-                  구글
-                </v-btn>
+        <!-- 소셜 로그인 -->
+        <v-container>
+          <div class="align-center my-4">
+            <v-row class="justify-center">
+              <v-col col>
+                <v-row class="justify-center mb-2">
+                  <p>----------</p>
+                  <p>또는</p>
+                  <p>----------</p>
+                </v-row>
+                <v-row class="justify-center">
+                  <v-btn
+                    fab
+                    elevation="0"
+                    class="mx-3"
+                    :href="socialLoginUrl('google')"
+                    :loading="loading"
+                    :disabled="loading"
+                    @click="loader = 'loading'"
+                  >
+                    구글
+                  </v-btn>
+                </v-row>
+              </v-col>
+            </v-row>
+          </div>
+        </v-container>
 
-                <v-btn
-                  fab
-                  elevation="0"
-                  class="mx-3"
-                >
-                  구글
-                </v-btn>
-
-                <v-btn
-                  fab
-                  elevation="0"
-                  class="mx-3"
-                >
-                  구글
-                </v-btn>
-              </v-row>
-            </v-col>
-          </v-row>
+        <!-- 그 외 -->
+        <div>
+          <div class="row justify-center mb-4 mt-1">
+            <p
+              class="mx-1"
+              @click="$router.push({ name: 'Signup2' })"
+            >
+              회원가입
+            </p>
+            <p class="mx-1">
+              |
+            </p>
+            <p class="mx-1">
+              비밀번호 찾기
+            </p>
+          </div>
         </div>
-      </v-container>
-
-      <!-- 그 외 -->
-      <v-container>
-        <div class="row justify-center mb-4 mt-1">
-          <p
-            class="mx-1"
-            @click="$router.push({ name: 'Signup2' })"
-          >
-            회원가입
-          </p>
-          <p class="mx-1">
-            |
-          </p>
-          <p class="mx-1">
-            이메일 찾기
-          </p>
-          <p class="mx-1">
-            |
-          </p>
-          <p class="mx-1">
-            비밀번호 찾기
-          </p>
-        </div>
-      </v-container>
+      </div>
     </div>
-  </v-app>
+  </div>
 </template>
 
 <script>
@@ -129,8 +110,8 @@ export default {
   data: () => ({
     // 로그인 값
     credentials: {
-      email: null,
-      password: null,
+      email: '',
+      password: '',
     },
 
     // 로딩 아이콘
@@ -200,7 +181,7 @@ export default {
 <style scoped>
   .background-login {
     background-color: #F1F1F4;
-    height: 844px;
+    height: 915px;
   }
 
   .btn-login {

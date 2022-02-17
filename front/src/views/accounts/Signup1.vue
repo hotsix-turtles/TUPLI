@@ -23,10 +23,10 @@
         </h2>
 
         <!-- 상태바 -->
-        <v-img
+        <img
           src="../../assets/signup_bar1.png"
           alt="logo"
-        />
+        >
 
         <!-- 회원가입 form -->
         <div class="mt-4 pt-4">

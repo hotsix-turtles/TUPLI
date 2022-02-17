@@ -1,16 +1,18 @@
 <template>
-  <div>
-    <v-card>
-      <img
-        :src="ImgUrl(img)"
-        alt="badge img"
-        style="background-size: 50%;"
-      >
-      <v-card-title>
-        {{ date }}
-      </v-card-title>
-    </v-card>
-  </div>
+  <v-card
+    v-if="badgeCheck"
+    style="width:25%"
+  >
+    <img
+      :src="ImgUrl(img)"
+      alt="badge img"
+      width="100%"
+      style="background-size: 50%;"
+    >
+    <v-card-title>
+      {{ date }}
+    </v-card-title>
+  </v-card>
 </template>
 
 <script>
@@ -26,6 +28,7 @@ export default {
     return {
       img: '',
       date: '',
+      badgeCheck: false,
     }
   },
   created: function() {
@@ -36,8 +39,14 @@ export default {
   methods: {
     // 배지 번호로 이미지 찾기
     getBadgeImg: function() {
-      this.img = this.badge.badgeSeq
-      console.log('뱃지이미지이ㅣ이ㅣ', this.img, typeof(this.img))
+      if (this.badge.badgeSeq < 32) {
+        this.badgeCheck = true
+        this.img = this.badge.badgeSeq
+        console.log('뱃지이미지이ㅣ이ㅣ', this.img, typeof(this.img))
+      }
+      else {
+        this.badgeCheck = false
+      }
     },
     // 이미지 조합
     ImgUrl: function(img) {
