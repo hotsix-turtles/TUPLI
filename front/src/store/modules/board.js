@@ -28,7 +28,10 @@ const board = {
       state.isSaved = false
       state.chosenPlaylist = { 'id': 0 }
       state.chosenPlayroom = { 'id': 0 }
-      console.log('RESET_FORM_DATA (board)', state.savedFormData)
+    },
+    RESET_CHOOSE_DATA: function (state) {
+      state.chosenPlaylist = { 'id': 0 }
+      state.chosenPlayroom = { 'id': 0 }
     },
     SAVE_FORM_DATA: function (state, formData) {
       state.savedFormData = formData
@@ -106,6 +109,9 @@ const board = {
   actions: {
     resetFormData: function ({ commit }) {
       commit('RESET_FORM_DATA')
+    },
+    resetChooseData: function ({ commit }) {
+      commit('RESET_CHOOSE_DATA')
     },
     saveFormData: function ({ commit }, formData) {
       // console.log('saveFormData (board)', formData)

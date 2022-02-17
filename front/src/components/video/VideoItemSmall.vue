@@ -1,7 +1,7 @@
 <template>
   <v-card
-    height="12vh"
-    class="d-flex"
+    height="100"
+    class="d-flex align-center"
     outlined
     tile
     :color="color"
@@ -11,19 +11,19 @@
       width="100%"
       @click="selectVideo"
     >
-      <div class="d-flex">
-        <div class="video-thumbnail">
+      <div class="d-flex align-center">
+        <div class="d-flex align-center video-thumbnail">
           <img
             v-if="!isVideoList"
-            :src="video ? video.thumbnail : undefined"
-            style="width: 35vw; height: 100%; object-fit: cover;"
+            :src="video.thumbnail"
+            style="width: 35vw; height: 90px; object-fit: cover;"
             class=""
             @click="watchingVideo(video)"
           >
           <img
             v-else
-            :src="video ? video.thumbnail : undefined"
-            style="width: 35vw; height: 100%; object-fit: cover;"
+            :src="video.thumbnail"
+            style="width: 35vw; height: 90px; object-fit: cover;"
             class=""
             @click="changeVideo(video)"
           >

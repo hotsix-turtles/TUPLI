@@ -38,8 +38,7 @@
         v-if="!blocked"
         class="font-3 ml-1"
         v-html="renderContent"
-      >
-      </p>
+      />
       <p
         v-else
         class="font-3 ml-1 blocked"

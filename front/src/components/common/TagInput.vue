@@ -13,6 +13,7 @@
       class="tag-input"
       :search-input.sync="search"
       @keyup.tab="updateTags"
+      @keyup.enter="updateTags"
       @paste="updateTags"
       @keyup="recommend"
     />

@@ -17,8 +17,7 @@
         :class="{ 'color-main': addedPlaylists.length > 0 }"
         @click="submit"
         v-text="formType == 'create' ? '완료' : '수정'"
-      >
-      </div>
+      />
     </div><br><br>
 
     <!-- 플레이룸 생성 폼 -->
@@ -455,7 +454,10 @@
         </v-row>
       </v-container>
     </v-form>
-    <loading-dialog :title="formType == 'create' ? '플레이룸 생성중...' : '플레이룸 변경중...'" :show="isSending" />
+    <loading-dialog
+      :title="formType == 'create' ? '플레이룸 생성중...' : '플레이룸 변경중...'"
+      :show="isSending"
+    />
   </div>
 </template>
 
