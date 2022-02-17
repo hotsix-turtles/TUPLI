@@ -5,22 +5,57 @@
       v-if="content.type == 'playroom'"
       class="d-flex flex-column align-center"
     >
-      <!-- playroom 썸네일 -->
-      <img
-        :src="thumbnailImage"
-        alt="썸네일"
-        width="100%"
-        @click="goPlayroom"
+      <div
+        class="video-thumbnail"
+        style="width: 100%;"
       >
+        <!-- playroom 썸네일 -->
+        <img
+          :src="thumbnailImage"
+          alt="썸네일"
+          width="100%"
+          height="auto"
+          @click="goPlayroom"
+        >
+        <div
+          v-if="mainPlayrooms"
+          class="d-flex align-center"
+        >
+          <div class="d-flex align-center duration-main">
+            <v-icon
+              size="16"
+              color="#f1f1f5"
+            >
+              mdi-account-multiple
+            </v-icon>
+            <p
+              style="margin-left:2px;"
+            >
+              {{ content.userCount }}
+            </p>
+          </div>
+          <div
+            class="d-flex align-center on-play mt-1"
+          >
+            <v-icon
+              size="16"
+              color="#f1f1f5"
+            >
+              mdi-play
+            </v-icon>
+            <p
+              style="margin-left:2px; padding-right:4px;"
+            >
+              PLAY
+            </p>
+          </div>
+        </div>
+      </div>
       <!-- playroom 정보 -->
       <div
         class="d-flex flex-column justify-center mt-1"
         style="width:96%;"
       >
-        <!-- 추천 -->
-        <p v-if="content.isRecommend == true">
-          추천
-        </p>
         <div class="d-flex">
           <img
             class="profile-img-main"
@@ -32,8 +67,15 @@
             class="d-flex flex-column align-start"
             style="width:67%"
           >
+            <!-- 추천 -->
             <p
-              class="main-title twolines"
+              v-if="content.isRecommend == true"
+              class="main-recommend-icon mt-2"
+            >
+              추천
+            </p>
+            <p
+              class="main-title txt-2"
               @click="goPlayroom"
             >
               {{ content.title }}
@@ -141,12 +183,6 @@
         class="d-flex flex-column justify-center mt-2"
         style="width:96%;"
       >
-        <p
-          v-if="content.isRecommend == true"
-          class="main-recommend-icon"
-        >
-          추천
-        </p>
         <!-- playlist 정보 -->
         <div class="d-flex">
           <img
@@ -160,7 +196,13 @@
             style="width:67%"
           >
             <p
-              class="main-title twolines"
+              v-if="content.isRecommend == true"
+              class="main-recommend-icon mt-2"
+            >
+              추천
+            </p>
+            <p
+              class="main-title-playlist twolines"
               @click="goPlaylist"
             >
               {{ content.title }}
@@ -221,14 +263,17 @@
               </p>
             </div>
             <div
-              class="d-flex flex-column align-center mx-1"
-              @click="addPlayroom"
+              class="mx-1"
+              @click="$router.push({ name: 'BoardComment', params: { boardId: content.id }})"
             >
-              <v-icon color="#000000">
-                mdi-video-plus-outline
+              <v-icon
+                color="black"
+                size="22"
+              >
+                mdi-comment-outline
               </v-icon>
               <p class="main-icon-text">
-                PRM
+                {{ content.commentCnt }}
               </p>
             </div>
           </div>
@@ -240,54 +285,81 @@
     <!-- 게시글 -->
     <div
       v-else-if="content.type == 'board'"
-      class="d-flex flex-column mt-5"
+      class="d-flex flex-column mt-1 align-center"
     >
-      <!-- playlist 정보 -->
-      <div class="d-flex">
-        <div class="d-flex align-start">
-          <img
-            style="border-radius: 100px; margin: 10px;"
-            :src="ImgUrl(image)"
-            alt="프로필 사진"
-            width="50"
-            height="50"
-            @click="setProfile"
-          >
-        </div>
-        <div class="d-flex flex-column align-start">
-          <p class="main-content">
-            {{ content.content }}
-          </p>
-          <p
-            class="main-username"
-            @click="setProfile"
-          >
-            {{ content.nickName }}
-          </p>
+      <div
+        class="d-flex mb-2"
+        style="width:96%;"
+      >
+        <div
+          class="d-flex align-start"
+          width="100%"
+        >
+          <div class="d-flex">
+            <img
+              style="border-radius: 100px; margin: 10px;"
+              :src="ImgUrl(image)"
+              class="profile-img-main"
+              alt="프로필 사진"
+              @click="setProfile"
+            >
+          </div>
           <div
-            v-if="content.userLikesYN === 'Y'"
-            class="d-flex align-center"
-            @click="onClickBoardUnlike"
+            class="d-flex flex-column align-start"
+            style="margin-top: 13px;"
+            width="100%"
           >
-            <div class="d-flex align-center">
-              <v-icon>
+            <p
+              class="main-username"
+              @click="setProfile"
+            >
+              {{ content.nickName }}
+            </p>
+            <p
+              class="main-content txt-3"
+              style="margin-top: 13px;"
+
+              @click="goBoard"
+            >
+              {{ content.content }}
+            </p>
+          </div>
+          <!-- 리액션 아이콘 -->
+          <div class="d-flex mr-2 align-start mt-4 pt-2">
+            <!-- 좋아요 -->
+            <div
+              v-if="content.userLikesYN === 'Y'"
+              class="d-flex flex-column align-center mx-1"
+              @click="onClickBoardUnlike"
+            >
+              <v-icon color="#5B5C9D">
                 mdi-cards-heart
               </v-icon>
-              <p class="mx-2 mb-0">
+              <p class="main-icon-text">
                 {{ content.likesCnt }}
               </p>
             </div>
-          </div>
-          <div
-            v-if="content.userLikesYN === 'N'"
-            class="d-flex align-center"
-            @click="onClickBoardLike"
-          >
-            <div class="d-flex align-center">
-              <v-icon>
+            <div
+              v-else-if="content.userLikesYN === 'N'"
+              class="d-flex flex-column align-center mx-1"
+              @click="onClickBoardLike"
+            >
+              <v-icon color="#000000">
                 mdi-cards-heart-outline
               </v-icon>
-              <p class="mx-2 mb-0">
+              <p class="main-icon-text">
+                {{ content.likesCnt }}
+              </p>
+            </div>
+            <div
+              v-else
+              class="d-flex flex-column align-center mx-1"
+              @click="goLogin"
+            >
+              <v-icon color="#000000">
+                mdi-cards-heart-outline
+              </v-icon>
+              <p class="main-icon-text">
                 {{ content.likesCnt }}
               </p>
             </div>
@@ -319,7 +391,7 @@ export default {
     }
   },
   computed: {
-    ...mapState(['authToken', 'userId', 'nickname']),
+    ...mapState(['authToken', 'userId', 'nickname', 'mainPlayrooms']),
     ...mapState('account', ['image'])
   },
   created: function() {

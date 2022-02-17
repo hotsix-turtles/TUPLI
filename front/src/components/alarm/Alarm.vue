@@ -32,7 +32,8 @@ export default {
         console.log('handler 알림 - this.realtimeBoolean :', this.realtimeBoolean)
         console.log('handler 알림 - realtimeNoti :', realtimeNoti)
         // this.newAlarms = val;
-        if ((val.toId == this.userId) && (val.isRead == false) && (this.realtimeBoolean == false) ) {this.realtimeNoti(val)}
+        if ((val.toId == this.userId) && (val.isRead == false) ) {this.realtimeNoti(val)}
+        // if ((val.toId == this.userId) && (val.isRead == false) && (this.realtimeBoolean == false) ) {this.realtimeNoti(val)}
       }
     }
   },
