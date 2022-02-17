@@ -1404,11 +1404,7 @@ iframe {
   font-weight: bold;
 }
 
-@media (orientation: portrait) {
-
-}
-
-@media (orientation: landscape) {
+@media screen and (min-device-aspect-ratio: 1/1) and (orientation: landscape) {
   body { overflow: hidden; }
 
   body * { touch-action: none; }
@@ -1483,7 +1479,7 @@ iframe {
 </style>
 
 <style lang="scss" scoped>
-@media (orientation: landscape) {
+@media screen and (min-device-aspect-ratio: 1/1) and (orientation: landscape) {
   .fixed-bottom-navbar {
     display: none;
   }
