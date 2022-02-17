@@ -37,11 +37,8 @@ export default {
         console.log('handler 알림 - val.isRead :', val.isRead)
         console.log('handler 알림 - this.realtimeBoolean :', this.realtimeBoolean)
         // this.newAlarms = val;
-<<<<<<< HEAD
         if ((val.toId == this.userId) && (val.isRead == false) ) {this.realtimeNoti(val)}
         // if ((val.toId == this.userId) && (val.isRead == false) && (this.realtimeBoolean == false) ) {this.realtimeNoti(val)}
-=======
->>>>>>> 0f1c9af68b7251c038304cf871d8016f08abb372
       }
     }
   },
