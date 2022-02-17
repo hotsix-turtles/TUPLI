@@ -162,6 +162,7 @@ public class PlaylistService {
 
     public List<SimplePlaylistDto> getRecommendPlaylist(List<Long> recommendPlaylist){
         List<SimplePlaylistDto> recommendPlaylists = new ArrayList<>();
+        if (recommendPlaylist == null) return null;
         for(Long recommendPlaylistId : recommendPlaylist){
             Playlist recommendPlaylistPL = playlistRepository.findById(recommendPlaylistId).orElse(null);
             if(recommendPlaylistPL == null) continue;
