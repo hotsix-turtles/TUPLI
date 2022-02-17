@@ -1,6 +1,6 @@
 <template>
   <v-dialog
-    v-model="show"
+    v-model="value"
     :width="width ? parseInt(width) : undefined"
     :max-width="maxWidth ? parseInt(maxWidth) : undefined"
     :scrollable="scrollable"
@@ -10,7 +10,7 @@
       class="tupli-dialog-normal"
     >
       <v-progress-linear
-        v-if="timeout && !hideProgress"
+        v-if="timeout && !hideProgress && (topProgress || (!topProgress && !bottomProgress))"
         v-model="progress"
         class="mb-0"
         color="accent"
@@ -46,6 +46,12 @@
           {{ button.name }}
         </v-btn>
       </v-card-actions>
+      <v-progress-linear
+        v-if="timeout && !hideProgress && bottomProgress"
+        v-model="progress"
+        class="mb-0"
+        color="accent"
+      />
     </v-card>
   </v-dialog>
 </template>
@@ -65,38 +71,45 @@ export default {
     buttons: { type: Array, default() { return [] } },
     timeout: { type: String, default: '3000' },
     redirect: { type: String, default: '' },
-    show: { type: Boolean, default: false },
-    hideProgress: { type: Boolean, default: false }
+    // show: { type: Boolean, default: false },
+    hideProgress: { type: Boolean, default: false },
+    topProgress: { type: Boolean, default: false },
+    bottomProgress: { type: Boolean, default: false },
+    value: { type: Boolean, default: false },
   },
   data() {
     return {
       progressEvent: null,
-      value: 0
+      time: 0
     }
   },
   computed: {
     progress() {
-      return Math.ceil(this.value / parseInt(this.timeout) * 100);
+      return Math.ceil(this.time / parseInt(this.timeout) * 100);
     }
   },
-  watch: {
-    show: function () {
-      if (this.show = true) {
-        setTimeout(() => {
-          console.log('setTimeout')
-          this.show = false
-          this.$emit('timeout')
-        }, this.timeout)
-      }
-    }
-  },
+  // watch: {
+  //   show: function () {
+  //     if (this.show = true) {
+  //       setTimeout(() => {
+  //         console.log('setTimeout')
+  //         this.show = false
+  //         this.$emit('timeout')
+  //       }, this.timeout)
+  //     }
+  //   }
+  // },
   created() {
     this.$emit('created', this);
 
-    console.log('Timeout created')
+    this.$watch('value', (newVal, oldVal) => {
+      if (newVal) {
+        this.time = 0
 
-    // if (this.timeout)
-    //   this.progressEvent = setInterval(this.updateProgress, 33); // 60FPS
+        if (this.timeout)
+          this.progressEvent = setInterval(this.updateProgress, 50); // 60FPS
+      }
+    });
   },
   mounted() {
     this.$emit('mounted', this);
@@ -111,7 +124,7 @@ export default {
   },
   methods: {
     updateProgress() {
-      this.value += 33;
+      this.time += 50;
 
       if (this.progress >= 100)
       {
@@ -134,6 +147,12 @@ export default {
         this.progressEvent = null
       }
       this.$emit('timeout')
+
+      if (this.progressEvent)
+      {
+        clearInterval(this.progressEvent);
+        this.progressEvent = null
+      }
     },
     onButtonClick(idx) {
       this.$emit('button-click', idx);
