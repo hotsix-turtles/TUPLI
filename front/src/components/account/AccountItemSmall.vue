@@ -10,19 +10,19 @@
         <img
           class="profile"
           :src="ImgUrl(account.profileImage)"
-          @click="$router.push({ name: 'Profile', params: { userId : account.userSeq }})"
+          @click="redirectProfile"
         >
       </div>
       <div class="ml-3 d-flex-column justify-center">
         <div
           class="font-2 semi-bold"
-          @click="$router.push({ name: 'Profile', params: { userId : account.userSeq }})"
+          @click="redirectProfile"
         >
           {{ account.nickname }}
         </div>
         <div
           class="color-dark-gray"
-          @click="$router.push({ name: 'Profile', params: { userId : account.userSeq }})"
+          @click="redirectProfile"
         >
           {{ account.email }}
         </div>
@@ -67,6 +67,10 @@ export default {
     console.log(this.playlist)
   },
   methods: {
+    redirectProfile() {
+      if (!this.readonly) return;
+      this.$router.push({ name: 'Profile', params: { userId : this.account.userSeq }})
+    },
     clickFriend() {
       if (this.readonly) return;
       if (this.selected) {
