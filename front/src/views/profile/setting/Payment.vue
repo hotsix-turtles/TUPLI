@@ -37,6 +37,7 @@
               src="@/assets/kakaopay_icon.png"
               alt="카카오페이"
               width="25%"
+              @click="buyPremium"
             >
           </div>
 

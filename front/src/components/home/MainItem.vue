@@ -333,7 +333,7 @@
               <div
                 v-if="content.userLikesYN === 'Y'"
                 class="d-flex flex-column align-center mx-1"
-                @click="onClickPlayroomUnlike"
+                @click="onClickBoardUnlike"
               >
                 <v-icon color="#5B5C9D">
                   mdi-cards-heart
@@ -345,7 +345,7 @@
               <div
                 v-else-if="content.userLikesYN === 'N'"
                 class="d-flex flex-column align-center mx-1"
-                @click="onClickPlayroomLike"
+                @click="onClickBoardLike"
               >
                 <v-icon color="#000000">
                   mdi-cards-heart-outline
@@ -379,7 +379,7 @@
             <div
               class="d-flex flex-column align-center"
             >
-              <div class="main-playroom-content">
+              <div class="main-playroom-content mx-auto pl-2">
                 <!-- 플레이룸 -->
                 <div
                   class="mt-5"
@@ -490,14 +490,21 @@
           </div>
         </div>
       </div>
+      <div class="border-line" />
     </div>
-    <div class="border-line" />
+    <div>
+      <login-dialog
+        :show="showLoginDialog"
+        @on-click="showLoginDialog = false"
+      />
+    </div>
   </div>
 </template>
 
 <script>
 import axiosConnector from '@/utils/axios-connector.js'
 
+import LoginDialog from '@/components/common/LoginDialog.vue'
 import { mapActions, mapState } from 'vuex'
 import { getImage } from '@/utils/utils'
 import { timeConverter } from '@/utils/utils';
@@ -506,6 +513,9 @@ import { playtimeConverter } from '@/utils/utils';
 
 export default {
   name: 'MainItem',
+  components: {
+    LoginDialog,
+  },
   props: {
     // eslint-disable-next-line vue/require-default-prop
     content: {type: Object}
@@ -518,14 +528,20 @@ export default {
       allBoardTags: [],
       time: [],
       time_playroom: [],
+
+      showLoginDialog: false,
+
     }
   },
   computed: {
     ...mapState(['authToken', 'userId', 'nickname', 'mainPlayrooms']),
-    ...mapState('account', ['image'])
+    ...mapState('account', ['image']),
+    ...mapState({
+      isLogin: state => state.isLogin,
+    }),
   },
   created: function() {
-    // console.log('content', this.content)
+    console.log('로그인 여부', this.isLogin)
     // console.log('content like', this.content.likesCnt)
 
     this.getThumbnailImage()
@@ -658,10 +674,16 @@ export default {
     // 좋아요
     // 좋아요 - 플레이룸
     onClickPlayroomLike: function () {
-      console.log('좋아요 누름', this.content.userLikesYN)
-      this.content.userLikesYN = 'Y'
-      this.content.likesCnt++
-      this.likePlayroom(this.content.id)
+      if(this.isLogin) {
+        console.log('좋아요 누름', this.content.userLikesYN)
+        this.content.userLikesYN = 'Y'
+        this.content.likesCnt++
+        this.likePlayroom(this.content.id)
+      }
+      else {
+        console.log("showLoginDialog")
+        this.showLoginDialog = true
+      }
     },
     onClickPlayroomUnlike: function () {
       console.log('좋아요 취소', this.content.userLikesYN)

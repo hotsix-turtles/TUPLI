@@ -12,7 +12,7 @@
         </v-icon>
 
         <img
-          class="mt-5"
+          class="mt-8"
           src="@/assets/tupli_logo2_dark.png"
           alt=""
           style="width: 30px; height:auto;"
@@ -24,6 +24,7 @@
 
         <!-- 상태바 -->
         <img
+          class="mt-1"
           src="../../assets/signup_bar1.png"
           alt="logo"
         >
@@ -71,10 +72,11 @@
           </h5>
 
           <v-btn
-            class="white--text my-5"
+            class="white--text my-12"
             color="#5B5C9D"
             block
             elevation="0"
+            large
             rounded
             @click="checkTerms"
           >
@@ -100,8 +102,8 @@ import Signup2Vue from './Signup2.vue'
 import TimeoutDialog from '../../components/common/TimeoutDialog.vue'
 
 export default {
-  components: { TimeoutDialog },
   name: 'Signup',
+  components: { TimeoutDialog },
 
   // 이메일 비밀번호 규칙 설정
   data: () => ({
