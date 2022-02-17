@@ -70,11 +70,7 @@ public class MailSendService {
     }
 
     // 임시 비밀번호
-    public void sendTmpPassword(Long userSeq) {
-        // 유저 찾기
-        User user = userRepository.findByUserSeq(userSeq);
-        String email = user.getEmail();
-
+    public void sendTmpPassword(User user, String email) {
         // 12자리 난수 인증번호 생성
         String tempPass = getKey(12);
 
