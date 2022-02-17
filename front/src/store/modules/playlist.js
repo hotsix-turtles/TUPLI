@@ -236,6 +236,7 @@ const playlist = {
 
     // [플레이리스트 디테일]
     getPlaylistDetail: function ({ commit, dispatch }, playlistId) {
+      console.log('getPlaylistDetail 실행됨')
       axiosConnector.get(`/playlist/${playlistId}`,
       )
         .then((res) => {

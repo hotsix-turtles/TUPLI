@@ -1,9 +1,10 @@
 <template>
   <div>
-    <back :page-name="'플레이리스트 선택하기'" />
+    <back :page-name="'플레이리스트 선택하기'" /><br>
     <search-bar
       :label="'검색어를 입력해주세요'"
       :router-page="'PlaylistSearch'"
+      class="pt-3"
     />
 
     <!-- 탭 -->

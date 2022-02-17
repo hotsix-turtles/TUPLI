@@ -29,7 +29,11 @@
                 <span class="semi-bold">
                   {{ playlistComment.user.nickname }}
                 </span>
-                <span class="">
+                <!-- <span
+                  class=""
+                  v-html="renderContent(playlistComment.content)"
+                > -->
+                <span>
                   <!-- 덧글내용 노출 -->
                   {{ playlistComment.content }}
                 </span>
@@ -78,7 +82,7 @@
 import { mapActions, mapState } from 'vuex'
 import Back from '../../components/common/Back.vue'
 import CommentInput from '../../components/common/CommentInput.vue'
-import { getImage } from '../../utils/utils'
+import { getImage, renderEmoticon } from '../../utils/utils'
 
 
 export default {
@@ -106,12 +110,12 @@ export default {
     this.playlistId = this.$route.params.playlistId
     this.getPlaylistComments(this.playlistId)
   },
-  mounted: function () {
-    this.updateScroll()
-  },
-  updated: function () {
-    this.updateScroll()
-  },
+  // mounted: function () {
+  //   this.updateScroll()
+  // },
+  // updated: function () {
+  //   this.updateScroll()
+  // },
   methods: {
     ...mapActions('playlist', [
       'getPlaylistComments',
@@ -137,7 +141,11 @@ export default {
     updateScroll: function () {
       var element = document.getElementById('comment');
       element.scrollTop = element.scrollHeight - element.clientHeight;
-    }
+    },
+    renderContent: function (content) {
+      console.log(content)
+      return renderEmoticon(content)
+    },
   },
 }
 </script>

@@ -98,12 +98,22 @@
         </v-tab-item>
       </v-tabs>
     </div>
+
+    <!--무한스크롤 -->
+    <infinite-loading
+      spinner="waveDots"
+      @infinite="getAccounts"
+    >
+      <div slot="no-results" />
+      <div slot="no-more" />
+    </infinite-loading><br><br>
   </v-app>
 </template>
 
 <script>
 import ProfilePlaylist from '@/components/profile/timeline/ProfilePlaylist.vue'
 import ProfileTaste from '@/components/profile/timeline/ProfileTaste.vue'
+import InfiniteLoading from "vue-infinite-loading"
 
 import { getImage } from '../../utils/utils'
 import axiosConnector from '@/utils/axios-connector.js'
@@ -111,7 +121,7 @@ import axiosConnector from '@/utils/axios-connector.js'
 import { mapActions, mapState } from 'vuex'
 
 export default {
-  components: { ProfileTaste, ProfilePlaylist },
+  components: { ProfileTaste, ProfilePlaylist, InfiniteLoading, },
   data: function() {
     return {
       profile: [],
@@ -119,10 +129,12 @@ export default {
       followerList: [], // 팔로잉 하면 팔로워가 늘어남.
       followingList: [],
       userId: '',
-      activities: '',
+      activities: [], // 무한스크롤 적용
       tastes: '',
       nickname: '',
 
+      // 무한스크롤용
+      page: 1,
     }
   },
   computed: {
@@ -133,28 +145,45 @@ export default {
     console.log('타인 프로필 조회', this.profile)
     // this.userId = this.$route.params.userId
     this.followState()
-    this.getAccounts()
+    // this.getAccounts()
   },
   methods: {
     ...mapActions('account', ['follow', 'unfollow', 'getAccounts']),
     // [조회]
-    getAccounts: function () {
+    getAccounts: function ($state) {
       console.log('getAccounts params')
-      axiosConnector.get(`userinfo/${this.$route.params.userId}`)
+      const params = {
+        paged: true,
+        page: this.page,
+        size: 5,
+      }
+      axiosConnector.get(`userinfo/${this.$route.params.userId}`, {
+        params
+      })
         .then((res) => {
-          console.log('성공적 프로필', res.data)
-          this.profile = res.data
-          this.activities = res.data.activities
-          this.tastes = res.data.userInfo.tasteInfo
-          this.nickname = res.data.nickname
-          // this.followerList = res.data.from_user
-          this.follower_cnt = res.data.from_user.length
-          this.followingList = res.data.to_user
-          console.log('취향', this.followerList)
-
+          if (this.page === 1) {
+            this.page++
+            console.log('성공적 프로필', res.data)
+            this.profile = res.data
+            this.activities = res.data.activities
+            this.tastes = res.data.userInfo.tasteInfo
+            this.nickname = res.data.nickname
+            // this.followerList = res.data.from_user
+            this.follower_cnt = res.data.from_user.length
+            this.followingList = res.data.to_user
+            console.log('취향', this.followerList)
+            $state.loaded()
+          } else if (res.data.activities.length) {
+            this.page++
+            this.activities.push(...res.data.activities)
+            $state.loaded()
+          } else {
+            $state.complete()
+          }
         })
         .catch((err) => {
           console.log('에러', err)
+          $state.complete()
         })
     },
     // // 팔로우 리스트 가져오기

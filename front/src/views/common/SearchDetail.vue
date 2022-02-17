@@ -19,19 +19,22 @@
     <add-button-bottom />
 
     <!-- 내용물 -->
-    <div class="container">
+    <div class="">
       <v-tabs
         v-model="tab"
         background-color="transparent"
         grow
         color="#5B5C9D"
       >
-        <!-- 탭 -->
+        <!-- 탭 이거 가운데 정렬 필요 ㅠ -->
         <v-tab
           v-for="item in items"
           :key="item"
+          class="d-flex justify-center"
         >
-          <span @click="onChangeTab(item)">{{ item }}</span>
+          <div @click="onChangeTab(item)">
+            {{ item }}
+          </div>
         </v-tab>
 
         <!-- 플리 검색 -->
@@ -99,9 +102,11 @@
             class="text-right clickable mt-1 mb-2"
             mt-1
             mb-3
-            @click="onClickModal"
           >
-            <span :key="rerenderKey + 2">
+            <span
+              :key="rerenderKey + 2"
+              @click="onClickModal"
+            >
               {{ convertSelect[accountOrder] }}
             </span>
             <v-icon>mdi-menu-down</v-icon>
@@ -127,9 +132,11 @@
             class="text-right clickable mt-1 mb-2"
             mt-1
             mb-3
-            @click="onClickModal"
           >
-            <span :key="rerenderKey + 3">
+            <span
+              :key="rerenderKey + 3"
+              @click="onClickModal"
+            >
               {{ convertSelect[videoOrder] }}
             </span>
             <v-icon>mdi-menu-down</v-icon>
@@ -154,6 +161,7 @@
             @infinite="searchVideosByScroll"
           >
             <div slot="no-results" />
+            <div slot="no-more" />
           </infinite-loading><br><br>
         </v-tab-item>
       </v-tabs>

@@ -14,7 +14,9 @@
         {{ playlist.title }}
       </v-list-item-title>
       <!-- 나중에 nickname으로 변경 -->
-      <v-list-item-subtitle>{{ playlist.title }}</v-list-item-subtitle>
+      <v-list-item-subtitle>
+        <span @click="$router.push({ name: 'Profile', params: { userId : playlist.userId }})">{{ playlist.nickName }}</span>
+      </v-list-item-subtitle>
       <div class="text-center d-flex align-center">
         <div class="mr-1">
           <v-icon
