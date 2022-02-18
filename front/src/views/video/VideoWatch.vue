@@ -20,7 +20,7 @@
       />
       <video-list-item-small
         v-else
-        :videos="watchingVideo"
+        :videos="[watchingVideo]"
         :is-video-list="isVideoList"
       />
     </div>

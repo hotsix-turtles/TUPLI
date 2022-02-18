@@ -191,8 +191,7 @@
       :content="'해당 플레이리스트가 삭제되었습니다.'"
       :show="showTimeoutDialog"
       hide-progress
-      :persistent="false"
-      timeout="1700"
+      timeout="1500"
       @timeout="onTimeout"
       @click="onTimeout"
     />
