@@ -6,11 +6,12 @@
       >
         <div class="d-flex">
           <v-icon
-            size="30"
-            color="#5B5C9D"
+            size="20"
+            color="black"
+            class="px-2"
             @click="$router.push({ name: 'MyProfile' })"
           >
-            mdi-chevron-left
+            mdi-arrow-left
           </v-icon>
           <h3>
             프로필 편집
@@ -33,18 +34,19 @@
       </v-row>
       <v-container>
         <div class="d-flex flex-column align-center">
-          <div class="profile-img-medium">
+          <div class="profile-img-large">
             <img
-              :src="ImgUrl(image)"
+              :src="ImgUrl(profileImage)"
               alt=""
               fab
             >
           </div>
           <!-- 사진 업로드용 임시 -->
-          <div class="update-modal mb-3">
+          <div class="d-flex flex-column align-center update-modal mb-3">
             <label for="profile-photo" />
             <input
               type="file"
+              accept="image/*"
               @change="getNewImage"
             >
           </div>
@@ -59,6 +61,7 @@
                 v-model="credentials.newNickname"
                 class="pt-0"
                 hint="새로운 닉네임을 입력해주세요."
+                :rules="[nicknameRules.input, nicknameRules.max]"
               />
               <!-- label="김춘식" -->
             </div>
@@ -92,18 +95,25 @@ export default {
   name: 'EditProfile',
   data: function() {
     return {
+      nicknameRules: {
+        input: v => !!v || '닉네임을 입력해주세요.',
+        max: v => v.length <= 7 || '7글자 내의 닉네임을 입력해주세요.',
+      },
+
       credentials: {
         newNickname: '',
         newIntroduction:'',
         newImage: ''
-      }
+      },
+      profileImage: '',
     }
   },
   computed: {
-    ...mapState(['nickname', 'introduction', 'image', 'authToken'])
+    ...mapState(['nickname', 'userId', 'introduction', 'image', 'authToken'])
   },
   created() {
     this.init()
+    this.getOldImage()
   },
   methods: {
     init: function() {
@@ -136,6 +146,17 @@ export default {
     },
     getNewImage: function(event) {
       this.credentials.newImage = event.target.files[0]
+    },
+    getOldImage: function() {
+      axiosConnector.get(`/account/userInfo`)
+        .then((res) => {
+          // console.log('프로필', res.data)
+          this.profileImage = res.data.profileImage
+        })
+        .catch((err) => {
+          console.log('에러 - 프로필 변경', err)
+
+        })
     },
     // 이미지 조합
     ImgUrl: function(img) {

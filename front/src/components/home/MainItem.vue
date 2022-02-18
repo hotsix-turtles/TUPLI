@@ -285,88 +285,218 @@
     <!-- 게시글 -->
     <div
       v-else-if="content.type == 'board'"
-      class="d-flex flex-column mt-1 align-center"
     >
       <div
-        class="d-flex mb-2"
+        class="d-flex flex-column mt-1 align-center"
         style="width:96%;"
       >
         <div
-          class="d-flex align-start"
-          width="95%"
+          class="d-flex align-center"
+          style="width:96%;"
         >
-          <div class="d-flex">
-            <img
-              style="border-radius: 100px; margin: 10px;"
-              :src="ImgUrl(image)"
-              class="profile-img-main"
-              alt="프로필 사진"
-              @click="setProfile"
-            >
-          </div>
+          <img
+            style="margin: 10px;"
+            :src="ImgUrl(image)"
+            class="profile-img-main"
+            alt="프로필 사진"
+            @click="setProfile"
+          >
+
           <div
             class="d-flex flex-column align-start"
-            style="margin-top: 13px;"
-            width="100%"
+            style="width:67%;"
           >
             <p
               class="main-username"
               @click="setProfile"
             >
               {{ content.nickName }}
+              <span
+                v-if="content.contentType"
+                style="font-size: 13px; padding-top: 2px;"
+              >
+                의 공유 게시물
+              </span>
             </p>
-            <p
-              class="main-content txt-3"
-              style="margin-top: 13px;"
-
+            <div
+              class="main-content mt-1"
+              style="width:96%;"
               @click="goBoard"
             >
-              {{ content.content }}
-            </p>
+              <span>{{ content.content }}</span>
+            </div>
           </div>
-          <!-- 리액션 아이콘 -->
-          <div class="d-flex mr-2 align-start mt-4 pt-2">
-            <!-- 좋아요 -->
-            <div
-              v-if="content.userLikesYN === 'Y'"
-              class="d-flex flex-column align-center mx-1"
-              @click="onClickBoardUnlike"
-            >
-              <v-icon color="#5B5C9D">
-                mdi-cards-heart
-              </v-icon>
-              <p class="main-icon-text">
-                {{ content.likesCnt }}
-              </p>
+          <div>
+            <!-- 리액션 아이콘 -->
+            <div class="d-flex align-start mt-4 ml-7">
+              <!-- 좋아요 -->
+              <div
+                v-if="content.userLikesYN === 'Y'"
+                class="d-flex flex-column align-center mx-1"
+                @click="onClickBoardUnlike"
+              >
+                <v-icon color="#5B5C9D">
+                  mdi-cards-heart
+                </v-icon>
+                <p class="main-icon-text">
+                  {{ content.likesCnt }}
+                </p>
+              </div>
+              <div
+                v-else-if="content.userLikesYN === 'N'"
+                class="d-flex flex-column align-center mx-1"
+                @click="onClickBoardLike"
+              >
+                <v-icon color="#000000">
+                  mdi-cards-heart-outline
+                </v-icon>
+                <p class="main-icon-text">
+                  {{ content.likesCnt }}
+                </p>
+              </div>
+              <div
+                v-else
+                class="d-flex flex-column align-center mx-1"
+                @click="goLogin"
+              >
+                <v-icon color="#000000">
+                  mdi-cards-heart-outline
+                </v-icon>
+                <p class="main-icon-text">
+                  {{ content.likesCnt }}
+                </p>
+              </div>
             </div>
+          </div>
+        </div>
+
+        <div>
+          <!-- 공유한 게시물이 있을 때 - 플레이룸 -->
+          <div
+            v-if="content.contentType === 'playroom'"
+            @click="goBoard(content.contents.id)"
+          >
             <div
-              v-else-if="content.userLikesYN === 'N'"
-              class="d-flex flex-column align-center mx-1"
-              @click="onClickBoardLike"
+              class="d-flex flex-column align-center"
             >
-              <v-icon color="#000000">
-                mdi-cards-heart-outline
-              </v-icon>
-              <p class="main-icon-text">
-                {{ content.likesCnt }}
-              </p>
+              <div class="main-playroom-content mx-auto pl-2">
+                <!-- 플레이룸 -->
+                <div
+                  class="mt-5"
+                >
+                  <div
+                    class="d-flex align-center"
+                  >
+                    <div
+                      class="d-flex align-center"
+                      style="width: 30px; height: 30px; margin-bottom: 8px;"
+                    >
+                      <img
+                        :src="ImgUrl(content.contents.userProfileImg)"
+                        alt="userImg"
+                        style="border-radius: 100%; width: 30px; height: 30px; margin-left: 16px;"
+                      >
+                    </div>
+                    <span
+                      class="history-nickname"
+                      style="margin-left: 22px; margin-bottom: 15px;"
+                    >{{ content.contents.nickName }}</span>
+                  </div>
+
+                  <!-- playlist 썸네일 -->
+                  <img
+                    :src="ImgUrl(content.contents.videos.thumbnail)"
+                    alt="썸네일"
+                    width="390"
+                    height="219"
+                  >
+                  <!-- playroom 정보 -->
+                  <div class="d-flex justify-space-between">
+                    <div class="d-flex flex-column align-start ml-4">
+                      <span
+                        class="history-content-title"
+                      >
+                        {{ content.contents.videos.title }}
+                      </span>
+
+                      <div class="d-flex flex-wrap">
+                        <p
+                          v-for="tag in allBoardTags"
+                          :key="tag.id"
+                          class="mb-0 main-tag"
+                        >
+                          {{ tag }}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
-            <div
-              v-else
-              class="d-flex flex-column align-center mx-1"
-              @click="goLogin"
-            >
-              <v-icon color="#000000">
-                mdi-cards-heart-outline
-              </v-icon>
-              <p class="main-icon-text">
-                {{ content.likesCnt }}
-              </p>
+          </div>
+
+          <!-- 공유한 게시물이 있을 때 - 플레이리스트 -->
+          <div v-else-if="content.contentType === 'playlist'">
+            <div class="d-flex flex-column align-center">
+              <div class="d-flex justify-center main-playlist-content">
+                <!-- 플레이리스트 -->
+                <div
+                  class="mt-3"
+                >
+                  <!-- playlist 썸네일 -->
+                  <span
+                    class="playlist-cd-case-small"
+                  >
+                    <div
+                      id="case"
+                      class="mx-3 mt-2"
+                      @click="goPlaylist"
+                    >
+                      <img
+                        :src="ImgUrl(content.contents.videos.thumbnail)"
+                        alt="썸네일"
+                      >
+                      <!-- cd 구멍 -->
+                      <div />
+                    </div>
+                  </span>
+                  <!-- playlist 정보 -->
+                  <div
+                    class="ml-12 mt-2 mb-1"
+                    style="width:240px;"
+                  >
+                    <div class="d-flex flex-column align-start">
+                      <span
+                        style="font-size: 16px; font-weight: 600; text-align: left;"
+                        @click="goPlaylist"
+                      >
+                        {{ content.contents.videos.title }}
+                      </span>
+
+                      <div class="d-flex flex-wrap">
+                        <p
+                          v-for="tag in allBoardTags"
+                          :key="tag.id"
+                          class="mb-0 main-tag"
+                        >
+                          {{ tag }}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </div>
       <div class="border-line" />
+    </div>
+    <div>
+      <login-dialog
+        :show="showLoginDialog"
+        @on-click="showLoginDialog = false"
+      />
     </div>
   </div>
 </template>
@@ -374,6 +504,7 @@
 <script>
 import axiosConnector from '@/utils/axios-connector.js'
 
+import LoginDialog from '@/components/common/LoginDialog.vue'
 import { mapActions, mapState } from 'vuex'
 import { getImage } from '@/utils/utils'
 import { timeConverter } from '@/utils/utils';
@@ -382,6 +513,9 @@ import { playtimeConverter } from '@/utils/utils';
 
 export default {
   name: 'MainItem',
+  components: {
+    LoginDialog,
+  },
   props: {
     // eslint-disable-next-line vue/require-default-prop
     content: {type: Object}
@@ -391,16 +525,23 @@ export default {
       thumbnailImage: '',
       userProfileImg: '',
       allTags: [],
+      allBoardTags: [],
       time: [],
       time_playroom: [],
+
+      showLoginDialog: false,
+
     }
   },
   computed: {
     ...mapState(['authToken', 'userId', 'nickname', 'mainPlayrooms']),
-    ...mapState('account', ['image'])
+    ...mapState('account', ['image']),
+    ...mapState({
+      isLogin: state => state.isLogin,
+    }),
   },
   created: function() {
-    // console.log('content', this.content)
+    console.log('로그인 여부', this.isLogin)
     // console.log('content like', this.content.likesCnt)
 
     this.getThumbnailImage()
@@ -425,15 +566,36 @@ export default {
         'unlikeBoard'
       ]),
     // 태그
+    // getTag: function() {
+    //   if (this.content.tags) {
+    //     // console.log('태그 있을 때', this.content.tags, typeof(this.content.tags))
+    //     this.allTags = this.content.tags.split(',')
+    //   }
+    //   else {
+    //     this.allTags = []
+    //   }
+
+    // },
+
     getTag: function() {
-      if (this.content.tags) {
-        // console.log('태그 있을 때', this.content.tags, typeof(this.content.tags))
-        this.allTags = this.content.tags.split(',')
+      if (this.content.type === 'board') {
+        if (this.content.contents.tags) {
+          this.allBoardTags = this.content.contents.tags.split(',')
+        }
+        else {
+          this.allBoardTags = []
+        }
       }
       else {
-        this.allTags = []
-      }
 
+        if (this.content.tags) {
+        // console.log('태그 있을 때', this.content.tags, typeof(this.content.tags))
+          this.allTags = this.content.tags.split(',')
+        }
+        else {
+          this.allTags = []
+        }
+      }
     },
     // 썸네일 이미지
     getThumbnailImage: function() {
@@ -512,10 +674,16 @@ export default {
     // 좋아요
     // 좋아요 - 플레이룸
     onClickPlayroomLike: function () {
-      console.log('좋아요 누름', this.content.userLikesYN)
-      this.content.userLikesYN = 'Y'
-      this.content.likesCnt++
-      this.likePlayroom(this.content.id)
+      if(this.isLogin) {
+        console.log('좋아요 누름', this.content.userLikesYN)
+        this.content.userLikesYN = 'Y'
+        this.content.likesCnt++
+        this.likePlayroom(this.content.id)
+      }
+      else {
+        console.log("showLoginDialog")
+        this.showLoginDialog = true
+      }
     },
     onClickPlayroomUnlike: function () {
       console.log('좋아요 취소', this.content.userLikesYN)
