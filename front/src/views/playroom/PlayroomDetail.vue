@@ -1449,6 +1449,10 @@ iframe {
   font-weight: bold;
 }
 
+@media screen and (max-device-aspect-ratio: 1/1) and (orientation: portrait) {
+
+}
+
 @media screen and (min-device-aspect-ratio: 1/1) and (orientation: landscape) {
   body { overflow: hidden; }
 
@@ -1524,6 +1528,11 @@ iframe {
 </style>
 
 <style lang="scss" scoped>
+@media screen and (max-device-aspect-ratio: 1/1) and (orientation: portrait) {
+  .fixed-bottom-navbar {
+    display: fixed !important;
+  }
+}
 @media screen and (min-device-aspect-ratio: 1/1) and (orientation: landscape) {
   .fixed-bottom-navbar {
     display: none;
