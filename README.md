@@ -202,6 +202,9 @@ tupli-front
 - [API](./docs/API.md)
 - [ERD](./docs/ERD.md)
 - [회의록](./docs/회의록.md)
+- [테스트케이스](./docs/TUPLI_테스트케이스.xlsx)
+- [명세기술서](./docs/TUPLI_명세_기술서.docx)
+
 
 
 ## 🎵 TUPLI 서비스 화면
