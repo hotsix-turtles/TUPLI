@@ -50,7 +50,7 @@ function timeConverterShort(UNIX_timestamp){
 // }
 
 function playtimeConverter(startTime, endTime){
-  const timezoneOffset = new Date().getTimezoneOffset() * 60 * 1000;
+  const timezoneOffset = new Date().getTimezoneOffset() * 60;
 
   const localStartTime = (startTime < 10000000000) ? new Date((startTime - timezoneOffset) * 1000) : new Date(startTime - timezoneOffset * 1000)
   const localEndTime = (endTime < 10000000000) ? new Date((endTime - timezoneOffset) * 1000) : new Date(endTime - timezoneOffset * 1000)
