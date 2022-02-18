@@ -27,7 +27,7 @@
         <!-- 댓글 -->
         <div
           class="mr-2"
-          @click="$router.push({ name: 'PlaylistComment', params: { playlistId: playlistDetail.id }})"
+          @click="onClickComment"
         >
           <v-icon color="black">
             mdi-comment-outline
@@ -35,7 +35,7 @@
         </div>
         <!-- 플레이룸 생성 -->
         <div
-          class="mr-1"
+          class="mr-2"
           @click="showCreatePlayroomDialog"
         >
           <v-icon color="black">
@@ -75,7 +75,10 @@
           </div>
         </div>
         <!-- 작성자 정보 -->
-        <div class="d-flex justify-center mt-1 mb-3">
+        <div
+          class="d-flex justify-center mt-1 mb-3"
+          @click="$router.push({ name: 'Profile', params: { userId : playlistDetail.userId }})"
+        >
           <img
             class="profileImg mr-2 mb-2"
             :src="ImgUrl(playlistDetail.userProfileImg)"
@@ -265,7 +268,8 @@ export default {
       'likePlaylist',
       'unlikePlaylist',
       'saveFormData',
-      'getRecommendPlaylists'
+      'getRecommendPlaylists',
+      'getPlaylistComments',
     ]),
     ...mapActions('video', [
       'deselectAllDetailVideos',
@@ -371,6 +375,10 @@ export default {
         this.showLoginDialog = true
       }
     },
+    onClickComment: function () {
+      this.getPlaylistComments(this.playlistDetail.id)
+      this.$router.push({ name: 'PlaylistComment', params: { playlistId: this.playlistDetail.id }})
+    }
   },
 }
 </script>
