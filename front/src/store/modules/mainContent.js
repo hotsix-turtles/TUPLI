@@ -41,7 +41,7 @@ const mainContent = {
 
     // 재생 중 여부 파악
     GET_MAIN_PLAYROOMS: function (state, playrooms) {
-      let today = new Date()
+      let today = new Date() / 1000
       playrooms.forEach((playroom) => {
         if (playroom.startTime <= today && playroom.endTime >= today) {
           playroom.onPlay = true
