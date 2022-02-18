@@ -122,6 +122,7 @@ np/* eslint-disable vue/require-default-prop */
     <alert-dialog
       v-model="followDialogState"
       :title="followDialogTitle"
+      max-width="350"
       timeout="2000"
       @timeout="hideFollowDialog"
     />

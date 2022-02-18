@@ -6,12 +6,12 @@
     :scrollable="scrollable"
     :persistent="persistent"
     hide-overlay
-    style="position: absolute; width: 290px; left: 0; bottom: 0; margin-left: 20px; margin-right: 20px; margin-bottom: 80px;"
+    style="position: fixed; left: 0; bottom: 0;"
   >
     <v-card
-      class="tupli-dialog-alert"
+      class="tupli-dialog-alert ml-2"
+      style="position: absolute; left: 0; bottom: 0; margin-bottom: 80px; width: 340px;"
       @click="fireTimeout"
-      style="position: absolute; left: 0; bottom: 0; margin-left: 20px; margin-right: 20px; margin-bottom: 80px;"
     >
       <v-progress-linear
         v-if="timeout && !hideProgress && (topProgress || (!topProgress && !bottomProgress))"
@@ -56,7 +56,6 @@
         class="mb-0"
         color="accent"
       />
-
     </v-card>
   </v-dialog>
 </template>
@@ -169,7 +168,7 @@ export default {
 <style lang="scss" scoped>
 .tupli-dialog-alert-title {
   color: $color-main;
-  font-size: 16px !important;
+  font-size: 15px !important;
   margin-right: 20px;
 }
 
