@@ -20,6 +20,7 @@
           <v-icon
             color="white"
             class="mr-1"
+            style="padding-right: 6px; padding-left: 2px: padding-bottom:4px;"
             small
           >
             mdi-account-multiple
