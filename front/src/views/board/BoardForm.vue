@@ -293,7 +293,7 @@ export default {
       }
     },
     onClickSaveDataDialog: function (idx) {
-      if (idx === 0) { // 확인
+      if (idx === 1) { // 확인
         this.$router.go(-1)
         this.resetFormData()
       } else { // 취소
