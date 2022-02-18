@@ -149,8 +149,7 @@
       :content="'해당 게시글이 삭제되었습니다.'"
       :show="showTimeoutDialog"
       hide-progress
-      :persistent="false"
-      timeout="1700"
+      timeout="1500"
       @timeout="onTimeout"
       @click="onTimeout"
     />
@@ -286,7 +285,7 @@ export default {
       return getImage(img)
     },
     onClickDeleteBoardDialog: function (idx) {
-      if (idx === 0) { // 확인
+      if (idx === 1) { // 확인
         this.deleteBoard = false
         axiosConnector.delete(`/board/${this.boardDetail.id}`
         ).then((res) => {

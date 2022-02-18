@@ -52,8 +52,7 @@
       :content="timeoutMsg"
       :show="showTimeoutDialog"
       hide-progress
-      :persistent="false"
-      timeout="1700"
+      timeout="1500"
       @timeout="onTimeout"
       @click="onTimeout"
     />
