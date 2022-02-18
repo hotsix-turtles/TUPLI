@@ -170,7 +170,7 @@
       content-html="이 플레이리스트를 넣어서 플레이룸을 생성하시겠습니까?"
       max-width="290"
       persistent
-      :buttons="[{ name: '확인', color: '#5B5C9D' }, { name: '취소', color: 'gray' }]"
+      :buttons="[{ name: '취소', color: 'gray' }, { name: '확인', color: '#5B5C9D'}]"
       :show="createPlayroom"
       @button-click="onClickCreatePlayroomDialog"
     />
@@ -180,7 +180,7 @@
       content-html="정말 이 플레이리스트를 삭제하시겠습니까?"
       max-width="290"
       persistent
-      :buttons="[{ name: '확인', color: '#5B5C9D' }, { name: '취소', color: 'gray' }]"
+      :buttons="[{ name: '취소', color: 'gray' }, { name: '확인', color: '#5B5C9D' }]"
       :show="deletePlaylist"
       @button-click="onClickDeletePlaylistDialog"
     />

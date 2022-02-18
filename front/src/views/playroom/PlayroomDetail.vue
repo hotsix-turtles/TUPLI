@@ -4,7 +4,10 @@
     height="100%"
   >
     <!-- 유튜브 동영상 플레이어 Wrapper (필요없음) -->
-    <v-sheet class="playerWrapper sticky-header" style="z-index:2">
+    <v-sheet
+      class="playerWrapper sticky-header"
+      style="z-index:2"
+    >
       <!-- 유튜브 동영상 플레이어 -->
       <youtube
         ref="youtube"
@@ -32,7 +35,7 @@
           class="playroomLike"
           @click="togglePlayroomLike"
         >
-          <span v-text="roomCurrentLike"></span>
+          <span v-text="roomCurrentLike" />
           <v-icon
             v-if="roomLiked"
             color="accent"
@@ -52,7 +55,7 @@
           class="playroomLike"
           @click="isLoginNeededInfo = true"
         >
-          <span v-text="roomCurrentLike"></span>
+          <span v-text="roomCurrentLike" />
           <v-icon>
             mdi-heart-outline
           </v-icon>
@@ -194,10 +197,13 @@
 
         <!-- 플레이룸 운영 시간(?) Wrapper -->
         <div class="mt-2 text-caption">
-          <v-icon color="accent" dense>
+          <v-icon
+            color="accent"
+            dense
+          >
             mdi-clock
           </v-icon>
-          {{roomPlaytime}}
+          {{ roomPlaytime }}
           <!-- <p class="playtime">
             {{ roomPlaytime }}
           </p> -->
@@ -205,10 +211,13 @@
 
         <!-- 플레이룸 운영 시간(?) Wrapper -->
         <div class="mt-2 text-caption">
-          <v-icon color="accent" dense>
+          <v-icon
+            color="accent"
+            dense
+          >
             mdi-account
           </v-icon>
-          {{roomUserCount}}명  시청 중
+          {{ roomUserCount }}명  시청 중
           <!-- <p class="playtime">
             {{ roomPlaytime }}
           </p> -->
@@ -266,7 +275,11 @@
               <span class="ml-1">전체 선택</span>
             </v-btn>
           </div>
-          <video-list-item-small :videos="roomCurrentPlaylistVideos" @change-video="onPlaylistVideoSelected" :isVideoList="isAuthor"/>
+          <video-list-item-small
+            :videos="roomCurrentPlaylistVideos"
+            :is-video-list="isAuthor"
+            @change-video="onPlaylistVideoSelected"
+          />
         </v-container>
       </div>
       <!-- 플레이룸생성/내 플레이리스트에 넣기/저장하기 -->
@@ -294,7 +307,12 @@
             <div
               class="ml-2 text-body-2 chat-title-text"
             >
-              <v-icon color="accent" dense>mdi-account</v-icon>
+              <v-icon
+                color="accent"
+                dense
+              >
+                mdi-account
+              </v-icon>
               {{ roomUserCount }}
             </div>
             <v-btn
@@ -352,8 +370,8 @@
                   >
                     <template v-slot:activator="{ on, attrs }">
                       <v-icon
-                        class="mr-0"
                         v-if="showEmoji"
+                        class="mr-0"
                         v-bind="attrs"
                         v-on="on"
                         @click="showEmoji = !showEmoji"
@@ -384,8 +402,16 @@
                     size="24"
                     indeterminate
                   />
-                  <v-btn text small>
-                    <v-img width="30" height="30" :src="require('@/assets/tupli_send_chat.png')" @click="sendChat"></v-img>
+                  <v-btn
+                    text
+                    small
+                  >
+                    <v-img
+                      width="30"
+                      height="30"
+                      :src="require('@/assets/tupli_send_chat.png')"
+                      @click="sendChat"
+                    />
                   </v-btn>
 
                   <!-- <v-icon
@@ -403,7 +429,7 @@
       </v-dialog>
     </v-sheet>
 
-    <login-dialog :show="isLoginNeededInfo"/>
+    <login-dialog :show="isLoginNeededInfo" />
 
     <!--
       방장 전환시 팝업
