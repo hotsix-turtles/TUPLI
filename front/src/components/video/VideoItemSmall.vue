@@ -1,41 +1,67 @@
 <template>
   <v-card
-    height="13vh"
+    height="100"
     class="d-flex align-center"
     outlined
     tile
     :color="color"
   >
     <div
-      class="d-flex justify-space-between"
+      class="d-flex justify-space-between align-center"
       width="100%"
       @click="selectVideo"
     >
-      <div class="d-flex">
-        <div class="video-thumbnail">
+      <div class="d-flex align-center">
+        <div class="d-flex align-center video-thumbnail">
           <img
+            v-if="!isVideoList"
             :src="video.thumbnail"
-            style="width: 35vw; height: 100px;"
+            style="width: 35vw; height: 90px; object-fit: cover;"
             class=""
             @click="watchingVideo(video)"
           >
-          <span class="duration">{{ video.duration }}</span>
+          <img
+            v-else
+            :src="video.thumbnail"
+            style="width: 35vw; height: 90px; object-fit: cover;"
+            class=""
+            @click="changeVideo(video)"
+          >
+          <span class="duration">{{ video ? video.duration : undefined }}</span>
         </div>
-        <div class="d-flex-column ml-2">
+        <div
+          v-if="!isVideoList"
+          class="d-flex-column mx-2"
+        >
           <div
             class="h6"
           >
-            <div class="font-3 line-height-s">
-              {{ video.title }}
+            <div class="font-3 semi-bold line-height-s txt-3">
+              {{ video ? video.title : undefined }}
             </div>
           </div>
           <div class="font-4 color-dark-gray">
-            <span>{{ video.channelTitle }}</span>
+            <div>{{ video ? video.channelTitle : undefined }}</div>
+            <div>{{ video ? video.date.slice(0, 10) : undefined }}</div>
           </div>
         </div>
-      </div>
-      <div class="">
-        <v-icon>mdi-dots-vertical</v-icon>
+        <div
+          v-else
+          class="d-flex-column mx-2"
+          @click="changeVideo(video)"
+        >
+          <div
+            class="h6"
+          >
+            <div class="font-3 semi-bold line-height-s txt-3">
+              {{ video ? video.title : undefined }}
+            </div>
+          </div>
+          <div class="font-4 color-dark-gray">
+            <div>{{ video ? video.channelTitle : undefined }}</div>
+            <div>{{ video ? video.date.slice(0, 10) : undefined }}</div>
+          </div>
+        </div>
       </div>
     </div>
   </v-card>
@@ -47,8 +73,8 @@ import { mapActions, mapState } from 'vuex'
 export default {
   name: 'VideoItemSmall',
   props: {
-    // eslint-disable-next-line vue/require-default-prop
-    video: { type: Object },
+    video: { type: Object, default () { } },
+    isVideoList: { type: Boolean, default: false }
   },
   data() {
     return {
@@ -73,12 +99,18 @@ export default {
       'resetVideoSearchState',
     ]),
     selectVideo: function() {
-      if (this.isSelected !== -1) {
-        this.removeSelectedVideo(this.video.videoId)
-      } else {
+      if (this.isVideoList) return;
+      if (this.isSelected === -1) {
+        console.log('selectVideo add')
         this.addSelectedVideo(this.video)
+      } else {
+        console.log('selectVideo remove')
+        this.removeSelectedVideo(this.video.videoId)
       }
     },
+    changeVideo: function (video) {
+      this.$emit('change-video', video)
+    }
   },
 }
 </script>

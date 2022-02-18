@@ -1,27 +1,39 @@
 <template>
-  <v-app>
-    <div class="d-flex justify-center mt-5 px-4">
+  <div>
+    <div class="d-flex justify-center align-center mt-2 mb-3">
       <img
-        src="@/assets/playroom_image.png"
-        alt=""
+        :src="thumbnail"
+        alt="playroom img"
         style="width: 126px; height: 71px"
+        class="ml-3"
+        @click="goPlayroom"
       >
       <div
         class="d-flex flex-column align-start mx-2"
-        style="width: 200px;"
+        style="width: 50%;"
       >
-        <p class="mb-0">
-          플레이룸 제목 1
+        <p
+          class="like-title-playlist pr-1"
+          @click="goPlayroom"
+        >
+          {{ playroomlist.title }}
         </p>
-        <p class="mb-0">
-          작성자 이름
+        <p
+          class="main-username"
+          @click="setProfile"
+        >
+          {{ playroomlist.user.nickname }}
         </p>
-        <p class="mb-0">
-          태그
-        </p>
+        <div class="d-flex flex-wrap">
+          <p
+            v-for="tag in tags"
+            :key="tag.id"
+            class="main-tag"
+          >
+            {{ tag }}
+          </p>
+        </div>
       </div>
-
-
 
 
       <!-- menu 형태의 더보기 버튼 -->
@@ -40,13 +52,22 @@
           </v-icon>
         </template>
         <v-list>
-          <v-list-item dense>
+          <v-list-item
+            dense
+            @click="makePlaylist(playroomlist.id)"
+          >
             플레이리스트 생성
           </v-list-item>
-          <v-list-item dense>
+          <v-list-item
+            dense
+            @click="makeBoard(playroomlist.id)"
+          >
             게시글 작성
           </v-list-item>
-          <v-list-item dense>
+          <v-list-item
+            dense
+            @click="unLike"
+          >
             좋아요 취소
           </v-list-item>
         </v-list>
@@ -96,22 +117,65 @@
         </v-card>
       </v-dialog> -->
     </div>
-  </v-app>
+  </div>
 </template>
 
 <script>
+import { mapActions } from 'vuex'
+
 export default {
   name: 'PlayroomItem',
+  props: {
+    // eslint-disable-next-line vue/require-default-prop
+    playroomlist: { type: Object },
+  },
   data: function() {
     return {
+      tags: [],
       options: {
         addPlaylist: null,
         writePost: null,
         like: true,
       },
+      thumbnail: '',
       // dialog: false,  // dialog 사용
 
     }
+  },
+  created: function() {
+    // console.log('thumbnaidldfasfadl', this.playroomlist)
+    this.getTag()
+    this.thumbnail = this.playroomlist.videos[0].thumbnail
+    // console.log('thumbnaidladl', this.thumbnail)
+  },
+  methods: {
+    ...mapActions( 'account',[
+      'makePlaylist', 'makeBoard'
+    ]),
+    ...mapActions(
+      'playroom', [
+        'unlikePlayroom',
+      ]),
+    // 태그
+    getTag: function() {
+      // console.log('태그', this.playroomlist.tags)
+      this.tags = this.playroomlist.tags.split(',')
+      // console.log('태그2', this.tags)
+    },
+    // 좋아요 취소
+    unLike: function() {
+      this.unlikePlayroom(this.playroomlist.id)
+    },
+    // 플레이룸 상세로 가기
+    goPlayroom: function() {
+      console.log( '플레이룸 상세', this.playroomlist.id )
+      this.$router.push({ name: 'PlayroomDetail', params: { id : this.playroomlist.id }})
+    },
+    // 타 유저 프로필로 가기
+    setProfile: function() {
+      console.log('타인 프로필')
+      this.$router.push({ name: 'Profile', params: { userId : this.playroomlist.user.userSeq }})
+    },
   }
 }
 </script>

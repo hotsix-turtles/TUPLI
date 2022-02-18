@@ -7,6 +7,7 @@ front/dist
 .env.local
 .env.*.local
 .env
+front/env.local
 
 # Log files
 npm-debug.log*
@@ -22,3 +23,4 @@ pnpm-debug.log*
 *.njsproj
 *.sln
 *.sw?
+

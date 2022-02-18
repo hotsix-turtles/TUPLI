@@ -9,15 +9,17 @@ import Login from '../views/accounts/Login.vue'
 import Signup from '../views/accounts/Signup1.vue'
 import Signup2 from '../views/accounts/Signup2.vue'
 import Signup3 from '../views/accounts/Signup3.vue'
+import FindPassword from '../views/accounts/FindPassword.vue'
 //profile
 import EditProfile from '../views/profile/EditProfile.vue'
+import MyFollow from '../views/profile/MyFollow.vue'
 import Follow from '../views/profile/Follow.vue'
-import PersonFollow from '../views/profile/PersonFollow.vue'
+import MyProfile from '../views/profile/MyProfile.vue'
 import Profile from '../views/profile/Profile.vue'
 import Setting from '../views/profile/Setting.vue'
 //setting
+import Admin from '../views/profile/setting/Admin.vue'
 import ChangePassword from '../views/profile/setting/ChangePassword.vue'
-import History from '../views/profile/setting/History.vue'
 import InviteNoticeAlert from '../views/profile/setting/InviteNoticeAlert.vue'
 import Like from '../views/profile/setting/Like.vue'
 import Payment from '../views/profile/setting/Payment.vue'
@@ -35,18 +37,28 @@ import Category from '@/views/common/Category'
 import Search from '@/views/common/Search'
 import SearchDetail from '@/views/common/SearchDetail'
 // video
-import VideoSearch from '../views/video/VideoSearch.vue'
+import VideoSearch from '../views/playlist/VideoSearch.vue'
 import VideoWatch from '../views/video/VideoWatch.vue'
-
+// playroom
 import PlayroomForm from '../views/playroom/PlayroomForm.vue'
 import PlayroomFormPlaylist from '../views/playroom/PlayroomFormPlaylist.vue'
+import PlayroomFormFriend from '../views/playroom/PlayroomFormFriend.vue'
 import PlayroomDetail from '../views/playroom/PlayroomDetail.vue'
+//board
+import BoardForm from '../views/board/BoardForm.vue'
+import BoardSelectPlayroom from '../views/board/BoardSelectPlayroom.vue'
+import BoardSelectPlaylist from '../views/board/BoardSelectPlaylist.vue'
+import PlayroomSearch from '@/views/board/PlayroomSearch.vue'
+import PlaylistSearch from '@/views/board/PlaylistSearch.vue'
+import BoardDetail from '@/views/board/BoardDetail.vue'
+import BoardComment from '@/views/board/BoardComment.vue'
 
 import AuthHandler from '../views/handler/AuthHandler.vue'
 import KakaoPaySuccess from '../views/handler/kakaoPay/KakaoPaySuccess.vue'
 import KakaoPayCancel from '../views/handler/kakaoPay/KakaoPayCancel.vue'
 import KakaoPayFail from '../views/handler/kakaoPay/KakaoPayFail.vue'
 import NotFound from '../views/handler/NotFound.vue'
+
 
 
 
@@ -78,14 +90,26 @@ const routes = [
     component: AuthHandler
   },
 
+  // 비밀번호 찾기
+  {
+    path: '/findpassword',
+    name: 'FindPassword',
+    component: FindPassword,
+  },
+
   // 플레이리스트
   {
-    path: '/playlist/create',
+    path: '/playlist/create/',
     name: 'PlaylistForm',
     component: PlaylistForm
   },
   {
-    path: '/playlist/create/video',
+    path: '/playlist/update/:playlistId',
+    name: 'PlaylistUpdateForm',
+    component: PlaylistForm
+  },
+  {
+    path: '/playlist/video',
     name: 'PlaylistFormVideo',
     component: PlaylistFormVideo
   },
@@ -131,7 +155,7 @@ const routes = [
     // }
   },
   {
-    path: '/video/watch',
+    path: '/video/watch/:isVideoList',
     name: 'VideoWatch',
     component: VideoWatch
   },
@@ -163,18 +187,25 @@ const routes = [
     component: EditProfile
   },
   {
-    path: '/follow',
+    path: '/myfollow',
+    name: 'MyFollow',
+    component: MyFollow
+  },
+  {
+    path: '/follow/:userId',
     name: 'Follow',
     component: Follow
   },
-  {
-    path: '/personfollow',
-    name: 'PersonFollow',
-    component: PersonFollow
-  },
 
+  // 내 프로필
   {
-    path: '/profile',
+    path: '/myprofile',
+    name: 'MyProfile',
+    component: MyProfile
+  },
+  // 타인 프로필
+  {
+    path: '/profile/:userId',
     name: 'Profile',
     component: Profile
   },
@@ -186,15 +217,21 @@ const routes = [
 
   //setting
   {
+    path: '/admin',
+    name: 'Admin',
+    component: Admin
+  },
+  {
     path: '/changepassword',
     name: 'ChangePassword',
     component: ChangePassword
   },
-  {
-    path: '/history',
-    name: 'History',
-    component: History
-  },
+  // 일단 없앰.
+  // {
+  //   path: '/history',
+  //   name: 'History',
+  //   component: History
+  // },
   {
     path: '/invitenotice',
     name: 'InviteNoticeAlert',
@@ -229,7 +266,7 @@ const routes = [
 
   //playroom
   {
-    path: '/playroom',
+    path: '/playroom/create',
     name: 'PlayroomForm',
     component: PlayroomForm
   },
@@ -239,9 +276,66 @@ const routes = [
     component: PlayroomFormPlaylist
   },
   {
+    path: '/playroom/create/friend',
+    name: 'PlayroomFormFriend',
+    component: PlayroomFormFriend
+  },
+  {
+    path: '/playroom/update/:id',
+    name: 'PlayroomUpdateForm',
+    component: PlayroomForm
+  },
+  {
+    path: '/playroom/create',
+    name: 'PlayroomByPlaylist',
+    component: PlayroomForm
+  },
+  {
     path: '/playroom/:id',
     name: 'PlayroomDetail',
     component: PlayroomDetail
+  },
+
+  // board (게시글)
+  {
+    path: '/board',
+    name: 'BoardForm',
+    component: BoardForm
+  },
+  {
+    path: '/board/update',
+    name: 'BoardUpdateForm',
+    component: BoardForm
+  },
+  {
+    path: '/board/playlist',
+    name: 'BoardSelectPlaylist',
+    component: BoardSelectPlaylist
+  },
+  {
+    path: '/board/playroom',
+    name: 'BoardSelectPlayroom',
+    component: BoardSelectPlayroom
+  },
+  {
+    path: '/playlist/search',
+    name: 'PlaylistSearch',
+    component: PlaylistSearch
+  },
+  {
+    path: '/playroom/search',
+    name: 'PlayroomSearch',
+    component: PlayroomSearch
+  },
+  {
+    path: '/board/:boardId',
+    name: 'BoardDetail',
+    component: BoardDetail
+  },
+  {
+    path: '/board/:boardId/comment',
+    name: 'BoardComment',
+    component: BoardComment
   },
 
   //handler
@@ -265,6 +359,11 @@ const routes = [
   {
     path: "/404",
     name: "NotFound",
+    component: NotFound,
+  },
+  {
+    path: "/500",
+    name: "Error",
     component: NotFound,
   },
   {

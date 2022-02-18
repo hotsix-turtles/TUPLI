@@ -1,128 +1,286 @@
 <template>
   <div class="">
     <!-- 상단 뒤로가기, 플레이룸생성, 좋아요, 점3 등 -->
-    <div class="fixed-top d-flex justify-space-between light-background navbar-top">
+    <div class="fixed-top d-flex justify-space-between light-background navbar-top mx-3 py-3">
       <back-only />
       <div class="d-flex me-5">
-        <!-- 플레이룸 생성 -->
-        <div>
-          <v-icon>mdi-youtube</v-icon>
-        </div>
         <!-- 좋아요 -->
-        <div>
+        <div class="mx-2">
           <div
-            v-if="isLiked"
-            @click="unlikePlaylist(playlistDetail.id)"
+            v-if="playlistDetail.isLiked"
+            class="animate__animated animate__heartBeat"
+            @click="onClickUnlike"
           >
-            <v-icon>mdi-cards-heart</v-icon>
+            <v-icon color="#5B5C9D">
+              mdi-cards-heart
+            </v-icon>
           </div>
           <div
             v-else
-            @click="likePlaylist(playlistDetail.id)"
+            @click="onClickLike"
           >
-            <v-icon>mdi-cards-heart-outline</v-icon>
+            <v-icon color="black">
+              mdi-cards-heart-outline
+            </v-icon>
           </div>
         </div>
         <!-- 댓글 -->
-        <div @click="$router.push({ name: 'PlaylistComment', params: { playlistId: playlistDetail.id }})">
-          <v-icon>mdi-comment-outline</v-icon>
+        <div
+          class="mr-2"
+          @click="onClickComment"
+        >
+          <v-icon color="black">
+            mdi-comment-outline
+          </v-icon>
+        </div>
+        <!-- 플레이룸 생성 -->
+        <div
+          class="mr-2"
+          @click="showCreatePlayroomDialog"
+        >
+          <v-icon color="black">
+            mdi-youtube
+          </v-icon>
         </div>
         <!-- 작성자일 경우, 수정하기 삭제하기 모달창 -->
-        <div v-if="userId === playlistDetail.userId">
-          <v-icon>mdi-dots-vertical</v-icon>
+        <div
+          v-if="userId === playlistDetail.userId"
+          @click="onClickModal"
+        >
+          <v-icon
+            color="black"
+          >
+            mdi-dots-vertical
+          </v-icon>
         </div>
       </div>
     </div><br><br>
-    <div class="container">
-      <div class="text-center">
+    <div class="container mt-2">
+      <div class="d-flex-column justify-center">
         <!-- 제목 공개여부 -->
-        <div class="d-flex justify-center">
-          <div class="font-1">
+        <div class="d-flex justify-center semi-bold">
+          <div
+            class=""
+            style="font-size: 20px;"
+          >
             {{ playlistDetail.title }}
           </div>
-          <div v-if="!playlistDetail.isPublic">
-            <v-icon>mdi-lock</v-icon>
+          <div
+            v-if="!playlistDetail.isPublic"
+            class="mx-1"
+          >
+            <v-icon color="#5B5C9D">
+              mdi-lock
+            </v-icon>
           </div>
         </div>
         <!-- 작성자 정보 -->
-        <div class="d-flex justify-center">
-          <div class="profileImg mx-1">
-            {{ playlistDetail.userProfileImg }}
-          </div>
-          <div class="">
-            {{ playlistDetail.userName }}
-          </div>
-          <div class="mx-1">
-            팔로워 <span>{{ playlistDetail.userFollowersCnt }}</span>
+        <div
+          class="d-flex justify-center mt-1 mb-3"
+          @click="$router.push({ name: 'Profile', params: { userId : playlistDetail.userId }})"
+        >
+          <img
+            class="profileImg mr-2 mb-2"
+            :src="ImgUrl(playlistDetail.userProfileImg)"
+            alt="프로필 이미지"
+          >
+          <div class="d-flex align-center">
+            <div class="font-2 semi-bold color-dark-gray mr-2">
+              {{ playlistDetail.nickname === undefined ? playlistDetail.nickName : playlistDetail.nickname }}
+            </div>
+            <div class="">
+              팔로워 <span>{{ playlistDetail.userFollowersCnt }}</span>
+            </div>
           </div>
         </div>
       </div>
       <!-- CD -->
-      <playlist-cd :thumbnail="playlistDetail.videos[0].thumbnail" />
-      <!-- 소개글 -->
-      <p>{{ playlistDetail.content }}</p>
-      <!-- 태그 -->
-      <tags :tags="playlistDetail.tags" />
-      <!-- 전체 선택 / 영상 리스트 -->
-      <div @click="onClickSelectAll">
-        <v-icon>mdi-check</v-icon>
-        <span class="clickable">전체 선택</span>
+      <!-- playlist 썸네일 -->
+      <div class="d-flex justify-center">
+        <span
+          class="playlist-cd-case"
+        >
+          <div id="case" />
+          <img
+            :src="playlistDetail.videos[0].thumbnail"
+            alt="썸네일"
+          >
+          <div />
+        </span>
       </div>
-      <video-list-item-small
-        :videos="playlistDetail.videos"
-      /><br><br>
+      <div class="container">
+        <!-- 소개글 -->
+        <div class="mx-1">
+          {{ playlistDetail.content }}
+        </div>
+        <!-- 태그 -->
+        <tags
+          v-if="playlistDetail.tags"
+          class="mx-1"
+          :tags="playlistDetail.tags"
+        /><br>
+        <!-- 유사 플레이리스트 추천 -->
+        <div
+          v-if="playlistDetail.recommendPlaylists !== null && playlistDetail.recommendPlaylists !== []"
+          class=""
+        >
+          <div class="font-2 semi-bold color-main mt-2 mb-2">
+            유사 플레이리스트 추천
+          </div>
+          <v-card
+            style="display:flex; flex-wrap: nowrap; overflow-x: auto"
+            class="playlistThumbnailWrapper"
+          >
+            <PlaylistThumbnailItem
+              v-for="(playlist, idx) in playlistDetail.recommendPlaylists"
+              :key="idx"
+              :playlist-id="playlist.id"
+              :src="playlist.image"
+            />
+          </v-card>
+        </div><br>
+        <!-- 전체 선택 / 영상 리스트 -->
+        <div class="">
+          <div class="font-2 semi-bold color-main mt-2 mb-1">
+            재생 영상 목록
+          </div>
+          <div
+            class="my-3"
+            @click="onClickSelectAll"
+          >
+            <v-icon>mdi-check</v-icon>
+            <span class="clickable">전체 선택</span>
+          </div>
+          <video-list-item-small
+            :videos="playlistDetail.videos"
+          /><br><br>
+        </div>
+      </div>
     </div>
+
     <!-- 플레이룸생성/내 플레이리스트에 넣기/저장하기 -->
     <detail-button-bottom />
+    <!-- 수정하기/삭제하기 -->
+    <modal
+      :items="selectList"
+      modal-name="플레이리스트 변경"
+      modal-type="modal"
+      @on-select="onSelect"
+    />
+    <!-- 플레이룸 생성 -->
+    <normal-dialog
+      title="플레이룸 생성하기"
+      content-html="이 플레이리스트를 넣어서 플레이룸을 생성하시겠습니까?"
+      max-width="290"
+      persistent
+      :buttons="[{ name: '취소', color: 'gray' }, { name: '확인', color: '#5B5C9D'}]"
+      :show="createPlayroom"
+      @button-click="onClickCreatePlayroomDialog"
+    />
+    <!-- 삭제 여부 확인 다이얼로그 -->
+    <normal-dialog
+      title="플레이리스트 삭제하기"
+      content-html="정말 이 플레이리스트를 삭제하시겠습니까?"
+      max-width="290"
+      persistent
+      :buttons="[{ name: '취소', color: 'gray' }, { name: '확인', color: '#5B5C9D' }]"
+      :show="deletePlaylist"
+      @button-click="onClickDeletePlaylistDialog"
+    />
+    <timeout-dialog-k
+      :content="'해당 플레이리스트가 삭제되었습니다.'"
+      :show="showTimeoutDialog"
+      hide-progress
+      :persistent="false"
+      timeout="1700"
+      @timeout="onTimeout"
+      @click="onTimeout"
+    />
+    <login-dialog
+      :show="showLoginDialog"
+      @on-click="showLoginDialog = false"
+    />
   </div>
 </template>
 
 <script>
 import { mapActions, mapState } from 'vuex'
+import axiosConnector from '../../utils/axios-connector';
+import { getImage } from '../../utils/utils'
 
 import BackOnly from '../../components/common/BackOnly.vue'
 import DetailButtonBottom from '../../components/playlist/DetailButtonBottom.vue'
-
 import Tags from '../../components/common/Tags.vue'
-import PlaylistCd from '../../components/playlist/PlaylistCd.vue'
+import Modal from '../../components/common/Modal.vue'
+import NormalDialog from '../../components/common/NormalDialog.vue';
+import LoginDialog from '../../components/common/LoginDialog.vue';
+import TimeoutDialogK from '@/components/common/TimeoutDialogK.vue'
 
 import VideoListItemSmall from '../../components/video/VideoListItemSmall.vue'
+import PlaylistThumbnailItem from '../../components/playlist/PlaylistThumbnailItem.vue'
+
 export default {
   name: 'PlaylistFormVideo',
   components: {
     BackOnly,
     DetailButtonBottom,
     VideoListItemSmall,
-    PlaylistCd,
+    PlaylistThumbnailItem,
+    // PlaylistCd,
     Tags,
+    Modal,
+    NormalDialog,
+    LoginDialog,
+    TimeoutDialogK,
   },
   data: function() {
     return {
       isSelectedAll: false,
+      selectList: {
+        '수정하기': 'update',
+        '삭제하기': 'delete',
+      },
+      createPlayroom: false,
+      deletePlaylist: false,
+      showTimeoutDialog: false,
+      showLoginDialog: false,
     }
   },
   computed: {
     ...mapState('playlist', {
       playlistDetail: state => state.playlistDetail,
+      recommendPlaylists: state => state.recommendPlaylists,
       isLiked: state => state.isLiked,
     }),
-    ...mapState('account', {
+    ...mapState({
       userId: state => state.userId,
+      isLogin: state => state.isLogin,
     })
-    // 좋아요 여부 받아와서 isLiked에 저장
   },
   created: function() {
+    console.log('getPlaylistDetail created에서 실행됨')
     this.getPlaylistDetail(this.$route.params.playlistId)
+    this.deselectAllDetailVideos()
   },
   methods: {
     ...mapActions('playlist', [
       'getPlaylistDetail',
       'likePlaylist',
       'unlikePlaylist',
+      'saveFormData',
+      'getRecommendPlaylists',
+      'getPlaylistComments',
     ]),
     ...mapActions('video', [
       'deselectAllDetailVideos',
       'selectAllDetailVideos',
+      'saveAddedVideos',
+    ]),
+    ...mapActions('common', [
+      'onClickModal',
+    ]),
+    ...mapActions('playroom', [
+      'savePlaylistData',
     ]),
     onClickSelectAll: function () {
       if (this.isSelectedAll) {
@@ -132,6 +290,95 @@ export default {
       }
       this.isSelectedAll = !this.isSelectedAll
     },
+    onSelect: function (item) {
+      if (item === 'update') {
+        const formData = {
+          title: this.playlistDetail.title,
+          content: this.playlistDetail.content,
+          tags: this.playlistDetail.tags,
+          isPublic: this.playlistDetail.isPublic,
+          videos: [],
+        }
+        this.saveFormData(formData)
+        this.saveAddedVideos(this.playlistDetail.videos)
+        this.$router.push({ name: 'PlaylistUpdateForm', params: { playlistId: this.playlistDetail.id } })
+      } else if (item === 'delete') {
+        this.deletePlaylist = true
+      }
+    },
+    showCreatePlayroomDialog: function () {
+      if (this.isLogin) {
+        this.createPlayroom = true
+      } else {
+        this.showLoginDialog = true
+      }
+    },
+    onClickCreatePlayroomDialog: function (idx) {
+      if (idx === 0) { // 확인
+        console.log('onClickCreatePlayroomDialog')
+        this.createPlayroom = false
+        const videoIds = this.playlistDetail.videos.map((video) => {
+          return video.videoId
+        })
+        const playlists = {
+          [this.playlistDetail.id]: videoIds
+        }
+        const data = {
+          title: this.playlistDetail.title,
+          content: this.playlistDetail.content,
+          tags: this.playlistDetail.tags,
+          isPublic: this.playlistDetail.isPublic,
+          playlists: playlists,
+        }
+        this.savePlaylistData(data)
+      } else {
+        this.createPlayroom = false
+      }
+    },
+    onClickDeletePlaylistDialog: function (idx) {
+      if (idx === 0) { // 확인
+        console.log('onClickDeletePlaylistDialog 삭제')
+        this.deletePlaylist = false
+        axiosConnector.delete(`/playlist/${this.playlistDetail.id}`
+        ).then((res) => {
+          console.log('삭제되었습니다', res)
+          this.showTimeoutDialog = true
+          this.$router.push({ name: 'Home' })
+        }).catch((err) => {
+          console.log(err)
+        })
+      } else {
+        this.deletePlaylist = false
+      }
+    },
+    onTimeout () {
+      this.showTimeoutDialog = false
+      this.$router.push({ name: 'Home' })
+    },
+    ImgUrl: function(img) {
+      return getImage(img)
+    },
+    onClickLike: function () {
+      console.log(this.isLogin)
+      if (this.isLogin) {
+        this.playlistDetail.isLiked = true
+        this.likePlaylist(this.playlistDetail.id)
+      } else {
+        this.showLoginDialog = true
+      }
+    },
+    onClickUnlike: function () {
+      if (this.isLogin) {
+        this.playlistDetail.isLiked = false
+        this.unlikePlaylist(this.playlistDetail.id)
+      } else {
+        this.showLoginDialog = true
+      }
+    },
+    onClickComment: function () {
+      this.getPlaylistComments(this.playlistDetail.id)
+      this.$router.push({ name: 'PlaylistComment', params: { playlistId: this.playlistDetail.id }})
+    }
   },
 }
 </script>

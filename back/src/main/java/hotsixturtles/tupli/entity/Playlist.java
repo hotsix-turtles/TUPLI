@@ -13,7 +13,6 @@ import javax.persistence.*;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Entity
@@ -57,9 +56,6 @@ public class Playlist {
     @Column(columnDefinition = "json")
     private ConcurrentHashMap<Integer, Integer> playlistInfo;  // 유튜브 Tag + Custom Tag 리스트 등의 메타정보 조합
 
-//    @Type(type = "json")
-//    @Column(columnDefinition = "json")
-//    private Set<String> playlistCate;  // 유튜브 Tag 기준으로 한 분류
     private String playlistCate;
 
     // 연결
@@ -70,10 +66,16 @@ public class Playlist {
     @OneToMany(mappedBy = "playlist")
     private List<PlaylistLikes> playlistLikes = new ArrayList<>();
 
-    @OneToMany(mappedBy = "playlist",  cascade = CascadeType.ALL)  // 단방향 설정
+    @OneToMany(mappedBy = "playlist")//,  cascade = CascadeType.ALL)
     private List<YoutubeVideo> youtubeVideos = new ArrayList<>();
 
     @OneToMany(mappedBy = "playlist", cascade = {CascadeType.REMOVE})
     private List<PlaylistComment> playlistComments = new ArrayList<>();
+
+    @OneToMany(mappedBy = "playlist")
+    private List<Board> board;
+
+    // 한길: playlist 에 좋아요넣기
+    private Integer likesCnt = 0;
 
 }

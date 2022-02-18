@@ -12,7 +12,7 @@ public class SimpleYoutubeVideoDto {
 
     private String videoId;  // url로 쓰임. 예시 : oODreucZqmM, https://www.youtube.com/watch?v= 주소와 조합하면 영상이 됨
     private String title;  // 영상 제목
-    private String date;  // ?
+    private String date;  // ? <== 업로드 날짜 아닐까여?..
     private String thumbnail;  // 썸네일 주소, 풀 주소가 들어온다.
     private String channelTitle;  // 영상 올린 채널
     private String duration;  // 영상길이

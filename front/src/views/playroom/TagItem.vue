@@ -11,6 +11,7 @@
 </template>
 
 <script>
+// deprecated components
 export default {
   name: 'TagItem',
   props: {

@@ -1,5 +1,5 @@
 <template>
-  <v-app>
+  <v-app id="tupli">
     <v-main>
       <router-view
         :key="$route.path"
@@ -28,10 +28,12 @@ export default {
 
 
 <style>
-@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
-
 * {
   font-family: 'SUIT';
 }
-
+#tupli {
+    width: 100vw;
+    height: 100vh;
+    margin: 0 auto;
+}
 </style>

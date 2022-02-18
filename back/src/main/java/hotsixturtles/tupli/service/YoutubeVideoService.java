@@ -2,18 +2,24 @@ package hotsixturtles.tupli.service;
 
 import hotsixturtles.tupli.dto.simple.SimpleYoutubeVideoDto;
 import hotsixturtles.tupli.dto.simple.YoutubeVideoLikesSavedDto;
+import hotsixturtles.tupli.entity.User;
 import hotsixturtles.tupli.entity.likes.YoutubeVideoLikes;
 import hotsixturtles.tupli.entity.likes.YoutubeVideoSaves;
+import hotsixturtles.tupli.entity.meta.UserInfo;
 import hotsixturtles.tupli.entity.youtube.YoutubeVideo;
 import hotsixturtles.tupli.repository.*;
 import hotsixturtles.tupli.repository.likes.YoutubeVideoLikesRepository;
 import hotsixturtles.tupli.repository.likes.YoutubeVideoSavesRepository;
+import hotsixturtles.tupli.service.list.CategoryList;
+import hotsixturtles.tupli.service.list.TasteScore;
+import hotsixturtles.tupli.utils.TasteUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 @Transactional(readOnly = true)
@@ -25,6 +31,7 @@ public class YoutubeVideoService {
 
     private final YoutubeVideoLikesRepository youtubeVideoLikesRepository;
     private final YoutubeVideoSavesRepository youtubeVideoSavesRepository;
+    private final UserInfoRepository userInfoRepository;
 
 
     @Transactional
@@ -33,7 +40,7 @@ public class YoutubeVideoService {
         YoutubeVideo youtubeVideo = youtubeVideoRepository.findByVideoId(youtubeVideoDto.getVideoId());
         if(youtubeVideo == null) {
             youtubeVideo = new YoutubeVideo();
-            youtubeVideo.setInit(youtubeVideoDto);  // Custom setter
+            youtubeVideo.newVideo(youtubeVideoDto);  // Custom setter
             youtubeVideoRepository.save(youtubeVideo);
         } else {
             // 만약 정보 업데이트 넣을거면 여기
@@ -73,10 +80,31 @@ public class YoutubeVideoService {
     public void dislikesVideo(Long userSeq, String url) {
         YoutubeVideoLikes video = youtubeVideoLikesRepository.findExistByUrl(userSeq, url);
         if(video != null) {
+            User user = userRepository.findById(userSeq).orElse(null);
+            // 유저 취향 가져오기
+            UserInfo userInfo = userInfoRepository.findOneByUserSeq(userSeq);
+            ConcurrentHashMap<String, Integer> tasteInfo = userInfo.getTasteInfo();
+            // 카테고리에 따른 분류
+            String category = CategoryList.CATEGORY_LIST.getOrDefault(video.getYoutubeVideo().getCategoryId(), "기타");
+            // 취향 반영
+            Integer tasteScore = tasteInfo.getOrDefault(category, 0);
+            tasteInfo.put(category, tasteScore + TasteScore.SCORE_VIDEO_UNLIKE);
+            // 유저 정보 저장
+            userInfo.setTasteInfo(tasteInfo);
+            userInfoRepository.save(userInfo);
+            // 유저 취향 분석 후 저장
+            List<String> userTaste = TasteUtil.getTaste(tasteInfo);
+            user.setTaste(userTaste);
+            userRepository.save(user);
+
             youtubeVideoLikesRepository.delete(video);
         } else {
             // 익셉션 발생
         }
+    }
+
+    public YoutubeVideoLikes getLikesVideo(Long userSeq, Long videoId){
+        return youtubeVideoLikesRepository.findExist(userSeq, videoId);
     }
 
     @Transactional
@@ -84,10 +112,28 @@ public class YoutubeVideoService {
         // 해당 유저가 기존에 좋아요 했나 확인, 없을 경우 저장
         YoutubeVideoLikes existVideo = youtubeVideoLikesRepository.findExist(userSeq, youtubeVideo.getId());
         if(existVideo == null) {
+            User user = userRepository.findById(userSeq).orElse(null);
             YoutubeVideoLikes youtubeVideoLikes = new YoutubeVideoLikes();
-            youtubeVideoLikes.setUser(userRepository.findById(userSeq).orElse(null));
+            youtubeVideoLikes.setUser(user);
             youtubeVideoLikes.setYoutubeVideo(youtubeVideo);
             youtubeVideoLikesRepository.save(youtubeVideoLikes);
+
+            // 유저 취향 가져오기
+            UserInfo userInfo = userInfoRepository.findOneByUserSeq(userSeq);
+            ConcurrentHashMap<String, Integer> tasteInfo = userInfo.getTasteInfo();
+            // 카테고리에 따른 분류
+            String category = CategoryList.CATEGORY_LIST.getOrDefault(youtubeVideo.getCategoryId(), "기타");
+            // 취향 반영
+            Integer tasteScore = tasteInfo.getOrDefault(category, 0);
+            tasteInfo.put(category, tasteScore + TasteScore.SCORE_VIDEO_LIKE);
+            // 유저 정보 저장
+            userInfo.setTasteInfo(tasteInfo);
+            userInfoRepository.save(userInfo);
+            // 유저 취향 분석 후 저장
+            List<String> userTaste = TasteUtil.getTaste(tasteInfo);
+            user.setTaste(userTaste);
+            userRepository.save(user);
+
         } else {
             // 익셉션 발생
         }
@@ -103,19 +149,40 @@ public class YoutubeVideoService {
         return youtubeVideoLikesRepository.findByUserOrderByIdDesc(userRepository.findByUserSeq(userSeq));
     }
 
-    // 검색 결과를 기존에 저장, 좋아요 했는지 체크
-    public YoutubeVideoLikesSavedDto getSearchResultInfo(Long userSeq, List<String> urls) {
-        List<Boolean> is_userSaved = new ArrayList<>();
+    public YoutubeVideoLikesSavedDto getSearchResultInfoNoLogin(List<String> urls){
+        List<Boolean> is_userSaved =  new ArrayList<>();
         List<Boolean> is_userLikes = new ArrayList<>();
+        List<Integer> is_LikesCount = new ArrayList<>();
 
         for (String url : urls) {
-            is_userSaved.add(youtubeVideoSavesRepository.isUserSaved(userSeq, url));
-            is_userLikes.add(youtubeVideoLikesRepository.isUserLikes(userSeq, url));
+            is_userSaved.add(false);
+            is_userLikes.add(false);
+            is_LikesCount.add(youtubeVideoLikesRepository.isUserLikesCnt(url));
         }
 
         YoutubeVideoLikesSavedDto dto = new YoutubeVideoLikesSavedDto();
         dto.setIsSavedList(is_userSaved);
         dto.setIsLikesList(is_userLikes);
+        dto.setIsLikesCnt(is_LikesCount);
+
+        return dto;
+    }
+    // 검색 결과를 기존에 저장, 좋아요 했는지 체크
+    public YoutubeVideoLikesSavedDto getSearchResultInfo(Long userSeq, List<String> urls) {
+        List<Boolean> is_userSaved = new ArrayList<>();
+        List<Boolean> is_userLikes = new ArrayList<>();
+        List<Integer> is_LikesCount = new ArrayList<>();
+
+        for (String url : urls) {
+            is_userSaved.add(youtubeVideoSavesRepository.isUserSaved(userSeq, url));
+            is_userLikes.add(youtubeVideoLikesRepository.isUserLikes(userSeq, url));
+            is_LikesCount.add(youtubeVideoLikesRepository.isUserLikesCnt(url));
+        }
+
+        YoutubeVideoLikesSavedDto dto = new YoutubeVideoLikesSavedDto();
+        dto.setIsSavedList(is_userSaved);
+        dto.setIsLikesList(is_userLikes);
+        dto.setIsLikesCnt(is_LikesCount);
 
         return dto;
     }

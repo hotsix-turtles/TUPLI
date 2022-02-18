@@ -21,7 +21,7 @@ public class YoutubeVideo {
 
     private String videoId;  // url로 쓰임. 예시 : oODreucZqmM, https://www.youtube.com/watch?v= 주소와 조합하면 영상이 됨
     private String title;  // 영상 제목
-    private String date;  // ?
+    private String date;  // ? 업로드 날짜인듯 싶어용..
     private String thumbnail;  // 썸네일 주소, 풀 주소가 들어온다.
     private String channelTitle;  // 영상 올린 채널
     private String duration;  // 영상길이
@@ -37,7 +37,7 @@ public class YoutubeVideo {
     private Playroom playroom;
 
 
-    public void setInit(SimpleYoutubeVideoDto simpleYoutubeVideoDto) {
+    public void newVideo(SimpleYoutubeVideoDto simpleYoutubeVideoDto) {
         this.videoId = simpleYoutubeVideoDto.getVideoId();
         this.title = simpleYoutubeVideoDto.getTitle();
         this.date = simpleYoutubeVideoDto.getDate();
@@ -47,7 +47,7 @@ public class YoutubeVideo {
         this.categoryId = simpleYoutubeVideoDto.getCategoryId();
     }
 
-    public void setInit(YoutubeVideo youtubeVideo) {
+    public void copyVideo(YoutubeVideo youtubeVideo) {
         this.videoId = youtubeVideo.getVideoId();
         this.title = youtubeVideo.getTitle();
         this.date = youtubeVideo.getDate();

@@ -4,6 +4,7 @@ import hotsixturtles.tupli.dto.chat.ChatMessage;
 import hotsixturtles.tupli.dto.chat.ChatRoom;
 import hotsixturtles.tupli.dto.chat.ChatUserInfo;
 
+import hotsixturtles.tupli.service.list.SystemConstant;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -11,10 +12,8 @@ import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Repository;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
 
@@ -60,7 +59,7 @@ public class ChatRoomRepository {
     public ChatRoom createChatRoom(String name) {
         ChatRoom chatRoom = ChatRoom.create(name);
         hashOpsChatRoom.put(CHAT_ROOMS, chatRoom.getRoomId(), chatRoom);
-        roomTtl.set(chatRoom.getRoomId(), "Zzz",120, SECONDS);
+        roomTtl.set(chatRoom.getRoomId(), "Zzz",24000, SECONDS);
         return chatRoom;
     }
 
@@ -120,15 +119,34 @@ public class ChatRoomRepository {
         if(messages == null) messages = new ArrayList<>();
         messages.add(message);
 
-        // $$$$$$$$ 최대 20개 까지 저장
-        
-        
-//        System.out.println("messages = " + messages.size());
-//
-//        for (ChatMessage chatMessage : messages) {
-//            System.out.println("chatMessage = " + chatMessage);
-//        }
+        // 다훈
+        if(messages.size() > SystemConstant.MESSAGE_MAX_LENGTH){
+            List<ChatMessage> changeMessages = new ArrayList<>(messages.subList(1, SystemConstant.MESSAGE_MAX_LENGTH));
+
+            roomMessages.put(CHAT_LIST, roomId, changeMessages);
+            return;
+        }
         roomMessages.put(CHAT_LIST, roomId, messages);
+
+        //민구
+//        if(messages.size() > SystemConstant.MESSAGE_MAX_LENGTH){
+//            messages = messages.stream().skip(0).limit(21).collect(Collectors.toList());
+//        }
+
+        // 한길
+//        if(messages.size() > SystemConstant.MESSAGE_MAX_LENGTH) {
+//            // 앞에서부터1개식 지우기
+//            for (int i = 1; i < messages.size(); i++) {
+//                messages.set(i-1, messages.get(i));
+//            }
+//            messages.add(message);
+//        }
+//        else {
+//            // 제거쓸거면 번120째 messages.add(message)는 지워야함
+//            messages.add(message);
+//        }
+
+
     }
 
     // 저장 메시지 보내기

@@ -25,7 +25,7 @@
           <div
             class="h6"
           >
-            <div class="font-3 line-height-s">
+            <div class="font-3 line-height-s txt-3">
               {{ video.title }}
             </div>
           </div>
@@ -34,36 +34,7 @@
           </div>
         </div>
       </div>
-      <div class="">
-        <v-icon>mdi-dots-vertical</v-icon>
-      </div>
     </div>
-    <!-- 점3개 눌렀을시 -->
-    <!-- <v-card-actions>
-        <v-menu bottom>
-          <template v-slot:activator="{ on, attrs }">
-            <v-btn
-              v-bind="attrs"
-              small
-              text
-              style="align-self: start"
-              fab
-              v-on="on"
-            >
-              <v-icon>mdi-dots-vertical</v-icon>
-            </v-btn>
-          </template>
-
-          <v-list>
-            <v-list-item
-              v-for="(item, index) in items"
-              :key="index"
-            >
-              <v-list-item-title>{{ item.title }}</v-list-item-title>
-            </v-list-item>
-          </v-list>
-        </v-menu>
-      </v-card-actions> -->
   </v-card>
 </template>
 

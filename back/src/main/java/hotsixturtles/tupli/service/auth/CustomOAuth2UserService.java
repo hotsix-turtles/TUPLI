@@ -2,6 +2,7 @@ package hotsixturtles.tupli.service.auth;
 
 import hotsixturtles.tupli.entity.User;
 import hotsixturtles.tupli.entity.UserBadge;
+import hotsixturtles.tupli.entity.UserSetting;
 import hotsixturtles.tupli.entity.auth.ProviderType;
 import hotsixturtles.tupli.entity.auth.RoleType;
 import hotsixturtles.tupli.entity.auth.UserPrincipal;
@@ -12,6 +13,7 @@ import hotsixturtles.tupli.info.OAuth2UserInfoFactory;
 import hotsixturtles.tupli.repository.UserInfoRepository;
 import hotsixturtles.tupli.repository.UserRepository;
 
+import hotsixturtles.tupli.repository.UserSettingRepository;
 import hotsixturtles.tupli.service.BadgeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
@@ -30,8 +32,8 @@ import java.util.List;
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
     private final UserRepository userRepository;
-
     private final UserInfoRepository userInfoRepository;
+    private final UserSettingRepository userSettingRepository;
 
     private final BadgeService badgeService;
 
@@ -65,19 +67,27 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             updateUser(savedUser, userInfo);
             UserInfo nowUserInfo =  userInfoRepository.findOneByUserSeq(savedUser.getUserSeq());
             nowUserInfo.setLoginCount(nowUserInfo.getLoginCount() + 1L);
+
+            List<UserBadge> userbadges = badgeService.getBadgeList(savedUser.getUserSeq());
+            List<Long> badges = badgeService.getUserBadgeSeq(userbadges);
+
+            badgeService.checkLoginNum(savedUser.getUserSeq(), badges);
+
             if(nowUserInfo.getDailyLoginYN().equals("N")) {
                 nowUserInfo.setDailyLoginYN("Y");
                 nowUserInfo.setDailyCheck(nowUserInfo.getDailyCheck() + 1L);
-                List<UserBadge> userbadges = badgeService.getBadgeList(savedUser.getUserSeq());
-                List<Long> badges = badgeService.getUserBadgeSeq(userbadges);
-                badgeService.checkDaily(26, savedUser.getUserSeq(), badges);
+                badgeService.checkDaily(savedUser.getUserSeq(), badges);
             }
 
             userInfoRepository.save(nowUserInfo);
         } else {
             savedUser = createUser(userInfo, providerType);
-            UserInfo nowUserInfo = new UserInfo(null, savedUser.getUserSeq(), null, 0L, 0L, 1L, 1L, "Y");
+            UserInfo nowUserInfo = new UserInfo();
+            nowUserInfo.setUserSeq(savedUser.getUserSeq());
             userInfoRepository.save(nowUserInfo);
+            UserSetting userSetting = new UserSetting();
+            userSetting.setUser(savedUser);
+            userSettingRepository.save(userSetting);
         }
 
         return UserPrincipal.create(savedUser, user.getAttributes());
@@ -97,7 +107,12 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                 now,
                 null
         );
-
+        user.setNickname(userInfo.getName());
+        user.setIs_vip("N");
+        if(user.getProfileImage() == null || user.getProfileImage().trim() == ""){
+            int randNum = (int)(Math.random()*20) + 1;
+            user.setProfileImage("#" + randNum);
+        }
         return userRepository.saveAndFlush(user);
     }
 

@@ -23,6 +23,7 @@ public class SimplePlaylistCategoryDto {
     private OffsetDateTime updatedAt;
 
     // 추가 변수수
+    private Long userId;
     private String nickname;
     private Integer likesCnt;
     private Boolean isLiked;
@@ -38,12 +39,14 @@ public class SimplePlaylistCategoryDto {
         this.updatedAt = playlist.getUpdatedAt();
 
         // 추가 변수
+       this.userId = playlist.getUser().getUserSeq();
        this.nickname = playlist.getUser().getNickname();
-       this.likesCnt = playlist.getPlaylistLikes().size();
+       this.likesCnt = playlist.getPlaylistLikes() == null ? 0 : playlist.getPlaylistLikes().size();
        this.isLiked = false;
    }
 
     public SimplePlaylistCategoryDto(Playlist playlist, Boolean isLiked) {
+        this.userId = playlist.getUser().getUserSeq();
         this.id = playlist.getId();
         this.title = playlist.getTitle();
         this.content = playlist.getContent();
@@ -55,7 +58,7 @@ public class SimplePlaylistCategoryDto {
 
         // 추가 변수
         this.nickname = playlist.getUser().getNickname();
-        this.likesCnt = playlist.getPlaylistLikes().size();
+        this.likesCnt = playlist.getPlaylistLikes() == null ? 0 : playlist.getPlaylistLikes().size();
         this.isLiked = isLiked;
     }
 }

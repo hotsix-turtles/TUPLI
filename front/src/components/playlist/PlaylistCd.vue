@@ -12,7 +12,7 @@
 <script>
 
 export default {
-  name: 'PlaylistCdItem',
+  name: 'PlaylistCd',
   props: {
     thumbnail: { type: String, default: '' }
   },

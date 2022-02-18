@@ -5,18 +5,19 @@
         class="align-center mt-5"
       >
         <v-icon
-          color="#5B5C9D"
-          size="30"
-          @click="$router.push({ name: 'Setting'})"         
+          size="20"
+          color="black"
+          class="px-2"
+          @click="$router.push({ name: 'Setting'})"
         >
-          mdi-chevron-left
+          mdi-arrow-left
         </v-icon>
         <h3>
           비밀번호 변경
         </h3>
       </v-row>
     </v-container>
-    <div class="mx-10 mt-3">
+    <div class="mx-10 mt-8">
       <div class="my-2">
         <h4>
           현재 비밀번호
@@ -51,12 +52,14 @@
         />
       </div>
     </div>
+
     <v-btn
-      class="d-flex justify-center p-5 mx-5"
+      class="d-flex justify-center mx-10 mt-3"
       rounded
       outlined
       color="#5B5C9D"
       depressed
+      large
       @click="changePassword"
     >
       비밀번호 변경하기
@@ -95,7 +98,7 @@ export default {
         })
       } else {
         axios({
-          method: 'PUT', 
+          method: 'PUT',
           url: SERVER.URL + '/account/password',
           headers: {Authorization: this.authToken},
           data: {

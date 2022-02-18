@@ -1,8 +1,11 @@
 package hotsixturtles.tupli.dto;
 
+import hotsixturtles.tupli.dto.simple.SimplePlaylistDto;
 import hotsixturtles.tupli.dto.simple.SimpleUserDto;
 import hotsixturtles.tupli.dto.simple.SimpleYoutubeVideoDto;
 import hotsixturtles.tupli.entity.Playlist;
+import hotsixturtles.tupli.entity.User;
+import hotsixturtles.tupli.entity.likes.PlaylistLikes;
 import lombok.Data;
 
 
@@ -24,7 +27,7 @@ public class PlaylistDto {
 
     // 유저 정보
     private Long userId;
-    private String userName;
+    private String nickName;
     private String userProfileImg;
     private Integer userFollowersCnt;
 
@@ -33,6 +36,9 @@ public class PlaylistDto {
     private Integer likesCnt;
     private List<SimpleUserDto> playlistLikes;
     private List<SimpleYoutubeVideoDto> videos;
+
+    private Boolean isLiked;
+    private List<SimplePlaylistDto> recommendPlaylists;
 
 
     public PlaylistDto(Playlist playlist) {
@@ -47,15 +53,54 @@ public class PlaylistDto {
 
         // 유저 정보
         this.userId = playlist.getUser().getUserSeq();
-        this.userName = playlist.getUser().getUsername();
+        this.nickName = playlist.getUser().getNickname();
         this.userProfileImg = playlist.getUser().getProfileImage();
-        this.userFollowersCnt = playlist.getUser().getTo_user().size();
+
+        this.userFollowersCnt = playlist.getUser().getTo_user() == null ? 0 : playlist.getUser().getTo_user().size();
 
         // 연결
-        this.likesCnt = playlist.getPlaylistLikes().size();
+        this.likesCnt = playlist.getPlaylistLikes() == null ? 0 :playlist.getPlaylistLikes().size();
         this.playlistLikes = playlist.getPlaylistLikes()
                 .stream().map(x-> new SimpleUserDto(x.getUser())).collect(Collectors.toList());
         this.videos = playlist.getYoutubeVideos()
                 .stream().map(x -> new SimpleYoutubeVideoDto(x)).collect(Collectors.toList());
     }
+    public PlaylistDto(Playlist playlist, User user) {
+        this.id = playlist.getId();
+        this.title = playlist.getTitle();
+        this.content = playlist.getContent();
+        this.tags = playlist.getTags();
+        this.isPublic = playlist.getIsPublic();
+        this.createdAt = playlist.getCreatedAt();
+        this.updatedAt = playlist.getUpdatedAt();
+        //this.image = playlist.getImage();
+
+        // 유저 정보
+        this.userId = playlist.getUser().getUserSeq();
+        this.nickName = playlist.getUser().getNickname();
+        this.userProfileImg = playlist.getUser().getProfileImage();
+
+        this.userFollowersCnt = playlist.getUser().getTo_user() == null ? 0 : playlist.getUser().getTo_user().size();
+
+        // 연결
+        this.likesCnt = playlist.getPlaylistLikes() == null ? 0 :playlist.getPlaylistLikes().size();
+        this.playlistLikes = playlist.getPlaylistLikes()
+                .stream().map(x-> new SimpleUserDto(x.getUser())).collect(Collectors.toList());
+        this.videos = playlist.getYoutubeVideos()
+                .stream().map(x -> new SimpleYoutubeVideoDto(x)).collect(Collectors.toList());
+        if(playlist.getPlaylistLikes() == null){
+            this.isLiked = false;
+        }
+            else{
+            this.isLiked = false;
+            for(PlaylistLikes nowPlaylistLikes : playlist.getPlaylistLikes()){
+                if(nowPlaylistLikes.getUser().getUserSeq() == user.getUserSeq()){
+                    this.isLiked = true;
+                    break;
+                }
+            }
+        }
+    }
+
+
 }

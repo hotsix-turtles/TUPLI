@@ -2,53 +2,53 @@
   <v-app>
     <div class="background-login px-5">
       <!-- <h1>회원가입 페이지</h1> -->
-      <v-container>
-        <router-link
-          to="/login"
-          class="no-background-hover"
+      <v-container class="d-flex flex-column">
+        <v-icon
+          class="ml-0 mr-auto mt-5"
+          @click="$router.push({ name: 'Login' })"
         >
-          <v-icon
-            color="#5B5C9D"
-          >
-            mdi-close
-          </v-icon>
-        </router-link>
+          mdi-close
+        </v-icon>
 
-
-        <h2 class="mt-5">
-          튜플리에
-        </h2>
-        <h2 class="mb-5">
+        <img
+          class="mt-8"
+          src="@/assets/tupli_logo2_dark.png"
+          alt=""
+          style="width: 30px; height:auto;"
+        >
+        <h2 class="mt-5 mb-5">
+          튜플리에 <br>
           가입하기
         </h2>
 
         <!-- 상태바 -->
-        <v-img
+        <img
+          class="mt-1"
           src="../../assets/signup_bar1.png"
           alt="logo"
-        />
+        >
 
         <!-- 회원가입 form -->
         <div class="mt-4 pt-4">
-          <v-container>
-            <v-row>
-              <v-checkbox
-                v-model="checkbox1"
-                :rules="checkRules"
-                class="pt-0"
-                label="[필수] 개인정보 이용약관 동의"
-                required
-              />
+          <div class="d-flex align-center">
+            <v-checkbox
+              v-model="checkbox1"
+              :rules="checkRules"
+              class="pt-0"
+              label="[필수] 개인정보 이용약관 동의"
+              required
+            />
 
-              <v-icon
-                color="#5B5C9D"
-              >
-                mdi-domain
-              </v-icon>
-            </v-row>
-          </v-container>
+            <v-icon
+              color="#5B5C9D"
+              class="ml-2 mb-1"
+              @click="$router.push({ name: 'PrivateTerms' })"
+            >
+              mdi-chevron-right
+            </v-icon>
+          </div>
 
-          <div>
+          <div class="d-flex align-center">
             <v-checkbox
               v-model="checkbox2"
               :rules="checkRules"
@@ -57,37 +57,52 @@
               required
             />
             <v-icon
+              class="ml-2 mb-1"
               color="#5B5C9D"
+              @click="$router.push({ name: 'ServiceTerms' })"
             >
-              mdi-next
+              mdi-chevron-right
             </v-icon>
           </div>
 
-          <h5 class="mx-5">
-            약관 동의 체크는 해당 약관을 모두 숙지히였으며, 이에 동의함을 의미합니다.
+          <h5 class="mx-6">
+            약관 동의 체크는 해당 약관을 모두 숙지히였으며, <br>
+            이에 동의함을 의미합니다.
           </h5>
 
           <v-btn
-            to="/signup2"
-            class="white--text my-5"
+            class="white--text my-12"
             color="#5B5C9D"
             block
             elevation="0"
+            large
             rounded
+            @click="checkTerms"
           >
             다음
           </v-btn>
         </div>
       </v-container>
     </div>
+    <timeout-dialog
+      v-model="isTermNotAcceptedError"
+      title="오류"
+      content-html="필수 약관에 모두 동의해주세요"
+      timeout="2000"
+      hide-progress
+      @timeout="isTermNotAcceptedError = false"
+    />
   </v-app>
 </template>
 
 <script>
 import axios from 'axios'
+import Signup2Vue from './Signup2.vue'
+import TimeoutDialog from '../../components/common/TimeoutDialog.vue'
 
 export default {
   name: 'Signup',
+  components: { TimeoutDialog },
 
   // 이메일 비밀번호 규칙 설정
   data: () => ({
@@ -96,6 +111,11 @@ export default {
       email: null,
       password: null,
     },
+
+    isTermNotAcceptedError: false,
+
+    checkbox1: false,
+    checkbox2: false,
 
     // 로딩 아이콘
     loader: null,
@@ -140,6 +160,19 @@ export default {
           console.log(err.response.data)
         })
     },
+
+
+    // 약관 동의
+    checkTerms: function() {
+      if (this.checkbox1 === true && this.checkbox2 === true) {
+        this.$router.push({ name: 'Signup2' })
+      }
+      else {
+        this.isTermNotAcceptedError = true
+      }
+
+    },
+
 
     validate () {
       this.$refs.form.validate()

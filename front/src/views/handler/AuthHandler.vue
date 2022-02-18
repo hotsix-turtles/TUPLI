@@ -13,13 +13,15 @@ export default {
     const token = this.$route.query.token
     if (token) {
       this.TOKEN(token)
-      this.getUserInfo(token) // 쿼리로 유저 네임이나 정보도 보내줘야되나...
+      this.getUserInfo(token)
+      this.getSetting(token)
+      this.OAUTH_LOGIN()
     }
     this.$router.push('/')
   },
   methods: {
-    ...mapActions(['getUserInfo']),
-    ...mapMutations(['TOKEN'])
+    ...mapActions(['getUserInfo', 'getSetting']),
+    ...mapMutations(['TOKEN', 'OAUTH_LOGIN'])
   }
 }
 </script>

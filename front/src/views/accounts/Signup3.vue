@@ -12,45 +12,59 @@
               class="no-background-hover"
             >
               <v-icon
-                color="#5B5C9D"
+                size="20"
+                color="black"
+                class="px-2"
               >
-                mdi-chevron-left
+                mdi-arrow-left
               </v-icon>
             </router-link>
-            <h4 class="">
+            <h4 class="back-menu-text">
               가입 완료
             </h4>
           </v-row>
         </v-container>
 
         <!-- 상태바 -->
-        <v-img
-          src="../../assets/signup_bar3.png"
-          alt="logo"
-        />
+        <div
+          class="d-flex justify-center"
+        >
+          <img
+            src="@/assets/signup_bar3.png"
+            alt="logo"
+            width="90%"
+          >
+        </div>
 
         <!-- 회원가입 form -->
-        <v-container class="mt-4 pt-4">
-          <v-row>
+        <div class="d-flex flex-column align-center mt-5">
+          <img
+            class="mt-6"
+            src="@/assets/tupli_party.png"
+            alt=""
+            width="50%"
+          >
+          <div class="d-flex mt-4">
             <p class="bold">
-              거북이
+              {{ nickname }}
             </p>
             <p>님의</p>
-          </v-row>
+          </div>
           <p>
             튜플리 가입을 환영합니다!
           </p>
           <v-btn
             to="/"
-            class="white--text my-5"
+            class="white--text my-10"
             color="#5B5C9D"
             block
             elevation="0"
             rounded
+            large
           >
             홈으로 이동
           </v-btn>
-        </v-container>
+        </div>
       </v-container>
     </div>
   </v-app>
@@ -58,17 +72,19 @@
 
 <script>
 import axios from 'axios'
+import { mapState } from 'vuex'
 
 export default {
   name: 'Signup3',
 
   // 이메일 비밀번호 규칙 설정
-  data: () => ({
+  data: function() {
+    return{
+    }
+  },
 
-  }),
-
-  watch: {
-
+  computed: {
+    ...mapState(['authToken', 'userId', 'nickname']),
   },
 
   methods: {

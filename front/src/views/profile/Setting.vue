@@ -5,11 +5,12 @@
         class="align-center mt-5"
       >
         <v-icon
-          color="#5B5C9D"
-          size="30"
-          @click="$router.push({ name: 'Profile' })"
+          size="20"
+          color="black"
+          class="px-2"
+          @click="$router.push({ name: 'MyProfile' })"
         >
-          mdi-chevron-left
+          mdi-arrow-left
         </v-icon>
         <h3>
           설정
@@ -20,135 +21,92 @@
     <div>
       <hr>
 
+      <!-- 관리자 API : hotsixturtles@gmail.com -->
+      <div
+        v-if="email=='hotsixturtles@gmail.com'"
+        class="d-flex justify-space-between setting-bar align-center"
+        @click="$router.push({ name: 'Admin' })"
+      >
+        <p>관리자 페이지</p>
+        <v-icon>mdi-chevron-right</v-icon>
+      </div>
+
+      <hr>
+
+      <!-- 좋아요한 게시물 -->
       <div
         class="d-flex justify-space-between setting-bar align-center"
         @click="$router.push({ name: 'Like' })"
       >
-        <p>
-          좋아요한 게시물
-        </p>
-        <v-icon>
-          mdi-chevron-right
-        </v-icon>
+        <p>좋아요한 게시물</p>
+        <v-icon>mdi-chevron-right</v-icon>
       </div>
 
       <hr>
 
+      <!-- 결제 서비스 -->
       <div
         class="d-flex justify-space-between setting-bar align-center"
-
-        @click="$router.push({ name: 'Save' })"
-      >
-        <p>
-          저장한 게시물
-        </p>
-        <v-icon>
-          mdi-chevron-right
-        </v-icon>
-      </div>
-
-      <hr>
-
-      <div
-        class="d-flex justify-space-between setting-bar align-center"
-
-        @click="$router.push({ name: 'History' })"
-      >
-        <p>
-          플레이룸 참여 기록
-        </p>
-        <v-icon>
-          mdi-chevron-right
-        </v-icon>
-      </div>
-
-      <hr>
-
-      <div
-        class="d-flex justify-space-between setting-bar align-center"
-
         @click="$router.push({ name: 'Payment' })"
       >
-        <p>
-          결제 서비스
-        </p>
-        <v-icon>
-          mdi-chevron-right
-        </v-icon>
+        <p>결제 서비스</p>
+        <v-icon>mdi-chevron-right</v-icon>
       </div>
 
       <hr>
 
+      <!-- 알림 설정 -->
       <div
         class="d-flex justify-space-between setting-bar align-center"
-
         @click="$router.push({ name: 'InviteNoticeAlert' })"
       >
-        <p>
-          초대/알림 설정
-        </p>
-        <v-icon>
-          mdi-chevron-right
-        </v-icon>
+        <p>초대/알림 설정</p>
+        <v-icon>mdi-chevron-right</v-icon>
       </div>
 
       <hr>
 
+      <!-- 개인정보 이용약관 -->
       <div
         class="d-flex justify-space-between setting-bar align-center"
-
         @click="$router.push({ name: 'PrivateTerms' })"
       >
-        <p>
-          개인정보 이용약관
-        </p>
-        <v-icon>
-          mdi-chevron-right
-        </v-icon>
+        <p>개인정보 이용약관</p>
+        <v-icon>mdi-chevron-right</v-icon>
       </div>
 
       <hr>
 
+      <!-- 서비스 이용약관 -->
       <div
         class="d-flex justify-space-between setting-bar align-center"
-
         @click="$router.push({ name: 'ServiceTerms' })"
       >
-        <p>
-          서비스 이용약관
-        </p>
-        <v-icon>
-          mdi-chevron-right
-        </v-icon>
+        <p>서비스 이용약관</p>
+        <v-icon>mdi-chevron-right</v-icon>
       </div>
 
       <hr>
 
+      <!-- 비밀번호 변경 -->
       <div
         class="d-flex justify-space-between setting-bar align-center"
-
         @click="$router.push({ name: 'ChangePassword' })"
       >
-        <p>
-          비밀번호 변경
-        </p>
-        <v-icon>
-          mdi-chevron-right
-        </v-icon>
+        <p>비밀번호 변경</p>
+        <v-icon>mdi-chevron-right</v-icon>
       </div>
 
       <hr>
 
+      <!-- 로그아웃 -->
       <div
         class="d-flex justify-space-between setting-bar align-center"
         @click.stop="dialogLogout = true"
       >
-        <p>
-          로그아웃
-        </p>
-        <v-icon>
-          mdi-chevron-right
-        </v-icon>
+        <p>로그아웃</p>
+        <v-icon>mdi-chevron-right</v-icon>
+        <!-- 로그아웃 여부 재확인 dialog -->
         <v-dialog
           v-model="dialogLogout"
           max-width="290"
@@ -159,7 +117,7 @@
             </v-card-title>
 
             <v-card-text>
-              로그아웃 후 비회원 상태로 홈 화면으로 이동합니다.
+              로그아웃 후 게스트 모드로 홈 화면으로 이동합니다.
             </v-card-text>
 
             <v-card-actions>
@@ -176,7 +134,7 @@
               <v-btn
                 color="purple darken-1"
                 text
-                @click="logoutUser"
+                @click="requestLogout"
               >
                 로그아웃
               </v-btn>
@@ -187,16 +145,14 @@
 
       <hr>
 
+      <!-- 회원 탈퇴 -->
       <div
         class="d-flex justify-space-between setting-bar align-center"
         @click.stop="dialogDeleteUser = true"
       >
-        <p>
-          회원 탈퇴
-        </p>
-        <v-icon>
-          mdi-chevron-right
-        </v-icon>
+        <p>회원 탈퇴</p>
+        <v-icon>mdi-chevron-right</v-icon>
+        <!-- 회원 탈퇴 여부 재확인 dialog -->
         <v-dialog
           v-model="dialogDeleteUser"
           max-width="290"
@@ -225,7 +181,7 @@
               <v-btn
                 color="purple darken-1"
                 text
-                @click="deleteUser"
+                @click="requestDeleteUser"
               >
                 회원탈퇴
               </v-btn>
@@ -235,7 +191,43 @@
       </div>
 
       <hr>
+
+      <!-- OAUTH유저 초회 비밀번호 변경 -->
+      <div
+        v-if="is_oauth"
+        class="d-flex justify-space-between setting-bar align-center"
+        @click="$router.push({ name: 'ChangePasswordOAUTH' })"
+      >
+        <p>구글 유저 비밀번호 설정(초회)</p>
+        <v-icon>mdi-chevron-right</v-icon>
+      </div>
+
+      <hr>
     </div>
+    <timeout-dialog
+      v-model="isLogoutInfo"
+      title="로그아웃 되었습니다"
+      content="오늘도 튜플리와 함께 즐거우셨나요?"
+      timeout="2000"
+      hide-progress
+      @timeout="logoutUser"
+    />
+    <timeout-dialog
+      v-model="isDeleteUserInfo"
+      title="탈퇴 성공"
+      content="지금까지 튜플리와 함께해주셔서 감사합니다"
+      timeout="2000"
+      hide-progress
+      @timeout="deleteUser"
+    />
+    <timeout-dialog
+      v-model="isDeleteUserError"
+      title="탈퇴 실패"
+      content-html="서버가 혼잡합니다<br>잠시 뒤 다시 시도해주세요"
+      timeout="2000"
+      hide-progress
+      @timeout="deleteUser"
+    />
   </v-app>
 </template>
 
@@ -243,53 +235,51 @@
 import axios from 'axios'
 import SERVER from '@/api/server'
 import { mapState } from 'vuex'
+import axiosConnector from '@/utils/axios-connector.js'
 import swal from 'sweetalert2'
+import TimeoutDialog from '../../components/common/TimeoutDialog.vue'
 
 export default {
   name: 'Setting',
+  components: { TimeoutDialog },
   data: function() {
     return {
       dialogLogout: null,
       dialogDeleteUser: null,
+      isLogoutInfo: false,
+      isDeleteUserInfo: false,
+      isDeleteUserError: false
     }
   },
   computed: {
-    ...mapState(['authToken'])
+    ...mapState(['authToken', 'email', 'is_oauth'])
   },
   methods: {
+    requestLogout: function() {
+      this.$store.dispatch('logout')
+      this.dialogLogout = false
+      this.isLogoutInfo = true
+    },
+
     // 로그아웃
     logoutUser: function() {
-      this.$store.dispatch('logout')
       this.$router.push({ name: 'Home' })
     },
 
+    requestDeleteUser: async function() {
+      let response;
+      try {
+        response = await axiosConnector.delete('/account/withdraw');
+        this.$store.commit('DELETE_TOKEN')
+      } catch (err) {
+        this.dialogDeleteUser = false
+        this.isDeleteUserError = true
+      }
+    },
+
     // 회원 탈퇴
-    deleteUser: function() {
-      //
-      axios({
-        method: 'DELETE',
-        url: SERVER.URL + '/account/withdraw',
-        headers: {Authorization: this.authToken}
-      })
-        .then(() => {
-          this.$store.commit('DELETE_TOKEN')
-          this.$router.push({ name: 'Home' })
-          // 여기까지 함께 해주셔서 감사합니다 같은 무언가
-          swal.fire ({
-            icon: 'info',
-            title: '탈퇴 성공',
-            text: '지금까지 튜플리와 함께해주셔서 감사합니다.',
-            width: '200px'
-          })
-        })
-        .catch (() => {
-          dialogDeleteUser = false
-          swal.fire ({
-            icon: 'error',
-            title: '탈퇴 실패',
-            text: '서버가 혼잡합니다. 다시 시도해 주세요.'
-          })
-        })
+    deleteUser: async function() {
+      this.$router.push({ name: 'Home' })
     },
   },
 

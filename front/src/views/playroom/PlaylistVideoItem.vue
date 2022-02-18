@@ -1,25 +1,34 @@
 <template>
   <v-card
-    height="100px"
-    class="d-flex"
+    height="13vh"
+    class="d-flex align-center"
     outlined
     tile
     :color="color"
     @click.stop="onItemClick"
   >
-    <v-list-item two-line>
+    <div class="video-thumbnail">
       <img
-        :src="thumbnail"
-        style="width: 40%; height: auto"
+        :src="video.thumbnail"
+        style="width: 35vw; height: 100px;"
         class=""
+        @click="watchingVideo(video)"
       >
-      <v-list-item-content class="ml-2">
-        <v-list-item-title>{{ title }}</v-list-item-title>
-        <v-list-item-subtitle>{{ author }}</v-list-item-subtitle>
-        <!-- <v-list-item-subtitle>{{ playtime }}</v-list-item-subtitle> -->
-      </v-list-item-content>
-    </v-list-item>
-    <v-card-actions>
+      <span class="duration">{{ video.duration }}</span>
+    </div>
+    <div class="d-flex-column ml-2">
+      <div
+        class="h6"
+      >
+        <div class="font-3 line-height-s">
+          {{ video.title }}
+        </div>
+      </div>
+      <div class="font-4 color-dark-gray">
+        <span>{{ video.channelTitle }}</span>
+      </div>
+    </div>
+    <!-- <v-card-actions>
       <v-menu bottom>
         <template v-slot:activator="{ on, attrs }">
           <v-btn
@@ -43,19 +52,16 @@
           </v-list-item>
         </v-list>
       </v-menu>
-    </v-card-actions>
+    </v-card-actions> -->
   </v-card>
 </template>
 
 <script>
+import { mapActions } from 'vuex';
 export default {
   name: 'PlaylistVideoItem',
   props: {
-    id: { type: Number, default: -1 },
-    title: { type: String, default: '' },
-    author: { type: String, default: '' },
-    thumbnail: { type: String, default: '' },
-    playtime: { type: String, default: '0:0' },
+    video: { type: Object, default() {}},
     selected: { type: Boolean, default: false },
     readonly: { type: Boolean, default: false }
   },
@@ -72,8 +78,9 @@ export default {
   methods: {
     onItemClick () {
       if (this.readonly) return;
-      this.$emit('click', { id: this.id, selected: this.selected })
-    }
+      this.$emit('click', { id: this.video.id, selected: this.selected })
+    },
+    ...mapActions('video', ['watchingVideo'])
   }
 }
 </script>

@@ -10,48 +10,151 @@
       >
       <!-- 알림 아이콘 -->
       <v-icon
-        @click="$router.push({ name: 'Notice' })"
+        color="#000000"
+        @click="goNotice"
       >
         mdi-bell
       </v-icon>
     </div>
-    <div>
-      <div class="d-flex mx-4 my-4">
+    <div class="d-flex-column">
+      <hr style="width: 100%; height: 1px; background-color: #f1f1f4 !important; ">
+      <div
+        v-if="authToken"
+        class="d-flex mx-5 mt-4 mb-3"
+      >
+        <p>
+          <span
+            class="font-weight-bold color-main"
+            style="margin-right: 0px;"
+            bold
+          >
+            {{ nickname }}
+          </span>
+          <span class="">
+            님이 좋아하는&nbsp;
+          </span>
+          <span class="color-main">
+            오늘의 추천 컨텐츠
+          </span>
+        </p>
+      </div>
+      <div
+        v-else
+        class="d-flex mx-5 mt-4 mb-3"
+      >
         <p
-          class="deep-purple--text font-weight-bold mb-0"
+          class="font-weight-bold color-main"
+          style="margin-right: 1px;"
           bold
         >
-          라이언
+          튜플리
         </p>
-        <p class="mb-0">
-          님이 좋아하는&nbsp;
+        <p class="">
+          가 추천하는&nbsp;
         </p>
-        <p class="mb-0 deep-purple--text">
-          오늘의 추천 컨텐츠
+        <p class="color-main">
+          오늘의 컨텐츠
         </p>
       </div>
     </div>
 
     <div>
-      <playroom-item />
+      <main-list :main-contents="mainContents" />
     </div>
+
+    <!--무한스크롤 -->
+    <infinite-loading
+      spinner="waveDots"
+      @infinite="getMainContents"
+    >
+      <div slot="no-results" />
+      <div slot="no-more" />
+    </infinite-loading><br><br>
   </v-app>
 </template>
 
 <script>
-import PlayroomItem from '@/components/home/PlayroomItem'
+import MainList from '@/components/home/MainList'
+import InfiniteLoading from "vue-infinite-loading"
+import axiosConnector from '../../utils/axios-connector';
+import { playtimeConverter } from '../../utils/utils';
+
+import { mapState } from 'vuex'
 
 export default {
   name: 'Home',
 
   components: {
-    PlayroomItem,
+    MainList,
+    InfiniteLoading,
+  },
+
+  data: function () {
+    return {
+      page: 0,
+      mainContents: [],
+    }
+  },
+
+  created: function () {
+  },
+
+  computed: {
+    ...mapState(['authToken', 'nickname']),
+    today: function () {
+      return new Date() / 1000
+    }
   },
 
   methods: {
-
+    getMainContents($state) {
+      const params = {
+        paged: true,
+        page: this.page,
+        size: 5,
+      }
+      axiosConnector.get(`home/all/`, {
+        params
+      })
+        .then((res) => {
+          if (res.data.length) {
+            console.log('Home', res.data)
+            this.page++
+            const contents = res.data
+            contents.forEach((content) => {
+              if (content.type === 'playroom') {
+                if (content.startTime <= this.today && content.endTime >= this.today) {
+                  content.onPlay = true
+                } else {
+                  content.onPlay = false
+                }
+                content.playTime = playtimeConverter(content.startTime, content.endTime)
+                content.image = content.videos.thumbnail
+                content.profileImg = content.userProfileImg
+                content.nickname = content.nickName
+              }
+            })
+            this.mainContents.push(...contents)
+            $state.loaded()
+          } else {
+            $state.complete()
+          }
+        })
+        .catch((err) => {
+          console.log(err)
+          $state.complete()
+        })
+    },
+    // 로그인 상태 확인
+    goNotice: function() {
+      if (this.authToken) {
+        this.$router.push({ name: 'Notice' })
+      }
+      else {
+        this.$router.push({ name: 'Login' })
+      }
+    }
   }
-
 }
 </script>
 

@@ -43,4 +43,42 @@ public class YoutubeVideoRepositoryImpl implements YoutubeVideoRepositoryCustom 
             return result;
     }
 
+    @Override
+    public List<YoutubeVideo> searchNoConditionByPageVideo(Pageable pageable) {
+
+        JPAQuery<YoutubeVideo> query = jpaQueryFactory
+                .selectFrom(youtubeVideo)
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize());
+
+        for (Sort.Order o : pageable.getSort()) {
+            PathBuilder pathBuilder = new PathBuilder(youtubeVideo.getType(), youtubeVideo.getMetadata());
+            query.orderBy(new OrderSpecifier(o.isAscending() ? Order.ASC : Order.DESC,
+                    pathBuilder.get(o.getProperty())));
+        }
+
+        List<YoutubeVideo> result = query.fetch();
+        return result;
+    }
+    @Override
+    public List<YoutubeVideo> findDistinctByVideoId(Pageable pageable) {
+
+        JPAQuery<YoutubeVideo> query = jpaQueryFactory
+                .select(youtubeVideo)
+                .distinct()
+                .from(youtubeVideo)
+                .groupBy(youtubeVideo.videoId)
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize());
+
+        for (Sort.Order o : pageable.getSort()) {
+            PathBuilder pathBuilder = new PathBuilder(youtubeVideo.getType(), youtubeVideo.getMetadata());
+            query.orderBy(new OrderSpecifier(o.isAscending() ? Order.ASC : Order.DESC,
+                    pathBuilder.get(o.getProperty())));
+        }
+
+        List<YoutubeVideo> result = query.fetch();
+        return result;
+    }
+
 }

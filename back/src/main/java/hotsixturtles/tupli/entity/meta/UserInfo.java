@@ -10,7 +10,9 @@ import org.hibernate.annotations.TypeDef;
 
 import javax.persistence.*;
 import javax.validation.constraints.Size;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 타 유저도 조회하거나, 분리하는 게 유리한 유저 정보
@@ -38,13 +40,38 @@ public class UserInfo {
 
     private Long boardUpload = 0L;
 
-    private Long loginCount = 0L;
+    private Long loginCount = 1L;
 
-    private Long dailyCheck = 0L;
+    private Long dailyCheck = 1L;
 
     @Column(name = "DAILY_LOGIN_YN", length = 1)
 //    @NotNull
     @Size(min = 1, max = 1)
-    private String dailyLoginYN;
+    private String dailyLoginYN = "Y";
+
+    // 뱃지용 장르별 시간
+    private Long watchTimeTrip = 0L; // 여행 1
+    private Long watchTimeGame = 0L; // 게임 2
+    private Long watchTimeLife = 0L; // 일상 3
+    private Long watchTimeStyle = 0L; // 노하우/스타일 4
+    private Long watchTimeAnimal = 0L; // 동물 5
+    private Long watchTimeEntertainment = 0L; // 엔터테인먼트 6
+    private Long watchTimeMovie = 0L; // 영화/드라마  7
+    private Long watchTimeMusic = 0L; // 음악 8
+    private Long watchTimeEducation = 0L; // 교육/시사 9
+    private Long watchTimeSports = 0L; // 스포츠 10
+    private Long watchTimeEtc = 0L; // 기타 11
+
+    // 만든 플레이리스트 수
+    private Long makePlaylist = 0L;
+
+    // 만든 플레이룸 수
+    private Long makePlayroom = 0L;
+
+
+    // 유저 취향 분석용
+    @Type(type = "json")
+    @Column(columnDefinition = "json")
+    private ConcurrentHashMap<String, Integer> TasteInfo = new ConcurrentHashMap<>();
 
 }

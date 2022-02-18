@@ -5,14 +5,15 @@
         class="d-flex align-center mt-5"
       >
         <v-icon
-          color="#5B5C9D"
-          size="30"
-          @click="$router.push({ name: 'Profile' })"
+          size="20"
+          color="black"
+          class="px-2"
+          @click="$router.go(-1)"
         >
-          mdi-chevron-left
+          mdi-arrow-left
         </v-icon>
         <h3 class="">
-          김춘식
+          {{ profile.nickname }}
         </h3>
       </v-row>
     </v-container>
@@ -27,29 +28,33 @@
         <v-tab class="v-tap-width">
           <div class="d-flex align-center">
             <p class="mx-1 mb-0">
-              135
+              팔로워
             </p>
             <p class="mx-1 mb-0">
-              팔로워
+              {{ followerlist.length }}
             </p>
           </div>
         </v-tab>
         <v-tab class="v-tap-width">
           <div class="d-flex align-center">
             <p class="mx-1 mb-0">
-              351
+              팔로잉
             </p>
             <p class="mx-1 mb-0">
-              팔로잉
+              {{ followinglist.length }}
             </p>
           </div>
         </v-tab>
 
         <v-tab-item>
-          <followers-list />
+          <followers-list
+            :followerlist="followerlist"
+          />
         </v-tab-item>
         <v-tab-item>
-          <followings-list />
+          <followings-list
+            :followinglist="followinglist"
+          />
         </v-tab-item>
       </v-tabs>
     </div>
@@ -60,11 +65,54 @@
 import FollowersList from '@/components/profile/user/FollowersList.vue'
 import FollowingsList from '@/components/profile/user/FollowingsList.vue'
 
+import { mapActions } from 'vuex'
+import axiosConnector from '@/utils/axios-connector.js'
+
 export default {
   name: 'Follow',
   components: {
     FollowersList,
     FollowingsList,
+  },
+  data: function() {
+    return {
+      profile: [],
+      followerlist: [],
+      followinglist: [],
+    }
+  },
+  created: function() {
+    // this.getFollowers(this.profile.userSeq)
+    this.getAccounts()
+    // this.getFollowerList()
+  },
+  methods: {
+    ...mapActions('account', [
+      'getFollowers'
+    ]),
+    // [조회]
+    getAccounts: function () {
+      console.log('getAccounts params')
+      axiosConnector.get(`userinfo/${this.$route.params.userId}`)
+        .then((res) => {
+          console.log('성공적', res.data)
+          this.profile = res.data
+
+          this.followerlist = res.data.from_user
+          this.followinglist = res.data.to_user
+
+        })
+        .catch((err) => {
+          console.log('에러', err)
+        })
+    },
+
+    // 팔로우. 팔로잉 리스트 조회
+    getFollowList: function() {
+      console.log('팔로우 리스트 조회 시도')
+    },
+
+
   }
 }
 </script>

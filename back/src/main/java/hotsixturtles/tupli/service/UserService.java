@@ -1,6 +1,7 @@
 package hotsixturtles.tupli.service;
 
 import hotsixturtles.tupli.entity.User;
+import hotsixturtles.tupli.entity.UserSetting;
 import hotsixturtles.tupli.entity.likes.UserDislikes;
 import hotsixturtles.tupli.entity.likes.UserLikes;
 import hotsixturtles.tupli.entity.meta.UserInfo;
@@ -13,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 
 
 @Service
@@ -25,6 +27,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final UserInfoRepository userInfoRepository;
     private final UserLikesRepository userLikesRepository;
+    private final UserSettingRepository userSettingRepository;
     private final UserBadgeRepository userBadgeRepository;
     private final UserDislikesRepository userDislikesRepository;
     private final NotificationService notificationService;
@@ -36,10 +39,15 @@ public class UserService {
         validateDuplicateUser(user);
         user.setPassword(user.getPassword());
         user.encodePassword(passwordEncoder);
-
+        int randNum = (int)(Math.random()*20) + 1;
+        user.setProfileImage("#" + randNum);
         userRepository.save(user);
-        UserInfo userInfo = new UserInfo(null, user.getUserSeq(), null, 0L, 0L, 0L, 1L, "Y");
+        UserInfo userInfo = new UserInfo();
+        userInfo.setUserSeq(user.getUserSeq());
         userInfoRepository.save(userInfo);
+        UserSetting userSetting = new UserSetting();
+        userSetting.setUser(user);
+        userSettingRepository.save(userSetting);
         return user.getUserSeq();
     }
 
@@ -91,6 +99,10 @@ public class UserService {
         return user;
     }
 
+    public User getUserByUserseq(Long userSeq){
+        return userRepository.findByUserSeq(userSeq);
+    }
+
     // OAUTH용
     public User getUser(String userId) {
         return userRepository.findByUserId(userId);
@@ -129,7 +141,6 @@ public class UserService {
     @Transactional
     public void follow(Long userSeq, Long otherUserSeq) {
         UserLikes existUserLikes = userLikesRepository.findExist(userSeq, otherUserSeq);
-        System.out.println("existUserLikes== " + existUserLikes);
         if(existUserLikes == null) {
             UserLikes userLikes = new UserLikes();
             userLikes.setFromUser(userRepository.findById(userSeq).orElse(null));
@@ -167,7 +178,6 @@ public class UserService {
     @Transactional
     public void dislike(Long userSeq, Long otherUserSeq) {
         UserDislikes existUserDislikes = userDislikesRepository.findExist(userSeq, otherUserSeq);
-        System.out.println("existUserDislikes== " + existUserDislikes);
         if(existUserDislikes == null) {
             UserDislikes userDislikes = new UserDislikes();
             userDislikes.setFromUser(userRepository.findById(userSeq).orElse(null));
@@ -200,6 +210,11 @@ public class UserService {
         return userlikes;
     }
 
+    public List<UserLikes> getFollowees(Long otherUserSeq) {
+        // to_user_id 가 otherUserSeq 로 이루어져있는 녀석들만 골라서 저장하고 리턴
+        List<UserLikes> userlikes = userLikesRepository.findByFromUser(otherUserSeq);
+        return userlikes;
+    }
 
     @Transactional
     public void rankUpPremium(String token) {
@@ -219,6 +234,26 @@ public class UserService {
 
     public int getFollowersCount(Long userSeq){
         return userLikesRepository.findFollowersCount(userSeq);
+    }
+
+    public List<String> getProfileTaste(Long userSeq) {
+        User user = userRepository.findByUserSeq(userSeq);
+        if (user != null) {
+            return user.getTaste();
+        } else {
+            throw new IllegalStateException("해당 유저 없음");
+        }
+    }
+
+
+    public ConcurrentHashMap<String, Integer> getProfileTasteInfo(Long userSeq) {
+        UserInfo userInfo = userInfoRepository.findOneByUserSeq(userSeq);
+        if (userInfo != null) {
+             return userInfo.getTasteInfo();
+        } else {
+            throw new IllegalStateException("해당 유저 없음");
+        }
+
     }
 }
 

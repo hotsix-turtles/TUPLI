@@ -1,110 +1,146 @@
 <template>
-  <v-app>
-    <div class="background-login px-5">
-      <!-- <h1>회원가입 페이지</h1> -->
-      <v-container>
+  <div class="background-login">
+    <div class="px-5">
+      <div>
         <v-container class="mb-5">
-          <v-row
-            class="align-center mt-5"
+          <div
+            class="align-center mt-5 d-flex"
           >
             <router-link
               to="/signup"
               class="no-background-hover"
             >
               <v-icon
-                color="#5B5C9D"
+                size="20"
+                color="black"
+                class="px-2"
               >
-                mdi-chevron-left
+                mdi-arrow-left
               </v-icon>
             </router-link>
-            <h4 class="">
+            <p class="back-menu-tex">
               회원정보
-            </h4>
-          </v-row>
+            </p>
+          </div>
         </v-container>
 
-        <!-- 상태바 -->
-        <v-img
-          src="../../assets/signup_bar2.png"
-          alt="logo"
-        />
+
+        <div
+          class="d-flex justify-center"
+        >
+          <!-- 상태바 -->
+          <img
+            src="../../assets/signup_bar2.png"
+            alt="logo"
+            width="90%"
+          >
+        </div>
 
 
         <!-- 회원가입 form -->
-        <div class="mt-4 pt-4">
+        <div class="mt-4 pt-4 px-6">
           <v-form ref="form">
-            <h3>이메일</h3>
+            <h3
+              class="mt-2"
+            >
+              이메일
+            </h3>
             <v-text-field
               v-model="credentials.email"
-              class="pt-0"
+              required
+              :rules="emailRules"
               label="이메일을 입력해주세요"
             />
 
-            <h3>비밀번호</h3>
+            <h3 class="mt-4">
+              비밀번호
+            </h3>
             <v-text-field
               v-model="credentials.password"
-              class="pt-0"
+              required
+              :rules="[passwordRules.input, passwordRules.min]"
               type="password"
               label="비밀번호"
             />
 
             <v-text-field
               v-model="credentials.passwordCheck"
-              class="pt-0"
+              required
+              :rules="[passwordCheckRules.input, passwordCheckRules.check]"
               type="password"
               label="비밀번호 확인"
             />
 
-            <h3>닉네임</h3>
+            <h3 class="mt-5">
+              닉네임
+            </h3>
             <v-text-field
               v-model="credentials.nickname"
-              class="pt-0"
+              required
+              :rules="[nicknameRules.input, nicknameRules.max]"
               type=""
               label="닉네임"
+              @keydown.enter="onInputKeyword"
             />
-
-            <!-- <h3>이름</h3>
-            <v-text-field
-              v-model="credentials.username"
-              class="pt-0"
-              type=""
-              label="이름"
-            /> -->
           </v-form>
 
+          <p
+            style="font-size: 11px; color: dark-gray;"
+            class="mt-3"
+          >
+            * 프로필 이미지와 자기소개 폼은 프로필 편집을 통해 변경할 수 있습니다.
+          </p>
+
           <v-btn
-            class="white--text my-5"
+            class="white--text my-6"
             color="#5B5C9D"
             block
+            required
             elevation="0"
             rounded
+            large
             @click="signupCheck"
           >
             회원가입
           </v-btn>
         </div>
-      </v-container>
+      </div>
     </div>
-  </v-app>
+    <timeout-dialog
+      v-model="isFormDataNotValidError"
+      title="오류"
+      :content="formDataNotValidReason"
+      max-width="320"
+      timeout="2000"
+      hide-progress
+      @timeout="isFormDataNotValidError = false"
+    />
+  </div>
 </template>
 
 <script>
 import { mapActions } from 'vuex'
+import TimeoutDialog from '../../components/common/TimeoutDialog.vue';
 
 export default {
   name: 'Signup2',
+  components: { TimeoutDialog },
 
   // 이메일 비밀번호 규칙 설정
   data: function() {
     return {
-    // 회원 정보
+      // 회원 정보
       credentials: {
-        email: null,
-        password: null,
-        passwordCheck: null,
-        nickname: null,
+        email: '',
+        password: '',
+        passwordCheck: '',
+        nickname: '',
+        image: '@/assets/tupli_logo2_dark.png',
         // username: null,
       },
+
+      isFormDataNotValidError: false,
+      formDataNotValidReason: '',
 
       // 유효성 검사
       valid: true,
@@ -115,16 +151,18 @@ export default {
       ],
 
       passwordRules: {
-        min: v => v.length >= 8 || '올바른 비밀번호를 입력해주세요.',
+        input: v => !!v || '비밀번호를 입력해주세요.',
+        min: v => v.length >= 4 && v.length <= 16 || '4자 이상 16자 이하 비밀번호를 입력해주세요.',
       },
 
       passwordCheckRules: {
-        check: v => v === password || '일치하지 않는 비밀번호입니다.',
+        input: v => !!v || '비밀번호를 입력해주세요.',
+        check: v => v === this.credentials.password || '일치하지 않는 비밀번호입니다.',
       },
 
       nicknameRules: {
-        max: v => v.length <= 6 || '6글자 내의 닉네임을 입력해주세요.',
-        min: v => v.length > 0 || '닉네임을 입력해주세요.'
+        input: v => !!v || '닉네임을 입력해주세요.',
+        max: v => v.length <= 7 || '7글자 내의 닉네임을 입력해주세요.',
       }
     };
   },
@@ -133,10 +171,27 @@ export default {
     ...mapActions([
       'signup',
     ]),
+    // 로그인
+    requestSignup: async function () {
+      const { data, status } = await this.signup(this.credentials)
+
+      if (status == 201) {
+        this.valid = true
+        this.$router.push( { name: 'Signup3' })
+      } else if (status == 400) {
+        this.isFormDataNotValidError = true;
+        this.formDataNotValidReason = data.errorMessage;
+      }
+    },
+
     // 회원가입 유효성 검사
     signupCheck: function () {
-      this.signup(this.credentials)
+      this.requestSignup()
     },
+
+    onInputKeyword: function() {
+      this.requestSignup()
+    }
 
   },
 

@@ -1,6 +1,9 @@
 <template>
   <div class="text-center">
-    <span class="playlist-cd-medium">
+    <span
+      class="playlist-cd-medium"
+      @click="readonly ? undefined : $router.push({ name: 'PlaylistDetail', params: { playlistId: playlistId } })"
+    >
       <img
         :src="thumbnail"
       >
@@ -12,9 +15,11 @@
 <script>
 
 export default {
-  name: 'PlaylistCdItemMedium',
+  name: 'PlaylistCdMedium',
   props: {
-    thumbnail: { type: String, default: '' }
+    thumbnail: { type: String, default: '' },
+    playlistId: { type: Number, default: 0 },
+    readonly: { type: Boolean, default: false }
   },
 }
 </script>
