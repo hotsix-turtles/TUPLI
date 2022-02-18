@@ -342,7 +342,7 @@ export default {
       this.$router.push({ name: 'PlaylistFormVideo'})
     },
     onClickCreatePlayroomDialog: function (idx) {
-      if (idx === 1) { // 확인
+      if (idx === 0) { // 확인
         console.log('onClickCreatePlayroomDialog')
         this.createPlayroom = false
         const data = {
