@@ -16,20 +16,20 @@
       >
         로그인 후 이용하시겠습니까?
       </v-card-text>
-      <v-card-actions>
-        <v-btn
-          text
-          color="#5B5C9D"
-          @click="onClickOk"
-        >
-          확인
-        </v-btn>
+      <v-card-actions style="margin-left:45%;">
         <v-btn
           text
           color="#8B8B8B"
           @click="onClickCancel"
         >
           취소
+        </v-btn>
+        <v-btn
+          text
+          color="#5B5C9D"
+          @click="onClickOk"
+        >
+          확인
         </v-btn>
       </v-card-actions>
     </v-card>

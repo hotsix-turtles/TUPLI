@@ -25,7 +25,7 @@
           </div>
         </div>
         <!-- 댓글 -->
-        <div @click="$router.push({ name: 'BoardComment', params: { boardId: boardDetail.id }})">
+        <div @click="onClickComment">
           <v-icon color="black">
             mdi-comment-outline
           </v-icon>
@@ -82,16 +82,17 @@
       <br>
       <!-- 공유 게시물 -->
       <div
-        class="container"
+        class=""
       >
         <div class="mb-5">
           <div
             v-if="boardDetail.playlist !== null"
-            class="container added"
           >
-            <playlist-item-big
-              :playlist="boardDetail.playlist"
-            />
+            <div class="container added">
+              <playlist-item-big
+                :playlist="boardDetail.playlist"
+              />
+            </div>
           </div>
           <div
             v-if="boardDetail.playroom !== null"
@@ -104,21 +105,26 @@
         </div>
         <!-- 전체 선택 / 영상 리스트 -->
         <div
-          v-if="boardDetail.playroom !== null || boardDetail.playroom !== null"
+          v-if="boardDetail.playlist != null || boardDetail.playroom != null"
           class="clickable my-3"
           @click="onClickSelectAll"
         >
-          <v-icon>mdi-check</v-icon>
-          <span>전체 선택</span>
+          <div class="font-2 semi-bold color-main mt-5 mb-1">
+            재생 영상 목록
+          </div>
+          <div class="mt-3 mb-2">
+            <v-icon>mdi-check</v-icon>
+            <span>전체 선택</span>
+          </div>
+          <video-list-item-small
+            v-if="boardDetail.playlist !== null"
+            :videos="boardDetail.playlist.videos"
+          />
+          <video-list-item-small
+            v-if="boardDetail.playroom !== null"
+            :videos="boardDetail.playroom.videos"
+          />
         </div>
-        <video-list-item-small
-          v-if="boardDetail.playlist !== null"
-          :videos="boardDetail.playlist.videos"
-        />
-        <video-list-item-small
-          v-if="boardDetail.playroom !== null"
-          :videos="boardDetail.playroom.videos"
-        />
         <detail-button-bottom />
       </div>
     </div>
@@ -135,7 +141,7 @@
       content-html="정말 이 게시글를 삭제하시겠습니까?"
       max-width="290"
       persistent
-      :buttons="[{ name: '확인', color: '#5B5C9D' }, { name: '취소', color: 'gray' }]"
+      :buttons="[{ name: '취소', color: 'gray' }, { name: '확인', color: '#5B5C9D' }]"
       :show="deleteBoard"
       @button-click="onClickDeleteBoardDialog"
     />
@@ -217,6 +223,7 @@ export default {
       'saveFormData',
       'choosePlaylist',
       'choosePlayroom',
+      'getBoardComments',
     ]),
     ...mapActions('video', [
       'deselectAllDetailVideos',
@@ -296,9 +303,17 @@ export default {
       this.showTimeoutDialog = false
       this.$router.push({ name: 'Home' })
     },
+    onClickComment: function () {
+      this.getBoardComments(this.boardDetail.id)
+      this.$router.push({ name: 'BoardComment', params: { boardId: this.boardDetail.id }})
+    }
   },
 }
 </script>
 
 <style>
+  .added {
+    border: solid 1px;
+    border-color: #d8d8ee;
+  }
 </style>

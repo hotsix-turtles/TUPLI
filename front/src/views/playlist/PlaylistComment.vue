@@ -1,28 +1,30 @@
 <template>
-  <div id="comment">
+  <div>
     <back
       :page-name="'댓글'"
     /><br><br>
     <!-- 댓글 노출 -->
-    <div
-      v-for="(playlistComment, index) in playlistComments.reverse()"
-      :key="index"
-      class="ml-2 mr-3"
-    >
-      <comment-item
-        :id="playlistId"
-        :comment-type="'playlist'"
-        :comment="playlistComment"
-        @delete-comment="deleteComment"
-      />
-    </div>
+    <div id="playlist-comment">
+      <div
+        v-for="(playlistComment, idx) in playlistComments"
+        :key="idx"
+        class="ml-2 mr-3"
+      >
+        <comment-item
+          :id="parseInt(playlistId)"
+          :comment-type="'playlist'"
+          :comment="playlistComment"
+          @delete-comment="deleteComment"
+        />
+      </div>
 
-    <!-- 덧글이 한개도 없을때 나오는 출력창 -->
-    <div
-      v-if="playlistComments.length == 0"
-      class="text-center text--secondary mt-5"
-    >
-      댓글이 없습니다.
+      <!-- 덧글이 한개도 없을때 나오는 출력창 -->
+      <div
+        v-if="playlistComments.length == 0"
+        class="text-center text--secondary"
+      >
+        댓글이 없습니다.
+      </div>
     </div>
 
     <!-- 댓글 입력창 -->
@@ -38,7 +40,6 @@
 import { mapActions, mapState } from 'vuex'
 import Back from '../../components/common/Back.vue'
 import CommentInput from '../../components/common/CommentInput.vue'
-import { getImage, renderEmoticon } from '../../utils/utils'
 import CommentItem from '../../components/common/CommentItem.vue'
 
 
@@ -65,14 +66,13 @@ export default {
   },
   created: function() {
     this.playlistId = this.$route.params.playlistId
-    this.getPlaylistComments(this.playlistId)
   },
   mounted: function () {
     this.updateScroll()
   },
-  // updated: function () {
-  //   this.updateScroll()
-  // },
+  updated: function () {
+    this.updateScroll()
+  },
   methods: {
     ...mapActions('playlist', [
       'getPlaylistComments',
@@ -86,7 +86,6 @@ export default {
         emoticon: null,
       }
       this.createPlaylistComment({ playlistId, data })
-      this.updateScroll()
     },
     deleteComment: function (commentId) {
       const playlistId = this.playlistId
@@ -94,28 +93,17 @@ export default {
       this.deletePlaylistComment({commentId, playlistId})
       this.getPlaylistComments(this.playlistId)
     },
-    ImgUrl: function(img) {
-      return getImage(img)
-    },
     updateScroll: function () {
-      console.log('updateScroll')
-      var element = document.getElementById('comment');
+      var element = document.getElementById('playlist-comment');
       element.scrollTop = element.scrollHeight - element.clientHeight;
-    },
-    renderContent: function (content) {
-      console.log(content)
-      return renderEmoticon(content)
     },
   },
 }
 </script>
 
 <style>
-  #comment {
-    overflow: scroll;
-    height: 915px;
-  }
-  .comment {
+  #playlist-comment {
+    height: 730px;
     overflow: scroll;
   }
 </style>

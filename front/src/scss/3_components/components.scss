@@ -651,8 +651,21 @@
 
 // 메인 유저 네임 크기
 .main-username {
+  color: $color-dark-gray;
   font-size: 13px;
-  font-weight: normal;
+  font-weight: 600;
+  font-stretch: normal;
+  font-style: normal;
+  line-height: normal;
+  letter-spacing: normal;
+  text-align: left;
+  padding-top: 2px;
+  padding-left: 1px;
+}
+
+.main-username-board {
+  font-size: 13px;
+  font-weight: 600;
   font-stretch: normal;
   font-style: normal;
   line-height: normal;
