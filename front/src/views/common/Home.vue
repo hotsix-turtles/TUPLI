@@ -77,6 +77,7 @@
 import MainList from '@/components/home/MainList'
 import InfiniteLoading from "vue-infinite-loading"
 import axiosConnector from '../../utils/axios-connector';
+import { playtimeConverter } from '../../utils/utils';
 
 import { mapState } from 'vuex'
 
@@ -99,7 +100,10 @@ export default {
   },
 
   computed: {
-    ...mapState(['authToken', 'nickname'])
+    ...mapState(['authToken', 'nickname']),
+    today: function () {
+      return new Date() / 1000
+    }
   },
 
   methods: {
@@ -114,8 +118,23 @@ export default {
       })
         .then((res) => {
           if (res.data.length) {
+            console.log('Home', res.data)
             this.page++
-            this.mainContents.push(...res.data)
+            const contents = res.data
+            contents.forEach((content) => {
+              if (content.type === 'playroom') {
+                if (content.startTime <= this.today && content.endTime >= this.today) {
+                  content.onPlay = true
+                } else {
+                  content.onPlay = false
+                }
+                content.playTime = playtimeConverter(content.startTime, content.endTime)
+                content.image = content.videos.thumbnail
+                content.profileImg = content.userProfileImg
+                content.nickname = content.nickName
+              }
+            })
+            this.mainContents.push(...contents)
             $state.loaded()
           } else {
             $state.complete()
