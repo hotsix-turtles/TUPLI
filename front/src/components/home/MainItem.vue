@@ -381,6 +381,8 @@ export default {
 
       showLoginDialog: false,
 
+      playroomlistnum: '',
+
     }
   },
   computed: {
@@ -391,12 +393,15 @@ export default {
     }),
   },
   created: function() {
+    console.log( '플레이리스트 상세', this.content.playlists )
+
     console.log('로그인 여부', this.isLogin)
     // console.log('content like', this.content.likesCnt)
 
     this.getThumbnailImage()
     this.getProfileImage()
     this.getTag()
+    this.getPlayroomListNum()
 
   },
   methods: {
@@ -506,6 +511,16 @@ export default {
     goPlayroom: function() {
       console.log( '플레이룸 상세', this.content.id )
       this.$router.push({ name: 'PlayroomDetail', params: { id: this.content.id }})
+    },
+    // 플레이리스트 상세로 가기
+    goPlayroomPlaylist: function() {
+      console.log( '플레이리스트 상세', this.content.playlists )
+      this.$router.push({ name: 'PlaylistDetail', params: { playlistId : this.playroomlistnum }})
+    },
+    getPlayroomListNum: function() {
+      for (let key in this.content.playlists) {
+        this.playroomlistnum = key
+      }
     },
     // 플레이리스트 상세로 가기
     goPlaylist: function() {
