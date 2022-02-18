@@ -286,7 +286,7 @@ export default {
       return getImage(img)
     },
     onClickDeleteBoardDialog: function (idx) {
-      if (idx === 0) { // 확인
+      if (idx === 1) { // 확인
         this.deleteBoard = false
         axiosConnector.delete(`/board/${this.boardDetail.id}`
         ).then((res) => {

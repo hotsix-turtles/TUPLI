@@ -314,7 +314,7 @@ export default {
       }
     },
     onClickCreatePlayroomDialog: function (idx) {
-      if (idx === 0) { // 확인
+      if (idx === 1) { // 확인
         console.log('onClickCreatePlayroomDialog')
         this.createPlayroom = false
         const videoIds = this.playlistDetail.videos.map((video) => {
@@ -336,7 +336,7 @@ export default {
       }
     },
     onClickDeletePlaylistDialog: function (idx) {
-      if (idx === 0) { // 확인
+      if (idx === 1) { // 확인
         console.log('onClickDeletePlaylistDialog 삭제')
         this.deletePlaylist = false
         axiosConnector.delete(`/playlist/${this.playlistDetail.id}`
