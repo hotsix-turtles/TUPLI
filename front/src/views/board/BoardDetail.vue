@@ -141,7 +141,7 @@
       content-html="정말 이 게시글를 삭제하시겠습니까?"
       max-width="290"
       persistent
-      :buttons="[{ name: '확인', color: '#5B5C9D' }, { name: '취소', color: 'gray' }]"
+      :buttons="[{ name: '취소', color: 'gray' }, { name: '확인', color: '#5B5C9D' }]"
       :show="deleteBoard"
       @button-click="onClickDeleteBoardDialog"
     />

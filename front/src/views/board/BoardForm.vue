@@ -161,7 +161,7 @@
       content-html="기존 입력 데이터가 사라집니다."
       max-width="290"
       persistent
-      :buttons="[{ name: '확인', color: '#5B5C9D' }, { name: '취소', color: 'gray' }]"
+      :buttons="[{ name: '취소', color: 'gray' }, { name: '확인', color: '#5B5C9D' }]"
       :show="isReset"
       @button-click="onClickSaveDataDialog"
     />

@@ -141,6 +141,7 @@
 
             <div
               class="d-flex flex-column align-center mx-1"
+              @click="goPlayroomPlaylist"
             >
               <v-icon
                 color="#000000"
@@ -531,6 +532,8 @@ export default {
 
       showLoginDialog: false,
 
+      playroomlistnum: '',
+
     }
   },
   computed: {
@@ -541,12 +544,15 @@ export default {
     }),
   },
   created: function() {
+    console.log( '플레이리스트 상세', this.content.playlists )
+
     console.log('로그인 여부', this.isLogin)
     // console.log('content like', this.content.likesCnt)
 
     this.getThumbnailImage()
     this.getProfileImage()
     this.getTag()
+    this.getPlayroomListNum()
 
   },
   methods: {
@@ -657,6 +663,16 @@ export default {
       this.$router.push({ name: 'PlayroomDetail', params: { id: this.content.id }})
     },
     // 플레이리스트 상세로 가기
+    goPlayroomPlaylist: function() {
+      console.log( '플레이리스트 상세', this.content.playlists )
+      this.$router.push({ name: 'PlaylistDetail', params: { playlistId : this.playroomlistnum }})
+    },
+    getPlayroomListNum: function() {
+      for (let key in this.content.playlists) {
+        this.playroomlistnum = key
+      }
+    },
+    // 플레이리스트 상세로 가기
     goPlaylist: function() {
       console.log( '플레이리스트 상세', this.content.id )
       this.$router.push({ name: 'PlaylistDetail', params: { playlistId : this.content.id }})
@@ -674,7 +690,7 @@ export default {
     // 좋아요
     // 좋아요 - 플레이룸
     onClickPlayroomLike: function () {
-      if(this.isLogin) {
+      if(this.content.userLikesYN) {
         console.log('좋아요 누름', this.content.userLikesYN)
         this.content.userLikesYN = 'Y'
         this.content.likesCnt++
