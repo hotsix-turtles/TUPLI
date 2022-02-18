@@ -119,6 +119,12 @@ np/* eslint-disable vue/require-default-prop */
       </div>
     </div>
 
+    <alert-dialog
+      v-model="followDialogState"
+      :title="followDialogTitle"
+      timeout="2000"
+      @timeout="hideFollowDialog"
+    />
     <login-dialog
       :show="showLoginDialog"
       @on-click="showLoginDialog = false"
@@ -128,7 +134,7 @@ np/* eslint-disable vue/require-default-prop */
 </template>
 
 <script>
-import { mapState } from 'vuex'
+import { mapActions, mapState } from 'vuex'
 import Alarm from '@/components/alarm/Alarm'
 import LoginDialog from './LoginDialog.vue'
 
@@ -150,7 +156,9 @@ export default {
     ...mapState([
       'isLogin',
       'profileImage',
-      'is_vip'
+      'is_vip',
+      'followDialogTitle',
+      'followDialogState'
     ]),
   },
   created: function () {
@@ -188,7 +196,8 @@ export default {
     changeRouter: function (pageName) {
       this.$router.push({ name: pageName })
       this.selectedPage = pageName
-    }
+    },
+    ...mapActions(['showFollowDialog','hideFollowDialog']),
   }
 }
 </script>

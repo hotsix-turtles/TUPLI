@@ -31,9 +31,18 @@ export default new Vuex.Store({
   state: {
     authToken: null,
     isLogin: false,
-    userSeq: null
+    userSeq: null,
+    followDialogTitle: '',
+    followDialogState: false,
   },
   mutations: {
+    SET_FOLLOW_DIALOG_TITLE(state, value) {
+      state.followDialogTitle = value;
+    },
+    SET_FOLLOW_DIALOG_STATE(state, value) {
+      state.followDialogState = value;
+    },
+
     // 로그인
     TOKEN: function (state, token) {
       localStorage.setItem('jwt', token)
@@ -110,6 +119,15 @@ export default new Vuex.Store({
 
   },
   actions: {
+    setFollowDialogTitle({commit}, value) {
+      commit('SET_FOLLOW_DIALOG_TITLE', value)
+    },
+    showFollowDialog({commit}) {
+      commit('SET_FOLLOW_DIALOG_STATE', true)
+    },
+    hideFollowDialog({commit}) {
+      commit('SET_FOLLOW_DIALOG_STATE', false)
+    },
     // 로그인
     login: async function ({ commit, dispatch }, credentials) {
       let response;
