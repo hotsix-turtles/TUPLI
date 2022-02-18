@@ -5,7 +5,9 @@
         class="d-flex align-center mt-5"
       >
         <v-icon
-          size="30"
+          size="20"
+          color="black"
+          class="px-2"
           @click="$router.go(-1)"
         >
           mdi-arrow-left

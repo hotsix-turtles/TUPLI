@@ -27,6 +27,7 @@
       </v-card-text>
       <v-card-actions
         v-if="buttons.length"
+        class="d-flex justify-end"
       >
         <v-spacer v-if="buttonSpacing" />
         <v-btn

@@ -29,6 +29,7 @@
                 :rules="emailRules"
                 label="이메일을 입력해주세요"
                 required
+                @keydown.enter="onInputKeyword"
               />
 
               <v-text-field

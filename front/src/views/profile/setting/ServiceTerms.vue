@@ -1,5 +1,5 @@
 <template>
-  <v-app>
+  <div>
     <v-container class="mb-5">
       <v-row
         class="align-center mt-5"
@@ -265,7 +265,7 @@ TUPLI 서비스는 TUPLI 대화방에서 일어나는 일에 대해 최대한 �
         </h4>
       </v-row>
     </v-container>
-  </v-app>
+  </div>
 </template>
 
 <script>
