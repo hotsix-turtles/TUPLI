@@ -73,7 +73,7 @@
           <div class="d-flex mr-5 align-center">
             <div
               v-if="content.userLikesYN === 'Y'"
-              class="d-flex flex-column align-center mx-1"
+              class="d-flex flex-column align-center mx-1 animate__animated animate__heartBeat"
               @click="onClickPlaylistUnlike"
             >
               <v-icon color="#5B5C9D">
@@ -179,7 +179,7 @@
               <!-- 좋아요 -->
               <div
                 v-if="content.userLikesYN === 'Y'"
-                class="d-flex flex-column justify-start mx-1"
+                class="d-flex flex-column justify-start mx-1 animate__animated animate__heartBeat"
                 @click="onClickBoardUnlike"
               >
                 <v-icon color="#5B5C9D">
