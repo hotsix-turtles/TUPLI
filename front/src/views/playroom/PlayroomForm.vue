@@ -20,7 +20,7 @@
     </div><br><br>
 
     <!-- 플레이룸 생성 폼 -->
-    <v-form>
+    <v-form class="mt-2 mx-1">
       <v-container>
         <!-- 제목 -->
         <v-row>
@@ -75,12 +75,12 @@
             class="d-flex flex-row justify-space-between"
           >
             <div>
-              <p class="font-3">
+              <div class="">
                 플레이리스트 구성
-              </p>
-              <p class="font-4 ml-1 mr-auto">
-                원하는 플레이리스트를 검색하고 추가하여<br> 나만의 플레이리스트를 구성할 수 있습니다.
-              </p>
+              </div>
+              <div class="font-4 color-dark-gray">
+                원하는 플레이리스트를 추가해주세요.
+              </div>
             </div>
 
             <!-- 플레이리스트 추가 버튼 -->
@@ -89,12 +89,18 @@
             >
               <v-btn
                 small
+                color="accent"
+                elevation="2"
+                rounded
                 @click="saveAndGoPlaylist"
               >
-                <v-icon color="black">
+                <v-icon
+                  small
+                  color="white"
+                >
                   mdi-plus
                 </v-icon>
-                <span style="color: black;">플레이리스트 추가</span>
+                <span style="color: white;">플레이리스트 추가</span>
               </v-btn>
             </div>
           </v-col>
@@ -154,15 +160,15 @@
           <v-col
             cols="12"
             md="12"
-            class="d-flex flex-row justify-space-between"
+            class="d-flex align-center justify-space-between py-0 my-5"
           >
-            <div>
-              <p class="font-3">
+            <div class="">
+              <div class="">
                 친구 초대
-              </p>
-              <p class="font-4 ml-1 mr-auto">
+              </div>
+              <div class="font-4 color-dark-gray">
                 친구에게 플레이룸 시작 전 알림을 보냅니다.
-              </p>
+              </div>
             </div>
 
             <!-- 친구 초대 버튼 -->
@@ -170,13 +176,19 @@
               class="py-0 mr-0"
             >
               <v-btn
+                color="accent"
+                elevation="2"
+                rounded
                 small
                 @click="saveAndGoFriend"
               >
-                <v-icon color="black">
+                <v-icon
+                  small
+                  color="white"
+                >
                   mdi-plus
                 </v-icon>
-                <span style="color: black;">친구 추가</span>
+                <span style="color: white;">친구 추가</span>
               </v-btn>
             </div>
           </v-col>
@@ -222,7 +234,9 @@
               class="d-flex flex-column justify-center align-center"
               min-height="300"
             >
-              <p v-if="!addedFriends.length">초대한 친구가 없습니다</p>
+              <p v-if="!addedFriends.length">
+                초대한 친구가 없습니다
+              </p>
               <account-list-item-small
                 :accounts="addedFriends"
                 readonly
@@ -238,18 +252,21 @@
           <v-col
             cols="12"
             md="12"
-            class="d-flex flex-row justify-space-between"
+            class="d-flex justify-space-between py-0 mt-5"
           >
-            <p class="font-3">
-              시간 설정
-            </p>
-            <p class="font-4 ml-1 mr-auto">
-              플레이룸을 운영할 시간을 지정합니다.
-            </p>
+            <div class="d-flex align-center">
+              <span>
+                시간 설정
+              </span>
+              <span class="font-4 ml-2 color-dark-gray">
+                플레이룸을 운영할 시간을 지정합니다.
+              </span>
+            </div>
             <v-checkbox
               v-model="autoTime"
               label="자동"
-              class="mt-0"
+              class="mt-2"
+              color="#5B5C9D"
             />
           </v-col>
         </v-row>
@@ -397,35 +414,37 @@
           <v-col
             cols="12"
             md="4"
-            class="d-flex flex-row justify-space-between"
+            class="d-flex justify-space-between py-0 mb-5"
           >
-            <p class="font-3">
-              공개 여부
-            </p>
-            <p class="font-4 ml-1 mr-auto">
-              {{ isPublicMsg }}
-            </p>
+            <div class="d-flex align-center">
+              <span>공개 설정</span>
+              <span class="font-4 ml-2 color-dark-gray">
+                {{ isPublicMsg }}
+              </span>
+            </div>
             <v-switch
               v-model="formData.isPublic"
+              color="#5B5C9D"
             />
           </v-col>
         </v-row>
 
-        <!-- 플레이리스트 셔플 여부 -->
+        <!-- 플레이룸 셔플 여부 -->
         <v-row>
           <v-col
             cols="12"
             md="4"
-            class="d-flex flex-row justify-space-between"
+            class="d-flex justify-space-between py-0 mb-5"
           >
-            <p class="font-3">
-              셔플 사용
-            </p>
-            <p class="font-4 ml-1 mr-auto">
-              {{ isShuffleMsg }}
-            </p>
+            <div class="d-flex align-center">
+              <span>셔플 사용</span>
+              <span class="font-4 ml-2 color-dark-gray">
+                {{ isShuffleMsg }}
+              </span>
+            </div>
             <v-switch
-              v-model="isShuffle"
+              v-model="formData.isShuffle"
+              color="#5B5C9D"
             />
           </v-col>
         </v-row>
@@ -435,17 +454,17 @@
           <v-col
             cols="12"
             md="4"
-            class="d-flex flex-row justify-space-between"
+            class="d-flex justify-space-between py-0 mb-5"
           >
-            <p class="font-3">
-              최대 인원수
-            </p>
-            <p class="font-4 ml-1 mr-auto">
-              참여할 최대 유저 수를 설정합니다.
-            </p>
+            <div class="d-flex align-center">
+              <span>최대 인원수</span>
+              <span class="font-4 ml-2 color-dark-gray">
+                참여할 최대 유저 수를 설정합니다.
+              </span>
+            </div>
             <v-combobox
               v-model="formData.userCountMax"
-              class="ml-5"
+              class="ml-5 mt-3"
               style="width: 50px;"
               dense
               solo

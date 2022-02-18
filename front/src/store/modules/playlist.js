@@ -76,7 +76,8 @@ const playlist = {
         playlistComments.forEach((playlistComment) => {
           playlistComment.created = timeConverter(playlistComment.created)
         })
-        state.playlistComments = playlistComments
+        state.playlistComments = playlistComments.reverse()
+        router.push({ name: 'PlaylistComment', params: {  }})
       }
       else {
         state.playlistComments = []
