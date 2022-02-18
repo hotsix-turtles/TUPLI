@@ -149,8 +149,7 @@
       :content="'해당 게시글이 삭제되었습니다.'"
       :show="showTimeoutDialog"
       hide-progress
-      :persistent="false"
-      timeout="1700"
+      timeout="1500"
       @timeout="onTimeout"
       @click="onTimeout"
     />

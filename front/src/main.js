@@ -6,8 +6,11 @@ import router from './router'
 import vuetify from './plugins/vuetify'
 import firebase from 'firebase/compat/app';
 // import {firebaseConfig} from './config/firebase'
+import AlertDialog from "@/components/common/AlertDialog.vue"
 
 Vue.config.productionTip = false
+
+Vue.component('alert-dialog', AlertDialog);
 
 Kakao.init(process.env.VUE_APP_KAKAO_API_KEY)
 

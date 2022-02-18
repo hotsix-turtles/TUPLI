@@ -52,8 +52,8 @@ function timeConverterShort(UNIX_timestamp){
 function playtimeConverter(startTime, endTime){
   const timezoneOffset = new Date().getTimezoneOffset() * 60 * 1000;
 
-  const localStartTime = new Date(startTime - timezoneOffset);
-  const localEndTime = new Date(endTime - timezoneOffset);
+  const localStartTime = (startTime < 10000000000) ? new Date((startTime - timezoneOffset) * 1000) : new Date(startTime - timezoneOffset * 1000)
+  const localEndTime = (endTime < 10000000000) ? new Date((endTime - timezoneOffset) * 1000) : new Date(endTime - timezoneOffset * 1000)
 
   if (localStartTime.getDate() == localEndTime.getDate())
     return `${localStartTime.toISOString().substr(11, 5)} - ${localEndTime.toISOString().substr(11, 5)}`
