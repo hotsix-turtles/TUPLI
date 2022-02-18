@@ -71,7 +71,7 @@
         <!-- 좋아요 -->
         <div class="d-flex-column text-center mr-2">
           <div
-            v-if="playroom.isLiked"
+            v-if="playroom.isLiked ? playroom.isLiked : playroom.userLikesYN == 'Y'"
             class="animate__animated animate__heartBeat"
             @click="onClickUnlike"
           >
