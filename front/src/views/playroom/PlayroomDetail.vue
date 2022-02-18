@@ -216,12 +216,8 @@
           <v-icon
             color="accent"
             dense
-            <<<<<<<
-            h-e-a-d="======"
             small
           >
-            >>>>>> c7c694b9e1d8c4f3f65d30fbdd515ca64bc52e4e
-            >
             mdi-account
           </v-icon>
           {{ roomUserCount }}명  시청 중
@@ -1449,6 +1445,10 @@ iframe {
   font-weight: bold;
 }
 
+@media screen and (max-device-aspect-ratio: 1/1) and (orientation: portrait) {
+
+}
+
 @media screen and (min-device-aspect-ratio: 1/1) and (orientation: landscape) {
   body { overflow: hidden; }
 
@@ -1524,6 +1524,11 @@ iframe {
 </style>
 
 <style lang="scss" scoped>
+@media screen and (max-device-aspect-ratio: 1/1) and (orientation: portrait) {
+  .fixed-bottom-navbar {
+    display: fixed !important;
+  }
+}
 @media screen and (min-device-aspect-ratio: 1/1) and (orientation: landscape) {
   .fixed-bottom-navbar {
     display: none;
