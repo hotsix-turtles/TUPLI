@@ -119,8 +119,8 @@ public class UserApiController {
 //        @Size(min=3, max=128, message = "{error.size.username}")
         private String username;
 //        @Size(min=3, max=128, message = "{error.size.email}")
-        @Email(message = "{error.format.email}")
-        @Email(message = "{email.notempty}")
+        @Email(message = "{error.format.email}", regexp = "^[\\w!#$%&'*+/=?`{|}~^-]+(?:\\.[\\w!#$%&'*+/=?`{|}~^-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}$")
+        @NotNull(message = "{email.notempty}")
         private String email;
         private String nickname;
         @Size(min=4, max=12, message = "{error.size.password}")
