@@ -32,6 +32,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @RestController
@@ -84,7 +85,7 @@ public class UserInfoApiController {
             List<Object> activities = homeInfoService.getUserActivites(userSeq, myUserSeq, pageable);
             List<Playroom> playrooms = playroomService.getWatchingPlayroom(userSeq);
             UserProfileDto result = new UserProfileDto(user, userInfo, playrooms, activities);
-            if(myUserSeq == user.getUserSeq()) result.setMeCheck(true);
+            if(Objects.equals(myUserSeq, user.getUserSeq())) result.setMeCheck(true);
             return ResponseEntity.ok().body(result);
         }
     }
@@ -116,9 +117,9 @@ public class UserInfoApiController {
         List<Long> badges = badgeService.getUserBadgeSeq(userBadges);
 
         // 배지갱신
-        badgeService.checkWatchTime(userSeq, badges);
-
-        return ResponseEntity.ok().body(null);
+        List<Badge> badgeResult = badgeService.checkWatchTime(userSeq, badges);
+        List<SimpleBadgeDto> result = badgeResult.stream().map(b -> new SimpleBadgeDto(b)).collect(Collectors.toList());
+        return ResponseEntity.ok().body(badgeResult);
     }
 
     /**
