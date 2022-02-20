@@ -30,12 +30,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
-@Api(tags = "프로필 정보 API")
+@Api(tags = "유저 정보 관련 API")
 public class UserInfoApiController {
 
     private final UserInfoRepository userInfoRepository;
@@ -56,8 +58,9 @@ public class UserInfoApiController {
      * 반환 코드 : 200, 204, 404
      */
     @GetMapping("/userinfo/{userSeq}")
-    @ApiOperation(value = "유저의 프로필 정보 확인", notes = "uid 저장된 정보가 없을 시 204 반환, 성공 시 200[userInfo 값] 반환")
+    @ApiOperation(value = "유저의 프로필 정보를 리턴", notes = "")
     public ResponseEntity findUserInfo(@ApiParam(value = "path 로 uid 전달받는다.") @PathVariable("userSeq") Long userSeq,
+                                       HttpServletRequest request,
                                        @PageableDefault(size = 30, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable ) {
 
         UserInfo userInfo = userInfoRepository.findOneByUserSeq(userSeq);
@@ -66,12 +69,25 @@ public class UserInfoApiController {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
         }
 
-        User user = userRepository.findByUserSeq(userSeq);
-        List<Object> activities = homeInfoService.getActivites(userSeq, pageable);
-        List<Playroom> playrooms = playroomService.getWatchingPlayroom(userSeq);
-        UserProfileDto result = new UserProfileDto(user, userInfo, playrooms, activities);
+        String token = request.getHeader("Authorization");
+        if (token == null || !jwtTokenProvider.validateToken(token)) {
+            User user = userRepository.findByUserSeq(userSeq);
 
-        return ResponseEntity.ok().body(result);
+            List<Object> activities = homeInfoService.getActivites(userSeq, pageable);
+            List<Playroom> playrooms = playroomService.getWatchingPlayroom(userSeq);
+            UserProfileDto result = new UserProfileDto(user, userInfo, playrooms, activities);
+            return ResponseEntity.ok().body(result);
+        }
+        else{
+            Long myUserSeq = jwtTokenProvider.getUserSeq(token);
+            User user = userRepository.findByUserSeq(userSeq);
+
+            List<Object> activities = homeInfoService.getUserActivites(userSeq, myUserSeq, pageable);
+            List<Playroom> playrooms = playroomService.getWatchingPlayroom(userSeq);
+            UserProfileDto result = new UserProfileDto(user, userInfo, playrooms, activities);
+            if(Objects.equals(myUserSeq, user.getUserSeq())) result.setMeCheck(true);
+            return ResponseEntity.ok().body(result);
+        }
     }
 
     /**
@@ -82,6 +98,7 @@ public class UserInfoApiController {
      * 반환 코드 : 200, 403, 404
      */
     @PutMapping("/userinfo/watchtime")
+    @ApiOperation(value = "유저의 플레이룸 시청시간 갱신", notes = "")
     public ResponseEntity userInfoUpdate(@RequestParam("time") Long time,
                                          @RequestHeader(value = "Authorization") String token) {
         // 토큰 유효 확인 및 유저 정보(UseqSeq) 가져오기
@@ -100,9 +117,9 @@ public class UserInfoApiController {
         List<Long> badges = badgeService.getUserBadgeSeq(userBadges);
 
         // 배지갱신
-        badgeService.checkWatchTime(userSeq, badges);
-
-        return ResponseEntity.ok().body(null);
+        List<Badge> badgeResult = badgeService.checkWatchTime(userSeq, badges);
+        List<SimpleBadgeDto> result = badgeResult.stream().map(b -> new SimpleBadgeDto(b)).collect(Collectors.toList());
+        return ResponseEntity.ok().body(badgeResult);
     }
 
     /**
@@ -112,6 +129,7 @@ public class UserInfoApiController {
      * 반환 코드 : 200, 403, 404
      */
     @PutMapping("/userinfo/board")
+    @ApiOperation(value = "유저가 게시글을 올린 횟수를 갱신", notes = "")
     public ResponseEntity userInfoUpdateBoard(@RequestHeader(value = "Authorization") String token) {
         // 토큰 유효 확인 및 유저 정보(UseqSeq) 가져오기
         if (!jwtTokenProvider.validateToken(token)) {

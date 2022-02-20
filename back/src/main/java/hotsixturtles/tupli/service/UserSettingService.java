@@ -1,6 +1,6 @@
 package hotsixturtles.tupli.service;
 
-import hotsixturtles.tupli.dto.UserSettingDto;
+import hotsixturtles.tupli.dto.request.UserSettingRequestDto;
 import hotsixturtles.tupli.entity.User;
 import hotsixturtles.tupli.entity.UserSetting;
 import hotsixturtles.tupli.repository.UserRepository;
@@ -18,7 +18,7 @@ public class UserSettingService {
     private final UserSettingRepository userSettingRepository;
 
     @Transactional
-    public void changeSetting(Long userSeq, UserSettingDto userSettingDto) {
+    public void changeSetting(Long userSeq, UserSettingRequestDto userSettingDto) {
         User user = userRepository.findByUserSeq(userSeq);
         UserSetting userSetting = userSettingRepository.findByUser(user);
         if (userSetting!=null) {

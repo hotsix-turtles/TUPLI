@@ -45,7 +45,10 @@ public class SimplePlayroomCategoryDto {
         this.image = playroom.getImage();
         this.startTime = playroom.getStartTime();
         this.endTime = playroom.getEndTime();
-        this.userCount = playroom.getUserCount();
+        if(playroom.getGuests() == null || playroom.getGuests().size() == 0){
+            this.userCount = 0;
+        }
+        else this.userCount = playroom.getGuests().size();
         this.userCountMax = playroom.getUserCountMax();
 
         // 추가 변수
@@ -68,7 +71,10 @@ public class SimplePlayroomCategoryDto {
         this.image = playroom.getImage();
         this.startTime = playroom.getStartTime();
         this.endTime = playroom.getEndTime();
-        this.userCount = playroom.getUserCount();
+        if(playroom.getGuests() == null || playroom.getGuests().size() == 0){
+            this.userCount = 0;
+        }
+        else this.userCount = playroom.getGuests().size();
         this.userCountMax = playroom.getUserCountMax();
 
         // 추가 변수

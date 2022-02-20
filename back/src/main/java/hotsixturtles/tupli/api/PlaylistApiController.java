@@ -9,6 +9,7 @@ import hotsixturtles.tupli.dto.response.ErrorResponse;
 import hotsixturtles.tupli.dto.response.IdResponse;
 import hotsixturtles.tupli.dto.simple.SimpleBadgeDto;
 import hotsixturtles.tupli.dto.simple.SimplePlaylistCategoryDto;
+import hotsixturtles.tupli.dto.simple.SimplePlaylistDto;
 import hotsixturtles.tupli.entity.*;
 import hotsixturtles.tupli.entity.likes.PlaylistLikes;
 import hotsixturtles.tupli.service.*;
@@ -39,7 +40,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@Api(tags = "플레이 리스트 관련 API")
+@Api(tags = "플레이리스트 관련 API")
 public class PlaylistApiController {
 
     private final JwtTokenProvider jwtTokenProvider;
@@ -63,6 +64,7 @@ public class PlaylistApiController {
      * 고민사항 : ID 또는 PlaylistDto 반환이라도 해줘야 하는지 고민
      */
     @PostMapping("/playlist")
+    @ApiOperation(value = "플레이리스트를 만듭니다.", notes = "플레이리스트를 만듭니다.\n인증정보가 틀리면 401에러가 발생합니다.")
     public ResponseEntity addPlaylist(@RequestHeader(value = "Authorization") String token,
                                       @RequestBody PlaylistRequest playlistRequest){
         // 유저 정보
@@ -103,18 +105,26 @@ public class PlaylistApiController {
      * 반환 코드 : 200, 404
      */
     @GetMapping("/playlist/{id}")
+    @ApiOperation(value = "id에 해당하는 플레이리스트 정보를 리턴합니다.", notes = "id에 해당하는 플레이리스트 정보를 리턴합니다." +
+            "\n비회원일 경우 플레이리스트 정보에 유저 정보가 담기지 않습니다.")
     public ResponseEntity getPlaylist(@PathVariable("id") Long id,
                                       HttpServletRequest request){
         // 회원, 비회원(유효하지 않은 토큰) 구분
         String token = request.getHeader("Authorization");
         if (token == null || !jwtTokenProvider.validateToken(token)) {
             Playlist playlist = playlistService.getPlaylist(id);
-            return ResponseEntity.status(HttpStatus.OK).body(new PlaylistDto(playlist));
+            List<SimplePlaylistDto> recommendPlaylist = playlistService.getRecommendPlaylist(playlist.getRecommendPlaylists());
+            PlaylistDto result = new PlaylistDto(playlist);
+            result.setRecommendPlaylists(recommendPlaylist);
+            return ResponseEntity.status(HttpStatus.OK).body(result);
         } else {
             Long userSeq = jwtTokenProvider.getUserSeq(token);
             Playlist playlist = playlistService.getPlaylist(id);
+            List<SimplePlaylistDto> recommendPlaylist = playlistService.getRecommendPlaylist(playlist.getRecommendPlaylists());
             User user = userService.getUserByUserseq(userSeq);
-            return ResponseEntity.status(HttpStatus.OK).body(new PlaylistDto(playlist, user));
+            PlaylistDto result = new PlaylistDto(playlist, user);
+            result.setRecommendPlaylists(recommendPlaylist);
+            return ResponseEntity.status(HttpStatus.OK).body(result);
         }
     }
 
@@ -125,6 +135,7 @@ public class PlaylistApiController {
      * @return
      */
     @GetMapping("/playlist/my")
+    @ApiOperation(value = "자신이 생성한 플레이리스트 목록을 리턴받습니다.", notes = "자신이 생성한 플레이리스트 목록을 리턴받습니다.")
     public ResponseEntity getMyPlaylist(@RequestHeader(value = "Authorization") String token,
                                       @PageableDefault(size = 50, sort ="id",  direction = Sort.Direction.DESC) Pageable pageable){
         // 유저 정보
@@ -146,6 +157,8 @@ public class PlaylistApiController {
      * 반환 코드 : 200, 404
      */
     @GetMapping("/playlist/list")
+    @ApiOperation(value = "현재 존재하는 모든 플레이리스트 목록을 리턴받습니다.",
+            notes = "현재 존재하는 모든 플레이리스트 목록을 리턴받습니다.")
     public ResponseEntity<?> getPlaylistList(HttpServletRequest request){
         // 회원, 비회원(유효하지 않은 토큰) 구분
         String token = request.getHeader("Authorization");
@@ -174,6 +187,7 @@ public class PlaylistApiController {
      * 반환 코드 : 200, 404
      */
     @PutMapping("/playlist/{id}")
+    @ApiOperation(value = "id에 해당하는 플레이리스트를 수정합니다.", notes = "id에 해당하는 플레이리스트를 수정합니다.")
     public ResponseEntity<?> updatePlaylist(@RequestHeader(value = "Authorization") String token,
                                          @PathVariable("id") Long id,
                                             @RequestBody PlaylistRequest playlistRequest){
@@ -197,6 +211,7 @@ public class PlaylistApiController {
      * 반환 코드 : 204, 404
      */
     @DeleteMapping("/playlist/{id}")
+    @ApiOperation(value = "id에 해당하는 플레이리스트를 삭제합니다.", notes = "id에 해당하는 플레이리스트를 삭제합니다.")
     public ResponseEntity<?> deletePlaylist(@RequestHeader(value = "Authorization") String token, @PathVariable("id") Long id){
         // 유저 인증
         if (!jwtTokenProvider.validateToken(token)) {
@@ -218,6 +233,8 @@ public class PlaylistApiController {
      * 반환코드 : 200 204 404
      */
     @GetMapping("/playlist/{id}/like")
+    @ApiOperation(value = "id에 해당하는 플레이리스트를 좋아요한 회원 목록을 리턴합니다.",
+            notes = "id에 해당하는 플레이리스트를 좋아요한 회원 목록을 리턴합니다.")
     public ResponseEntity getPlaylistLike(@RequestHeader(value = "Authorization") String token,
                                           @PathVariable("id") Long id) {
         // 유저 인증 & 정보
@@ -244,6 +261,8 @@ public class PlaylistApiController {
      * @return
      */
     @PostMapping("/playlist/{id}/like")
+    @ApiOperation(value = "id에 해당하는 플레이리스트를 좋아요 합니다.",
+            notes = "id에 해당하는 플레이리스트를 좋아요 합니다.")
     public ResponseEntity<?> addPlaylistLike(@RequestHeader(value = "Authorization") String token,
                                              @PathVariable("id") Long id) {
         // 유저 인증 & 정보
@@ -267,6 +286,8 @@ public class PlaylistApiController {
      * @return
      */
     @DeleteMapping("/playlist/{id}/like")
+    @ApiOperation(value = "id에 해당하는 플레이리스트를 좋아요 해제합니다.",
+            notes = "id에 해당하는 플레이리스트를 좋아요 해제합니다.")
     public ResponseEntity<?> deletePlaylistLike(@RequestHeader(value = "Authorization") String token,
                                                 @PathVariable("id") Long id) {
         // 유저 인증 & 정보
@@ -290,6 +311,9 @@ public class PlaylistApiController {
      * 반환 코드 : 200, 404
      */
     @GetMapping("/playlist/search")
+    @ApiOperation(value = "검색어에 해당하는 플레이리스트 목록을 리턴합니다.",
+            notes = "검색어에 해당하는 플레이리스트 목록을 리턴합니다.\n" +
+                    "order 에는 'relevance', 'date'가 올 수 있습니다.")
     public ResponseEntity searchPlaylistSimple(@RequestParam(value = "keyword") String keyword,
                                                @RequestParam(value = "order") String order,
                                                @PageableDefault(size = 1000) Pageable pageable,
@@ -320,6 +344,7 @@ public class PlaylistApiController {
      * @return
      */
     @GetMapping("/playlist/category/{categoryKeyword}")
+    @ApiOperation(value = "카데고리 키워드에 해당하는 플레이리스트 목록을 반환합니다.", notes = "무야호")
     public ResponseEntity categoryPlaylist(@PathVariable("categoryKeyword") String categoryKeyword,
                                            @PageableDefault(size = 50, sort ="id",  direction = Sort.Direction.DESC) Pageable pageable,
                                            HttpServletRequest request) {
@@ -357,6 +382,7 @@ public class PlaylistApiController {
      * 반환 코드 : 200, 204, 404
      */
     @GetMapping("/playlist/{playlistId}/comment")
+    @ApiOperation(value = "플레이리스트의 댓글 목록을 리턴합니다.", notes = "playlistId에 해당하는 플레이리스트 목록을 리턴합니다.")
     public ResponseEntity<List<PlaylistCommentDto>> getCommentList(@PathVariable("playlistId") Long playlistId)
     {
 
@@ -380,6 +406,7 @@ public class PlaylistApiController {
      *반환 코드 : 201, 403, 404
      */
     @PostMapping("/playlist/{playlistId}/comment")
+    @ApiOperation(value = "플레이리스트의 댓글을 작성합니다.", notes = "playlistId에 해당하는 플레이리스트 댓글을 작성합니다.")
     public ResponseEntity<?> addComment(@RequestHeader(value = "Authorization") String token,
                                         @PathVariable("playlistId") Long playlistId,
                                         @RequestBody PlaylistComment playlistComment){
@@ -405,6 +432,7 @@ public class PlaylistApiController {
      * 반환 코드 : 200, 401, 403, 404
      */
     @PutMapping("/playlist/{commentId}/comment")
+    @ApiOperation(value = "플레이리스트의 댓글을 수정합니다.", notes = "playlistId에 해당하는 플레이리스트 댓글을 수정합니다.")
     public ResponseEntity<?> updateComment(@RequestHeader(value = "Authorization") String token,
                                            @PathVariable("commentId") Long commentId,
                                            @RequestBody PlaylistComment playlistComment){
@@ -433,6 +461,7 @@ public class PlaylistApiController {
      * 반환 코드 : 200, 401, 403, 404
      */
     @DeleteMapping("/playlist/{commentId}/comment")
+    @ApiOperation(value = "플레이리스트의 댓글을 삭제합니다.", notes = "playlistId에 해당하는 플레이리스트 댓글을 삭제합니다.")
     public ResponseEntity<?> deleteComment(@RequestHeader(value = "Authorization") String token,
                                            @PathVariable("commentId") Long commentId){
 
@@ -459,6 +488,7 @@ public class PlaylistApiController {
      * 반환 코드 : 200, 403, 404
      */
     @GetMapping("/playlist/likes")
+    @ApiOperation(value = "사용자가 좋아요 누른 플레이리스트의 목록을 리턴합니다.", notes = "사용자가 좋아요 누른 플레이리스트의 목록을 리턴합니다.")
     public ResponseEntity<?> getPlaylistLiked(@RequestHeader(value = "Authorization") String token)
     {
         if (!jwtTokenProvider.validateToken(token)) {

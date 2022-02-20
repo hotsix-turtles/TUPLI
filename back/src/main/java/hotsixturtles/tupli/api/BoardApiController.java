@@ -1,16 +1,15 @@
 package hotsixturtles.tupli.api;
 
+import hotsixturtles.tupli.dto.CommentDto;
 import hotsixturtles.tupli.dto.PlayroomDto;
 import hotsixturtles.tupli.dto.request.BoardRequestDto;
 import hotsixturtles.tupli.dto.response.BoardResponseDto;
 import hotsixturtles.tupli.dto.response.ErrorResponse;
 import hotsixturtles.tupli.dto.simple.SimpleBadgeDto;
+import hotsixturtles.tupli.dto.simple.SimpleCommentDto;
 import hotsixturtles.tupli.entity.*;
 import hotsixturtles.tupli.entity.likes.BoardLikes;
-import hotsixturtles.tupli.service.BadgeService;
-import hotsixturtles.tupli.service.BoardService;
-import hotsixturtles.tupli.service.UserInfoService;
-import hotsixturtles.tupli.service.UserService;
+import hotsixturtles.tupli.service.*;
 import hotsixturtles.tupli.service.token.JwtTokenProvider;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -50,6 +49,8 @@ public class BoardApiController {
 
     private final UserService userService;
 
+    private final CommentService commentService;
+
 
     /**
      * 내가 작성한 게시글들
@@ -58,6 +59,7 @@ public class BoardApiController {
      * @return
      */
     @GetMapping("/board/my")
+    @ApiOperation(value = "본인이 작성한 게시글 목록을 리턴", notes = "")
     public ResponseEntity getMyBoard(@RequestHeader(value = "Authorization") String token,
                                         @PageableDefault(size = 50, sort ="id",  direction = Sort.Direction.DESC) Pageable pageable){
         // 유저 정보
@@ -79,6 +81,7 @@ public class BoardApiController {
      * 반환 코드 : 200, 204, 404
      */
     @GetMapping("/board/list")
+    @ApiOperation(value = "현재 존재하는 모든 게시글 목록을 리턴", notes = "")
     public ResponseEntity<List<BoardResponseDto>> getBoardList(HttpServletRequest request){
         List<Board> boardList = boardService.getBoardList();
         if (boardList.isEmpty()) {
@@ -104,6 +107,7 @@ public class BoardApiController {
      * 반환 코드 : 200, 404
      */
     @GetMapping("/board/{boardId}")
+    @ApiOperation(value = "boardId에 해당하는 게시글 정보를 리턴", notes = "")
     public ResponseEntity<?> getBoard(@PathVariable("boardId") Long boardId,
                                       HttpServletRequest request){
 
@@ -127,6 +131,7 @@ public class BoardApiController {
      * 반환 코드 : 201, 403, 404
      */
     @PostMapping("/board")
+    @ApiOperation(value = "게시글 작성하기", notes = "")
     public ResponseEntity<?> addBoard(@RequestHeader(value = "Authorization") String token,
                                       @RequestBody BoardRequestDto board){
 
@@ -164,6 +169,7 @@ public class BoardApiController {
      * 반환 코드 : 200, 404
      */
     @PutMapping("/board/{boardId}")
+    @ApiOperation(value = "게시글 수정하기", notes = "")
     public ResponseEntity<?> updateBoard(@RequestHeader(value = "Authorization") String token,
                                          @PathVariable("boardId") Long boardId,
                                          @RequestBody Board board){
@@ -187,6 +193,7 @@ public class BoardApiController {
      * 반환 코드 : 200, 403, 404
      */
     @DeleteMapping("/board/{boardId}")
+    @ApiOperation(value = "boardId에 해당하는 게시글 삭제하기", notes = "")
     public ResponseEntity<?> deleteBoard(@RequestHeader(value = "Authorization") String token, @PathVariable("boardId") Long boardId){
 
         if (!jwtTokenProvider.validateToken(token)) {
@@ -207,8 +214,7 @@ public class BoardApiController {
      * @return
      */
     @GetMapping("/board/{boardId}/like")
-    @ApiOperation(value = "게시글에 좋아요 정보 조회", notes = "유저 정보가 일치하지 않으면 404, '유효하지 않은 토큰입니다' 반환," +
-            "좋아요가 된 상태라면 200, 'ok' 반환, 좋아요가 아닌 상태라면 200, null 반환")
+    @ApiOperation(value = "해당 게시글에 좋아요를 눌렀는지 여부를 리턴", notes = "")
     public ResponseEntity<?> getBoardLike(@ApiParam(value = "auth token")
                                           @RequestHeader(value = "Authorization") String token,
                                           @ApiParam(value = "게시글 id") @PathVariable("boardId") Long boardId) {
@@ -235,8 +241,7 @@ public class BoardApiController {
      * @return
      */
     @PostMapping("/board/{boardId}/like")
-    @ApiOperation(value = "게시글에 좋아요 등록", notes = "유저 정보가 일치하지 않으면 404, '유효하지 않은 토큰입니다' 반환," +
-            "정상 등록 시 200, null 반환")
+    @ApiOperation(value = "해당 게시글에 좋아요 추가하기", notes = "")
     public ResponseEntity<?> addBoardLike(@ApiParam(value = "auth token")
                                           @RequestHeader(value = "Authorization") String token,
                                           @ApiParam(value = "게시글 id") @PathVariable("boardId") Long boardId) {
@@ -258,8 +263,7 @@ public class BoardApiController {
      * @return
      */
     @DeleteMapping("/board/{boardId}/like")
-    @ApiOperation(value = "게시글 좋아요 해제", notes = "유저 정보가 일치하지 않으면 404, '유효하지 않은 토큰입니다' 반환," +
-            "정상 등록 시 200, null 반환")
+    @ApiOperation(value = "해당 게시글에 좋아요를 해제하기", notes = "")
     public ResponseEntity<?> deleteBoardLike(@ApiParam(value = "auth token")
                                              @RequestHeader(value = "Authorization") String token,
                                              @ApiParam(value = "게시글 id") @PathVariable("boardId") Long boardId) {
@@ -281,6 +285,7 @@ public class BoardApiController {
      * * 반환코드 : 200, 403, 404
      */
     @GetMapping("/board/likes")
+    @ApiOperation(value = "본 사용자가 좋아요한 게시글 목록을 리턴", notes = "")
     public ResponseEntity<?> getPlayroomLiked(@RequestHeader(value = "Authorization") String token)
     {
         if (!jwtTokenProvider.validateToken(token)) {
@@ -297,6 +302,111 @@ public class BoardApiController {
         List<BoardResponseDto> result = boards.stream().map(b -> new BoardResponseDto(b,user)).collect(Collectors.toList());
 
         return ResponseEntity.ok().body(result);
+    }
+
+    /**
+     * 게시글의 덧글 리스트 출력
+     * @param boardId
+     * @return List<comment>
+     * 반환 코드 : 200, 204, 404
+     */
+    @GetMapping("/board/{boardId}/comment")
+    @ApiOperation(value = "해당 게시글의 덧글 목록을 리턴", notes = "")
+    public ResponseEntity<List<CommentDto>> getCommentList(@PathVariable("boardId") Long boardId)
+    {
+
+        List<Comment> commentList = commentService.getCommentList(boardId);
+
+        if (commentList.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+        }
+
+        List<CommentDto> result = commentList.stream().map(b -> new CommentDto(b)).collect(Collectors.toList());
+
+        return ResponseEntity.ok().body(result);
+    }
+
+    /**
+     * 게시글 추가하기
+     * @param token
+     * @param boardId
+     * @param comment
+     * @return null
+     *반환 코드 : 201, 403, 404
+     */
+    @PostMapping("/board/{boardId}/comment")
+    @ApiOperation(value = "해당 게시글에 댓글을 작성하기", notes = "")
+    public ResponseEntity<?> addComment(@RequestHeader(value = "Authorization") String token,
+                                        @PathVariable("boardId") Long boardId,
+                                        @RequestBody Comment comment){
+        if (!jwtTokenProvider.validateToken(token)) {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(new ErrorResponse(messageSource.getMessage("error.valid.jwt", null, LocaleContextHolder.getLocale())));
+        }
+
+        Long userSeq = jwtTokenProvider.getUserSeq(token);
+
+        Comment commentResult = commentService.addComment(userSeq, boardId, comment);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(new SimpleCommentDto(commentResult));
+    }
+
+    /**
+     * 게시글 댓글 갱신하기
+     * @param token
+     * @param commentId
+     * @param comment : {content}
+     * @return null
+     * 반환 코드 : 200, 401, 403, 404
+     */
+    @PutMapping("/board/{commentId}/comment")
+    @ApiOperation(value = "댓글 수정하기", notes = "")
+    public ResponseEntity<?> updateComment(@RequestHeader(value = "Authorization") String token,
+                                           @PathVariable("commentId") Long commentId,
+                                           @RequestBody Comment comment){
+
+        if (!jwtTokenProvider.validateToken(token)) {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(new ErrorResponse(messageSource.getMessage("error.valid.jwt", null, LocaleContextHolder.getLocale())));
+        }
+
+        Long userSeq = jwtTokenProvider.getUserSeq(token);
+
+        Comment commentSaved = commentService.updateComment(userSeq, commentId, comment);
+
+        if(commentSaved == null){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(null);
+    }
+
+    /**
+     * 게시글 댓글 지우기
+     * @param token
+     * @param commentId
+     * @return null
+     * 반환 코드 : 200, 401, 403, 404
+     */
+    @DeleteMapping("/board/{commentId}/comment")
+    @ApiOperation(value = "댓글 지우기", notes = "")
+    public ResponseEntity<?> deleteComment(@RequestHeader(value = "Authorization") String token,
+                                           @PathVariable("commentId") Long commentId) {
+
+        if (!jwtTokenProvider.validateToken(token)) {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(new ErrorResponse(messageSource.getMessage("error.valid.jwt", null, LocaleContextHolder.getLocale())));
+        }
+        Long userSeq = jwtTokenProvider.getUserSeq(token);
+
+        Long result = commentService.deleteComment(commentId, userSeq);
+
+        if(result == -1L){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(null);
     }
 
 }

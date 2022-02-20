@@ -41,6 +41,7 @@ public class SimpleHomeBoardDto {
     // 제작 변수
     private Integer likesCnt;
     private String userLikesYN;
+    private Boolean isRecommend;
 
     public SimpleHomeBoardDto(Board board) {
         this.id = board.getId();
@@ -59,10 +60,14 @@ public class SimpleHomeBoardDto {
             this.contents = null;
         }
         else if(this.contentType.equals("playroom")){
-            this.contents = new SimpleHomePlayroomDto(board.getPlayroom());
+            SimpleHomePlayroomDto simplePlayroom = new SimpleHomePlayroomDto(board.getPlayroom());
+            simplePlayroom.setId(null);
+            this.contents = simplePlayroom;
         }
         else if(this.contentType.equals("playlist")){
-            this.contents = new SimpleHomePlaylistDto(board.getPlaylist());
+            SimpleHomePlaylistDto simplePlaylist = new SimpleHomePlaylistDto(board.getPlaylist());
+            simplePlaylist.setId(null);
+            this.contents = simplePlaylist;
         }
 
         // 변수
@@ -87,12 +92,15 @@ public class SimpleHomeBoardDto {
             this.contents = null;
         }
         else if(this.contentType.equals("playroom")){
-            this.contents = new SimpleHomePlayroomDto(board.getPlayroom());
+            SimpleHomePlayroomDto simplePlayroom = new SimpleHomePlayroomDto(board.getPlayroom());
+            simplePlayroom.setId(null);
+            this.contents = simplePlayroom;
         }
         else if(this.contentType.equals("playlist")){
-            this.contents = new SimpleHomePlaylistDto(board.getPlaylist());
+            SimpleHomePlaylistDto simplePlaylist = new SimpleHomePlaylistDto(board.getPlaylist());
+            simplePlaylist.setId(null);
+            this.contents = simplePlaylist;
         }
-
         // 변수
         this.likesCnt = board.getBoardLikes() == null ? 0 : board.getBoardLikes().size();
 

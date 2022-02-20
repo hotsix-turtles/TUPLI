@@ -70,11 +70,7 @@ public class MailSendService {
     }
 
     // 임시 비밀번호
-    public void sendTmpPassword(Long userSeq) {
-        // 유저 찾기
-        User user = userRepository.findByUserSeq(userSeq);
-        String email = user.getEmail();
-
+    public void sendTmpPassword(User user, String email) {
         // 12자리 난수 인증번호 생성
         String tempPass = getKey(12);
 
@@ -92,7 +88,8 @@ public class MailSendService {
                     .append(email)
                     .append("&임시비밀번호=")
                     .append(tempPass)
-                    .append("' target='_blenk'>임시비밀번호 발송</a>")
+                    .append("<p>만약 TUPLI를 이용하지 않았는데 해당 메시지를 받으셨다면</p>")
+                    .append("<p>(hotsixturtles@gmail.com)으로 연락주시길 바랍니다.</p>")
                     .toString());
             sendMail.setFrom("hotsixturtles@gmail.com", "TUPLI");
             sendMail.setTo(email);

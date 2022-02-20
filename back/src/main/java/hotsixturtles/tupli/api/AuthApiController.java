@@ -13,6 +13,7 @@ import hotsixturtles.tupli.service.token.AuthToken;
 import hotsixturtles.tupli.service.token.AuthTokenProvider;
 import hotsixturtles.tupli.service.token.JwtTokenProvider;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -34,7 +35,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/accounts/auth")
 @RequiredArgsConstructor
-@Api(tags = "Auth 회원가입 API")
+@Api(tags = "소셜로그인 API")
 public class AuthApiController {
 
     private final AppProperties appProperties;
@@ -45,6 +46,7 @@ public class AuthApiController {
     private final BadgeService badgeService;
 
     @PostMapping("/login")
+    @ApiOperation(value = "소셜로그인 진행", notes = "")
     public ApiResponse login(
             @RequestBody AuthReqModel authReqModel
     ) {
@@ -75,6 +77,7 @@ public class AuthApiController {
      * @return
      */
     @PutMapping("/login/success")
+    @ApiOperation(value = "소셜로그인 진행 후, 성공했을 시 실행", notes = "Ouath 로그인, 출석체크 뱃지 체크")
     public ResponseEntity<?> getLoginBadge(@RequestHeader(value = "Authorization") String token){
 
         if (!jwtTokenProvider.validateToken(token)) {
@@ -89,8 +92,12 @@ public class AuthApiController {
         List<Long> badges = badgeService.getUserBadgeSeq(userbadges);
         // jwt 토큰 발급
         List<Badge> badgeResult = new ArrayList<>();
-        badgeResult.addAll(badgeService.checkLoginNum(userSeq, badges));
-        badgeResult.addAll(badgeService.checkDaily(userSeq, badges));
+        List<Badge> loginBadges = badgeService.checkLoginNum(userSeq, badges);
+        List<Badge> daliyBadges = badgeService.checkDaily(userSeq, badges);
+        if(loginBadges != null)
+        badgeResult.addAll(loginBadges);
+        if(daliyBadges != null)
+        badgeResult.addAll(daliyBadges);
 
         if(badgeResult == null || badgeResult.size() == 0) return ResponseEntity.ok(null);
         List<SimpleBadgeDto> badgeDtoResult = badgeResult.stream().map(b -> new SimpleBadgeDto(b)).collect(Collectors.toList());

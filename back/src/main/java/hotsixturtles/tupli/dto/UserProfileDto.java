@@ -34,6 +34,8 @@ public class UserProfileDto {
 
     private List<Object> activities;
 
+    private boolean meCheck = false;
+
     // 연결
 //    private List<Board> boards = new ArrayList<>();
 //    private List<Comment> comments = new ArrayList<>();

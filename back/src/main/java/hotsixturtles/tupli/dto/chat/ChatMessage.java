@@ -18,7 +18,7 @@ public class ChatMessage implements Serializable {
 
     // 메시지 타입 : 채팅방 입장, 채팅방 메시지보내기, 채팅방 나가기
     public enum MessageType {
-        ENTER, TALK, QUIT, SYNC, KICK
+        ENTER, TALK, QUIT, SYNC, KICK, KICK_DUP
     }
     private MessageType type; // 메시지 타입
     private String roomId; // 방번호

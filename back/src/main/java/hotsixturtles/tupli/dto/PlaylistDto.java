@@ -1,5 +1,6 @@
 package hotsixturtles.tupli.dto;
 
+import hotsixturtles.tupli.dto.simple.SimplePlaylistDto;
 import hotsixturtles.tupli.dto.simple.SimpleUserDto;
 import hotsixturtles.tupli.dto.simple.SimpleYoutubeVideoDto;
 import hotsixturtles.tupli.entity.Playlist;
@@ -37,6 +38,7 @@ public class PlaylistDto {
     private List<SimpleYoutubeVideoDto> videos;
 
     private Boolean isLiked;
+    private List<SimplePlaylistDto> recommendPlaylists;
 
 
     public PlaylistDto(Playlist playlist) {

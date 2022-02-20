@@ -8,6 +8,7 @@ import hotsixturtles.tupli.entity.likes.PlaylistLikes;
 import hotsixturtles.tupli.entity.likes.PlayroomLikes;
 import lombok.Data;
 
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -26,6 +27,8 @@ public class SimpleHomePlayroomDto {
     private Integer likesCnt;
 
     private SimpleYoutubeVideoDto videos;
+    private OffsetDateTime startTime;
+    private OffsetDateTime endTime;
 
     // 유저 정보
 
@@ -37,6 +40,7 @@ public class SimpleHomePlayroomDto {
     // 특수변수
 //    private List<SimpleUserDto> guest;  // 참여자 정보 다 보내는 버전
     private String userLikesYN;
+    private Boolean isRecommend;
 
     public SimpleHomePlayroomDto(Playroom playroom) {
         this.id = playroom.getId();
@@ -50,7 +54,8 @@ public class SimpleHomePlayroomDto {
         this.nickName = playroom.getUser().getNickname();
         this.userProfileImg = playroom.getUser().getProfileImage();
         this.userFollowersCnt = playroom.getUser().getTo_user() == null ? 0 : playroom.getUser().getTo_user().size();
-
+        this.startTime = playroom.getStartTime();
+        this.endTime = playroom.getEndTime();
         if(playroom.getVideos() == null || playroom.getVideos().size() == 0) this.videos = null;
         else this.videos = new SimpleYoutubeVideoDto(playroom.getVideos().get(0));
     }
@@ -67,6 +72,8 @@ public class SimpleHomePlayroomDto {
             this.nickName = playroom.getUser().getNickname();
             this.userProfileImg = playroom.getUser().getProfileImage();
             this.userFollowersCnt = playroom.getUser().getTo_user() == null ? 0 : playroom.getUser().getTo_user().size();
+            this.startTime = playroom.getStartTime();
+            this.endTime = playroom.getEndTime();
 
             if(playroom.getVideos() == null || playroom.getVideos().size() == 0) this.videos = null;
             else this.videos = new SimpleYoutubeVideoDto(playroom.getVideos().get(0));

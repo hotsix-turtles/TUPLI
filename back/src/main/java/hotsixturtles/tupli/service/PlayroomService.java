@@ -93,6 +93,136 @@ public class PlayroomService {
         playroom.setEndTime(playroomDto.getEndTime());
         playroom.setStartTime(playroomDto.getStartTime());
         playroom.setUserCountMax(playroomDto.getUserCountMax());
+        playroom.setInviteIds(playroomDto.getInviteIds());
+
+        Set<String> categorys = new HashSet<>();
+        // 플레이리스트 비디오 분리하고 저장 + ID만 저장
+        ConcurrentHashMap<Long, List<Long>> playlists = new ConcurrentHashMap<>();
+        ConcurrentHashMap<Integer, Integer> playroomInfo = new ConcurrentHashMap<Integer, Integer>();
+        List<YoutubeVideo> youtubeVideoList = new ArrayList<>();
+        for (Map.Entry<Long, List<String>> entry : playroomDto.getPlaylists().entrySet()) {
+            // 플레이리스트 ID만 저장
+//            playlists.add(entry.getKey());
+            List<Long> playroomPlList = new ArrayList<>();
+
+
+            String image = null;
+
+            // 비디오 저장(플레이리스트 삭제 대비 및 편한 추가 삭제를 위해 DB 별도 저장)
+            for (String videoUrl : entry.getValue()) {
+                YoutubeVideo video = new YoutubeVideo();
+                YoutubeVideo existVideo = youtubeVideoRepository.findFirstByVideoId(videoUrl);
+                // 첫 영상 이미지만 저장 (미리보기용)
+                if (image == null) {
+                    image = existVideo.getThumbnail();
+                    playroom.setImage(image);
+                }
+                video.setPlayroom(playroom);
+                video.copyVideo(existVideo);
+                youtubeVideoRepository.save(video);
+                YoutubeVideo nowVideo = youtubeVideoRepository.findFirstByVideoIdOrderByIdDesc(videoUrl);
+                playroomPlList.add(nowVideo.getId());
+                youtubeVideoList.add(nowVideo);
+
+                // 플레이룸 구성 비디오 정보로 메타 정보 구축
+                Integer categoryId = existVideo.getCategoryId();
+
+                Integer count = playroomInfo.getOrDefault(categoryId, 0);
+                playroomInfo.put(categoryId, count+1);
+
+                // 카테고리에 따른 분류
+                String category = CategoryList.CATEGORY_LIST.getOrDefault(categoryId, "기타");
+                categorys.add(category);
+
+                // 취향 반영
+                Integer tasteScore = tasteInfo.getOrDefault(category, 0);
+                tasteInfo.put(category, tasteScore + TasteScore.SCORE_PLAYROOM_MAKE);
+            }
+            playlists.put(entry.getKey(), playroomPlList);
+
+        }
+        playroom.setPlayroomInfo(playroomInfo);
+        playroom.setPlaylists(playlists);
+
+        // 검색을 위한 Stringify
+        String categorysString = "";
+        for (String category : categorys) {
+            categorysString = categorysString + category + ", ";
+        }
+
+        playroom.setPlayroomCate(categorysString);
+        Playroom nowPlayroom = playroomRepository.save(playroom);
+
+        // 플레이룸 개설 알림 보내기 (초청 유저)
+        for (Long inviteId : playroomDto.getInviteIds()) {
+            notificationService.notiPlayroomMake(userSeq, inviteId, nowPlayroom.getId());
+        }
+
+        // 플레이룸 개설 알림 보내기 (로직짜고, 팔로우한 유저들에게, 유저 설정 부분 만들어지면 그 때 수정)
+        if (false) {
+            List<UserLikes> followers = userService.getFollowers(userSeq);
+            for (UserLikes follower : followers) {
+                notificationService.notiInvite(userSeq, follower.getFromUser().getUserSeq(), nowPlayroom.getId());
+            }
+
+        }
+
+        // 유저 정보 저장
+        userInfo.setTasteInfo(tasteInfo);
+        userInfoRepository.save(userInfo);
+
+        // 유저 취향 분석 후 저장
+        List<String> userTaste = TasteUtil.getTaste(tasteInfo);
+        maker.setTaste(userTaste);
+        userRepository.save(maker);
+
+        HomeInfo homeInfo = new HomeInfo();
+        homeInfo.setType("playroom");
+        homeInfo.setInfoId(nowPlayroom.getId());
+        homeInfo.setUserSeq(userSeq);
+        homeInfoRepository.save(homeInfo);
+
+        return new PlayroomDto(playroom);
+    }
+
+    @Transactional
+    public PlayroomDto updatePlayroom(Long playroomId, RequestPlayroomDto playroomDto, Long userSeq){
+
+        User maker = userRepository.findByUserSeq(userSeq);
+        youtubeVideoRepository.deleteVideos(playroomId);
+
+        // 유저 취향 가져오기
+        UserInfo userInfo = userInfoRepository.findOneByUserSeq(userSeq);
+        ConcurrentHashMap<String, Integer> tasteInfo = userInfo.getTasteInfo();
+
+        Playroom playroom = playroomRepository.findById(playroomId).orElse(null);
+
+        if(playroom == null || !Objects.equals(playroom.getUser().getUserSeq(), userSeq)){
+            return null;
+        }
+
+        if(playroomDto.getTitle() != null){
+            playroom.setTitle(playroomDto.getTitle());
+        }
+        if(playroomDto.getContent() != null){
+            playroom.setContent(playroomDto.getContent());
+        }
+        if(playroomDto.getIsPublic() != null){
+            playroom.setIsPublic(playroomDto.getIsPublic());
+        }
+        if(playroomDto.getTags() != null){
+            playroom.setTags(playroomDto.getTags());
+        }
+        if(playroomDto.getStartTime() != null){
+            playroom.setStartTime(playroomDto.getStartTime());
+        }
+        if(playroomDto.getEndTime() != null){
+            playroom.setEndTime(playroomDto.getEndTime());
+        }
+        if(playroom.getUserCountMax() != null){
+            playroom.setUserCountMax(playroomDto.getUserCountMax());
+        }
+        playroom.setInviteIds(playroomDto.getInviteIds());
 
         // 플레이리스트 비디오 분리하고 저장 + ID만 저장
         ConcurrentHashMap<Long, List<Long>> playlists = new ConcurrentHashMap<>();
@@ -182,20 +312,6 @@ public class PlayroomService {
         playroom.setPlayroomCate(categorysString);
         Playroom nowPlayroom = playroomRepository.save(playroom);
 
-        // 플레이룸 개설 알림 보내기 (초청 유저)
-        for (Long inviteId : playroomDto.getInviteIds()) {
-            notificationService.notiPlayroomMake(userSeq, inviteId, nowPlayroom.getId());
-        }
-
-        // 플레이룸 개설 알림 보내기 (로직짜고, 팔로우한 유저들에게, 유저 설정 부분 만들어지면 그 때 수정)
-        if (false) {
-            List<UserLikes> followers = userService.getFollowers(userSeq);
-            for (UserLikes follower : followers) {
-                notificationService.notiInvite(userSeq, follower.getFromUser().getUserSeq(), nowPlayroom.getId());
-            }
-
-        }
-
         // 유저 정보 저장
         userInfo.setTasteInfo(tasteInfo);
         userInfoRepository.save(userInfo);
@@ -205,35 +321,7 @@ public class PlayroomService {
         maker.setTaste(userTaste);
         userRepository.save(maker);
 
-        HomeInfo homeInfo = new HomeInfo();
-        homeInfo.setType("playroom");
-        homeInfo.setInfoId(nowPlayroom.getId());
-        homeInfo.setUserSeq(userSeq);
-        homeInfoRepository.save(homeInfo);
-
-        return new PlayroomDto(playroom);
-    }
-
-    @Transactional
-    public PlayroomDto updatePlayroom(Long playroomId, RequestPlayroomDto playroomDto, Long userSeq){
-
-        Playroom playroom = playroomRepository.findById(playroomId).orElse(null);
-
-        if(playroom == null || playroom.getUser().getUserSeq() != userSeq){
-            return null;
-        }
-
-        if(playroomDto.getTitle() != null){
-            playroom.setTitle(playroomDto.getTitle());
-        }
-        if(playroomDto.getContent() != null){
-            playroom.setContent(playroomDto.getContent());
-        }
-
-
-        playroomRepository.save(playroom);
-
-        return new PlayroomDto(playroom);
+        return new PlayroomDto(nowPlayroom);
     }
 
     @Transactional
@@ -242,8 +330,10 @@ public class PlayroomService {
         Playroom playroom = playroomRepository.findById(playroomId).orElse(null);
 
         //userSeq == -1L 이면 관리자
-        if(playroom == null || playroom.getUser().getUserSeq() != userSeq || userSeq != -1L){
-            return null;
+        if(userSeq != -1L) {
+            if (playroom == null || !Objects.equals(playroom.getUser().getUserSeq(), userSeq)) {
+                return null;
+            }
         }
 
         playroomRepository.deleteById(playroomId);

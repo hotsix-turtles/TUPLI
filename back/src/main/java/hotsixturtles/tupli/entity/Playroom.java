@@ -40,6 +40,10 @@ public class Playroom {
     @Column(columnDefinition = "json")
     private List<Long> guests = new ArrayList<>();
 
+    @Type(type = "json")
+    @Column(columnDefinition = "json")
+    private List<Long> inviteIds = new ArrayList<>();
+
     private OffsetDateTime startTime;
 
 //    @PrePersist

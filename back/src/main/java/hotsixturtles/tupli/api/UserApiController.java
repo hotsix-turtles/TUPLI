@@ -3,6 +3,7 @@ package hotsixturtles.tupli.api;
 import hotsixturtles.tupli.dto.UserDto;
 import hotsixturtles.tupli.dto.UserProfileDto;
 import hotsixturtles.tupli.dto.UserSettingDto;
+import hotsixturtles.tupli.dto.request.UserSettingRequestDto;
 import hotsixturtles.tupli.dto.response.ErrorResponse;
 import hotsixturtles.tupli.dto.simple.SimpleBadgeDto;
 import hotsixturtles.tupli.dto.simple.SimpleUpdateProfileDto;
@@ -55,7 +56,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@Api(tags = "회원 관리 API")
+@Api(tags = "유저 관련 API")
 public class UserApiController {
 
     private final UserRepository userRepository;
@@ -79,7 +80,7 @@ public class UserApiController {
      * 반환 코드 : 201/ 404
      */
     @PostMapping("/account/signup")
-    @ApiOperation(value = "회원가입", notes = "실패 시 404'이미 있는 아이디입니다' 반환, 성공 시 201 반환")
+    @ApiOperation(value = "회원가입", notes = "")
     public ResponseEntity signup(@ApiParam(value = "email, username, nickname, password를 받습니다.") @Validated @RequestBody CreateUserRequest request,
                                  BindingResult bindingResult) {
 
@@ -117,12 +118,12 @@ public class UserApiController {
     static class CreateUserRequest {
 //        @Size(min=3, max=128, message = "{error.size.username}")
         private String username;
-        @Size(min=3, max=128, message = "{error.size.email}")
-        @Email(message = "{error.format.email}")
-        @Email(message = "{email.notempty}")
+//        @Size(min=3, max=128, message = "{error.size.email}")
+        @Email(message = "{error.format.email}", regexp = "^[\\w!#$%&'*+/=?`{|}~^-]+(?:\\.[\\w!#$%&'*+/=?`{|}~^-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}$")
+        @NotNull(message = "{email.notempty}")
         private String email;
         private String nickname;
-        @Size(min=3, max=128, message = "{error.size.password}")
+        @Size(min=4, max=12, message = "{error.size.password}")
 //        @Length(min=3, max=128, message = "비밀번호 길이 불일치")
         private String password;
         @Size(max = 64) String userId;
@@ -140,7 +141,7 @@ public class UserApiController {
      * @return
      */
     @DeleteMapping("/account/withdraw")
-    @ApiOperation(value = "회원탈퇴", notes = "실행 후 204 반환")
+    @ApiOperation(value = "회원탈퇴", notes = "")
     public ResponseEntity<?> signout(@RequestHeader(value = "Authorization") String token) {
         if (!jwtTokenProvider.validateToken(token)) {
             return ResponseEntity
@@ -161,6 +162,7 @@ public class UserApiController {
      * @return
      */
     @GetMapping("/profile/taste/{userSeq}")
+    @ApiOperation(value = "사용자의 취향 분석 결과 상위 5개를 리턴", notes = "")
     public ResponseEntity profileTaste(@PathVariable("userSeq") Long userSeq) {
         // 해당 유저의 취향 가져가기
         List<String> taste = userService.getProfileTaste(userSeq);
@@ -173,6 +175,7 @@ public class UserApiController {
      * @return
      */
     @GetMapping("/profile/tasteInfo/{userSeq}")
+    @ApiOperation(value = "사용자의 취향 분석 결과 전체를 리턴 ", notes = "")
     public ResponseEntity profileTasteInfo(@PathVariable("userSeq") Long userSeq) {
         // 해당 유저의 취향 가져가기
         ConcurrentHashMap<String, Integer> tasteInfo = userService.getProfileTasteInfo(userSeq);
@@ -187,6 +190,7 @@ public class UserApiController {
      * @return
      */
     @PutMapping("/account/password")
+    @ApiOperation(value = "비밀번호 변경", notes = "")
     public ResponseEntity passwordChange(@RequestHeader(value = "Authorization") String token,
                                          @Validated @RequestBody passwordChangeRequest request,
                                          BindingResult bindingResult) {
@@ -238,6 +242,7 @@ public class UserApiController {
      * @return
      */
     @PutMapping("/account/password/oauth")
+    @ApiOperation(value = "소셜로그인 사용자의 비밀번호 변경", notes = "")
     public ResponseEntity passwordOauthChange(@RequestHeader(value = "Authorization") String token,
                                               @RequestBody passwordOauthChangeRequest request,
                                               BindingResult bindingResult) {
@@ -258,7 +263,7 @@ public class UserApiController {
         User user = jwtTokenProvider.getUser(token);
 
         // Oauth유저 확인
-        if (!request.getPassword().equals("NO_PASS")) {
+        if (!"NO_PASS".equals(user.getPassword())) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(new ErrorResponse(messageSource.getMessage("error.wrong.oauthpassword", null, LocaleContextHolder.getLocale())));
         }
@@ -289,7 +294,7 @@ public class UserApiController {
      * @return
      */
     @PostMapping("/account/login")
-    @ApiOperation(value = "로그인", notes = "실패 시 404'존재하지 않은 유저입니다' 또는 404'잘못된 비밀번호입니다' 반환, 성공 시 token 반환")
+    @ApiOperation(value = "일반 로그인", notes = "")
     public ResponseEntity<?> login(@ApiParam(value = "email, password를 받습니다.") @RequestBody Map<String, String> userInfo) {
         User user = userRepository.findByEmail(userInfo.get("email"));
         if (user == null) {
@@ -330,6 +335,7 @@ public class UserApiController {
      * @return
      */
     @GetMapping("/account/userInfo")
+    @ApiOperation(value = "사용자 프로필정보 리턴", notes = "")
     public ResponseEntity getMyProfile(@RequestHeader(value = "Authorization") String token) {
         try {
             User user = jwtTokenProvider.getUser(token);
@@ -345,6 +351,7 @@ public class UserApiController {
      * @return
      */
     @GetMapping("/account/setting")
+    @ApiOperation(value = "사용자의 설정 리턴", notes = "")
     public ResponseEntity getSetting(@RequestHeader(value = "Authorization") String token) {
         // 인증 및 대상
         if (!jwtTokenProvider.validateToken(token)) {
@@ -366,8 +373,9 @@ public class UserApiController {
      * @return
      */
     @PutMapping("/account/setting")
+    @ApiOperation(value = "사용자의 설정 수정", notes = "")
     public ResponseEntity changeSetting(@RequestHeader(value = "Authorization") String token,
-                                        UserSettingDto userSettingDto) {
+                                        @RequestBody UserSettingRequestDto userSettingDto) {
         // 인증 및 대상
         if (!jwtTokenProvider.validateToken(token)) {
             return ResponseEntity
@@ -375,7 +383,6 @@ public class UserApiController {
                     .body(new ErrorResponse(messageSource.getMessage("error.valid.jwt", null, LocaleContextHolder.getLocale())));
         }
         Long userSeq = jwtTokenProvider.getUserSeq(token);
-
         userSettingService.changeSetting(userSeq, userSettingDto);
 
         return ResponseEntity.ok().body(null);
@@ -388,6 +395,7 @@ public class UserApiController {
      * @return
      */
     @GetMapping("/account/tokenvalidate")
+    @ApiOperation(value = "사용자의 jwt token이 유효한지 체크", notes = "")
     public ResponseEntity<?> checkTokenValidate(HttpServletRequest request){
 
         // 인증 확인후 돌리기
@@ -404,14 +412,26 @@ public class UserApiController {
 
     /**
      * 임시비밀번호 발송
-     * @param userSeq
+     * @param email
      * @return
      */
-    @PutMapping("/account/passwordFind/{userSeq}/nickname/{nickname}")
-    public ResponseEntity passwordFind(@PathVariable("userSeq") Long userSeq,
+    @PutMapping("/account/passwordFind/{email}/nickname/{nickname}")
+    @ApiOperation(value = "비밀번호 변경 시, 임시 비밀번호를 메일로 전송", notes = "")
+    public ResponseEntity passwordFind(@PathVariable("email") String email,
                                        @PathVariable("nickname") String nickname) {
+
+        User user = userRepository.findByEmail(email);
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new ErrorResponse(messageSource.getMessage("error.none.user", null, LocaleContextHolder.getLocale())));
+        }
+        if (user.getNickname() != nickname) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new ErrorResponse(messageSource.getMessage("error.wrong.nickname", null, LocaleContextHolder.getLocale())));
+        }
+
         // 임시 비밀번호
-        mailSendService.sendTmpPassword(userSeq);
+        mailSendService.sendTmpPassword(user, email);
         return ResponseEntity.ok().body(null);
     }
 
@@ -422,6 +442,7 @@ public class UserApiController {
      * @return 
      */
     @GetMapping("/account/profile/{userSeq}")
+    @ApiOperation(value = "유저의 정보를 리턴", notes = "")
     public ResponseEntity getOtherProfile(@PathVariable("userSeq") Long userSeq) {
         User user = userRepository.findByUserSeq(userSeq);
         return ResponseEntity.ok().body(new UserDto(user));
@@ -449,8 +470,7 @@ public class UserApiController {
      * 반환 코드 : 200, 404
      */
     @PutMapping("/profile")
-    @ApiOperation(value = "프로필 내용 변경", notes = "회원정보가 안맞을 시 404'유효하지 않은 토큰입니다' 반환, " +
-            "프로필 사진 업로드에 문제가 있을 경우 404'잘못된 값입니다' 반환, 성공 시 200 반환")
+    @ApiOperation(value = "사용자 프로필 정보 수정", notes = "")
     public ResponseEntity<?> updateProfile(@RequestPart(value = "image", required = false) MultipartFile file,
                                            @RequestPart(value = "introduction", required = false) String introduction,
                                             @RequestPart(value = "nickname", required = false) String nickname,
@@ -495,8 +515,7 @@ public class UserApiController {
      * 내 로그인 정보와 유저의 아이디 받아옴. 내 회원id가 그 회원id를 좋아한다고 해야함. 반환되는건 뱃지반환
      */
     @PostMapping("/account/follow/{userSeq}")
-    @ApiOperation(value = "팔로우 하기", notes = "회원정보가 안맞을 시 404'유효하지 않은 토큰입니다' 반환, " +
-            "정상 실행 시 200 반환")
+    @ApiOperation(value = "유저 팔로우하기", notes = "")
     public ResponseEntity<?> followUser(
             @ApiParam(value = "Authroization 으로 입력된다.")
             @RequestHeader(value = "Authorization") String token,
@@ -519,11 +538,13 @@ public class UserApiController {
             List<Long> badges = badgeService.getUserBadgeSeq(userbadges);
             List<Badge> badgeResult = new ArrayList<>();
 
-            badgeResult.addAll(badgeService.checkFollowees(userSeq, badges));
+            badgeResult = badgeService.checkFollowees(userSeq, badges);
 
-            if(badgeResult.size() == 0) badgeResult = null;
+            if(badgeResult == null || badgeResult.size() == 0) {
+                return ResponseEntity.status(HttpStatus.CREATED).body(null);
+            }
             List<SimpleBadgeDto> badgeDtoResult = badgeResult.stream().map(b -> new SimpleBadgeDto(b)).collect(Collectors.toList());
-            return ResponseEntity.status(HttpStatus.OK).body(badgeDtoResult);
+            return ResponseEntity.status(HttpStatus.CREATED).body(badgeDtoResult);
         }
         // 이미 팔로우 되어있음
         return ResponseEntity.status(HttpStatus.OK).body(null);
@@ -533,8 +554,7 @@ public class UserApiController {
      * 언팔로우 하기
      */
     @DeleteMapping("/account/follow/{userSeq}")
-    @ApiOperation(value = "언팔로우 하기", notes = "회원정보가 안맞을 시 404'유효하지 않은 토큰입니다' 반환, " +
-            "정상 실행 시 200 반환")
+    @ApiOperation(value = "유저 언팔로우 하기", notes = "")
     public ResponseEntity<?> unfollowUser(
             @ApiParam(value = "Authroization 으로 입력된다.")
             @RequestHeader(value = "Authorization") String token,
@@ -560,8 +580,7 @@ public class UserApiController {
      * 팔로우 했는지 여부를 반환하는 함수
      */
     @GetMapping("/account/follow/{userSeq}")
-    @ApiOperation(value = "팔로우 했는지 여부 반환", notes = "회원정보가 안맞을 시 404'유효하지 않은 토큰입니다' 반환, " +
-            "정상 실행 시 200 반환")
+    @ApiOperation(value = "해당 유저를 팔로우했는지, 안했는지 여부를 리턴", notes = "")
     public ResponseEntity<?> getFollowUser(
             @ApiParam(value = "Authroization 으로 입력된다.")
             @RequestHeader(value = "Authorization") String token,
@@ -573,6 +592,9 @@ public class UserApiController {
                             getMessage("error.valid.jwt", null, LocaleContextHolder.getLocale())));
         }
         Long userSeq = jwtTokenProvider.getUserSeq(token);
+        if(userSeq == otherUserSeq){
+            return ResponseEntity.status(HttpStatus.OK).body("me");
+        }
         UserLikes userLikes = userService.getFollow(userSeq, otherUserSeq);
         if (userLikes == null) {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);  // 안했음
@@ -586,8 +608,7 @@ public class UserApiController {
      * @return
      */
     @PostMapping("/account/dislike/{userSeq}")
-    @ApiOperation(value = "싫어요 하기", notes = "회원정보가 안맞을 시 404'유효하지 않은 토큰입니다' 반환, " +
-            "정상 실행 시 200, body에 null 반환")
+    @ApiOperation(value = "사용자 싫어요 하기", notes = "")
     public ResponseEntity<?> dislikeUser(
             @ApiParam(value = "Authroization 으로 입력된다.")
             @RequestHeader(value = "Authorization") String token,
@@ -616,8 +637,7 @@ public class UserApiController {
      * @return
      */
     @DeleteMapping("/account/dislike/{userSeq}")
-    @ApiOperation(value = "싫어요 해제 하기", notes = "회원정보가 안맞을 시 404'유효하지 않은 토큰입니다' 반환, " +
-            "정상 실행 시 200, body에 null 반환")
+    @ApiOperation(value = "사용자 싫어요 해제하기", notes = "")
     public ResponseEntity<?> undoDislikeUser(
             @ApiParam(value = "Authroization 으로 입력된다.")
             @RequestHeader(value = "Authorization") String token,
@@ -642,8 +662,7 @@ public class UserApiController {
      * 싫어요 했는지 여부를 반환하는 함수
      */
     @GetMapping("/account/dislike/{userSeq}")
-    @ApiOperation(value = "싫어요 했는지 여부 반환", notes = "회원정보가 안맞을 시 404'유효하지 않은 토큰입니다' 반환, " +
-            "정상 실행 시 200 반환")
+    @ApiOperation(value = "해당 유저를 싫어요 했는지 여부를 리턴", notes = "")
     public ResponseEntity<?> getDislikeUser(
             @ApiParam(value = "Authroization 으로 입력된다.")
             @RequestHeader(value = "Authorization") String token,
@@ -666,6 +685,7 @@ public class UserApiController {
      * 해당 유저의 팔로워(이 유저를 팔로우 한 사람) 보기
      */
     @GetMapping("/profile/followers/{userSeq}")
+    @ApiOperation(value = "해당 유저의 팔로워 목록을 리턴", notes = "")
     public ResponseEntity<?> getFollowers(
             @ApiParam(value = "auth token")
             @RequestHeader(value = "Authorization") String token,
@@ -690,6 +710,7 @@ public class UserApiController {
      * 해당 유저의 팔로워(이 유저를 팔로우 한 사람) 수 보기
      */
     @GetMapping("/profile/followers/{userSeq}/count")
+    @ApiOperation(value = "해당 유저의 팔로우 목록을 리턴", notes = "")
     public ResponseEntity<?> getFollowers(
             @ApiParam(value = "path로 userSeq가 입력된다.")
             @PathVariable("userSeq") Long userSeq) {
@@ -704,6 +725,7 @@ public class UserApiController {
      * @return
      */
     @GetMapping("/profile/followings/{userSeq}")
+    @ApiOperation(value = "사용자의 팔로우 유저 수 리턴", notes = "")
     public ResponseEntity<?> getMyFollowees(
             @ApiParam(value = "auth token")
             @RequestHeader(value = "Authorization") String token,
@@ -732,6 +754,7 @@ public class UserApiController {
      * @return
      */
     @GetMapping("/profile/cofollowers/{userSeq}")
+    @ApiOperation(value = "사용자와 맞팔로우 하고있는 유저 목록을 리턴", notes = "")
     public ResponseEntity<?> getMyCoFollowers(
             @ApiParam(value = "auth token")
             @RequestHeader(value = "Authorization") String token,
