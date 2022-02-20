@@ -1,47 +1,39 @@
 <template>
   <div>
     <div
-      class="d-flex justify-center mx-4 my-2"
-      style="width: 360px;"
+      class="d-flex justify-center align-center"
+      style="margin-top:5px; margin-bottom:5px;"
     >
-      <div class="d-flex align-center">
-        <div class="d-flex align-center">
-          <div
-            class="d-flex profile-img-medium"
-            @click="goProfile"
-          >
-            <img
-              :src="ImgUrl(following.profileImage)"
-              alt="profile img"
-            >
-          </div>
-          <p
-            class="mb-0 mx-3"
-            @click="goProfile"
-          >
-            {{ following.nickname }}&nbsp;
-          </p>
-        </div>
-        <v-btn
-          v-if="!follow"
-          class="text-center mx-2 white--text"
-          color="#5B5C9D"
-          rounded
-          @click="followBtn"
+      <div
+        class="profile-img-medium"
+        @click="goProfile"
+      >
+        <img
+          :src="ImgUrl(following.profileImage)"
+          alt="profile img"
         >
-          &nbsp;팔로우&nbsp;
-        </v-btn>
-        <v-btn
-          v-else
-          class="text-center mx-2 dark--text"
-          color="#5B5C9D"
-          rounded
-          outlined
-          @click="unfollowBtn"
-        >
-          &nbsp;팔로잉&nbsp;
-        </v-btn>
       </div>
+      <p
+        class="mb-0 mx-3"
+        style="font-size: 14px; width:40%;"
+        @click="goProfile"
+      >
+        {{ following.nickname }}&nbsp;
+      </p>
+      <btn
+        v-if="!follow"
+        class="follow-btn-true"
+        @click="followBtn"
+      >
+        &nbsp;팔로우&nbsp;
+      </btn>
+      <btn
+        v-else
+        class="follow-btn-false"
+        @click="unfollowBtn"
+      >
+        &nbsp;팔로잉&nbsp;
+      </btn>
     </div>
   </div>
 </template>

@@ -98,7 +98,6 @@ export default {
 
   created: function () {
   },
-
   computed: {
     ...mapState(['authToken', 'nickname']),
     today: function () {
@@ -129,7 +128,7 @@ export default {
                   content.onPlay = false
                 }
                 content.playTime = playtimeConverter(content.startTime, content.endTime)
-                content.image = content.videos.thumbnail
+                content.image = content.videos !== null ? content.videos.thumbnail : 'https://storage.googleapis.com/support-forums-api/attachment/thread-76026956-6858996944613458654.png'
                 content.profileImg = content.userProfileImg
                 content.nickname = content.nickName
               }

@@ -1,49 +1,42 @@
 <template>
   <div>
-    <div
-      class="d-flex justify-center mx-4 my-2"
-      style="width: 360px;"
-    >
-      <div class="d-flex align-center">
-        <div
-          class="d-flex align-center"
-          @click="goProfile"
+    <div class="d-flex justify-center align-center mt-2">
+      <div
+        class="profile-img-medium"
+        @click="goProfile"
+      >
+        <img
+          :src="ImgUrl(follower.profileImage)"
+          alt="profile img"
         >
-          <div
-            class="d-flex profile-img-medium"
-          >
-            <img
-              :src="ImgUrl(follower.profileImage)"
-              alt="profile img"
-            >
-          </div>
-          <p
-            class="mb-0 mx-3"
-          >
-            {{ follower.nickname }}&nbsp;
-          </p>
-        </div>
-        <div v-if="!meCheck">
-          <v-btn
-            v-if="!follow"
-            class="text-center mx-2 white--text"
-            color="#5B5C9D"
-            rounded
-            @click="followBtn"
-          >
-            &nbsp;팔로우&nbsp;
-          </v-btn>
-          <v-btn
-            v-else
-            class="text-center mx-2 dark--text"
-            color="#5B5C9D"
-            rounded
-            outlined
-            @click="unfollowBtn"
-          >
-            &nbsp;팔로잉&nbsp;
-          </v-btn>
-        </div>
+      </div>
+      <p
+        class="mb-0 mx-3"
+        style="font-size: 14px; width:40%;"
+        @click="goProfile"
+      >
+        {{ follower.nickname }}&nbsp;
+      </p>
+      <div v-if="!meCheck">
+        <btn
+          v-if="!follow"
+          class="follow-btn-true"
+          @click="followBtn"
+        >
+          &nbsp;팔로우&nbsp;
+        </btn>
+        <btn
+          v-else
+          class="follow-btn-false"
+          @click="unfollowBtn"
+        >
+          &nbsp;팔로잉&nbsp;
+        </btn>
+      </div>
+      <div v-else>
+        <button class="follow-btn-none">
+          프로필
+        </button>
       </div>
     </div>
   </div>

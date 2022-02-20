@@ -39,7 +39,7 @@ export default {
   background-color: #F5F5F5;
   border: solid 1px;
   border-color: #5B5C9D;
-  border-radius: 10%;
+  border-radius: 5px;
   font-size: 14px;
   padding: 3px 3px 3px 3px;
   line-height: 2.2;
