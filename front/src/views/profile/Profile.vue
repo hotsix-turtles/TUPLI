@@ -1,9 +1,17 @@
 <template>
   <v-app>
-    <v-container>
+    <div>
       <div
-        class="d-flex justify-end mt-7 mr-5 pb-5"
+        class="d-flex justify-end mt-5"
       />
+      <v-icon
+        size="20"
+        color="black"
+        class="px-2"
+        @click="$router.go(-1)"
+      >
+        mdi-arrow-left
+      </v-icon>
       <div>
         <div class="d-flex flex-column align-center">
           <img
@@ -11,33 +19,44 @@
             :src="ImgUrl(profile.profileImage)"
             alt=""
           >
-          <h3 class="text-center pt-2 pb-1">
+          <p
+            class="text-center pt-2 pb-1"
+            style="font-weight:700;"
+          >
             {{ profile.nickname }}
-          </h3>
-          <div class="d-flex align-center mt-1">
-            <p class="mb-0">
+          </p>
+          <div class="d-flex align-center">
+            <p class="mt-1 profile-text">
               {{ profile.introduction }}
             </p>
           </div>
         </div>
-        <div class="d-flex justify-center pt-3 mb-3">
+        <div class="d-flex justify-center mt-2 mb-3">
           <div
             class="d-flex mx-3"
             @click="followList"
           >
-            <p class="mr-2">
+            <p class="mr-2 profile-text">
               팔로워
             </p>
-            <p>{{ follower_cnt }}</p>
+            <p class="profile-text">
+              {{ follower_cnt }}
+            </p>
           </div>
           <div
-            class="d-flex mx-3"
+            class="hr-vertical"
+            style="margin-left:2px; margin-right:2px;"
+          />
+          <div
+            class="d-flex mx-3 profile-text"
             @click="followList"
           >
             <p class="mr-2">
               팔로잉
             </p>
-            <p>{{ followingList.length }}</p>
+            <p class="profile-text">
+              {{ followingList.length }}
+            </p>
           </div>
         </div>
         <div class="d-flex justify-center">
@@ -46,6 +65,8 @@
             class="text-center mx-2 white--text"
             color="#5B5C9D"
             rounded
+            style="font-size: 13px; padding: 8px 14px 8px 14px;"
+            small
             @click="followBtn"
           >
             &nbsp;팔로우&nbsp;
@@ -55,6 +76,8 @@
             class="text-center mx-2 dark--text"
             color="#5B5C9D"
             rounded
+            style="font-size: 13px; padding: 8px 14px 8px 14px;"
+            small
             outlined
             @click="unfollowBtn"
           >
@@ -65,15 +88,17 @@
             outlined
             color="#5B5C9D"
             rounded
+            style="font-size: 13px; padding: 8px 14px 8px 14px;"
+            small
             @click="wacthTogether"
           >
             같이 시청하기
           </v-btn>
         </div>
       </div>
-    </v-container>
+    </div>
 
-    <div class="d-flex justify-space-around mt-5">
+    <div class="d-flex justify-space-around mt-1">
       <v-tabs
         centered
         grow

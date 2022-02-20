@@ -495,6 +495,16 @@
       @button-click="errorPromptHandler"
     />
     <normal-dialog
+      title="오류"
+      content-html="입장 정원이 초과되었습니다."
+      max-width="290"
+      :show="isExceedUserCountError"
+      :buttons="[{name: '확인'}]"
+      button-spacing
+      persistent
+      @button-click="errorPromptHandler"
+    />
+    <normal-dialog
       content-html="플레이룸을 종료할까요?"
       max-width="290"
       :show="exitPrompt"
@@ -566,6 +576,7 @@ export default {
       isDuplicatedError: false,
       isKickedError: false,
       isKickedDupError: false,
+      isExceedUserCountError: false,
       exitPrompt: false,
       exitTo: null,
       roomPlaytime: null,
@@ -606,7 +617,7 @@ export default {
       return this.roomContent == this.roomReducedContent
     },
     isDialogOpened() {
-      return this.isDuplicatedError || this.isOperationTimeError || this.isNotInvitedError || this.isAuthorChangedInfo
+      return this.isDuplicatedError || this.isOperationTimeError || this.isNotInvitedError || this.isAuthorChangedInfo || this.isExceedUserCountError
     },
     ...mapState([
       'userId',
@@ -830,6 +841,10 @@ export default {
         // 비공개방이고 미초대 유저면
         if (!this.roomPublic && !this.roomInviteIds.find(inviteId => inviteId == this.userId))
           throw 'not-invited';
+
+        // 내가 새로 들어왔는데 방이 이미 꽉 차있다.
+        if (!this.isAuthor && !this.roomGuests.find(roomGuest => roomGuest == this.userId) && this.roomGuests.length >= this.roomUserCountMax)
+          throw 'exceed-user-count'
       } catch (err) {
         console.log(err)
         switch (err) {
@@ -840,6 +855,11 @@ export default {
           return false;
         case 'not-invited':
           this.showErrorNotInvited();
+          this.stopHeartbeat();
+          await this.destroyWsConnector();
+          return false;
+        case 'exceed-user-count':
+          this.showErrorExceedUserCount();
           this.stopHeartbeat();
           await this.destroyWsConnector();
           return false;
@@ -869,6 +889,13 @@ export default {
     },
     hideErrorNotInvited() {
       this.isNotInvitedError = false;
+    },
+    showErrorExceedUserCount() {
+      if (this.isDialogOpened) return;
+      this.isExceedUserCountError = true;
+    },
+    hideErrorExceedUserCount() {
+      this.isExceedUserCountError = false;
     },
     async checkConnection() {
       if (this.$router.currentRoute.name != 'PlayroomDetail') return;
@@ -1242,7 +1269,7 @@ export default {
             }
           },
           {
-            title: '다른 영상 찾기',
+            title: '다른 영상보기',
             link: {
               mobileWebUrl: 'https://tupli.kr/category',
               webUrl: 'https://tupli.kr/category'
@@ -1450,10 +1477,6 @@ iframe {
 }
 
 @media screen and (min-device-aspect-ratio: 1/1) and (orientation: landscape) {
-  body { overflow: hidden; }
-
-  body * { touch-action: none; }
-
   .youtube-player {
     height: 100vh;
     z-index: 2 !important;
@@ -1525,11 +1548,19 @@ iframe {
 
 <style lang="scss" scoped>
 @media screen and (max-device-aspect-ratio: 1/1) and (orientation: portrait) {
+  body { overflow: overflow-y; }
+
+  body * { touch-action: manipulation; }
+
   .fixed-bottom-navbar {
     display: fixed !important;
   }
 }
 @media screen and (min-device-aspect-ratio: 1/1) and (orientation: landscape) {
+  body { overflow: hidden; }
+
+  body * { touch-action: none; }
+
   .fixed-bottom-navbar {
     display: none;
   }
