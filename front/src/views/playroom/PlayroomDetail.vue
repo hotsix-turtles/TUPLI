@@ -1269,7 +1269,7 @@ export default {
             }
           },
           {
-            title: '다른 영상 찾기',
+            title: '다른 영상보기',
             link: {
               mobileWebUrl: 'https://tupli.kr/category',
               webUrl: 'https://tupli.kr/category'
