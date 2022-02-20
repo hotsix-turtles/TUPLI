@@ -843,7 +843,7 @@ export default {
           throw 'not-invited';
 
         // 내가 새로 들어왔는데 방이 이미 꽉 차있다.
-        if (!this.isAuthor && !this.roomGuests.find(roomGuest => roomGuest == this.userId) && this.roomGuests.length + 1 >= this.roomUserCountMax)
+        if (!this.isAuthor && !this.roomGuests.find(roomGuest => roomGuest == this.userId) && this.roomGuests.length >= this.roomUserCountMax)
           throw 'exceed-user-count'
       } catch (err) {
         console.log(err)
