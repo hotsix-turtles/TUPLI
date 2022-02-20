@@ -1450,10 +1450,6 @@ iframe {
 }
 
 @media screen and (min-device-aspect-ratio: 1/1) and (orientation: landscape) {
-  body { overflow: hidden; }
-
-  body * { touch-action: none; }
-
   .youtube-player {
     height: 100vh;
     z-index: 2 !important;
@@ -1525,11 +1521,19 @@ iframe {
 
 <style lang="scss" scoped>
 @media screen and (max-device-aspect-ratio: 1/1) and (orientation: portrait) {
+  body { overflow: overflow-y; }
+
+  body * { touch-action: manipulation; }
+
   .fixed-bottom-navbar {
     display: fixed !important;
   }
 }
 @media screen and (min-device-aspect-ratio: 1/1) and (orientation: landscape) {
+  body { overflow: hidden; }
+
+  body * { touch-action: none; }
+
   .fixed-bottom-navbar {
     display: none;
   }
