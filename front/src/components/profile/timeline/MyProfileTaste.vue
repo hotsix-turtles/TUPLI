@@ -39,7 +39,7 @@
           v-else
           class="pl-7"
         >
-          <span>튜플리에 더 자주 방문해주세요. <br>기분 좋은 선물을 드릴게요.</span>
+          <span style="font-size:13px; line-height:120%;">튜플리에 더 자주 방문해주세요. <br>기분 좋은 선물을 드릴게요.</span>
         </div>
       </div>
     </div>

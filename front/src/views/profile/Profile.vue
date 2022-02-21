@@ -118,6 +118,7 @@
           <profile-taste
             class="pt-4"
             :tastes="tastes"
+            :badges="badges"
             :nickname="nickname"
             :user-id="userId"
           />
@@ -164,12 +165,13 @@ export default {
     }
   },
   computed: {
-    ...mapState(['authToken', 'userId', 'following', 'followers'])
+    ...mapState(['authToken', 'following', 'followers'])
   },
   created: function() {
     console.log('타인 프로필 조회', this.$route.params.userId)
     console.log('타인 프로필 조회', this.profile)
     this.followState()
+    this.getBadge()
   },
   methods: {
     ...mapActions('account', ['follow', 'unfollow', 'getAccounts']),
@@ -190,11 +192,12 @@ export default {
             console.log('성공적 프로필', res.data)
             this.profile = res.data
             this.activities.push(...res.data.activities)
+            this.userId = res.data.userSeq
             this.tastes = res.data.userInfo.tasteInfo
             this.nickname = res.data.nickname
             this.follower_cnt = res.data.from_user.length
             this.followingList = res.data.to_user
-            console.log('취향', this.followerList)
+            console.log('userId', this.userId)
             $state.loaded()
           } else if (res.data.activities.length) {
             this.page++
@@ -279,6 +282,18 @@ export default {
     ImgUrl: function(img) {
       return getImage(img)
     },
+
+    // 뱃지 획득
+    getBadge: function() {
+      axiosConnector.get(`/badge/list/${this.userId}`)
+        .then((res) => {
+          this.badges = res.data
+        })
+        .catch((err) => {
+          console.log('에러', err)
+        })
+    },
+
   },
 
 }

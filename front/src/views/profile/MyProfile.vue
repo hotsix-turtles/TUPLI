@@ -236,7 +236,7 @@ export default {
         .then((res) => {
           // console.log('뱃지 획득', res.data, typeof(res.data))
           this.badges = res.data
-          // console.log('뱃지 획득2', this.badges, typeof(this.badges))
+          console.log('뱃지 획득2', this.badges, typeof(this.badges))
 
         })
         .catch((err) => {
