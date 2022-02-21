@@ -90,7 +90,8 @@ public class PlayroomRepositoryImpl implements PlayroomRepositoryCustom{
         JPAQuery<Playroom> query = jpaQueryFactory
                 .selectFrom(playroom)
                 .offset(pageable.getOffset())
-                .limit(pageable.getPageSize());
+                .limit(pageable.getPageSize())
+                .orderBy(playroom.likesCnt.desc());
 
         for (Sort.Order o : pageable.getSort()) {
             PathBuilder pathBuilder = new PathBuilder(playroom.getType(), playroom.getMetadata());
