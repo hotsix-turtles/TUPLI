@@ -29,4 +29,8 @@ public interface YoutubeVideoRepository extends JpaRepository<YoutubeVideo, Long
     @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("delete from YoutubeVideo y where y.playroom.id = :playroomId")
     void deleteVideos(@Param("playroomId") Long playroomId);
+
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("delete from YoutubeVideo y where y.playlist.id = :playlistId")
+    void deletePlaylistVideos(@Param("playlistId") Long playlistId);
 }
