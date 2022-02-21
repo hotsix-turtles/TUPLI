@@ -11,7 +11,7 @@
   >
     <v-card
       class="tupli-dialog-alert ml-3"
-      style="position: absolute; left: 0; bottom: 0; margin-bottom: 70px; width: 390px; padding: 0px 0px;"
+      style="position: absolute; left: 0; bottom: 0; margin-bottom: 70px; width: 330px; padding: 0px 0px;"
       @click="fireTimeout"
     >
       <v-progress-linear
@@ -169,7 +169,7 @@ export default {
 <style lang="scss" scoped>
 .tupli-dialog-alert {
   background-color: #F1F1F4;
-  border: solid 1px #5B5C9D;
+  border: solid 1.3px #5B5C9D;
   border-radius: 12px;
 }
 
