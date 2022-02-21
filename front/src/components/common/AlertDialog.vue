@@ -10,8 +10,8 @@
     class="tupli-dialog-alert"
   >
     <v-card
-      class="tupli-dialog-alert ml-2"
-      style="position: absolute; left: 0; bottom: 0; margin-bottom: 80px; width: 340px;"
+      class="tupli-dialog-alert ml-3"
+      style="position: absolute; left: 0; bottom: 0; margin-bottom: 70px; width: 390px; padding: 0px 0px;"
       @click="fireTimeout"
     >
       <v-progress-linear
@@ -21,7 +21,7 @@
         color="accent"
       />
       <v-card-title
-        class="tupli-dialog-alert-title"
+        class="tupli-dialog-alert-title pt-3"
       >
         {{ title }}
       </v-card-title>
@@ -168,12 +168,14 @@ export default {
 
 <style lang="scss" scoped>
 .tupli-dialog-alert {
-  background-color: #5B5C9D;
+  background-color: #F1F1F4;
+  border: solid 1px #5B5C9D;
+  border-radius: 12px;
 }
 
 .tupli-dialog-alert-title {
-  color: white;
-  font-size: 15px !important;
+  color: black;
+  font-size: 14px !important;
   margin-right: 20px;
 }
 
