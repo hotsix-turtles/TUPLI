@@ -138,7 +138,7 @@
       >
         <div
           class="d-flex align-center"
-          style="width:96%;"
+          style="width:100%;"
         >
           <img
             style="margin: 10px;"
