@@ -69,7 +69,7 @@ public class Playroom {
     @JoinColumn(name = "user_id")
     private User user;  // 방제작자, 방장, 싱크조절자.
 
-    @OneToMany(mappedBy = "playroom")
+    @OneToMany(mappedBy = "playroom", cascade = {CascadeType.ALL})
     private List<PlayroomLikes> playroomLikes = new ArrayList<>();
 
     @OneToMany(mappedBy = "playroom", cascade = {CascadeType.ALL})

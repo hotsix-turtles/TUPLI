@@ -52,7 +52,8 @@ public class PlaylistRepositoryImpl implements PlaylistRepositoryCustom{
         JPAQuery<Playlist> query = jpaQueryFactory
                 .selectFrom(playlist)
                 .offset(pageable.getOffset())
-                .limit(pageable.getPageSize());
+                .limit(pageable.getPageSize())
+                .orderBy(playlist.likesCnt.desc());
 
         for (Sort.Order o : pageable.getSort()) {
             PathBuilder pathBuilder = new PathBuilder(playlist.getType(), playlist.getMetadata());
