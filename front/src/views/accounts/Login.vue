@@ -187,7 +187,7 @@ export default {
         this.$router.push({ name: 'Home' })
       } else if (status == 404) {
         this.isAccountNotFoundError = true;
-      }login-dialog
+      }
     },
     ...mapActions([
       'login',
