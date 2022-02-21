@@ -7,6 +7,7 @@
     :persistent="persistent"
     hide-overlay
     style="position: fixed; left: 0; bottom: 0;"
+    class="tupli-dialog-alert"
   >
     <v-card
       class="tupli-dialog-alert ml-2"
@@ -166,8 +167,12 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.tupli-dialog-alert {
+  background-color: #5B5C9D;
+}
+
 .tupli-dialog-alert-title {
-  color: $color-main;
+  color: white;
   font-size: 15px !important;
   margin-right: 20px;
 }
