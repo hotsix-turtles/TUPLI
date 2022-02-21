@@ -63,10 +63,10 @@ public class Playlist {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @OneToMany(mappedBy = "playlist")
+    @OneToMany(mappedBy = "playlist", cascade = CascadeType.ALL)
     private List<PlaylistLikes> playlistLikes = new ArrayList<>();
 
-    @OneToMany(mappedBy = "playlist")//,  cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "playlist",  cascade = CascadeType.ALL)
     private List<YoutubeVideo> youtubeVideos = new ArrayList<>();
 
     @OneToMany(mappedBy = "playlist", cascade = {CascadeType.REMOVE})
