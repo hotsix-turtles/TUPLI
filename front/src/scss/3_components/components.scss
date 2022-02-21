@@ -755,7 +755,7 @@
   font-weight: 400;
   font-stretch: normal;
   font-style: normal;
-  line-height: normal;
+  line-height: 120%;
   letter-spacing: normal;
   text-align: left;
   margin-top: 16px;
@@ -897,6 +897,7 @@
   border-radius: 8px;
   border: solid 1px;
   border-color: $color-sub2;
+  line-height: 120%;
   margin-top: 8px;
   margin-bottom: 8px;
   padding: 6px 10px;
@@ -917,13 +918,15 @@
   width: 90%;
   margin-bottom: 5px;
   padding-left: 8px;
+  line-height: 120%;
+
 
   span {
   font-size: 14px;
   font-weight: 500;
   font-stretch: normal;
   font-style: normal;
-  line-height: normal;
+  line-height: 120%;
   letter-spacing: normal;
   text-align: left;
   }
