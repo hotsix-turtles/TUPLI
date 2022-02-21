@@ -48,7 +48,7 @@ export default {
   methods: {
     // 뱃지 획득
     getBadge: function() {
-      axiosConnector.get(`/badge/list/${this.$route.params.userSeq}`)
+      axiosConnector.get(`/badge/list/${this.userId}`)
         .then((res) => {
           this.badges = res.data.badgeSeq
         })
