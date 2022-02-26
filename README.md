@@ -3,7 +3,7 @@
 ![타이틀이미지](https://user-images.githubusercontent.com/55949647/154088644-8ae7ec32-04bb-4fc3-810a-c2111ec2afb8.png)
 
 
-## TUPLI 링크 : [https://tupli.kr](https://tupli.kr/api/v1/swagger-ui/index.html#/)
+## TUPLI 링크 : [https://tupli.kr](https://tupli.kr/)
 ## 소개 영상 보기 : [UCC 링크](https://youtu.be/WU3tIIOS0Ec)
 
 ## 💜 프로젝트 진행 기간
