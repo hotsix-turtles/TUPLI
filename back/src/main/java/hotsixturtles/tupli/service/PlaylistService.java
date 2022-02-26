@@ -189,9 +189,7 @@ public class PlaylistService {
             // 연결 (제작자가 바뀌지는 않을테니 pass)
 
             // Video 기존 정보 삭제 & 초기화 (이유 : 1. ID, 2. 연결 부분 해제시의 오류)
-            for (YoutubeVideo youtubeVideo : playlistUpdate.getYoutubeVideos()) {
-                youtubeVideoRepository.delete(youtubeVideo);
-            }
+                youtubeVideoRepository.deletePlaylistVideos(playlistId);
 
             // 카테고리 정보 담을 Set
             Set<String> categorys = new HashSet<>();

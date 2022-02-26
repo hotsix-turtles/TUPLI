@@ -233,7 +233,7 @@
             class="mx-3 history-board-content-new"
             style=""
           >
-            <span>{{ activity.content }}</span>
+            <span class="">{{ activity.content }}</span>
           </div>
 
           <!-- 공유한 게시물이 있을 때 - 플레이룸 -->
@@ -306,9 +306,9 @@
               <div class="d-flex justify-center history-playlist-content">
                 <!-- 플레이리스트 -->
                 <div
-                  class="mt-4"
+                  class="mt-3"
                 >
-                  <div class="d-flex align-center ml-6">
+                  <div class="d-flex align-center pl-8">
                     <div class="profile-img-small-history">
                       <img
                         :src="ImgUrl(activity.contents.userProfileImg)"
@@ -323,7 +323,7 @@
                   >
                     <div
                       id="case"
-                      class="mx-3 mt-2"
+                      class="mx-3 mt-3"
                       @click="goPlaylist"
                     >
                       <img
@@ -341,7 +341,7 @@
                   >
                     <div class="d-flex flex-column align-start">
                       <span
-                        style="font-size: 16px; font-weight: 600; text-align: left;"
+                        style="font-size: 14px; font-weight: 600; text-align: left; line-height:120%;"
                         @click="goPlaylist"
                       >
                         {{ activity.contents.videos.title }}

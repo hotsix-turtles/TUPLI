@@ -1,29 +1,39 @@
 <template>
   <div>
     <div
-      class="d-flex justify-center mx-4 my-2"
-      style="width: 360px;"
+      class="d-flex justify-center align-center"
+      style="margin-top:5px; margin-bottom:5px;"
     >
-      <div class="d-flex align-center">
-        <div class="d-flex align-center">
-          <div
-            class="d-flex profile-img-medium"
-            @click="goProfile"
-          >
-            <img
-              :src="ImgUrl(follower.profileImage)"
-              alt="profile img"
-            >
-          </div>
-          <p
-            class="mb-0 mx-3"
-            @click="goProfile"
-          >
-            {{ follower.nickname }}&nbsp;
-          </p>
-        </div>
-        <v-btn>팔로잉</v-btn>
+      <div
+        class="profile-img-medium"
+        @click="goProfile"
+      >
+        <img
+          :src="ImgUrl(follower.profileImage)"
+          alt="profile img"
+        >
       </div>
+      <p
+        class="mb-0 mx-3"
+        style="font-size: 14px; width:40%;"
+        @click="goProfile"
+      >
+        {{ follower.nickname }}&nbsp;
+      </p>
+      <btn
+        v-if="!follow"
+        class="follow-btn-true"
+        @click="followBtn"
+      >
+        &nbsp;팔로우&nbsp;
+      </btn>
+      <btn
+        v-else
+        class="follow-btn-false"
+        @click="unfollowBtn"
+      >
+        &nbsp;팔로잉&nbsp;
+      </btn>
     </div>
   </div>
 </template>

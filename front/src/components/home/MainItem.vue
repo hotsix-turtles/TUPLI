@@ -2,7 +2,7 @@
   <div>
     <!-- 플레이룸 -->
     <div v-if="content.type == 'playroom'">
-      <playroom-item-big :playroom="content" />
+      <playroom-item-big-main :playroom="content" />
       <div class="border-line" />
     </div>
 
@@ -25,7 +25,7 @@
       </span>
       <!-- playlist 정보 -->
       <div
-        class="d-flex flex-column justify-center mt-2"
+        class="d-flex justify-space-between mt-2"
         style="width:100%;"
       >
         <!-- playlist 정보 -->
@@ -36,6 +36,7 @@
             alt="프로필 사진"
             @click="setProfile"
           >
+
           <div
             class="d-flex flex-column align-start"
             style="width:60%"
@@ -53,7 +54,7 @@
               {{ content.title }}
             </p>
             <p
-              class="mb-0 main-username"
+              class="main-username"
               @click="setProfile"
             >
               {{ content.nickName }}
@@ -68,59 +69,59 @@
               </p>
             </div>
           </div>
+        </div>
 
-          <!-- 좋아요/댓글 -->
-          <div class="d-flex mr-5 align-center">
-            <div
-              v-if="content.userLikesYN === 'Y'"
-              class="d-flex flex-column align-center mx-1 animate__animated animate__heartBeat"
-              @click="onClickPlaylistUnlike"
-            >
-              <v-icon color="#5B5C9D">
-                mdi-cards-heart
-              </v-icon>
-              <p class="main-icon-text">
-                {{ content.likesCnt }}
-              </p>
+        <!-- 좋아요/댓글 -->
+        <div class="d-flex mr-3 align-center">
+          <div
+            v-if="content.userLikesYN === 'Y'"
+            class="d-flex flex-column align-center mx-1 animate__animated animate__heartBeat"
+            @click="onClickPlaylistUnlike"
+          >
+            <v-icon color="#5B5C9D">
+              mdi-cards-heart
+            </v-icon>
+            <p class="main-icon-text">
+              {{ content.likesCnt }}
+            </p>
+          </div>
+          <div
+            v-else-if="content.userLikesYN === 'N'"
+            class="d-flex flex-column align-center mx-1"
+            @click="onClickPlaylistLike"
+          >
+            <v-icon color="#000000">
+              mdi-cards-heart-outline
+            </v-icon>
+            <div class="main-icon-text">
+              {{ content.likesCnt }}
             </div>
-            <div
-              v-else-if="content.userLikesYN === 'N'"
-              class="d-flex flex-column align-center mx-1"
-              @click="onClickPlaylistLike"
-            >
-              <v-icon color="#000000">
-                mdi-cards-heart-outline
-              </v-icon>
-              <div class="main-icon-text">
-                {{ content.likesCnt }}
-              </div>
+          </div>
+          <div
+            v-else-if="content.userLikesYN === null"
+            class="d-flex flex-column align-center mx-1"
+            @click="onClickPlaylistLike"
+          >
+            <v-icon color="#000000">
+              mdi-cards-heart-outline
+            </v-icon>
+            <div class="main-icon-text">
+              {{ content.likesCnt }}
             </div>
-            <div
-              v-else-if="content.userLikesYN === null"
-              class="d-flex flex-column align-center mx-1"
-              @click="onClickPlaylistLike"
+          </div>
+          <div
+            class="ml-1"
+            @click="onClickPlaylistComment"
+          >
+            <v-icon
+              color="black"
+              size="22"
             >
-              <v-icon color="#000000">
-                mdi-cards-heart-outline
-              </v-icon>
-              <div class="main-icon-text">
-                {{ content.likesCnt }}
-              </div>
-            </div>
-            <div
-              class="ml-1"
-              @click="onClickPlaylistComment"
-            >
-              <v-icon
-                color="black"
-                size="22"
-              >
-                mdi-comment-outline
-              </v-icon>
-              <p class="main-icon-text">
-                {{ content.commentCnt }}
-              </p>
-            </div>
+              mdi-comment-outline
+            </v-icon>
+            <p class="main-icon-text">
+              {{ content.commentCnt }}
+            </p>
           </div>
         </div>
       </div>
@@ -137,7 +138,7 @@
       >
         <div
           class="d-flex align-center"
-          style="width:96%;"
+          style="width:100%;"
         >
           <img
             style="margin: 10px;"
@@ -235,46 +236,49 @@
                     class="d-flex align-center"
                   >
                     <div
-                      class="d-flex align-center"
-                      style="width: 30px; height: 30px; margin-bottom: 8px;"
+                      class="d-flex justify-start align-center"
+                      style="height: 30px; margin-bottom: 8px;"
                     >
                       <img
                         :src="ImgUrl(content.contents.userProfileImg)"
                         alt="userImg"
-                        style="border-radius: 100%; width: 30px; height: 30px; margin-left: 16px;"
+                        style="border-radius: 100%; width: 30px; height: 30px; margin-left: 5px; margin-right: 5px; border: solid 1px #f1f1f4;"
                       >
-                    </div>
-                    <span
-                      class="history-nickname"
-                      style="margin-left: 22px; margin-bottom: 15px;"
-                    >{{ content.contents.nickName }}</span>
-                  </div>
-
-                  <!-- playlist 썸네일 -->
-                  <img
-                    :src="ImgUrl(content.contents.videos.thumbnail)"
-                    alt="썸네일"
-                    width="390"
-                    height="219"
-                  >
-                  <!-- playroom 정보 -->
-                  <div class="d-flex justify-space-between">
-                    <div class="d-flex flex-column align-start ml-4 txt-2">
                       <span
-                        class="history-content-title"
-                      >
-                        {{ content.contents.videos.title }}
-                      </span>
+                        class="history-nickname"
+                        style="margin-bottom: 6px;"
+                      >{{ content.contents.nickName }}</span>
+                    </div>
+                  </div>
+                </div>
 
-                      <div class="d-flex flex-wrap">
-                        <p
-                          v-for="tag in allBoardTags"
-                          :key="tag.id"
-                          class="mb-0 main-tag"
-                        >
-                          {{ tag }}
-                        </p>
-                      </div>
+                <!-- playlist 썸네일 -->
+                <img
+                  :src="ImgUrl(content.contents.videos.thumbnail)"
+                  alt="썸네일"
+                  width="390"
+                  height="219"
+                  class="mx-auto"
+                >
+
+
+                <!-- playroom 정보 -->
+                <div class="d-flex justify-space-between">
+                  <div class="d-flex flex-column align-start txt-2">
+                    <span
+                      class="history-content-title"
+                    >
+                      {{ content.contents.videos.title }}
+                    </span>
+
+                    <div class="d-flex flex-wrap">
+                      <p
+                        v-for="tag in allBoardTags"
+                        :key="tag.id"
+                        class="mb-0 main-tag"
+                      >
+                        {{ tag }}
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -352,7 +356,7 @@
 <script>
 import axiosConnector from '@/utils/axios-connector.js'
 
-import PlayroomItemBig from '@/components/playroom/PlayroomItemBig.vue'
+import PlayroomItemBigMain from '@/components/playroom/PlayroomItemBigMain.vue'
 import LoginDialog from '@/components/common/LoginDialog.vue'
 import { mapActions, mapState } from 'vuex'
 import { getImage } from '@/utils/utils'
@@ -364,7 +368,7 @@ export default {
   name: 'MainItem',
   components: {
     LoginDialog,
-    PlayroomItemBig,
+    PlayroomItemBigMain,
   },
   props: {
     // eslint-disable-next-line vue/require-default-prop
@@ -393,9 +397,9 @@ export default {
     }),
   },
   created: function() {
-    console.log( '플레이리스트 상세', this.content.playlists )
+    // console.log( '플레이리스트 상세', this.content.playlists )
 
-    console.log('로그인 여부', this.isLogin)
+    // console.log('로그인 여부', this.isLogin)
     // console.log('content like', this.content.likesCnt)
 
     this.getThumbnailImage()
@@ -460,7 +464,7 @@ export default {
         // console.log('플레이리스트 섬네일', this.thumbnailImage)
       }
       else if (this.content.type === 'playroom'){
-        this.thumbnailImage = this.content.videos.thumbnail
+        this.thumbnailImage = this.content.videos !== null ? this.content.videos.thumbnail : '@/assets/no_videos.png'
         // console.log('플레이룸 섬네일', this.thumbnailImage)
       }
       else if (this.content.type === 'board'){

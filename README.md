@@ -3,7 +3,7 @@
 ![타이틀이미지](https://user-images.githubusercontent.com/55949647/154088644-8ae7ec32-04bb-4fc3-810a-c2111ec2afb8.png)
 
 
-## TUPLI 링크 : [https://tupli.kr](https://tupli.kr/api/v1/swagger-ui/index.html#/)
+## TUPLI 링크 : [https://tupli.kr](https://tupli.kr/)
 ## 소개 영상 보기 : [UCC 링크](https://youtu.be/WU3tIIOS0Ec)
 
 ## 💜 프로젝트 진행 기간
@@ -200,7 +200,7 @@ tupli-front
 - [디자인&컨셉기획](./docs/디자인&컨셉기획.md)
 - [스토리보드](./docs/스토리보드.md)
 - [시퀀스다이어그램](./docs/시퀀스다이어그램.md)
-- [아키텍처](./docs/아키텍처.md)
+- [아키텍처](./docs/서비스_아키텍처.md)
 - [와이어프레임](./docs/와이어프레임.md)
 - [컨벤션](./docs/컨벤션.md)
 - [API](./docs/API.md)

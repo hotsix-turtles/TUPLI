@@ -1,6 +1,6 @@
 <template>
   <v-app>
-    <v-container>
+    <div style="padding: 12px 12px 8px 12px">
       <!-- 설정 아이콘 -->
       <div
         class="d-flex justify-end mt-7 mr-5"
@@ -22,53 +22,64 @@
               fab
             >
           </div>
-          <h3 class="text-center pt-2 pb-1">
+          <p
+            class="text-center pt-2 pb-1"
+            style="font-weight:700;"
+          >
             {{ nickname }}
-          </h3>
+          </p>
           <div class="d-flex align-center">
-            <p class="mb-0 mt-1">
+            <p class="mt-1 profile-text">
               {{ introduction }}
             </p>
           </div>
         </div>
         <!-- 팔로우/팔로잉 -->
-        <div class="d-flex justify-center pt-3 mb-3">
+        <div class="d-flex justify-center mt-2 mb-3">
           <div
             class="d-flex mx-3"
             @click="$router.push({ name: 'MyFollow' })"
           >
-            <p class="mr-2">
+            <p class="mr-2 profile-text">
               팔로워
             </p>
-            <p>{{ followerlist.length }}</p>
+            <p class="profile-text">
+              {{ followerlist.length }}
+            </p>
           </div>
           <div
-            style="width: 1px; height: 6px;"
+            class="hr-vertical"
+            style="margin-left:2px; margin-right:2px;"
           />
+
           <div
             class="d-flex mx-3"
             @click="$router.push({ name: 'MyFollow' })"
           >
-            <p class="mr-2">
+            <p class="mr-2 profile-text">
               팔로잉
             </p>
-            <p>{{ followinglist.length }}</p>
+            <p class="profile-text">
+              {{ followinglist.length }}
+            </p>
           </div>
         </div>
         <!-- 프로필 편집 버튼 -->
         <div class="d-flex justify-center">
           <v-btn
-            class="text-center"
+            class="text-center mt-1"
             outlined
             color="#5B5C9D"
             rounded
+            small
+            style="font-size: 13px; padding: 8px 14px 8px 14px;"
             to="/editprofile"
           >
             프로필 편집하기
           </v-btn>
         </div>
       </div>
-    </v-container>
+    </div>
 
     <!-- 유저 활동, 취향 탭 -->
     <div class="d-flex justify-space-around mt-1">
@@ -225,7 +236,7 @@ export default {
         .then((res) => {
           // console.log('뱃지 획득', res.data, typeof(res.data))
           this.badges = res.data
-          // console.log('뱃지 획득2', this.badges, typeof(this.badges))
+          console.log('뱃지 획득2', this.badges, typeof(this.badges))
 
         })
         .catch((err) => {

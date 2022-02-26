@@ -1,7 +1,12 @@
+// 세로 구분선
+.hr-vertical {
+   border: 0.1px solid #cdcdcd; width: 0.1px; height: 14px; align-self: center;
+  }
+
 .back-menu-text {
   font-size: 18px;
   font-weight: 800;
-  padding-left: 4px;;
+  padding-left: 4px;
 }
 
 .dark-background {
@@ -113,25 +118,25 @@
 // 큰 영상용 시청자수/영상길이
 .duration-big {
   position: absolute;
-  bottom: 13px;
+  bottom: 11px;
   right: 5px;
   background-color: rgba($color: #000000, $alpha: 0.6);
   color: white;
   border-radius: 5px;
-  font-size: 16px;
-  padding: 2px 0px 0px 2px;
+  font-size: 12px;
+  padding: 3px 6px 4px 5px;
 }
 
 // 큰 영상용 현재 플레이 여부
 .on-play-big {
   position: absolute;
-  top: 7px;
+  top: 6px;
   left: 5px;
   background-color: red;
   color: white;
   border-radius: 5px;
-  font-size: 13px;
-  padding: 2px;
+  font-size: 12px;
+  padding: 2px 3px 2px 3px;
 }
 
 // 시청자수/영상길이 - 메인
@@ -428,6 +433,11 @@
     }
 }
 
+// 프로필 텍스트
+.profile-text {
+  font-size: 14px;
+}
+
 // 프로필 사진
 .profileImg {
   border-radius: 100%;
@@ -446,7 +456,7 @@
   height: 40px;
 }
 
-// 프로필 사진 Large
+// 프로필 사진 Large - MyProfile에서 사용
 .profile-img-large {
   border-radius: 100%;
   border: solid 1px;
@@ -457,23 +467,23 @@
   margin-bottom: 16px;
   img {
     border-radius: 100%;
-    width: 88px;
-    height: 88px;
+    width: 86px;
+    height: 86px;
   }
 }
 
-// 프로필 사진 Medium7
+// 프로필 사진 Medium7 - follow list에 쓰임
 .profile-img-medium {
   border-radius: 100%;
   border: solid 1px;
   border-color: $color-main;
-  width: 60px;
-  height: 60px;
+  width: 45px;
+  height: 45px;
   align-items: center;
   img {
     border-radius: 100%;
-    width: 60px;
-    height: 60px;
+    width: 43px;
+    height: 43px;
   }
 }
 
@@ -745,7 +755,7 @@
   font-weight: 400;
   font-stretch: normal;
   font-style: normal;
-  line-height: normal;
+  line-height: 120%;
   letter-spacing: normal;
   text-align: left;
   margin-top: 16px;
@@ -765,7 +775,7 @@
 
 // 활동 내역 제목
 .history-content-title {
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 600;
   font-stretch: normal;
   font-style: normal;
@@ -824,23 +834,23 @@
 
 // 활동 플룸 공간
 .main-playroom-content {
-  width: 95%;
+  width: 94%;
   border-radius: 8px;
   border: solid 1px;
   border-color: $color-sub2;
   margin-top: 8px;
   margin-bottom: 8px;
-  padding-bottom: 14px;
+  padding-bottom: 12px;
 
   div {
     width: 100%;
 
-    img {
-      width: 90%;
-      height: auto;
-      margin-left: 5%;
-      margin-bottom: 6px;
-    }
+  }
+  img {
+    width: 96%;
+    height: auto;
+    align-content: center;
+    margin-bottom: 6px;
   }
 }
 
@@ -887,6 +897,7 @@
   border-radius: 8px;
   border: solid 1px;
   border-color: $color-sub2;
+  line-height: 120%;
   margin-top: 8px;
   margin-bottom: 8px;
   padding: 6px 10px;
@@ -907,13 +918,15 @@
   width: 90%;
   margin-bottom: 5px;
   padding-left: 8px;
+  line-height: 120%;
+
 
   span {
   font-size: 14px;
   font-weight: 500;
   font-stretch: normal;
   font-style: normal;
-  line-height: normal;
+  line-height: 120%;
   letter-spacing: normal;
   text-align: left;
   }
@@ -973,3 +986,31 @@
   word-wrap:break-word;
 }
 
+.follow-btn-true {
+  border-radius: 25px;
+  align-content: center;
+  font-size: 13px;
+  padding: 5px 13px 5px 13px;
+  color: white;
+  background-color: #5B5C9D;
+}
+
+.follow-btn-false {
+  border: solid 1px;
+  border-radius: 25px;
+  align-content: center;
+  font-size: 13px;
+  padding: 4px 12px 4px 12px;
+  background-color: white;
+  color: #5B5C9D;
+}
+
+.follow-btn-none {
+  border: solid 1px;
+  border-radius: 25px;
+  align-content: center;
+  font-size: 13px;
+  padding: 5px 13px 5px 13px;
+  background-color: white;
+  color: white;
+}
