@@ -51,10 +51,10 @@
               :rules="emailRules"
               label="이메일을 입력해주세요"
             />
-
             <h3 class="mt-4">
               비밀번호
             </h3>
+
             <v-text-field
               v-model="credentials.password"
               required
