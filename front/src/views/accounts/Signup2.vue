@@ -55,6 +55,7 @@
             <h3 class="mt-4">
               비밀번호
             </h3>
+
             <v-text-field
               v-model="credentials.password"
               required
